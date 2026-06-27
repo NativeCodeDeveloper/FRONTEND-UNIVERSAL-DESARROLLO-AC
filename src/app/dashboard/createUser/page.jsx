@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ShieldCheck, UserPlus, BadgeCheck, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import {
   getAssignableDashboardRoles,
+  getDashboardRoleAccessList,
   getDashboardRoleDescription,
   getDashboardRoleLabel,
 } from "@/lib/dashboard-access";
@@ -72,6 +73,9 @@ export default function CreateUserPage() {
     () => roleOptions.find((option) => option.value === form.role) || roleOptions[0],
     [form.role, roleOptions]
   );
+  const selectedRoleAccess = selectedRoleMeta?.access?.length
+    ? selectedRoleMeta.access
+    : getDashboardRoleAccessList(form.role);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -222,6 +226,21 @@ export default function CreateUserPage() {
                             <div>
                               <p className="text-[13px] font-semibold text-slate-900">{option.label}</p>
                               <p className="mt-1 text-[11px] leading-5 text-slate-500">{option.description}</p>
+                              {option.access?.length ? (
+                                <ul className="mt-2 space-y-1 text-[11px] leading-4 text-slate-500">
+                                  {option.access.slice(0, 4).map((accessItem) => (
+                                    <li key={accessItem} className="flex gap-2">
+                                      <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-cyan-500" />
+                                      <span>{accessItem}</span>
+                                    </li>
+                                  ))}
+                                  {option.access.length > 4 ? (
+                                    <li className="pl-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                                      + {option.access.length - 4} accesos mas
+                                    </li>
+                                  ) : null}
+                                </ul>
+                              ) : null}
                             </div>
                             {isActive ? <BadgeCheck className="mt-0.5 h-4 w-4 text-cyan-600" /> : null}
                           </div>
@@ -282,6 +301,16 @@ export default function CreateUserPage() {
                 <p className="mt-2 text-[12px] leading-6 text-slate-300">
                   {selectedRoleMeta?.description || getDashboardRoleDescription(form.role)}
                 </p>
+                {selectedRoleAccess.length ? (
+                  <ul className="mt-4 space-y-2 border-t border-white/10 pt-4">
+                    {selectedRoleAccess.map((accessItem) => (
+                      <li key={accessItem} className="flex gap-2 text-[12px] leading-5 text-slate-300">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300" />
+                        <span>{accessItem}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
             </div>
 

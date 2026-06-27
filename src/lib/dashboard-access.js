@@ -2,6 +2,8 @@ const DASHBOARD_ROLES = [
   "default",
   "admin",
   "super-usuario-nativecode",
+  "administrador-clinico",
+  "operador-clinico",
   "recepcionista",
   "secretaria",
   "cancelado",
@@ -24,6 +26,43 @@ const routeMatchersByRole = {
     /^\/dashboard$/,
     /^\/dashboard\/no-access$/,
     /^\/dashboard\/createUser$/,
+  ],
+  "administrador-clinico": [
+    /^\/dashboard$/,
+    /^\/dashboard\/no-access$/,
+    /^\/dashboard\/calendario$/,
+    /^\/dashboard\/bloqueosAgenda$/,
+    /^\/dashboard\/AgendaDetalle\/[^/]+$/,
+    /^\/dashboard\/recetaPacientes\/[^/]+$/,
+    /^\/dashboard\/recetaRapida$/,
+    /^\/dashboard\/examenDocumento$/,
+    /^\/dashboard\/presupuestoTratamiento$/,
+    /^\/dashboard\/ingresoProductos$/,
+    /^\/dashboard\/categoriasProductos$/,
+    /^\/dashboard\/subCategorias\/[^/]+$/,
+    /^\/dashboard\/subsubcategoria\/[^/]+$/,
+    /^\/dashboard\/EspecificacionProductos\/[^/]+$/,
+    /^\/dashboard\/profesionales$/,
+    /^\/dashboard\/serviciosAgendamiento$/,
+    /^\/dashboard\/tarifaServicio$/,
+    /^\/dashboard\/examenesClinicos$/,
+    /^\/dashboard\/datosEmpresa$/,
+    /^\/dashboard\/portadaEdit$/,
+    /^\/dashboard\/publicacionesTituloDescripcion$/,
+    /^\/dashboard\/publicaciones$/,
+    /^\/dashboard\/edicionPagina$/,
+  ],
+  "operador-clinico": [
+    /^\/dashboard$/,
+    /^\/dashboard\/no-access$/,
+    /^\/dashboard\/listaPacientes$/,
+    /^\/dashboard\/GestionPaciente$/,
+    /^\/dashboard\/FichaClinica$/,
+    /^\/dashboard\/paciente\/[^/]+$/,
+    /^\/dashboard\/FichasPacientes\/[^/]+$/,
+    /^\/dashboard\/NuevaFicha\/[^/]+$/,
+    /^\/dashboard\/EdicionFicha\/[^/]+$/,
+    /^\/dashboard\/archivosPacientes\/[^/]+$/,
   ],
   recepcionista: [
     /^\/dashboard$/,
@@ -286,7 +325,7 @@ const DASHBOARD_NAV_SECTIONS = [
     id: "capacitaciones",
     title: "CAPACITACIONES",
     items: [
-      { label: "Videos", href: "https://academia.agendaclinicas.cl/dashboard", icon: "academy" },
+      { label: "Videos", href: "https://academia.agendaclinicas.cl/dashboard", icon: "academy", roles: ["administrador-clinico"] },
     ],
   },
   {
@@ -384,54 +423,149 @@ const DASHBOARD_ROLE_DETAILS = {
   "super-usuario-nativecode": {
     label: "Super Usuario NativeCode",
     description: "Puede crear usuarios en Clerk y asignar perfiles del sistema.",
+    access: [
+      "Panel de reservas.",
+      "Creacion de usuarios y asignacion de perfiles.",
+    ],
+  },
+  "administrador-clinico": {
+    label: "Administrador Clinico",
+    description: "Administra la operacion clinica, agenda, documentos, presupuestos, configuracion y contenido web.",
+    access: [
+      "Capacitaciones.",
+      "Panel de reservas.",
+      "Agenda: calendario, reservas y bloqueos.",
+      "Documentos clinicos: receta medica y solicitud de examenes.",
+      "Presupuestos: generar presupuestos, tratamientos disponibles y categorias.",
+      "Configuracion clinica: profesionales, agendas, servicios, tarifas y examenes clinicos.",
+      "Contenido web: datos del sitio, banners, tratamientos destacados y publicaciones.",
+    ],
+  },
+  "operador-clinico": {
+    label: "Operador Clinico",
+    description: "Opera reservas y gestiona pacientes y fichas sin acceso a valores de reserva.",
+    access: [
+      "Panel de reservas con datos de citas, pacientes, profesional, motivo y estado.",
+      "No visualiza el valor/monto ubicado bajo el motivo de la reserva.",
+      "Pacientes y fichas: ver pacientes, registrar pacientes y trabajar fichas clinicas.",
+      "Documentos adjuntos de pacientes desde la ficha.",
+    ],
   },
   recepcionista: {
     label: "Recepcionista",
     description: "Gestiona agenda, pacientes basicos y detalle de reservas.",
+    access: [
+      "Panel de reservas.",
+      "Agenda: calendario, reservas y bloqueos.",
+      "Registro de pacientes y detalle administrativo de reservas.",
+    ],
   },
   secretaria: {
     label: "Secretaria",
     description: "Gestiona agenda y flujo administrativo de reservas.",
+    access: [
+      "Panel de reservas.",
+      "Agenda: calendario, reservas y bloqueos.",
+      "Registro de pacientes y detalle administrativo de reservas.",
+    ],
   },
   cancelado: {
     label: "Cancelado",
     description: "Suscripcion cancelada, acceso suspendido hasta regularizar pagos.",
+    access: [
+      "Pantalla de suscripcion cancelada.",
+    ],
   },
   basico: {
     label: "Basico",
     description: "Acceso clinico y operativo limitado, sin recetas ni examenes.",
+    access: [
+      "Panel de reservas.",
+      "Agenda y bloqueos.",
+      "Pacientes y fichas clinicas.",
+      "Configuracion basica y contenido web.",
+      "Sin recetas medicas ni solicitudes de examenes.",
+    ],
   },
   "centro-estetico": {
     label: "Centro Estetico",
     description: "Base operativa mas catalogo de tratamientos y categorias.",
+    access: [
+      "Panel de reservas.",
+      "Agenda y bloqueos.",
+      "Pacientes y fichas clinicas.",
+      "Contenido web.",
+      "Catalogo de tratamientos y categorias.",
+    ],
   },
   "clinico-medico": {
     label: "Clinico Medico",
     description: "Puede trabajar fichas, recetas medicas y solicitudes de examenes.",
+    access: [
+      "Panel de reservas.",
+      "Agenda y bloqueos.",
+      "Pacientes y fichas clinicas.",
+      "Recetas medicas.",
+      "Solicitudes de examenes.",
+      "Configuracion clinica y contenido web.",
+    ],
   },
   odontologico: {
     label: "Odontologico",
     description: "Incluye flujo clinico con odontograma y catalogo odontologico.",
+    access: [
+      "Panel de reservas.",
+      "Agenda y bloqueos.",
+      "Pacientes y fichas clinicas.",
+      "Recetas medicas y solicitudes de examenes.",
+      "Odontograma.",
+      "Presupuestos, tratamientos disponibles y categorias.",
+    ],
   },
   oftalmologia: {
     label: "Oftalmologia",
     description: "Incluye flujo clinico mas receta de lentes.",
+    access: [
+      "Panel de reservas.",
+      "Agenda y bloqueos.",
+      "Pacientes y fichas clinicas.",
+      "Recetas medicas y solicitudes de examenes.",
+      "Receta de lentes.",
+      "Configuracion clinica y contenido web.",
+    ],
   },
   agenda: {
     label: "Agenda",
     description: "Enfocado en agenda, pacientes y continuidad de fichas.",
+    access: [
+      "Agenda, reservas y bloqueos.",
+      "Pacientes y fichas clinicas.",
+      "Recetas desde ficha del paciente.",
+    ],
   },
   configuracion: {
     label: "Configuracion",
     description: "Mantiene catalogos, contenido y configuraciones maestras.",
+    access: [
+      "Configuracion clinica.",
+      "Plantillas y examenes.",
+      "Tratamientos, categorias y subcategorias.",
+      "Contenido web.",
+    ],
   },
   default: {
     label: "Default",
     description: "Rol por defecto con acceso administrativo completo.",
+    access: [
+      "Acceso administrativo completo.",
+    ],
   },
   unknown: {
     label: "Sin permisos",
     description: "Rol no reconocido por el sistema.",
+    access: [
+      "Sin acceso a modulos protegidos.",
+    ],
   },
 };
 
@@ -482,9 +616,23 @@ function getVisibleDashboardSections(role) {
   return DASHBOARD_NAV_SECTIONS
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => canAccessDashboardPath(role, item.href)),
+      items: section.items.filter((item) => canAccessDashboardNavItem(role, item)),
     }))
     .filter((section) => section.items.length > 0);
+}
+
+function canAccessDashboardNavItem(role, item) {
+  const normalizedRole = normalizeDashboardRole(role);
+
+  if (hasFullDashboardAccess(normalizedRole)) {
+    return true;
+  }
+
+  if (Array.isArray(item.roles)) {
+    return item.roles.includes(normalizedRole);
+  }
+
+  return canAccessDashboardPath(normalizedRole, item.href);
 }
 
 function getDashboardRoleLabel(role) {
@@ -497,6 +645,11 @@ function getDashboardRoleDescription(role) {
   return DASHBOARD_ROLE_DETAILS[normalizedRole]?.description || "";
 }
 
+function getDashboardRoleAccessList(role) {
+  const normalizedRole = normalizeDashboardRole(role);
+  return DASHBOARD_ROLE_DETAILS[normalizedRole]?.access || [];
+}
+
 function getAssignableDashboardRoles() {
   return DASHBOARD_ROLES
     .filter((role) => !["default", "admin"].includes(role))
@@ -504,6 +657,7 @@ function getAssignableDashboardRoles() {
       value: role,
       label: getDashboardRoleLabel(role),
       description: getDashboardRoleDescription(role),
+      access: getDashboardRoleAccessList(role),
     }));
 }
 
@@ -536,7 +690,7 @@ function canAccessOdontograma(role) {
 
 function canAccessRecetasEnFicha(role) {
   const normalizedRole = normalizeDashboardRole(role);
-  return hasFullDashboardAccess(role) || ["clinico-medico", "odontologico", "oftalmologia", "agenda"].includes(normalizedRole);
+  return hasFullDashboardAccess(role) || ["administrador-clinico", "clinico-medico", "odontologico", "oftalmologia", "agenda"].includes(normalizedRole);
 }
 
 function canAccessFichasClinicas(role) {
@@ -551,6 +705,7 @@ export {
   canAccessFichasClinicas,
   canAccessOdontograma,
   canAccessRecetasEnFicha,
+  getDashboardRoleAccessList,
   getDashboardRoleFromClaims,
   getDashboardRoleFromUser,
   getDashboardRoleDescription,

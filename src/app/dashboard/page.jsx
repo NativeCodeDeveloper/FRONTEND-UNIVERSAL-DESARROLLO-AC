@@ -43,6 +43,7 @@ export default function AgendaCitas() {
     const {user, isLoaded} = useUser();
     const dashboardRole = getDashboardRoleFromUser(user);
     const canSeeFichasClinicas = isLoaded && canAccessFichasClinicas(dashboardRole);
+    const canSeeReservationAmounts = isLoaded && dashboardRole !== "operador-clinico";
     const [dataLista, setdataLista] = useState([]);
     const [dataListaBase, setDataListaBase] = useState([]);
     const [nombrePaciente, setnombrePaciente] = useState("");
@@ -616,17 +617,24 @@ export default function AgendaCitas() {
             return toast.error("No hay datos para exportar.");
         }
 
-        const datosExportar = dataLista.map((reserva) => ({
-            "Fecha": formatearFechaDashboard(reserva.fechaInicio),
-            "Hora": formatearHoraDashboard(reserva.horaInicio),
-            "Nombre Paciente": reserva.nombrePaciente || "",
-            "Apellido Paciente": reserva.apellidoPaciente || "",
-            "RUT": reserva.rut || "",
-            "Profesional": obtenerNombreProfesionalReserva(reserva),
-            "Motivo": reserva.motivo_reserva || "",
-            "Monto": reserva.monto_reserva || "",
-            "Estado": reserva.estadoReserva || "",
-        }));
+        const datosExportar = dataLista.map((reserva) => {
+            const fila = {
+                "Fecha": formatearFechaDashboard(reserva.fechaInicio),
+                "Hora": formatearHoraDashboard(reserva.horaInicio),
+                "Nombre Paciente": reserva.nombrePaciente || "",
+                "Apellido Paciente": reserva.apellidoPaciente || "",
+                "RUT": reserva.rut || "",
+                "Profesional": obtenerNombreProfesionalReserva(reserva),
+                "Motivo": reserva.motivo_reserva || "",
+                "Estado": reserva.estadoReserva || "",
+            };
+
+            if (canSeeReservationAmounts) {
+                fila.Monto = reserva.monto_reserva || "";
+            }
+
+            return fila;
+        });
 
         const worksheet = XLSX.utils.json_to_sheet(datosExportar);
         const workbook = XLSX.utils.book_new();
@@ -902,7 +910,9 @@ export default function AgendaCitas() {
                                                 <div>
                                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Motivo de Atención</p>
                                                     <p className="mt-1 text-base font-semibold text-slate-800">{data.motivo_reserva}</p>
-                                                    <p className="mt-0.5 text-[13px] font-bold text-[#6E56CF]">${data.monto_reserva}</p>
+                                                    {canSeeReservationAmounts ? (
+                                                        <p className="mt-0.5 text-[13px] font-bold text-[#6E56CF]">${data.monto_reserva}</p>
+                                                    ) : null}
                                                 </div>
                                                 <div>
                                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Profesional</p>
@@ -965,7 +975,9 @@ export default function AgendaCitas() {
                                                 <TableCell className="py-6">
                                                     <div className="flex flex-col max-w-[180px]">
                                                         <span className="text-[13px] font-semibold text-slate-700 truncate">{reserva.motivo_reserva}</span>
-                                                        <span className="text-[13px] font-bold text-[#6E56CF] mt-0.5">${reserva.monto_reserva}</span>
+                                                        {canSeeReservationAmounts ? (
+                                                            <span className="text-[13px] font-bold text-[#6E56CF] mt-0.5">${reserva.monto_reserva}</span>
+                                                        ) : null}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="py-6 overflow-visible">
