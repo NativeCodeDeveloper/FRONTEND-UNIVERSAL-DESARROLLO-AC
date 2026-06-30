@@ -72,9 +72,19 @@ export default function MobileNav() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
-              Movil
-            </div>
+            {role === "cancelado" ? (
+              <div className="flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-rose-700">Cancelado</span>
+              </div>
+            ) : (
+              <div className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+                Movil
+              </div>
+            )}
             <button
               onClick={() => setOpen((prev) => !prev)}
               className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50"
@@ -119,6 +129,25 @@ export default function MobileNav() {
                 <div className="space-y-3">
                   <div className="h-24 rounded-2xl bg-slate-100 animate-pulse" />
                   <div className="h-24 rounded-2xl bg-slate-100 animate-pulse" />
+                </div>
+              ) : role === "cancelado" ? (
+                <div className="rounded-2xl border border-rose-200 bg-[linear-gradient(135deg,rgba(255,241,242,0.95),rgba(254,226,226,0.88))] p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm">
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 9v4" />
+                        <path d="M12 17h.01" />
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-rose-800">Cuenta suspendida</p>
+                      <p className="mt-0.5 text-[11px] text-rose-600/80">Suscripcion cancelada</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-[12px] leading-[1.5] text-rose-700/90">
+                    Regularice sus pagos para recuperar el acceso al sistema.
+                  </p>
                 </div>
               ) : (
                 sections.map((section) => (
