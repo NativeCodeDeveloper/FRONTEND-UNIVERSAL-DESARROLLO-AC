@@ -8,6 +8,7 @@ declare global {
         | "super-usuario-nativecode"
         | "administrador-clinico"
         | "operador-clinico"
+        | "operador-medico"
         | "recepcionista"
         | "secretaria"
         | "cancelado"
