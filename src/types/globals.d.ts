@@ -9,6 +9,7 @@ declare global {
         | "administrador-clinico"
         | "operador-clinico"
         | "operador-medico"
+        | "operador-odontologico"
         | "recepcionista"
         | "secretaria"
         | "cancelado"

@@ -5,6 +5,7 @@ const DASHBOARD_ROLES = [
   "administrador-clinico",
   "operador-clinico",
   "operador-medico",
+  "operador-odontologico",
   "recepcionista",
   "secretaria",
   "cancelado",
@@ -80,6 +81,26 @@ const routeMatchersByRole = {
     /^\/dashboard\/recetaRapida$/,
     /^\/dashboard\/recetaLentes$/,
     /^\/dashboard\/examenDocumento$/,
+  ],
+  "operador-odontologico": [
+    /^\/dashboard$/,
+    /^\/dashboard\/no-access$/,
+    /^\/dashboard\/listaPacientes$/,
+    /^\/dashboard\/GestionPaciente$/,
+    /^\/dashboard\/FichaClinica$/,
+    /^\/dashboard\/paciente\/[^/]+$/,
+    /^\/dashboard\/FichasPacientes\/[^/]+$/,
+    /^\/dashboard\/NuevaFicha\/[^/]+$/,
+    /^\/dashboard\/EdicionFicha\/[^/]+$/,
+    /^\/dashboard\/archivosPacientes\/[^/]+$/,
+    /^\/dashboard\/recetaPacientes\/[^/]+$/,
+    /^\/dashboard\/recetaRapida$/,
+    /^\/dashboard\/recetaLentes$/,
+    /^\/dashboard\/examenDocumento$/,
+    /^\/dashboard\/odontogramasPaciente\/[^/]+$/,
+    /^\/dashboard\/presupuestoTratamiento$/,
+    /^\/dashboard\/ingresoProductos$/,
+    /^\/dashboard\/categoriasProductos$/,
   ],
   recepcionista: [
     /^\/dashboard$/,
@@ -480,6 +501,18 @@ const DASHBOARD_ROLE_DETAILS = {
       "Sin acceso a odontograma.",
     ],
   },
+  "operador-odontologico": {
+    label: "Operador Odontologico",
+    description: "Gestiona fichas, documentos medicos, odontograma y presupuestos odontologicos.",
+    access: [
+      "Panel de reservas.",
+      "Pacientes y fichas clinicas.",
+      "Nueva ficha, edicion de fichas y documentos adjuntos de pacientes.",
+      "Documentos clinicos: receta medica, receta de lentes y solicitud de examenes.",
+      "Odontograma desde la ficha del paciente.",
+      "Presupuestos: generar presupuesto, tratamientos disponibles y categorias.",
+    ],
+  },
   recepcionista: {
     label: "Recepcionista",
     description: "Gestiona agenda, pacientes basicos y detalle de reservas.",
@@ -714,12 +747,13 @@ function getDashboardRoleFromUser(user) {
 }
 
 function canAccessOdontograma(role) {
-  return hasFullDashboardAccess(role) || normalizeDashboardRole(role) === "odontologico";
+  const normalizedRole = normalizeDashboardRole(role);
+  return hasFullDashboardAccess(role) || ["odontologico", "operador-odontologico"].includes(normalizedRole);
 }
 
 function canAccessRecetasEnFicha(role) {
   const normalizedRole = normalizeDashboardRole(role);
-  return hasFullDashboardAccess(role) || ["administrador-clinico", "operador-medico", "clinico-medico", "odontologico", "oftalmologia", "agenda"].includes(normalizedRole);
+  return hasFullDashboardAccess(role) || ["administrador-clinico", "operador-medico", "operador-odontologico", "clinico-medico", "odontologico", "oftalmologia", "agenda"].includes(normalizedRole);
 }
 
 function canAccessFichasClinicas(role) {
