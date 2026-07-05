@@ -203,7 +203,7 @@ return (
             <div className="space-y-6">
 
                 {/* Formulario de ingreso */}
-                <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
@@ -272,7 +272,7 @@ return (
                 </div>
 
                 {/* Lista de categorias */}
-                <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

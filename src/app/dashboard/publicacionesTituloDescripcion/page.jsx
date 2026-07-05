@@ -277,7 +277,7 @@ export default function PublicacionesTituloDescripcion() {
             <div className="mx-auto w-full max-w-6xl px-6 py-10 space-y-8">
 
                 {/* Header */}
-                <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-sm">
+                <div className="rounded-[32px] border border-slate-200 bg-white/90 p-6 shadow-sm">
                     <div className="flex flex-col gap-1">
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Gestión de contenido</p>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Publicaciones Tratamientos</h1>
@@ -286,7 +286,7 @@ export default function PublicacionesTituloDescripcion() {
                 </div>
 
                 {/* Formulario de creación / edición */}
-                <div ref={formularioRef} className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+                <div ref={formularioRef} className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex flex-col gap-6">
                         <div className="space-y-1">
                             <h2 className="text-base font-semibold text-slate-900">
@@ -374,7 +374,7 @@ export default function PublicacionesTituloDescripcion() {
 
                 {/* Detalle de publicación seleccionada */}
                 {dataPublicacionesEspecifica.length > 0 && (
-                    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
                         <div className="space-y-1">
                             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Detalle de publicación</p>
                         </div>
@@ -413,7 +413,7 @@ export default function PublicacionesTituloDescripcion() {
                 )}
 
                 {/* Listado de publicaciones */}
-                <div className="rounded-[24px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100">
                         <h2 className="text-base font-semibold text-slate-900">Publicaciones existentes</h2>
                         <p className="text-sm text-slate-500 mt-0.5">Selecciona una publicación para ver su detalle.</p>

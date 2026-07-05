@@ -213,7 +213,7 @@ export default function FichasClinicasPlantillas() {
                     <button
                         type="button"
                         onClick={() => setMostrarGuia((prev) => !prev)}
-                        className="group inline-flex w-full items-center justify-between gap-4 rounded-[28px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition-all duration-150 hover:border-slate-300 hover:bg-slate-50/60"
+                        className="group inline-flex w-full items-center justify-between gap-4 rounded-[32px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition-all duration-150 hover:border-slate-300 hover:bg-slate-50/60"
                     >
                         <div className="flex items-center gap-3">
                             <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE] text-[#6E56CF]">
@@ -240,7 +240,7 @@ export default function FichasClinicasPlantillas() {
                     </button>
 
                     {mostrarGuia && (
-                        <div className="mt-3 rounded-[28px] border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+                        <div className="mt-3 rounded-[32px] border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
                             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                                 <div className="max-w-2xl">
                                     <div className="inline-flex items-center gap-2 rounded-lg border border-[#DDD6FE] bg-[#F3F0FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6E56CF]">
@@ -323,7 +323,7 @@ export default function FichasClinicasPlantillas() {
 
                     {/* Empty state */}
                     {plantillas.length === 0 && (
-                        <div className="rounded-[28px] border border-slate-200 bg-white p-10 text-center shadow-sm sm:p-14">
+                        <div className="rounded-[32px] border border-slate-200 bg-white p-10 text-center shadow-sm sm:p-14">
                             <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-[#DDD6FE] bg-[#F3F0FF]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="size-8 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -337,7 +337,7 @@ export default function FichasClinicasPlantillas() {
                     {plantillas.map((plantilla) => (
                         <div
                             key={plantilla.id_plantilla}
-                            className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:border-slate-300"
+                            className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:border-slate-300"
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-4 sm:py-5 gap-4">
 
@@ -407,7 +407,7 @@ export default function FichasClinicasPlantillas() {
                         className="fixed inset-0 bg-slate-950/35"
                         onClick={() => setModalPlantilla(false)}
                     />
-                    <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-xl">
+                    <div className="relative w-full max-w-md overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl">
                         {/* Header */}
                         <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
                             <div>
@@ -479,7 +479,7 @@ export default function FichasClinicasPlantillas() {
                         className="fixed inset-0 bg-slate-950/35"
                         onClick={() => setModalEditarPlantilla(false)}
                     />
-                    <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-xl">
+                    <div className="relative w-full max-w-md overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl">
                         {/* Header */}
                         <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
                             <div>

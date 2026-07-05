@@ -124,102 +124,102 @@ export default function GestionStock() {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-sky-50 text-slate-900 py-10">
+        <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
             <ToasterClient/>
-            <div className="mx-auto max-w-6xl px-4">
-                <header className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-sky-800 to-sky-700">
-                Gestión de Inventario
-              </span>
+            <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
+
+                {/* ── Header ── */}
+                <div className="mb-10">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Tienda</p>
+                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        Gestión de <span className="text-[#6E56CF]">Inventario</span>
                     </h1>
-                    <p className="mt-2 text-sm text-slate-600">
+                    <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                         Administra el stock de tus productos de forma clara y profesional.
                     </p>
-                </header>
-
-                <div className="mb-8">
-                    <div className="flex flex-col md:flex-row items-stretch gap-3">
-                        <div className="relative flex-1">
-                            <input
-                                type="text"
-                                value={productoSimilar}
-                                onChange={(event) => setProductoSimilar(event.target.value)}
-                                placeholder="Buscar por título o palabra clave..."
-                                aria-label="Buscar similitudes de producto"
-                                className="w-full rounded-xl border border-slate-300 bg-white/80 px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100 placeholder:text-slate-400"
-                            />
-                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
-                                {/* simple magnifying glass icon */}
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-                                    <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 104.165 9.33l3.003 3.003a.75.75 0 101.06-1.06l-3.003-3.004A5.5 5.5 0 009 3.5zm-4 5.5a4 4 0 118 0 4 4 0 01-8 0z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={() => buscarProductoSimilar(productoSimilar)}
-                            className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-sky-700 to-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-sky-800 hover:to-sky-700 hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-200"
-                        >
-                            <span className="mr-2 hidden md:inline">Buscar</span>
-                            {/* search icon duplicated for button for consistency */}
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-                                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 104.165 9.33l3.003 3.003a.75.75 0 101.06-1.06l-3.003-3.004A5.5 5.5 0 009 3.5zm-4 5.5a4 4 0 118 0 4 4 0 01-8 0z" clipRule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                    <p className="mt-2 text-xs text-slate-500">Ingresa un término y presiona <span className="font-medium text-slate-700">Buscar</span> para encontrar productos similares.</p>
                 </div>
 
-                <div className="space-y-4">
-                    {productos.map((producto) => (
-                        <div
-                            key={producto.id_producto}
-                            className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm hover:shadow-md transition"
-                        >
+                <div className="grid grid-cols-1 gap-6">
 
-                            <img src={cfToSrc(producto.imagenProducto,)} alt="Producto" className="rounded-2xl h-25 w-25 hidden md:block" />
-
-
-                            <div className="flex flex-col">
-                                <span className="text-[11px] uppercase tracking-wider text-slate-500">Producto</span>
-                                <span className="text-base font-medium text-slate-800">
-                    {producto.tituloProducto}
-                  </span>
-                            </div>
-
-                            <div className="flex items-center gap-6">
-                  <span className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                    Stock: {producto.cantidadStock}
-                  </span>
-
+                    {/* ── Búsqueda ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Búsqueda de Productos</h2>
+                        </div>
+                        <div className="p-4 md:p-8">
+                            <div className="flex flex-col md:flex-row items-stretch gap-3">
                                 <input
-                                    min="0"
-                                    step="1"
-                                    type="number"
-                                    className="w-24 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-800 outline-none transition focus:border-slate-500"
-                                    value={nuevoStock[producto.id_producto] ?? ""}
-                                    onChange={(e) =>
-                                        setNuevoStock((objetoPrevio) => ({
-                                            ...objetoPrevio,
-                                            [producto.id_producto]: e.target.value,
-                                        }))
-                                    }
+                                    type="text"
+                                    value={productoSimilar}
+                                    onChange={(event) => setProductoSimilar(event.target.value)}
+                                    placeholder="Buscar por título o palabra clave..."
+                                    aria-label="Buscar similitudes de producto"
+                                    className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-50 placeholder:text-slate-400"
                                 />
-
                                 <button
-                                    onClick={() =>
-                                        actualizarStock(Number(nuevoStock[producto.id_producto] ?? 0), producto.id_producto)
-                                    }
                                     type="button"
-                                    className="rounded-lg border border-slate-400 bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
+                                    onClick={() => buscarProductoSimilar(productoSimilar)}
+                                    className="h-11 px-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#6E56CF] text-sm font-bold text-white hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100"
                                 >
-                                    Actualizar
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                                        <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 104.165 9.33l3.003 3.003a.75.75 0 101.06-1.06l-3.003-3.004A5.5 5.5 0 009 3.5zm-4 5.5a4 4 0 118 0 4 4 0 01-8 0z" clipRule="evenodd" />
+                                    </svg>
+                                    Buscar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => listarProductos()}
+                                    className="h-11 px-5 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all"
+                                >
+                                    Ver Todos
                                 </button>
                             </div>
                         </div>
-                    ))}
+                    </div>
+
+                    {/* ── Listado de Productos ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Listado de Productos</h2>
+                            <span className="h-5 px-2 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{productos.length}</span>
+                        </div>
+                        <div className="divide-y divide-slate-50">
+                            {productos.map((producto) => (
+                                <div key={producto.id_producto} className="flex items-center gap-4 px-4 py-4 md:px-8 hover:bg-slate-50/50 transition-colors">
+                                    <img src={cfToSrc(producto.imagenProducto)} alt="Producto" className="rounded-xl h-12 w-12 object-cover hidden md:block flex-shrink-0" />
+                                    <div className="flex flex-col flex-1 min-w-0">
+                                        <span className="text-[10px] uppercase tracking-wider text-slate-400">Producto</span>
+                                        <span className="text-[13px] font-bold text-slate-800 truncate">{producto.tituloProducto}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                        <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 hidden sm:block">
+                                            Stock: {producto.cantidadStock}
+                                        </span>
+                                        <input
+                                            min="0"
+                                            step="1"
+                                            type="number"
+                                            className="w-24 h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-[#6E56CF]"
+                                            value={nuevoStock[producto.id_producto] ?? ""}
+                                            onChange={(e) => setNuevoStock((prev) => ({ ...prev, [producto.id_producto]: e.target.value }))}
+                                        />
+                                        <button
+                                            onClick={() => actualizarStock(Number(nuevoStock[producto.id_producto] ?? 0), producto.id_producto)}
+                                            type="button"
+                                            className="h-9 px-4 rounded-xl bg-[#6E56CF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all"
+                                        >
+                                            Actualizar
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {productos.length === 0 && (
+                                <div className="p-12 text-center">
+                                    <p className="text-sm text-slate-400 italic">No se encontraron productos. Usa la búsqueda para encontrar un producto específico.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

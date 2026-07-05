@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { ShieldCheck, UserPlus, BadgeCheck, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import {
   getAssignableDashboardRoles,
-  getDashboardRoleAccessList,
   getDashboardRoleDescription,
   getDashboardRoleLabel,
 } from "@/lib/dashboard-access";
@@ -73,9 +72,6 @@ export default function CreateUserPage() {
     () => roleOptions.find((option) => option.value === form.role) || roleOptions[0],
     [form.role, roleOptions]
   );
-  const selectedRoleAccess = selectedRoleMeta?.access?.length
-    ? selectedRoleMeta.access
-    : getDashboardRoleAccessList(form.role);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -144,39 +140,33 @@ export default function CreateUserPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.10),transparent_28%),radial-gradient(circle_at_top_right,rgba(99,102,241,0.10),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_360px]">
-          <section className="overflow-hidden rounded-[28px] border border-white/70 bg-white/90 shadow-[0_32px_90px_rgba(15,23,42,0.10)] backdrop-blur">
-            <div className="border-b border-slate-200/80 bg-[linear-gradient(135deg,rgba(8,145,178,0.06),rgba(79,70,229,0.08))] px-6 py-6 sm:px-8">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-cyan-100 bg-white/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-700">
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                    Provision de usuarios
-                  </div>
-                  <h1 className="mt-4 text-[28px] font-semibold tracking-[-0.03em] text-slate-950 sm:text-[34px]">
-                    Crear usuarios Clerk con perfil del dashboard
-                  </h1>
-                  <p className="mt-3 max-w-2xl text-[14px] leading-6 text-slate-600">
-                    Este formulario crea el usuario en Clerk usando solo correo y contrasena, y le asigna el perfil en
-                    <code className="mx-1 rounded bg-slate-100 px-1.5 py-0.5 text-[12px] text-slate-700">publicMetadata.role</code>
-                    para que el middleware y el menu respeten sus permisos.
-                  </p>
-                </div>
+    <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
+      <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
 
-                <div className="rounded-3xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                    Perfil seleccionado
-                  </p>
-                  <p className="mt-1 text-[15px] font-semibold text-slate-900">
-                    {selectedRoleMeta?.label || getDashboardRoleLabel(form.role)}
-                  </p>
-                </div>
+        {/* ── Header ── */}
+        <div className="mb-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración del Sistema</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+            Crear <span className="text-[#6E56CF]">Usuario</span>
+          </h1>
+          <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
+            Crea un usuario en Clerk con correo y contraseña, y asígnale un perfil. El rol queda guardado en <code className="mx-0.5 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-700">publicMetadata.role</code> para que el middleware y el menú respeten sus permisos.
+          </p>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_360px] items-start">
+
+          {/* ── Formulario principal ── */}
+          <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+            <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+              <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Datos del nuevo usuario</h2>
+              <div className="h-9 px-4 rounded-xl border border-slate-200 bg-white flex items-center gap-2 shadow-sm">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Perfil:</span>
+                <span className="text-[12px] font-bold text-[#6E56CF]">{selectedRoleMeta?.label || getDashboardRoleLabel(form.role)}</span>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6 sm:px-8">
+            <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6">
               <Field label="Correo electronico" hint="Se usara como email principal del usuario">
                 <Input
                   icon={Mail}
@@ -195,7 +185,6 @@ export default function CreateUserPage() {
                     placeholder="Ingresa una contrasena segura"
                   />
                 </Field>
-
                 <Field label="Confirmar contrasena" hint="Debe coincidir con la anterior">
                   <PasswordInput
                     value={form.confirmPassword}
@@ -206,11 +195,10 @@ export default function CreateUserPage() {
               </div>
 
               <Field label="Perfil del sistema" hint="Este valor se guardara en publicMetadata.role y publicMetadata.rol">
-                <div className="rounded-[26px] border border-slate-200 bg-slate-50/80 p-2">
+                <div className="rounded-[28px] border border-slate-200 bg-slate-50/80 p-2">
                   <div className="grid gap-2 md:grid-cols-2">
                     {roleOptions.map((option) => {
                       const isActive = form.role === option.value;
-
                       return (
                         <button
                           key={option.value}
@@ -218,7 +206,7 @@ export default function CreateUserPage() {
                           onClick={() => updateField("role", option.value)}
                           className={`rounded-2xl border px-4 py-3 text-left transition-all ${
                             isActive
-                              ? "border-cyan-200 bg-white shadow-[0_12px_30px_rgba(8,145,178,0.12)]"
+                              ? "border-violet-200 bg-white shadow-[0_12px_30px_rgba(110,86,207,0.12)]"
                               : "border-transparent bg-transparent hover:border-slate-200 hover:bg-white"
                           }`}
                         >
@@ -226,23 +214,8 @@ export default function CreateUserPage() {
                             <div>
                               <p className="text-[13px] font-semibold text-slate-900">{option.label}</p>
                               <p className="mt-1 text-[11px] leading-5 text-slate-500">{option.description}</p>
-                              {option.access?.length ? (
-                                <ul className="mt-2 space-y-1 text-[11px] leading-4 text-slate-500">
-                                  {option.access.slice(0, 4).map((accessItem) => (
-                                    <li key={accessItem} className="flex gap-2">
-                                      <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-cyan-500" />
-                                      <span>{accessItem}</span>
-                                    </li>
-                                  ))}
-                                  {option.access.length > 4 ? (
-                                    <li className="pl-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                                      + {option.access.length - 4} accesos mas
-                                    </li>
-                                  ) : null}
-                                </ul>
-                              ) : null}
                             </div>
-                            {isActive ? <BadgeCheck className="mt-0.5 h-4 w-4 text-cyan-600" /> : null}
+                            {isActive ? <BadgeCheck className="mt-0.5 h-4 w-4 text-[#6E56CF]" /> : null}
                           </div>
                         </button>
                       );
@@ -252,9 +225,7 @@ export default function CreateUserPage() {
               </Field>
 
               {error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
-                  {error}
-                </div>
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">{error}</div>
               ) : null}
 
               {createdUser ? (
@@ -267,78 +238,64 @@ export default function CreateUserPage() {
                 </div>
               ) : null}
 
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#0891b2,#4f46e5)] px-5 text-[13px] font-semibold text-white shadow-[0_18px_40px_rgba(8,145,178,0.24)] transition-all hover:translate-y-[-1px] hover:shadow-[0_22px_50px_rgba(8,145,178,0.30)] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#6E56CF] px-6 text-[13px] font-bold text-white shadow-lg shadow-indigo-100 transition-all hover:bg-[#5b45bc] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <UserPlus className="h-4 w-4" />
                   {isSubmitting ? "Creando usuario..." : "Crear usuario"}
                 </button>
-
                 <p className="text-[12px] text-slate-500">
                   El acceso final del usuario quedara determinado por el rol seleccionado.
                 </p>
               </div>
             </form>
-          </section>
+          </div>
 
+          {/* ── Panel lateral ── */}
           <aside className="space-y-6">
-            <div className="rounded-[28px] border border-white/70 bg-slate-950 p-6 text-white shadow-[0_28px_70px_rgba(15,23,42,0.22)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                Metadata aplicada
-              </p>
-              <div className="mt-4 rounded-2xl bg-white/5 p-4">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">publicMetadata.role</p>
-                <p className="mt-2 text-[16px] font-semibold text-white">{form.role}</p>
+            <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/30">
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Metadata aplicada</p>
               </div>
-              <div className="mt-3 rounded-2xl bg-white/5 p-4">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Resumen del perfil</p>
-                <p className="mt-2 text-[14px] font-semibold text-white">
-                  {selectedRoleMeta?.label || getDashboardRoleLabel(form.role)}
-                </p>
-                <p className="mt-2 text-[12px] leading-6 text-slate-300">
-                  {selectedRoleMeta?.description || getDashboardRoleDescription(form.role)}
-                </p>
-                {selectedRoleAccess.length ? (
-                  <ul className="mt-4 space-y-2 border-t border-white/10 pt-4">
-                    {selectedRoleAccess.map((accessItem) => (
-                      <li key={accessItem} className="flex gap-2 text-[12px] leading-5 text-slate-300">
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300" />
-                        <span>{accessItem}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
+              <div className="p-6 space-y-3">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">publicMetadata.role</p>
+                  <p className="mt-1.5 text-[15px] font-bold text-[#6E56CF]">{form.role}</p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Resumen del perfil</p>
+                  <p className="mt-1.5 text-[13px] font-bold text-slate-800">
+                    {selectedRoleMeta?.label || getDashboardRoleLabel(form.role)}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-500">
+                    {selectedRoleMeta?.description || getDashboardRoleDescription(form.role)}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-[0_22px_55px_rgba(15,23,42,0.08)]">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Como funciona
-              </p>
-              <div className="mt-4 space-y-4">
+            <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/30">
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Como funciona</p>
+              </div>
+              <div className="p-6 space-y-3">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[13px] font-semibold text-slate-900">1. Clerk crea el usuario</p>
-                  <p className="mt-1 text-[12px] leading-6 text-slate-500">
-                    Se registra correo y contrasena usando el Backend SDK.
-                  </p>
+                  <p className="text-[13px] font-bold text-slate-900">1. Clerk crea el usuario</p>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-500">Se registra correo y contrasena usando el Backend SDK.</p>
                 </div>
-
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[13px] font-semibold text-slate-900">2. Se asigna el perfil</p>
-                  <p className="mt-1 text-[12px] leading-6 text-slate-500">
+                  <p className="text-[13px] font-bold text-slate-900">2. Se asigna el perfil</p>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-500">
                     El rol queda guardado en <span className="font-semibold text-slate-700">publicMetadata.role</span> y{" "}
                     <span className="font-semibold text-slate-700">publicMetadata.rol</span>.
                   </p>
                 </div>
-
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[13px] font-semibold text-slate-900">3. El sistema restringe accesos</p>
-                  <p className="mt-1 text-[12px] leading-6 text-slate-500">
-                    Middleware, sidebar y menu movil usan la misma tabla de permisos del dashboard.
-                  </p>
+                  <p className="text-[13px] font-bold text-slate-900">3. El sistema restringe accesos</p>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-500">Middleware, sidebar y menu movil usan la misma tabla de permisos del dashboard.</p>
                 </div>
               </div>
             </div>

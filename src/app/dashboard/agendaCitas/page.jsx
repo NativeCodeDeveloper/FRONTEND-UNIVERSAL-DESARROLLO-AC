@@ -359,7 +359,7 @@ export default function AgendaCitas() {
                 <div className="grid grid-cols-1 gap-4 md:gap-8">
 
                     {/* ── Filtros Avanzados ── */}
-                    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
                             <div className="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -462,7 +462,7 @@ export default function AgendaCitas() {
                     </div>
 
                     {/* ── Listado de Citas ── */}
-                    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Reservaciones</h2>

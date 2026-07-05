@@ -303,7 +303,7 @@ export default function TarifaServicio() {
             <div className="mx-auto w-full max-w-6xl px-6 py-10">
 
                 {/* Header */}
-                <div className="mb-8 rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-sm">
+                <div className="mb-8 rounded-[32px] border border-slate-200 bg-white/90 p-6 shadow-sm">
                     <div className="flex flex-col gap-1">
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración</p>
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
@@ -317,7 +317,7 @@ export default function TarifaServicio() {
 
                 {/* Selectores */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
                         <div className="space-y-1 mb-5">
                             <h2 className="text-base font-semibold text-slate-900">Seleccionar Profesional</h2>
                             <p className="text-sm text-slate-500">Seleccione el profesional que imparte el servicio.</p>
@@ -341,7 +341,7 @@ export default function TarifaServicio() {
                         </div>
                     </div>
 
-                    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
                         <div className="space-y-1 mb-5">
                             <h2 className="text-base font-semibold text-slate-900">Seleccionar Servicio</h2>
                             <p className="text-sm text-slate-500">Seleccione un servicio para asignar tarifa.</p>
@@ -367,7 +367,7 @@ export default function TarifaServicio() {
                 </div>
 
                 {/* Form */}
-                <div className="mt-6 rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mt-6 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex flex-col gap-6">
 
                         <div className="space-y-1">
@@ -446,7 +446,7 @@ export default function TarifaServicio() {
 
 
 
-                <div className="mt-8 rounded-[24px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="mt-8 rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="space-y-1 mb-0 p-6 pb-5 border-b border-slate-100">
                         <h2 className="text-base font-semibold text-slate-900">Tarifas registradas</h2>
                         <p className="text-sm text-slate-500">Lista de valores por consulta y profesional.</p>

@@ -313,7 +313,7 @@ export default function ExamenDocumento() {
 
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
                     <div className="space-y-6 xl:col-span-2">
-                        <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+                        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
                                 <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-700">Datos del documento</h2>
                             </div>
@@ -381,7 +381,7 @@ export default function ExamenDocumento() {
                             </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+                        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 bg-slate-50/50">
                                 <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -415,7 +415,7 @@ export default function ExamenDocumento() {
                     </div>
 
                     <div className="space-y-6 xl:col-span-3">
-                        <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+                        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                     <div>
@@ -483,7 +483,7 @@ export default function ExamenDocumento() {
                             </div>
                         </div>
 
-                        <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
+                        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 bg-slate-50/50">
                                 <div className="flex items-center gap-3">
                                     <div className="h-8 w-8 rounded-xl bg-slate-100 flex items-center justify-center">

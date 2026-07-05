@@ -862,7 +862,7 @@ export default function AgendaCitas() {
 
                     {/* Tabla de Resultados */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
-                        <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
                             <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Citas Agendadas</h2>
                             <div className="flex items-center gap-3">
                                 <span className="text-[11px] font-bold text-slate-400">{dataLista.length} {dataLista.length === 1 ? "cita" : "citas"}</span>

@@ -431,7 +431,7 @@ useEffect(() => {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
 
                 {/* ── FORMULARIO ── */}
-                <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm">
+                <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm">
                     {/* Cabecera del card */}
                     <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center gap-2.5">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF]">
@@ -605,7 +605,7 @@ useEffect(() => {
                 <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
 
                     {/* Filtro por categoria */}
-                    <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <div className="flex size-6 items-center justify-center rounded-md bg-[#EDE9FE]">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-[#6E56CF]">
@@ -633,7 +633,7 @@ useEffect(() => {
                     </div>
 
                     {/* Busqueda por similitud */}
-                    <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
                             <div className="flex size-6 items-center justify-center rounded-md bg-emerald-50">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-emerald-600">
@@ -662,7 +662,7 @@ useEffect(() => {
 
 
                 {/* ── TABLA ── */}
-                <div className="mt-8 rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="mt-8 rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     {/* Cabecera de tabla */}
                     <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">

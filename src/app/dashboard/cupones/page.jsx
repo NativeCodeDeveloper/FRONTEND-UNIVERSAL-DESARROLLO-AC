@@ -244,276 +244,129 @@ function mostrarIdSeleccionado(id_cupon) {
 
 
     return(
-       <div>
+        <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
+            <ToasterClient/>
+            <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
 
-           {/*PANTALLAS EN CELULARES*/}
-           <div className="blok md:hidden min-h-screen bg-slate-50 px-4 py-5">
-               <ToasterClient/>
-               {/* Header con diseño premium */}
+                {/* ── Header ── */}
+                <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                    <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Marketing y Descuentos</p>
+                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                            Gestión de <span className="text-[#6E56CF]">Cupones</span>
+                        </h1>
+                        <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
+                            Crea y administra cupones de descuento. Para desactivar un cupón, simplemente elimínalo del listado.
+                        </p>
+                    </div>
+                    <InfoButton informacion={"En este apartado, usted podrá crear cupones de descuento para que sus clientes obtengan rebajas en los productos o servicios ofrecidos. Estos cupones no son individuales ni se desactivan automáticamente al ser utilizados, por lo que deben desactivarse de forma manual cuando usted lo estime conveniente.\n\nEn el último campo del formulario, usted puede indicar el porcentaje de descuento que se aplicará al producto. Este valor solo puede ingresarse como un número entero entre 1 y 100; no se permiten letras ni caracteres especiales.\n\nPara desactivar un cupón, únicamente debe eliminarlo, y este dejará de estar activo de manera inmediata."}/>
+                </div>
 
-               <div className="max-w-7xl mx-auto mb-4">
-                   <h1 className="text-lg font-semibold text-slate-900">Sistema de Gestión de Cupones</h1>
-                   <div className="h-px w-full bg-slate-200 mt-3"></div>
-               </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-               <div className="max-w-7xl mx-auto grid grid-cols-1 gap-4">
-                   {/* Card de Ingreso - Premium */}
-                   <div className="relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                       <div className="relative p-4">
-                           <div className="flex items-center gap-3 mb-5">
-                               <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-md">
-                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                   </svg>
-                               </div>
-                               <h2 className="text-base font-semibold text-slate-900">
-                                   Crear Cupón
-                               </h2>
-                               <br/>
-                           </div>
-                           <div className="flex items-center gap-3">
-                             <label className="text-[11px] uppercase tracking-wide text-sky-800 font-semibold">ID cupón</label>
-                             <span className="text-xs font-semibold text-slate-700 border border-slate-200 bg-slate-100 px-2.5 py-1 rounded-lg">{mostrarIdSeleccionado(id_cupon)}</span>
-                           </div>
-                           <div className="space-y-3 mt-4">
-                               <div>
-                                   <ShadcnInput value={nombreCupon}
-                                                onChange={(e)=>setNombreCupon(e.target.value)}
-                                                placeholder={"Titulo del cupon.."} />
-                               </div>
+                    {/* ── Formulario (5 cols) ── */}
+                    <div className="lg:col-span-5">
+                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Crear / Editar Cupón</h2>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID seleccionado:</span>
+                                    <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{mostrarIdSeleccionado(id_cupon)}</span>
+                                </div>
+                            </div>
+                            <div className="p-4 md:p-8 space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Título del cupón</label>
+                                    <ShadcnInput value={nombreCupon} onChange={(e) => setNombreCupon(e.target.value)} placeholder="Titulo del cupon.." />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Código verificador</label>
+                                    <ShadcnInput value={codigoVerificadorCupon} onChange={(e) => setCodigoVerificadorCupon(e.target.value)} placeholder="Codigo del cupon.." />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Descripción / Objetivo</label>
+                                    <Textarea className="min-h-[84px] resize-none rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50"
+                                        placeholder="Descripción del cupón..." value={objetivoCupon} onChange={(e) => setObjetivoCupon(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Porcentaje de descuento <span className="normal-case text-slate-300">(1–100)</span></label>
+                                    <ShadcnInput type="number" placeholder="Ej: 15" value={porcentajeDescuento} onChange={(e) => setPorcentajeDescuento(e.target.value)} />
+                                </div>
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        onClick={() => insertarCupon(nombreCupon, codigoVerificadorCupon, objetivoCupon, porcentajeDescuento)}
+                                        className="flex-1 h-11 rounded-xl bg-[#6E56CF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100">
+                                        Ingresar
+                                    </button>
+                                    <button
+                                        onClick={() => actualizarCupon(nombreCupon, codigoVerificadorCupon, objetivoCupon, porcentajeDescuento, id_cupon)}
+                                        className="flex-1 h-11 rounded-xl border border-slate-200 text-slate-600 text-[12px] font-bold hover:bg-slate-50 transition-all">
+                                        Actualizar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                               <div>
-                                   <ShadcnInput
-                                       value={codigoVerificadorCupon}
-                                       onChange={(e)=>setCodigoVerificadorCupon(e.target.value)}
-                                       placeholder={"Codigo del cupon.."}
-                                   />
-                               </div>
-
-                               <div>
-                                   <Textarea className="min-h-[84px] resize-none border-slate-200 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 rounded-lg"
-                                             placeholder="Descripción del cupón..."
-                                             value={objetivoCupon}
-                                             onChange={(e)=>setObjetivoCupon(e.target.value)}
-                                   />
-                               </div>
-
-                               <div>
-                                   <h1 className="pt-1 font-bold text-gray-700">Porcentaje descuento</h1>
-                                   <p className="text-gray-400 text-[11px]">Solo números del 1 al 100</p>
-                                   <ShadcnInput
-                                       type="number"
-                                       placeholder="Descuento (%).. solo en numeros 1 a 100.."
-                                       value={porcentajeDescuento}
-                                       onChange={(e)=>setPorcentajeDescuento(e.target.value)}
-                                   />
-                               </div>
-
-                               <div className="flex gap-3 pt-2">
-                                   <div className="flex-1">
-                                       <ShadcnButton nombre={"Ingresar"}
-                                                     funcion={()=> insertarCupon(nombreCupon,codigoVerificadorCupon,objetivoCupon,porcentajeDescuento)}
-                                                     className="w-full"/>
-                                   </div>
-                                   <div className="flex-1">
-                                       <ShadcnButton
-                                           funcion={()=>actualizarCupon(nombreCupon,codigoVerificadorCupon,objetivoCupon,porcentajeDescuento,id_cupon)}
-                                           nombre={"Actualizar"} className="w-full"/>
-                                   </div>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-
-                   {/* Card de Listado - Premium */}
-                   <div className="relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                       <div className="relative p-4">
-                           <div className="flex items-center gap-3 mb-5">
-                               <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-md">
-                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                   </svg>
-                               </div>
-                               <h2 className="text-base font-semibold text-slate-900">
-                                   Cupones Activos
-                               </h2>
-                           </div>
-
-                           <div>
-                               <Table className="text-xs">
-                                   <TableCaption className="text-xs text-slate-500">Listado de cupones</TableCaption>
-                                   <TableHeader>
-                                       <TableRow>
-                                           <TableHead className="text-xs text-slate-600">ID Cupon</TableHead>
-                                           <TableHead className="text-xs text-slate-600">Codigo</TableHead>
-                                           <TableHead className="text-xs text-slate-600">Descuento (%)</TableHead>
-                                       </TableRow>
-                                   </TableHeader>
-                                   <TableBody>
-                                       {tablaCupones.map((cupon) => (
-                                           <TableRow key={cupon.id_cupon}>
-                                               <TableCell className="font-medium py-1">{cupon.id_cupon}</TableCell>
-                                               <TableCell className="py-1">{cupon.codigoVerificadorCupon}</TableCell>
-                                               <TableCell className="py-1">{cupon.porcentajeDescuento} %</TableCell>
-                                               <TableCell className="py-1">
-                                                   <ShadcnButton
-                                                       funcion={()=> eliminarCupon(cupon.id_cupon)}
-                                                       nombre={"Eliminar"}/>
-                                               </TableCell>
-                                               <TableCell className="py-1">
-                                                   <ShadcnButton
-                                                       funcion={()=> seleccionarCupon(cupon.id_cupon)}
-                                                       nombre={"Seleccionar"}/>
-                                               </TableCell>
-                                           </TableRow>
-                                       ))}
-                                   </TableBody>
-                               </Table>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-
-
-
-           {/*PANTALLA EN COMPUTADORES DE ESCRITORIO*/}
-           <div className="hidden md:block min-h-screen bg-slate-50 px-8 py-8">
-               <ToasterClient/>
-               {/* Header con diseño premium */}
-
-               <div className='flex justify-end mr-15'>
-                   <InfoButton informacion={"En este apartado, usted podrá crear cupones de descuento para que sus clientes obtengan rebajas en los productos o servicios ofrecidos. Estos cupones no son individuales ni se desactivan automáticamente al ser utilizados, por lo que deben desactivarse de forma manual cuando usted lo estime conveniente.\n" +
-                       "\n" +
-                       "En el último campo del formulario, usted puede indicar el porcentaje de descuento que se aplicará al producto. Este valor solo puede ingresarse como un número entero entre 1 y 100; no se permiten letras ni caracteres especiales.\n" +
-                       "\n" +
-                       "Para desactivar un cupón, únicamente debe eliminarlo, y este dejará de estar activo de manera inmediata."}/>
-               </div>
-               <div className="max-w-7xl mx-auto mb-7">
-                   <h1 className="text-3xl font-semibold text-slate-900">Sistema de Gestión de Cupones</h1>
-                   <div className="h-px w-full bg-slate-200 mt-4"></div>
-               </div>
-
-               <div className="max-w-7xl mx-auto grid grid-cols-1 gap-6">
-                   {/* Card de Ingreso - Premium */}
-                   <div className="relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                       <div className="relative p-6">
-                           <div className="flex items-center gap-3 mb-6">
-                               <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-md">
-                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                   </svg>
-                               </div>
-                               <h2 className="text-base font-semibold text-slate-900">
-                                   Crear Cupón
-                               </h2>
-                               <br/>
-                           </div>
-                           <div className="flex items-center gap-3">
-                             <label className="text-[11px] uppercase tracking-wide text-sky-800 font-semibold">ID cupón seleccionado</label>
-                             <span className="text-xs font-semibold text-slate-700 border border-slate-200 bg-slate-100 px-2.5 py-1 rounded-lg">{mostrarIdSeleccionado(id_cupon)}</span>
-                           </div>
-                           <div className="space-y-3 mt-4">
-                               <div>
-                                   <ShadcnInput value={nombreCupon}
-                                                onChange={(e)=>setNombreCupon(e.target.value)}
-                                                placeholder={"Titulo del cupon.."} />
-                               </div>
-
-                               <div>
-                                   <ShadcnInput
-                                       value={codigoVerificadorCupon}
-                                       onChange={(e)=>setCodigoVerificadorCupon(e.target.value)}
-                                       placeholder={"Codigo del cupon.."}
-                                   />
-                               </div>
-
-                               <div>
-                                   <Textarea className="min-h-[84px] resize-none border-slate-200 focus:border-slate-400 focus:ring-2 focus:ring-slate-200 rounded-lg"
-                                             placeholder="Descripción del cupón..."
-                                             value={objetivoCupon}
-                                             onChange={(e)=>setObjetivoCupon(e.target.value)}
-                                   />
-                               </div>
-
-                               <div>
-                                   <ShadcnInput
-                                       type="number"
-                                       placeholder="Descuento (%).. solo en numeros 1 a 100.."
-                                       value={porcentajeDescuento}
-                                       onChange={(e)=>setPorcentajeDescuento(e.target.value)}
-                                   />
-                               </div>
-
-                               <div className="flex gap-3 pt-2">
-                                   <div className="flex-1">
-                                       <ShadcnButton nombre={"Ingresar"}
-                                                     funcion={()=> insertarCupon(nombreCupon,codigoVerificadorCupon,objetivoCupon,porcentajeDescuento)}
-                                                     className="w-full"/>
-                                   </div>
-                                   <div className="flex-1">
-                                       <ShadcnButton
-                                           funcion={()=>actualizarCupon(nombreCupon,codigoVerificadorCupon,objetivoCupon,porcentajeDescuento,id_cupon)}
-                                           nombre={"Actualizar"} className="w-full"/>
-                                   </div>
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-
-                   {/* Card de Listado - Premium */}
-                   <div className="relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                       <div className="relative p-6">
-                           <div className="flex items-center gap-3 mb-6">
-                               <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-md">
-                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                   </svg>
-                               </div>
-                               <h2 className="text-base font-semibold text-slate-900">
-                                   Cupones Activos
-                               </h2>
-                           </div>
-
-                           <div>
-                               <Table className="text-xs">
-                                   <TableCaption className="text-xs text-slate-500">Listado de cupones</TableCaption>
-                                   <TableHeader>
-                                       <TableRow>
-                                           <TableHead className="text-xs text-slate-600">ID Cupon</TableHead>
-                                           <TableHead className="text-xs text-slate-600">Titulo</TableHead>
-                                           <TableHead className="text-xs text-slate-600">Objetivo</TableHead>
-                                           <TableHead className="text-xs text-slate-600">Codigo</TableHead>
-                                           <TableHead className="text-xs text-slate-600">Descuento (%)</TableHead>
-                                       </TableRow>
-                                   </TableHeader>
-                                   <TableBody>
-                                       {tablaCupones.map((cupon) => (
-                                           <TableRow key={cupon.id_cupon}>
-                                               <TableCell className="font-medium py-1">{cupon.id_cupon}</TableCell>
-                                               <TableCell className="font-medium py-1">{cupon.nombreCupon}</TableCell>
-                                               <TableCell className="font-medium py-1">{cupon.objetivoCupon}</TableCell>
-                                               <TableCell className="py-1">{cupon.codigoVerificadorCupon}</TableCell>
-                                               <TableCell className="py-1">{cupon.porcentajeDescuento} %</TableCell>
-                                               <TableCell className="py-1">
-                                                   <ShadcnButton
-                                                       funcion={()=> eliminarCupon(cupon.id_cupon)}
-                                                       nombre={"Eliminar"}/>
-                                               </TableCell>
-                                               <TableCell className="py-1">
-                                                   <ShadcnButton
-                                                       funcion={()=> seleccionarCupon(cupon.id_cupon)}
-                                                       nombre={"Seleccionar"}/>
-                                               </TableCell>
-                                           </TableRow>
-                                       ))}
-                                   </TableBody>
-                               </Table>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
+                    {/* ── Tabla de cupones (7 cols) ── */}
+                    <div className="lg:col-span-7">
+                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Cupones Activos</h2>
+                                <span className="h-5 px-2 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{tablaCupones.length}</span>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">ID</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Título</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 hidden md:table-cell">Objetivo</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Código</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">%</TableHead>
+                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">Acciones</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {tablaCupones.map((cupon) => (
+                                            <TableRow key={cupon.id_cupon} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                                <TableCell className="py-4 text-[12px] font-bold text-slate-500">#{cupon.id_cupon}</TableCell>
+                                                <TableCell className="py-4 text-[13px] font-bold text-slate-800">{cupon.nombreCupon}</TableCell>
+                                                <TableCell className="py-4 text-[12px] text-slate-500 hidden md:table-cell max-w-[150px] truncate">{cupon.objetivoCupon}</TableCell>
+                                                <TableCell className="py-4">
+                                                    <span className="text-[11px] font-mono bg-slate-100 px-2 py-1 rounded-lg text-slate-600">{cupon.codigoVerificadorCupon}</span>
+                                                </TableCell>
+                                                <TableCell className="py-4 text-center">
+                                                    <span className="text-[12px] font-bold text-[#6E56CF]">{cupon.porcentajeDescuento}%</span>
+                                                </TableCell>
+                                                <TableCell className="py-4 text-center">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <button onClick={() => seleccionarCupon(cupon.id_cupon)}
+                                                            className="h-8 px-3 rounded-xl bg-violet-50 text-[#6E56CF] text-[11px] font-bold hover:bg-[#6E56CF] hover:text-white transition-all">
+                                                            Editar
+                                                        </button>
+                                                        <button onClick={() => eliminarCupon(cupon.id_cupon)}
+                                                            className="h-8 px-3 rounded-xl bg-rose-50 text-rose-600 text-[11px] font-bold hover:bg-rose-600 hover:text-white transition-all">
+                                                            Eliminar
+                                                        </button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {tablaCupones.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="py-12 text-center text-[13px] text-slate-400 italic">
+                                                    No hay cupones activos. Crea el primero con el formulario.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }

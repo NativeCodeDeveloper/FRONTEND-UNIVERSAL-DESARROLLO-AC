@@ -381,245 +381,229 @@ export default function EdicionPagina() {
 
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6">
-            <div className="max-w-7xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold">Gestión de Contenido Web</h1>
-                            <p className="text-slate-200">Personaliza los textos y contenido de la página web</p>
-                        </div>
+        <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
+            <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
+
+                {/* ── Header ── */}
+                <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                    <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración Web</p>
+                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                            Gestión de <span className="text-[#6E56CF]">Contenido</span>
+                        </h1>
+                        <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
+                            Personaliza los textos y contenido de la página web pública.
+                        </p>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-300">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span suppressHydrationWarning>Última actualización: {ultimaActualizacion || '—'}</span>
+                    <div className="h-12 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm shrink-0">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Última actualización</span>
+                        <span suppressHydrationWarning className="text-[12px] font-bold text-slate-700 mt-0.5 leading-none">{ultimaActualizacion || '—'}</span>
                     </div>
                 </div>
 
-                <div className="grid gap-6 md:gap-8">
+                <div className="grid gap-6">
 
-
-
-                    {/* Título Principal */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Título Principal</h2>
-
-                        {/* Texto Actual */}
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Texto actual</label>
-                            <div className="bg-white border border-gray-200 rounded-md p-3">
-                                <p className="text-gray-900">{titulo || 'No hay título configurado'}</p>
-                            </div>
+                    {/* ── Título Principal ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título Principal</h2>
                         </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Nuevo Título:</label>
-                                <textarea
-                                    value={nuevoTitulo}
-                                    onChange={(e) => setNuevoTitulo(e.target.value)}
-                                    placeholder="Escribe el nuevo título"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm"
-                                    rows={3}
-                                />
-                            </div>
-
-                            <div className="flex justify-end">
-                                <button
-                                    className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                    type="submit"
-                                    disabled={cargando}
-                                 >
-                                    Guardar Cambios
-                                </button>
-                            </div>
-
-                            {mensaje && (
-                                <div className={`p-3 rounded-md text-sm ${
-                                    mensaje.startsWith('✅') ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
-                                }`}>
-                                    {mensaje}
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{titulo || 'No hay título configurado'}</p>
                                 </div>
-                            )}
-                        </form>
+                            </div>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo Título</label>
+                                    <textarea value={nuevoTitulo} onChange={(e) => setNuevoTitulo(e.target.value)} placeholder="Escribe el nuevo título"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={3} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Cambios
+                                    </button>
+                                    {mensaje && <p className={`text-[12px] font-medium ${mensaje.startsWith('✅') ? 'text-emerald-700' : 'text-amber-700'}`}>{mensaje}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Subtítulo */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h3 className="mb-2 text-sm font-semibold text-slate-700">Texto actual</h3>
-                        <div className="overflow-hidden border border-gray-200 bg-white rounded-md inline-block max-w-full p-3">
-                            <p className="text-slate-900">{subtitulo}</p>
+                    {/* ── Subtítulo ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Subtítulo</h2>
                         </div>
-                        <br />
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Editar Subtítulo</h2>
-                        <form onSubmit={handleUpdateSubtitulo}>
-              <textarea
-                  value={nuevoSubtitulo}
-                  onChange={(e) => setNuevoSubtitulo(e.target.value)}
-                  placeholder="Escribe el nuevo subtítulo"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm bg-white"
-              />
-                            <br />
-                            <button
-                                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                type="submit"
-                                disabled={cargando}
-                             >
-                                 Guardar subtítulo
-                             </button>
-                            <br />
-                            {mensajeSubTitulo && <p>{mensajeSubTitulo}</p>}
-                        </form>
+                        <div className="p-4 md:p-8 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{subtitulo || '—'}</p>
+                                </div>
+                            </div>
+                            <form onSubmit={handleUpdateSubtitulo} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo Subtítulo</label>
+                                    <textarea value={nuevoSubtitulo} onChange={(e) => setNuevoSubtitulo(e.target.value)} placeholder="Escribe el nuevo subtítulo"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={3} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Subtítulo
+                                    </button>
+                                    {mensajeSubTitulo && <p className="text-[12px] font-medium text-slate-600">{mensajeSubTitulo}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Sobre nosotros */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h3 className="mb-2 text-sm font-semibold text-slate-700">Texto actual</h3>
-                        <div className="overflow-hidden border border-gray-200 bg-white rounded-md inline-block max-w-full p-3">
-                            <p className="text-slate-900">{sobreNosotros}</p>
+                    {/* ── Sobre nosotros ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título: Acerca de</h2>
                         </div>
-                        <br />
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Editar Título: Acerca de</h2>
-                        <form onSubmit={handleUpdateSobreNosotros}>
-              <textarea
-                  value={nuevoSobreNosotros}
-                  onChange={(event) => setNuevoSobreNosotros(event.target.value)}
-                  placeholder="Escribe el nuevo 'Sobre nosotros'"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm bg-white"
-              />
-                            <br />
-                            <button
-                                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                type="submit"
-                                disabled={cargando}
-                             >
-                                 Guardar Sobre Nosotros
-                             </button>
-                            <br /> {mensajeSobreNosotros && <p>{mensajeSobreNosotros}</p>}
-                        </form>
+                        <div className="p-4 md:p-8 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{sobreNosotros || '—'}</p>
+                                </div>
+                            </div>
+                            <form onSubmit={handleUpdateSobreNosotros} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo texto</label>
+                                    <textarea value={nuevoSobreNosotros} onChange={(event) => setNuevoSobreNosotros(event.target.value)} placeholder="Escribe el nuevo 'Sobre nosotros'"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={3} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Sobre Nosotros
+                                    </button>
+                                    {mensajeSobreNosotros && <p className="text-[12px] font-medium text-slate-600">{mensajeSobreNosotros}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Proyectos */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h3 className="mb-2 text-sm font-semibold text-slate-700">Texto actual</h3>
-                        <div className="overflow-hidden border border-gray-200 bg-white rounded-md inline-block max-w-full p-3">
-                            <p className="text-slate-900">{tituloProyectos}</p>
+                    {/* ── Título Proyectos ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título: Proyectos</h2>
                         </div>
-                        <br />
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Editar título Proyectos</h2>
-                        <form onSubmit={handleSubmitProyectos}>
-              <textarea
-                  value={nuevoTituloProyecto}
-                  onChange={(evento) => setnuevoTituloProyecto(evento.target.value)}
-                  placeholder="Nuevo titulo de la seccion Proyectos"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm bg-white"
-              />
-                            <br />
-                            <button
-                                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                type="submit"
-                                disabled={cargando}
-                             >
-                                 Guardar titulo Proyecto
-                             </button>
-                            <br />
-                            {mensajeProyectos && <p>{mensajeProyectos}</p>}
-                        </form>
+                        <div className="p-4 md:p-8 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{tituloProyectos || '—'}</p>
+                                </div>
+                            </div>
+                            <form onSubmit={handleSubmitProyectos} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo título</label>
+                                    <textarea value={nuevoTituloProyecto} onChange={(evento) => setnuevoTituloProyecto(evento.target.value)} placeholder="Nuevo titulo de la seccion Proyectos"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={2} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Título Proyecto
+                                    </button>
+                                    {mensajeProyectos && <p className="text-[12px] font-medium text-slate-600">{mensajeProyectos}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Contacto */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h3 className="mb-2 text-sm font-semibold text-slate-700">Texto actual</h3>
-                        <div className="overflow-hidden border border-gray-200 bg-white rounded-md inline-block max-w-full p-3">
-                            <p className="text-slate-900">{tituloContacto}</p>
+                    {/* ── Título Contacto ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título: Contacto</h2>
                         </div>
-                        <br />
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Editar título Contacto</h2>
-                        <form onSubmit={handleSubmitContacto}>
-              <textarea
-                  value={contactoTitulo}
-                  onChange={(evento) => setcontactoTitulo(evento.target.value)}
-                  placeholder="Nuevo titulo de la seccion contacto"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm bg-white"
-              />
-                            <br />
-                            <button
-                                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                type="submit"
-                                disabled={cargando}
-                             >
-                                 Guardar titulo Contacto
-                             </button>
-                            <br />
-                            {MensajeContacto && <p>{MensajeContacto}</p>}
-                        </form>
+                        <div className="p-4 md:p-8 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{tituloContacto || '—'}</p>
+                                </div>
+                            </div>
+                            <form onSubmit={handleSubmitContacto} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo título</label>
+                                    <textarea value={contactoTitulo} onChange={(evento) => setcontactoTitulo(evento.target.value)} placeholder="Nuevo titulo de la seccion contacto"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={2} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Título Contacto
+                                    </button>
+                                    {MensajeContacto && <p className="text-[12px] font-medium text-slate-600">{MensajeContacto}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Párrafo 1 */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h3 className="mb-2 text-sm font-semibold text-slate-700">Texto actual</h3>
-                        <div className="overflow-hidden border border-gray-200 bg-white rounded-md inline-block max-w-full p-3">
-                            <p className="text-slate-900">{primerParrafo}</p>
+                    {/* ── Párrafo 1 ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Primer Párrafo</h2>
                         </div>
-                        <br />
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Editar Primer Párrafo</h2>
-                        <form onSubmit={handleSubmitText1}>
-                            <br />
-                            <textarea
-                                value={texto1}
-                                onChange={(event) => settexto1(event.target.value)}
-                                placeholder="Nuevo texto Párrafo"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm bg-white"
-                            />
-                            <br />
-                            <button
-                                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                type="submit"
-                                disabled={cargando}
-                             >
-                                 Guardar Párrafo
-                             </button>
-                            <br />
-                            {MensajeTexto1 && <p>{MensajeTexto1}</p>}
-                        </form>
+                        <div className="p-4 md:p-8 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{primerParrafo || '—'}</p>
+                                </div>
+                            </div>
+                            <form onSubmit={handleSubmitText1} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo texto</label>
+                                    <textarea value={texto1} onChange={(event) => settexto1(event.target.value)} placeholder="Nuevo texto Párrafo"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={4} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Párrafo
+                                    </button>
+                                    {MensajeTexto1 && <p className="text-[12px] font-medium text-slate-600">{MensajeTexto1}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    {/* Párrafo 2 */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-7">
-                        <h3 className="mb-2 text-sm font-semibold text-slate-700">Texto actual</h3>
-                        <div className="overflow-hidden border border-gray-200 bg-white rounded-md inline-block max-w-full p-3">
-                            <p className="text-slate-900">{segundoParrafo}</p>
+                    {/* ── Párrafo 2 ── */}
+                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
+                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Segundo Párrafo</h2>
                         </div>
-                        <br />
-                        <h2 className="text-xl font-semibold text-slate-900 mb-2">Editar Segundo Párrafo</h2>
-                        <form onSubmit={handleSubmitText2}>
-                            <br />
-                            <textarea
-                                value={texto2}
-                                onChange={(event) => settexto2(event.target.value)}
-                                placeholder="Nuevo texto Párrafo"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-slate-500 focus:border-slate-500 text-sm bg-white"
-                            />
-                            <br />
-                            <button
-                                className="inline-flex items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50 disabled:pointer-events-none"
-                                type="submit"
-                                disabled={cargando}
-                             >
-                                 Guardar Párrafo
-                             </button>
-                        </form>
-                        <br />
-                        <br />
-                        {MensajeTexto2 && <p>{MensajeTexto2}</p>}
+                        <div className="p-4 md:p-8 space-y-4">
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p className="text-[13px] text-slate-700">{segundoParrafo || '—'}</p>
+                                </div>
+                            </div>
+                            <form onSubmit={handleSubmitText2} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo texto</label>
+                                    <textarea value={texto2} onChange={(event) => settexto2(event.target.value)} placeholder="Nuevo texto Párrafo"
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={4} />
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                    <button type="submit" disabled={cargando}
+                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        Guardar Párrafo
+                                    </button>
+                                    {MensajeTexto2 && <p className="text-[12px] font-medium text-slate-600">{MensajeTexto2}</p>}
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                 </div>

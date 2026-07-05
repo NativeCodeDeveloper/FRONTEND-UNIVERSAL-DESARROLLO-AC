@@ -346,7 +346,7 @@ export default function BloqueosAgendas() {
 
                     {/* ── Columna Izquierda: Formulario ── */}
                     <div className="lg:col-span-5 space-y-5">
-                        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center text-[#6E56CF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -589,7 +589,7 @@ export default function BloqueosAgendas() {
 
                     {/* ── Columna Derecha: Listado ── */}
                     <div className="lg:col-span-7 space-y-6">
-                        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
@@ -696,7 +696,7 @@ export default function BloqueosAgendas() {
             {modalEliminarTodos === "paso1" && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setModalEliminarTodos(false)} />
-                    <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <div className="relative w-full max-w-sm overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                             <div className="h-10 w-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -731,7 +731,7 @@ export default function BloqueosAgendas() {
             {modalEliminarTodos === "paso2" && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModalEliminarTodos(false)} />
-                    <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-rose-200 bg-white shadow-sm">
+                    <div className="relative w-full max-w-sm overflow-hidden rounded-[32px] border border-rose-200 bg-white shadow-sm">
                         <div className="px-6 py-5 border-b border-rose-100 bg-rose-50/50 flex items-center gap-3">
                             <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -776,7 +776,7 @@ export default function BloqueosAgendas() {
             {modalBloqueoAbierto && bloqueoSeleccionado && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={cerrarModalBloqueo} />
-                    <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <div className="relative w-full max-w-md overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                             <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center text-[#6E56CF]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

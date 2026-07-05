@@ -61,7 +61,7 @@ export const metadata = {
   icons: {
     icon: "/logofavcom.png",
     shortcut: "/logofavcom.png",
-    apple: "/logofavcom.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "Agenda Clínica | Sistema de Agendamiento Médico Online",
@@ -104,6 +104,13 @@ export default function RootLayout({ children }) {
             {children}
           </AnimatedLayout>
         </AgendaProvider>
+        <script dangerouslySetInnerHTML={{ __html: `
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js').catch(function() {});
+            });
+          }
+        `}} />
       </body>
     </html>
   );

@@ -177,7 +177,7 @@ export default function SolicitudExamenes() {
                 <div className="space-y-6">
 
                     {/* Formulario */}
-                    <div className="bg-white border border-slate-200 rounded-[28px] shadow-[0_8px_30px_rgba(15,23,42,0.06)] overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-[32px] shadow-[0_8px_30px_rgba(15,23,42,0.06)] overflow-hidden">
                         <div className="border-b border-slate-100 bg-slate-50/30 px-6 py-4 flex items-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -269,7 +269,7 @@ export default function SolicitudExamenes() {
                     </div>
 
                     {/* Tabla de exámenes */}
-                    <div className="bg-white border border-slate-200 rounded-[28px] shadow-[0_8px_30px_rgba(15,23,42,0.06)] overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-[32px] shadow-[0_8px_30px_rgba(15,23,42,0.06)] overflow-hidden">
                         <div className="border-b border-slate-100 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
