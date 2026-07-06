@@ -88,13 +88,11 @@ export function AppointmentCard({ event, currentView }) {
   const horaInicio = formatHora(event.start);
   const horaFin = formatHora(event.end);
 
-  // ── Vista MES: una sola línea compacta (el wrapper RBC ya tiene bg y border) ──
+  // ── Vista MES: dot de estado + nombre paciente ─────────────────────────────
   if (currentView === "month") {
     return (
-      <div className="flex w-full items-center gap-1 overflow-hidden h-full">
-        <span className="text-[10px] font-semibold tabular-nums leading-none flex-shrink-0" style={{ color: token.accent }}>
-          {horaInicio}
-        </span>
+      <div className="flex w-full items-center gap-1.5 overflow-hidden h-full px-0.5">
+        <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: token.accent }} />
         <span className="truncate text-[11px] font-bold leading-none flex-1" style={{ color: token.text }}>
           {nombreCompleto || event.title}
         </span>
@@ -143,7 +141,7 @@ export function AppointmentCard({ event, currentView }) {
     return (
       <div
         className="flex h-full w-full items-center gap-1 px-1.5 overflow-hidden"
-        style={{ borderLeft: `3px solid ${token.accent}`, background: token.bg }}
+        style={{ borderLeft: `4px solid ${token.accent}`, background: token.bg }}
       >
         <span className="text-[10px] font-bold tabular-nums leading-none shrink-0" style={{ color: token.accent }}>
           {horaInicio}
@@ -156,30 +154,24 @@ export function AppointmentCard({ event, currentView }) {
   }
 
   if (isShort) {
-    // Compacta (15-29 min): hora + pill en la misma fila, nombre abajo
+    // Compacta (15-29 min): hora + dot de estado a la derecha, nombre abajo
     return (
       <div
         className="flex h-full w-full flex-col justify-start px-2 py-1 cursor-pointer overflow-hidden"
         style={{
-          borderLeft: `3px solid ${token.accent}`,
+          borderLeft: `4px solid ${token.accent}`,
           background: token.bg,
           boxShadow: `inset 0 0 0 1px ${token.border}`,
         }}
       >
-        <div className="flex items-center justify-between gap-1 shrink-0 min-w-0">
+        <div className="flex items-center gap-1 shrink-0 min-w-0">
           <span
             className="text-[10px] font-bold tabular-nums whitespace-nowrap leading-none shrink-0"
             style={{ color: token.accent }}
           >
             {horaInicio} – {horaFin}
           </span>
-          <span
-            className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[8px] font-bold leading-none shrink-0"
-            style={{ backgroundColor: `${token.accent}18`, color: token.text, border: `1px solid ${token.accent}35` }}
-          >
-            <span className="inline-block h-1 w-1 rounded-full shrink-0" style={{ backgroundColor: token.accent }} />
-            {token.label}
-          </span>
+          <span className="ml-auto h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: token.accent }} />
         </div>
         <span
           className="truncate text-[12px] font-bold leading-tight mt-0.5 shrink-0"
@@ -199,11 +191,67 @@ export function AppointmentCard({ event, currentView }) {
     );
   }
 
+  // ── Vista DÍA: layout horizontal — info izq, hora+badge der ───────────────
+  if (currentView === "day") {
+    return (
+      <div
+        className="flex h-full w-full cursor-pointer overflow-hidden"
+        style={{
+          borderLeft: `4px solid ${token.accent}`,
+          background: token.bg,
+          boxShadow: `inset 0 0 0 1px ${token.border}`,
+        }}
+      >
+        {/* Izquierda — nombre + servicio + doctor */}
+        <div className="flex flex-col justify-center flex-1 min-w-0 px-4 py-3 gap-0.5">
+          <span className="truncate text-[16px] font-extrabold leading-snug" style={{ color: token.text }}>
+            {nombreCompleto || event.title}
+          </span>
+          {prestacion && (
+            <span className="truncate text-[12px] font-medium leading-tight" style={{ color: token.text, opacity: 0.68 }}>
+              {prestacion}
+            </span>
+          )}
+          {profesional && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium leading-none mt-1 truncate" style={{ color: token.text, opacity: 0.55 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+              <span className="truncate">{profesional}</span>
+            </span>
+          )}
+          {modalidad === "online" && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-sky-500 mt-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              Online
+            </span>
+          )}
+        </div>
+        {/* Derecha — hora + estado */}
+        <div className="flex flex-col items-end justify-start px-4 py-3 gap-2 shrink-0" style={{ borderLeft: `1px solid ${token.accent}18` }}>
+          <span className="text-[11px] font-bold tabular-nums whitespace-nowrap" style={{ color: token.accent }}>
+            {horaInicio} – {horaFin}
+          </span>
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold whitespace-nowrap"
+            style={{ backgroundColor: `${token.accent}18`, color: token.text, border: `1px solid ${token.accent}35` }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: token.accent }} />
+            {token.label}
+          </span>
+          {pago && <StatusBadge estado={pago} size="xs" />}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="flex h-full w-full flex-col justify-start px-2.5 py-1.5 cursor-pointer overflow-hidden"
       style={{
-        borderLeft: `3px solid ${token.accent}`,
+        borderLeft: `4px solid ${token.accent}`,
         background: token.bg,
         boxShadow: `inset 0 0 0 1px ${token.border}`,
       }}

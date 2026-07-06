@@ -153,14 +153,14 @@ export default function RecetaRapida() {
 
             y += 8;
 
-            doc.setFont("times", "normal");
-            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
             doc.setTextColor(15, 23, 42);
 
             const lineasReceta = doc.splitTextToSize(descripcionReceta.trim(), rightX - margin);
-            doc.text(lineasReceta, margin, y, {maxWidth: rightX - margin, lineHeightFactor: 1.65});
+            doc.text(lineasReceta, margin, y, {maxWidth: rightX - margin, lineHeightFactor: 1.5});
 
-            const alturaTexto = lineasReceta.length * 6.8;
+            const alturaTexto = lineasReceta.length * 5;
             const inicioCaja = y - 6;
             const altoCaja = Math.max(88, alturaTexto + 18);
             doc.roundedRect(margin - 2, inicioCaja, rightX - margin + 4, altoCaja, 1.5, 1.5);

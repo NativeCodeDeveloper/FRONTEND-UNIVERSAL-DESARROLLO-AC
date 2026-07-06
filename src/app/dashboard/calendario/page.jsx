@@ -94,26 +94,52 @@ function CalendarioContent() {
                 background: rgba(168, 85, 247, 0.04) !important;
             }
             .rbc-today {
-                background: rgba(248, 250, 252, 0.5) !important;
+                background: rgba(110, 86, 207, 0.04) !important;
             }
             .rbc-current-time-indicator {
-                background-color: #7c3aed !important;
+                background-color: #6E56CF !important;
                 height: 2px !important;
+                z-index: 3 !important;
+            }
+            .rbc-current-time-indicator::before {
+                content: '';
+                position: absolute;
+                left: -4px;
+                top: -4px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: #6E56CF;
             }
             .rbc-slot-selection {
-                background: rgba(124, 58, 237, 0.12) !important;
-                border: 1px solid rgba(124, 58, 237, 0.3) !important;
+                background: rgba(110, 86, 207, 0.10) !important;
+                border: 1px solid rgba(110, 86, 207, 0.35) !important;
                 border-radius: 12px !important;
             }
             .rbc-selected-cell {
-                background: rgba(124, 58, 237, 0.04) !important;
+                background: rgba(110, 86, 207, 0.04) !important;
             }
             .rbc-event,
             .rbc-background-event {
-                border-radius: 8px !important;
-                box-shadow: none !important;
+                border-radius: 10px !important;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.07) !important;
                 overflow: hidden !important;
                 border: none !important;
+            }
+            /* Número de día hoy en mes — círculo violeta */
+            .rbc-date-cell.rbc-now > a,
+            .rbc-date-cell.rbc-now > button,
+            .rbc-date-cell.rbc-now > span {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 26px !important;
+                height: 26px !important;
+                background: #6E56CF !important;
+                color: white !important;
+                border-radius: 50% !important;
+                font-weight: 700 !important;
+                font-size: 12px !important;
             }
             .rbc-background-event {
                 background-color: rgba(107, 114, 128, 0.08) !important;
@@ -2069,6 +2095,69 @@ function CalendarioContent() {
 
                 {/* ── Grilla del calendario ── */}
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                    {currentView === "agenda" ? (
+                        <div className="overflow-y-auto" style={{ height: "calc(100vh - 240px)", minHeight: 520 }}>
+                            {(() => {
+                                const soloReservas = filteredEvents.filter(ev => ev.tipo === "reserva" && !ev._filtered);
+                                if (soloReservas.length === 0) return (
+                                    <div className="flex flex-col items-center justify-center py-20 gap-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        <p className="text-sm text-slate-400 font-medium">Sin reservas en el período</p>
+                                    </div>
+                                );
+                                const grupos = soloReservas.reduce((acc, ev) => {
+                                    const key = format(ev.start, "yyyy-MM-dd");
+                                    if (!acc[key]) acc[key] = [];
+                                    acc[key].push(ev);
+                                    return acc;
+                                }, {});
+                                return Object.keys(grupos).sort().map(key => {
+                                    const fecha = new Date(key + "T00:00:00");
+                                    const labelFecha = format(fecha, "EEEE, d 'de' MMMM", { locale: es }).toUpperCase();
+                                    const evsDia = grupos[key].slice().sort((a, b) => a.start - b.start);
+                                    return (
+                                        <div key={key}>
+                                            <div className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-sm border-b border-slate-100 px-5 py-2.5">
+                                                <span className="text-[11px] font-bold tracking-widest text-slate-500">{labelFecha}</span>
+                                            </div>
+                                            <div className="divide-y divide-slate-50">
+                                                {evsDia.map(ev => {
+                                                    const paleta = obtenerPaletaEstadoReserva(ev.resource?.estadoReserva);
+                                                    const nombrePac = [ev.resource?.nombrePaciente, ev.resource?.apellidoPaciente].filter(Boolean).join(" ");
+                                                    const prof = ev.resource?._nombreProfesional || ev.resource?.nombreProfesional || "";
+                                                    const estadoLabel = ev.resource?.estadoReserva || "reservada";
+                                                    return (
+                                                        <div key={ev.id || ev.resource?.id_reserva}
+                                                            className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/70 cursor-pointer transition-colors"
+                                                            onClick={() => {
+                                                                setid_reserva(ev.resource?.id_reserva);
+                                                                seleccionarReservaEspecifica(ev.resource?.id_reserva);
+                                                                abrirPopupReservaExistente(ev);
+                                                            }}
+                                                        >
+                                                            <div className="w-1 self-stretch rounded-full shrink-0" style={{ backgroundColor: paleta?.color || "#6E56CF" }} />
+                                                            <div className="w-16 shrink-0">
+                                                                <p className="text-[12px] font-bold tabular-nums text-slate-700">{formatHoraCorta(ev.start)}</p>
+                                                                <p className="text-[11px] text-slate-400 tabular-nums">{formatHoraCorta(ev.end)}</p>
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-[13px] font-bold text-slate-800 truncate">{nombrePac || ev.title}</p>
+                                                                {prof && <p className="text-[11px] text-slate-400 truncate mt-0.5">{prof}</p>}
+                                                            </div>
+                                                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 capitalize"
+                                                                style={{ backgroundColor: `${paleta?.color || "#6E56CF"}18`, color: paleta?.color || "#6E56CF", border: `1px solid ${paleta?.color || "#6E56CF"}35` }}>
+                                                                {estadoLabel}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                });
+                            })()}
+                        </div>
+                    ) : (
                     <div
                         className="relative p-3 md:p-4"
                         style={{
@@ -2177,6 +2266,7 @@ function CalendarioContent() {
                             }}
                         />
                     </div>
+                    )}
                 </div>
 
 

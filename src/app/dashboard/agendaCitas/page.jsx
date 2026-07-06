@@ -43,6 +43,7 @@ export default function AgendaCitas() {
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [id_profesional, setId_profesional] = useState("");
     const [actualizandoReservaId, setActualizandoReservaId] = useState(null);
+    const [viewMode, setViewMode] = useState('lista');
 
 
 
@@ -68,11 +69,12 @@ export default function AgendaCitas() {
 
         } catch (error) {
             console.log(error);
-            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de Medify");
+            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de AgendaClínica");
         }
     }
 
     useEffect(() => {
+        if (!id_profesional) return;
         buscarPorProfesional(id_profesional)
     },[id_profesional])
 
@@ -183,7 +185,7 @@ export default function AgendaCitas() {
             }
         } catch (error) {
             console.log(error);
-            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de Medify");
+            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de AgendaClínica");
         }
     }
 
@@ -213,7 +215,7 @@ export default function AgendaCitas() {
             }
         } catch (error) {
             console.log(error);
-            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de Medify");
+            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de AgendaClínica");
         }
     }
 
@@ -335,6 +337,28 @@ export default function AgendaCitas() {
             setActualizandoReservaId(null);
         }
     }
+
+    const citasAgrupadas = useMemo(() => {
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        const grupos = dataLista.reduce((acc, item) => {
+            const key = (item.fechaInicio || '').split('T')[0] || 'sin-fecha';
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+        }, {});
+        return Object.keys(grupos)
+            .sort((a, b) => new Date(a) - new Date(b))
+            .map(key => {
+                const d = new Date(key + 'T00:00:00');
+                const diff = Math.round((d - hoy) / 86400000);
+                let label = diff === 0 ? 'Hoy'
+                    : diff === 1 ? 'Mañana'
+                    : diff === -1 ? 'Ayer'
+                    : d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+                const items = grupos[key].slice().sort((a, b) => (a.horaInicio || '').localeCompare(b.horaInicio || ''));
+                return { key, label, isHoy: diff === 0, items };
+            });
+    }, [dataLista]);
 
     return (
         <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
@@ -469,6 +493,17 @@ export default function AgendaCitas() {
                                 <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-xs font-bold flex items-center justify-center">
                                     {dataLista.length} registros
                                 </span>
+                                {/* Toggle vista */}
+                                <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-0.5">
+                                    <button
+                                        onClick={() => setViewMode('lista')}
+                                        className={`h-7 px-3 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'lista' ? 'bg-white text-[#6E56CF] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                    >Tarjetas</button>
+                                    <button
+                                        onClick={() => setViewMode('tabla')}
+                                        className={`h-7 px-3 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'tabla' ? 'bg-white text-[#6E56CF] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                    >Tabla</button>
+                                </div>
                             </div>
                             
                             <div className="flex items-center gap-4 w-full md:w-auto">
@@ -490,6 +525,75 @@ export default function AgendaCitas() {
                             </div>
                         </div>
 
+                        {/* ── Vista Tarjetas ── */}
+                        {viewMode === 'lista' && (
+                            <div>
+                                {dataLista.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 gap-3">
+                                        <div className="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <p className="text-sm font-medium text-slate-400">No hay reservaciones para mostrar</p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-slate-50">
+                                        {citasAgrupadas.map(({ key, label, isHoy, items }) => (
+                                            <div key={key} className="px-6 py-5">
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <span className={`text-[11px] font-bold uppercase tracking-widest ${isHoy ? 'text-[#6E56CF]' : 'text-slate-400'}`}>{label}</span>
+                                                    {isHoy && <span className="h-1.5 w-1.5 rounded-full bg-[#6E56CF] animate-pulse" />}
+                                                    <div className="flex-1 h-px bg-slate-100" />
+                                                    <span className="text-[10px] font-bold text-slate-300 tabular-nums">{items.length} cita{items.length !== 1 ? 's' : ''}</span>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                                                    {items.map(data => (
+                                                        <div key={data.id_reserva} className="bg-slate-50/60 border border-slate-100 rounded-2xl p-4 hover:border-violet-100 hover:bg-violet-50/20 transition-all">
+                                                            <div className="flex items-center justify-between mb-3">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="h-9 w-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                                                        <span className="text-[11px] font-extrabold text-violet-700 leading-tight">{(data.horaInicio || '--:--').slice(0, 5)}</span>
+                                                                    </div>
+                                                                    {data.horaFinalizacion && (
+                                                                        <span className="text-[10px] text-slate-400 font-medium">→ {data.horaFinalizacion.slice(0, 5)}</span>
+                                                                    )}
+                                                                </div>
+                                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border shadow-sm ${badgeEstado(data.estadoReserva)}`}>
+                                                                    {data.estadoReserva}
+                                                                </span>
+                                                            </div>
+                                                            <div className="mb-3">
+                                                                <p className="text-[14px] font-bold text-slate-800 leading-tight truncate">{data.nombrePaciente} {data.apellidoPaciente}</p>
+                                                                <p className="text-[11px] text-slate-400 mt-0.5">{formatRut(data.rut)} · <span className="text-slate-500 font-semibold">{data.nombreProfesional}</span></p>
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100">
+                                                                <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'asiste')} disabled={actualizandoReservaId === data.id_reserva}
+                                                                    className="flex-1 h-8 rounded-xl bg-cyan-50 text-cyan-600 text-[9px] font-bold uppercase tracking-tight hover:bg-cyan-600 hover:text-white transition-all border border-cyan-100 disabled:opacity-40">Asiste</button>
+                                                                <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'no asiste')} disabled={actualizandoReservaId === data.id_reserva}
+                                                                    className="flex-1 h-8 rounded-xl bg-pink-50 text-pink-600 text-[9px] font-bold uppercase tracking-tight hover:bg-pink-600 hover:text-white transition-all border border-pink-100 disabled:opacity-40">Faltó</button>
+                                                                <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'finalizado')} disabled={actualizandoReservaId === data.id_reserva}
+                                                                    className="flex-1 h-8 rounded-xl bg-orange-50 text-orange-600 text-[9px] font-bold uppercase tracking-tight hover:bg-orange-600 hover:text-white transition-all border border-orange-100 disabled:opacity-40">Fin</button>
+                                                                <button onClick={() => verDetalleAgenda(data.id_reserva)}
+                                                                    className="h-8 w-8 rounded-xl bg-white border border-slate-200 text-slate-400 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all flex items-center justify-center shadow-sm shrink-0">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* ── Vista Tabla (original) ── */}
+                        {viewMode === 'tabla' && (
                         <div className="overflow-x-auto">
                             <Table className="min-w-[800px]">
                                 <TableHeader className="bg-slate-50/50">
@@ -570,6 +674,7 @@ export default function AgendaCitas() {
                                 </TableBody>
                             </Table>
                         </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -90,3 +90,32 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 });
+
+// ── Push notifications ───────────────────────────────────────────────────────
+self.addEventListener('push', (event) => {
+    if (!event.data) return;
+    let data = {};
+    try { data = event.data.json(); } catch { data = { titulo: 'Aviso', body: event.data.text() }; }
+
+    event.waitUntil(
+        self.registration.showNotification(data.titulo || 'Agenda Clínica', {
+            body:    data.body  || '',
+            icon:    data.icon  || '/logo.png',
+            badge:   '/icon-192.png',
+            data:    { url: data.url || '/dashboard' },
+            vibrate: [200, 100, 200],
+        })
+    );
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const url = event.notification.data?.url || '/dashboard';
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+            const match = list.find(c => c.url.includes('/dashboard') && 'focus' in c);
+            if (match) return match.focus();
+            return clients.openWindow(url);
+        })
+    );
+});

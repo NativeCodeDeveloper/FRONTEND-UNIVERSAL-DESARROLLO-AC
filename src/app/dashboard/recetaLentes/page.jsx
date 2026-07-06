@@ -322,10 +322,10 @@ export default function RecetaLentesPage() {
             doc.setTextColor(...text);
             doc.text("OBSERVACIONES:", margin + 6, y);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(8.5);
+            doc.setFontSize(9);
             const observaciones = formulario.observaciones.trim() || formulario.notas.trim() || " ";
             const observacionesLineas = doc.splitTextToSize(observaciones, contentW - 20);
-            doc.text(observacionesLineas, margin + 6, y + 8, {lineHeightFactor: 1.5});
+            doc.text(observacionesLineas, margin + 6, y + 7, {lineHeightFactor: 1.5});
 
             const signatureY = pageH - 26;
             doc.setDrawColor(180, 187, 200);

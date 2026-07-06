@@ -1,5 +1,5 @@
 'use client'
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import {
     Table,
     TableBody,
@@ -25,7 +25,10 @@ export default function PresupuestoTratamiento() {
     const EMPRESA_NOMBRE = process.env.NEXT_PUBLIC_EMPRESA_NOMBRE || "AgendaClinica";
     const [listaServicios, setListaServicios] = useState([]);
     const [listaPresupuesto, setListaPresupuesto] = useState([]);
-    const [totalPresupuesto, setTotalPresupuesto] = useState(0);
+    const totalPresupuesto = useMemo(
+        () => listaPresupuesto.reduce((sum, el) => sum + (el.valorProducto || 0), 0),
+        [listaPresupuesto]
+    );
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [nombreProfesional, setNombreProfesional] = useState("");
     const [nombrePaciente, setNombrePaciente] = useState("");
@@ -62,22 +65,11 @@ export default function PresupuestoTratamiento() {
 
 
     function generarPresupuesto(servicioCotizado) {
-        setListaPresupuesto(servicioCotizadoPrev => [...servicioCotizadoPrev, {...servicioCotizado, observacionCotizacion: ""}]);
-        let valorPresupuesto = servicioCotizado.valorProducto;
-        listaPresupuesto.forEach(element => {
-            valorPresupuesto += element.valorProducto;
-        })
-        setTotalPresupuesto(valorPresupuesto);
+        setListaPresupuesto(prev => [...prev, {...servicioCotizado, observacionCotizacion: ""}]);
     }
 
     function quitarDelPresupuesto(indexEliminar) {
-        setListaPresupuesto(prev => {
-            const nueva = prev.filter((_, i) => i !== indexEliminar);
-            let total = 0;
-            nueva.forEach(el => { total += el.valorProducto; });
-            setTotalPresupuesto(total);
-            return nueva;
-        });
+        setListaPresupuesto(prev => prev.filter((_, i) => i !== indexEliminar));
     }
 
     function actualizarObservacionPresupuesto(indexActualizar, observacionCotizacion) {
