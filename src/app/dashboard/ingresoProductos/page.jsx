@@ -15,6 +15,9 @@ import ToasterClient from "@/Componentes/ToasterClient";
 import {ButtonDinamic} from "@/Componentes/ButtonDinamic";
 import {InfoButton} from "@/Componentes/InfoButton";
 
+const normalizarLista = (data) => Array.isArray(data) ? data : [];
+const normalizarIdOpcional = (value) => value && value !== 0 && value !== "0" ? value : "";
+const normalizarIdParaEnvio = (value) => value ? value : "0";
 
 export default function Dashboard() {
 
@@ -57,8 +60,8 @@ export default function Dashboard() {
                     valorProducto,
                     valor_previo: 1,
                     categoriaProducto,
-                    subcategoria: subcategoria || 0,
-                    subsubcategoria: subsubcategoria || 0,
+                    subcategoria: normalizarIdParaEnvio(subcategoria),
+                    subsubcategoria: normalizarIdParaEnvio(subsubcategoria),
                     imagenProducto : `NO APLICA`,
                     imagenProductoSegunda : `NO APLICA`,
                     imagenProductoTercera : `NO APLICA`,
@@ -126,13 +129,15 @@ export default function Dashboard() {
             })
 
             if(!res.ok){
+                setlistaSubcategorias([]);
                 return;
             }
 
-                const dataSubcategoria = await res.json();
-                setlistaSubcategorias(dataSubcategoria);
+            const dataSubcategoria = await res.json();
+            setlistaSubcategorias(normalizarLista(dataSubcategoria));
 
         }catch (e) {
+            setlistaSubcategorias([]);
             return toast.error('No ha sido posible listar las subcategorias contacte  a soporte de NativeCode: ERROR :' + e);
         }
 }
@@ -218,9 +223,10 @@ useEffect(() => {
             }
 
             const data = await res.json();
-            setlistadoCategorias(data);
+            setlistadoCategorias(normalizarLista(data));
 
         }catch (error) {
+            setlistadoCategorias([]);
             return toast.error('Problemas en listar categoria contacte a soporte');
         }
     }
@@ -253,8 +259,8 @@ useEffect(() => {
                     valorProducto,
                     valor_previo : 1,
                     categoriaProducto,
-                    subcategoria: subcategoria || 0,
-                    subsubcategoria: subsubcategoria || 0,
+                    subcategoria: normalizarIdParaEnvio(subcategoria),
+                    subsubcategoria: normalizarIdParaEnvio(subsubcategoria),
                     imagenProducto: "NO APLICA",
                     imagenProductoSegunda: "NO APLICA",
                     imagenProductoTercera: "NO APLICA",
@@ -349,8 +355,8 @@ useEffect(() => {
                 setdescripcionProducto(data[0].descripcionProducto);
                 setvalorProducto(data[0].valorProducto);
                 setcategoriaProducto(data[0].categoriaProducto);
-                setsubcategorias(data[0].subcategoria);
-                setsubsubcategorias(data[0].subsubcategoria);
+                setsubcategorias(normalizarIdOpcional(data[0].subcategoria));
+                setsubsubcategorias(normalizarIdOpcional(data[0].subsubcategoria));
                 setid_producto(data[0].id_producto);
                 toast.success("Se ha Seleccionado un producto para edicion");
             }
@@ -466,7 +472,7 @@ useEffect(() => {
                                     className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer placeholder:text-slate-400"
                                 >
                                     <option value="" disabled>Seleccione una categoria</option>
-                                    {listadoCategorias.map((categoria) => (
+                                    {normalizarLista(listadoCategorias).map((categoria) => (
                                         <option key={categoria.id_categoriaProducto} value={categoria.id_categoriaProducto}>
                                             {categoria.descripcionCategoria}
                                         </option>
@@ -486,8 +492,8 @@ useEffect(() => {
                                     disabled={!categoriaProducto}
                                     className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
-                                    <option value="">Sin subcategoría</option>
-                                    {listaSubcategorias.map((subcategoria) => (
+                                    <option value="">No aplica</option>
+                                    {normalizarLista(listaSubcategorias).map((subcategoria) => (
                                         <option key={subcategoria.id_subcategoria} value={subcategoria.id_subcategoria}>
                                             {subcategoria.descripcionCategoria}
                                         </option>
@@ -507,8 +513,8 @@ useEffect(() => {
                                     disabled={!subcategorias}
                                     className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
-                                    <option value="">Sin sub-subcategoría</option>
-                                    {listaSubSubCategorias.map((subsubcategoria) => (
+                                    <option value="">No aplica</option>
+                                    {normalizarLista(listaSubSubCategorias).map((subsubcategoria) => (
                                         <option key={subsubcategoria.id_subsubcategoria} value={subsubcategoria.id_subsubcategoria}>
                                             {subsubcategoria.descripcionSubSubCategoria}
                                         </option>
@@ -624,7 +630,7 @@ useEffect(() => {
                             }}
                         >
                             <option value="">-- Selecciona una categoria --</option>
-                            {listadoCategorias.map((categoria) => (
+                            {normalizarLista(listadoCategorias).map((categoria) => (
                                 <option key={categoria.id_categoriaProducto} value={categoria.id_categoriaProducto}>
                                     {categoria.descripcionCategoria}
                                 </option>
