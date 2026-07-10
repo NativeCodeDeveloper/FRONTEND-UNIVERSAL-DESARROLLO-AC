@@ -363,7 +363,7 @@ const DASHBOARD_NAV_SECTIONS = [
     id: "capacitaciones",
     title: "CAPACITACIONES",
     items: [
-      { label: "Videos", href: "https://academia.agendaclinicas.cl/dashboard", icon: "academy", roles: ["administrador-clinico"] },
+      { label: "Videos", href: "https://academia.agendaclinicas.cl/dashboard", icon: "academy", visibleForAllRoles: true },
     ],
   },
   {
@@ -688,6 +688,10 @@ function canAccessDashboardNavItem(role, item) {
 
   if (hasFullDashboardAccess(normalizedRole)) {
     return true;
+  }
+
+  if (item.visibleForAllRoles) {
+    return normalizedRole !== "unknown";
   }
 
   if (Array.isArray(item.roles)) {
