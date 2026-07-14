@@ -101,14 +101,16 @@ export default function ReecetasPacientes() {
     function calcularEdad(fechaNacimiento) {
         if (!fechaNacimiento) return "-";
         const hoy = new Date();
-        const nacimiento = new Date(fechaNacimiento);
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const mes = hoy.getMonth() - nacimiento.getMonth();
-
-        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        const partes = String(fechaNacimiento).split('T')[0].split('-');
+        const anioNac = parseInt(partes[0], 10);
+        const mesNac = parseInt(partes[1], 10);
+        const diaNac = parseInt(partes[2], 10);
+        if (isNaN(anioNac) || isNaN(mesNac) || isNaN(diaNac)) return "-";
+        let edad = hoy.getFullYear() - anioNac;
+        const mesActual = hoy.getMonth() + 1;
+        if (mesActual < mesNac || (mesActual === mesNac && hoy.getDate() < diaNac)) {
             edad--;
         }
-
         return edad;
     }
 
