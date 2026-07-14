@@ -142,7 +142,7 @@ export default function ExamenDocumento() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(90, 90, 90);
-        doc.text("Solicitud de examenes clinicos", contentLeft, 29);
+        doc.text("Solicitud de exámenes clínicos", contentLeft, 29);
 
         doc.setDrawColor(60, 60, 60);
         doc.setLineWidth(0.6);
@@ -151,11 +151,11 @@ export default function ExamenDocumento() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(40, 40, 40);
-        doc.text("ORDEN DE EXAMENES", contentRight, 22, {align: "right"});
+        doc.text("ORDEN DE EXÁMENES", contentRight, 22, {align: "right"});
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.text(`Fecha de emision: ${new Date(`${fechaSolicitud}T00:00:00`).toLocaleDateString("es-CL")}`, contentRight, 28, {align: "right"});
+        doc.text(`Fecha de emisión: ${new Date(`${fechaSolicitud}T00:00:00`).toLocaleDateString("es-CL")}`, contentRight, 28, {align: "right"});
 
         let y = 44;
 
@@ -240,14 +240,14 @@ export default function ExamenDocumento() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(25, 25, 25);
-        doc.text("Total examenes:", contentRight - 51, finalY);
+        doc.text("Total exámenes:", contentRight - 51, finalY);
         doc.text(String(listaExamenesSolicitados.length), contentRight, finalY, {align: "right"});
 
         finalY += 7;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
         doc.setTextColor(95, 95, 95);
-        doc.text("Documento de solicitud clinica", contentRight, finalY, {align: "right"});
+        doc.text("Documento de solicitud clínica", contentRight, finalY, {align: "right"});
 
         const footerY = pageH - 18;
         const firmaY = Math.min(Math.max(finalY + 22, pageH - 52), footerY - 18);
@@ -260,14 +260,14 @@ export default function ExamenDocumento() {
         doc.setFontSize(8);
         doc.setTextColor(90, 90, 90);
         doc.text("Firma profesional", contentLeft, firmaY + 5);
-        doc.text("Recepcion paciente", contentRight, firmaY + 5, {align: "right"});
+        doc.text("Recepción paciente", contentRight, firmaY + 5, {align: "right"});
 
         doc.setDrawColor(190, 190, 190);
         doc.line(contentLeft, footerY - 5, contentRight, footerY - 5);
         doc.setFontSize(7);
         doc.setTextColor(110, 110, 110);
-        doc.text("Documento generado desde AgendaClinica para solicitud interna o entrega al paciente.", contentLeft, footerY);
-        doc.text("Examenes clinicos", contentRight, footerY, {align: "right"});
+        doc.text("Documento generado desde AgendaClínica para solicitud interna o entrega al paciente.", contentLeft, footerY);
+        doc.text("Exámenes clínicos", contentRight, footerY, {align: "right"});
 
         const nombrePacienteArchivo = `${nombrePaciente || "paciente"}`
             .trim()

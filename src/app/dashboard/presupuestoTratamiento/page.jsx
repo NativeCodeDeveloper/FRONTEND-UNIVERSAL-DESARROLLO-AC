@@ -281,7 +281,7 @@ export default function PresupuestoTratamiento() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(6.5);
         doc.setTextColor(...LIGHT);
-        doc.text(`${EMPRESA_NOMBRE}  ·  Documento generado por AgendaClinica`, margin, footerY);
+        doc.text(`${EMPRESA_NOMBRE}  ·  Documento generado por AgendaClínica`, margin, footerY);
         doc.text(`Folio ${folio}  ·  Emisión: ${fechaEmision}`, rightX, footerY, { align: "right" });
 
         doc.save(`presupuesto-${(nombrePaciente || "paciente").toLowerCase().replace(/\s+/g, "-")}.pdf`);

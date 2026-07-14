@@ -124,8 +124,6 @@ function normalizarTextoPDF(valor, fallback = "-") {
     if (!texto) return fallback;
 
     return texto
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
         .replace(/[–—]/g, "-")
         .replace(/[“”]/g, '"')
         .replace(/[‘’]/g, "'");
@@ -554,12 +552,12 @@ export default function Paciente() {
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(18);
                 doc.setTextColor(20, 30, 48);
-                doc.text("AgendaClinica", margin, 27);
+                doc.text("AgendaClínica", margin, 27);
 
                 doc.setFont("helvetica", "italic");
                 doc.setFontSize(8.5);
                 doc.setTextColor(92, 108, 128);
-                doc.text("Ficha clinica del paciente", margin, 32);
+                doc.text("Ficha clínica del paciente", margin, 32);
 
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(8);
@@ -575,8 +573,8 @@ export default function Paciente() {
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(7.5);
                 doc.setTextColor(148, 163, 184);
-                doc.text("Generado por AgendaClinica | Sistema de informacion clinica", margin, pageH - 12);
-                doc.text(`Pagina ${data.pageNumber}`, rightX, pageH - 12, {align: "right"});
+                doc.text("Generado por AgendaClínica | Sistema de información clínica", margin, pageH - 12);
+                doc.text(`Página ${data.pageNumber}`, rightX, pageH - 12, {align: "right"});
             };
 
             dibujarEncabezado();
@@ -590,7 +588,7 @@ export default function Paciente() {
             doc.setFont("helvetica", "bold");
             doc.setFontSize(8.5);
             doc.setTextColor(15, 23, 42);
-            doc.text("Identificacion clinica", margin + 4, y + 7);
+            doc.text("Identificación clínica", margin + 4, y + 7);
 
             doc.setDrawColor(226, 232, 240);
             doc.setLineWidth(0.25);
@@ -615,23 +613,23 @@ export default function Paciente() {
             escribirDato("FECHA CONSULTA", formatearFecha(ficha.fechaConsulta), margin + 74, y + 32, 38);
             escribirDato("TIPO / PLANTILLA", tituloFicha, margin + 130, y + 32, 58);
             escribirDato("NACIMIENTO", formatearFecha(pacienteActual.nacimiento), margin + 4, y + 46, 50);
-            escribirDato("EDAD", calcularEdad(pacienteActual.nacimiento) === "-" ? "-" : `${calcularEdad(pacienteActual.nacimiento)} anos`, margin + 74, y + 46, 35);
-            escribirDato("PREVISION", previsionDeterminacion(pacienteActual.prevision_id), margin + 130, y + 46, 45);
+            escribirDato("EDAD", calcularEdad(pacienteActual.nacimiento) === "-" ? "-" : `${calcularEdad(pacienteActual.nacimiento)} años`, margin + 74, y + 46, 35);
+            escribirDato("PREVISIÓN", previsionDeterminacion(pacienteActual.prevision_id), margin + 130, y + 46, 45);
 
             y += 64;
 
             const datosPaciente = [
-                ["Telefono", pacienteActual.telefono],
+                ["Teléfono", pacienteActual.telefono],
                 ["Correo", pacienteActual.correo],
-                ["Direccion", pacienteActual.direccion],
-                ["Pais", pacienteActual.pais],
+                ["Dirección", pacienteActual.direccion],
+                ["País", pacienteActual.pais],
                 ["Sexo", pacienteActual.sexo],
             ].filter(([, value]) => esDatoVisible(value));
 
             if (datosPaciente.length > 0) {
                 autoTable(doc, {
                     startY: y,
-                    head: [["Datos del paciente", "Informacion"]],
+                    head: [["Datos del paciente", "Información"]],
                     body: datosPaciente.map(([label, value]) => [
                         normalizarTextoPDF(label),
                         normalizarTextoPDF(value)
@@ -669,13 +667,13 @@ export default function Paciente() {
             }
 
             const camposLegacy = [
-                ["Tipo de atencion", ficha.tipoAtencion],
+                ["Tipo de atención", ficha.tipoAtencion],
                 ["Motivo consulta", ficha.motivoConsulta],
                 ["Signos vitales", ficha.signosVitales],
                 ["Profesional responsable", ficha.observaciones],
-                ["Anotacion consulta", ficha.anotacionConsulta],
+                ["Anotación consulta", ficha.anotacionConsulta],
                 ["Anamnesis", ficha.anamnesis],
-                ["Diagnostico", ficha.diagnostico],
+                ["Diagnóstico", ficha.diagnostico],
                 ["Indicaciones", ficha.indicaciones],
                 ["Archivos adjuntos", ficha.archivosAdjuntos],
                 ["Consentimiento firmado", ficha.consentimientoFirmado],
@@ -705,7 +703,7 @@ export default function Paciente() {
             });
 
             if (filasFicha.length === 0) {
-                filasFicha.push(["Sin datos clinicos registrados", "-"]);
+                filasFicha.push(["Sin datos clínicos registrados", "-"]);
             }
 
             autoTable(doc, {

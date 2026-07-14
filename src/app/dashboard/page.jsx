@@ -755,7 +755,7 @@ export default function AgendaCitas() {
 
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total Hoy</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
                             <span className="text-lg font-bold text-slate-900 mt-1 leading-none">{dataLista.length}</span>
                         </div>
                         <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
