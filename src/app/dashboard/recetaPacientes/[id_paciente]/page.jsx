@@ -141,6 +141,11 @@ export default function ReecetasPacientes() {
         });
     }
 
+    function formatearFechaHoraDocumento(fecha = new Date()) {
+        const hora = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        return `${formatearFechaDocumento(fecha)} ${hora}`;
+    }
+
     function sanitizarNombreArchivo(valor) {
         return String(valor ?? "")
             .trim()
@@ -206,7 +211,7 @@ export default function ReecetasPacientes() {
                 doc.setFontSize(8);
                 doc.setTextColor(100, 116, 139);
                 doc.text("Medical prescription", margin, 36.5);
-                doc.text(`Issue date: ${formatearFechaDocumento(fechaEmision)}`, rightX, 27, {align: "right"});
+                doc.text(`Issue date: ${formatearFechaHoraDocumento(fechaEmision)}`, rightX, 27, {align: "right"});
                 doc.text("Clinical document", rightX, 32, {align: "right"});
             };
 

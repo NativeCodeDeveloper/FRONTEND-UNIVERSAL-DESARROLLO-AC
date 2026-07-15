@@ -21,6 +21,12 @@ export default function RecetaRapida() {
     const [nombreProfesional, setNombreProfesional] = useState("");
     const [diagnostico, setDiagnostico] = useState("");
 
+    function formatearGeneracionPDF(fecha) {
+        const fechaTexto = fecha.toLocaleDateString("es-CL");
+        const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        return `Generado: ${fechaTexto} ${horaTexto}`;
+    }
+
     const nombreCompletoPaciente = useMemo(() => {
         return [nombrePaciente, apellidoPaterno, apellidoMaterno].filter(Boolean).join(" ").trim();
     }, [nombrePaciente, apellidoPaterno, apellidoMaterno]);
@@ -95,6 +101,11 @@ export default function RecetaRapida() {
             doc.setFontSize(8);
             doc.setTextColor(71, 85, 105);
             doc.text(`Ficha: ${idFicha}`, rightX, 20, {align: "right"});
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            doc.setTextColor(148, 163, 184);
+            doc.text(formatearGeneracionPDF(new Date()), rightX, 25, {align: "right"});
 
             let y = 44;
 

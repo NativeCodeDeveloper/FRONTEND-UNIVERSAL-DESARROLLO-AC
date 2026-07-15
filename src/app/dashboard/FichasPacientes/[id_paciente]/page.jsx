@@ -563,7 +563,8 @@ export default function Paciente() {
                 doc.setFontSize(8);
                 doc.setTextColor(100, 116, 139);
                 doc.text(`Ficha #${normalizarTextoPDF(ficha.id_ficha)}`, rightX, 27, {align: "right"});
-                doc.text(`Descarga: ${formatearFecha(fechaDescarga)}`, rightX, 32, {align: "right"});
+                const horaDescarga = fechaDescarga.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+                doc.text(`Descarga: ${formatearFecha(fechaDescarga)} ${horaDescarga}`, rightX, 32, {align: "right"});
             };
 
             const dibujarPie = (data) => {
@@ -747,6 +748,23 @@ export default function Paciente() {
                     dibujarPie(data);
                 },
             });
+
+            let firmaY = doc.lastAutoTable.finalY + 14;
+            if (firmaY + 20 > pageH - 24) {
+                doc.addPage();
+                dibujarEncabezado();
+                firmaY = 48 + 14;
+                dibujarPie({pageNumber: doc.internal.getNumberOfPages()});
+            }
+
+            doc.setDrawColor(148, 163, 184);
+            doc.setLineWidth(0.35);
+            doc.line(rightX - 62, firmaY, rightX, firmaY);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(71, 85, 105);
+            doc.text(profesionalFicha, rightX, firmaY + 6, {align: "right"});
+            doc.text("Firma y timbre profesional", rightX, firmaY + 11, {align: "right"});
 
             const rutPacienteArchivo = sanitizarNombreArchivo(pacienteActual.rut || id_paciente || "paciente");
             doc.save(`ficha_clinica_${rutPacienteArchivo || "paciente"}_${ficha.id_ficha}.pdf`);

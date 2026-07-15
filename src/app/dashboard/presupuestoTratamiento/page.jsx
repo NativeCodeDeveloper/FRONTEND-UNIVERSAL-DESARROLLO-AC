@@ -87,7 +87,9 @@ export default function PresupuestoTratamiento() {
         const pageH  = doc.internal.pageSize.getHeight();
         const margin = 20;
         const rightX = pageW - margin;
-        const fechaEmision = new Date().toLocaleDateString("es-CL", { day: "2-digit", month: "long", year: "numeric" });
+        const fechaGeneracion = new Date();
+        const fechaEmision = fechaGeneracion.toLocaleDateString("es-CL", { day: "2-digit", month: "long", year: "numeric" });
+        const horaGeneracion = fechaGeneracion.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
         const folio = `N° ${String(Date.now()).slice(-6)}`; // folio temporal
 
         const profesionalLabel = listaProfesionales.find(p => String(p.id_profesional) === String(nombreProfesional));
@@ -282,7 +284,7 @@ export default function PresupuestoTratamiento() {
         doc.setFontSize(6.5);
         doc.setTextColor(...LIGHT);
         doc.text(`${EMPRESA_NOMBRE}  ·  Documento generado por AgendaClínica`, margin, footerY);
-        doc.text(`Folio ${folio}  ·  Emisión: ${fechaEmision}`, rightX, footerY, { align: "right" });
+        doc.text(`Folio ${folio}  ·  Emisión: ${fechaEmision}, ${horaGeneracion}`, rightX, footerY, { align: "right" });
 
         doc.save(`presupuesto-${(nombrePaciente || "paciente").toLowerCase().replace(/\s+/g, "-")}.pdf`);
     }

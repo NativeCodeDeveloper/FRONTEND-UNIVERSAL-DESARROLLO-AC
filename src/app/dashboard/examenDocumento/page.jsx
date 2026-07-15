@@ -19,6 +19,12 @@ export default function ExamenDocumento() {
     const [listaExamenesSolicitados, setListaExamenesSolicitados] = useState([]);
     const [busquedaExamen, setBusquedaExamen] = useState("");
 
+    function formatearGeneracionPDF(fecha) {
+        const fechaTexto = fecha.toLocaleDateString("es-CL");
+        const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        return `Generado: ${fechaTexto} ${horaTexto}`;
+    }
+
     const formatoCLP = new Intl.NumberFormat("es-CL", {
         style: "currency",
         currency: "CLP",
@@ -155,7 +161,7 @@ export default function ExamenDocumento() {
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.text(`Fecha de emisión: ${new Date(`${fechaSolicitud}T00:00:00`).toLocaleDateString("es-CL")}`, contentRight, 28, {align: "right"});
+        doc.text(`Fecha de emisión: ${new Date(`${fechaSolicitud}T00:00:00`).toLocaleDateString("es-CL")}   ·   ${formatearGeneracionPDF(new Date())}`, contentRight, 28, {align: "right"});
 
         let y = 44;
 
