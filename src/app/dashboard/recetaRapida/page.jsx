@@ -1,25 +1,38 @@
 'use client'
 
-import {useMemo, useState} from "react";
+import {useMemo, useRef, useState} from "react";
 import jsPDF from "jspdf";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import ShadcnInput from "@/Componentes/shadcnInput2";
+import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
+import {useProfesionales} from "@/hooks/useProfesionales";
+import {buscarPacientePorRut} from "@/lib/buscarPaciente";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 
 export default function RecetaRapida() {
-    const PDF_BRAND_TITLE = "AgendaClínica";
-    const PDF_BRAND_SUBTITLE = "Healthcare Information System";
+    const empresaNombre = useEmpresaNombre();
+    const listaProfesionales = useProfesionales();
 
     const [idFicha, setIdFicha] = useState("");
     const [nombrePaciente, setNombrePaciente] = useState("");
-    const [apellidoPaterno, setApellidoPaterno] = useState("");
-    const [apellidoMaterno, setApellidoMaterno] = useState("");
+    const [apellidoPaciente, setApellidoPaciente] = useState("");
     const [rutPaciente, setRutPaciente] = useState("");
+    const [buscandoPaciente, setBuscandoPaciente] = useState(false);
     const [fechaEmision, setFechaEmision] = useState(new Date().toISOString().split("T")[0]);
     const [fechaCaducidad, setFechaCaducidad] = useState("");
     const [descripcionReceta, setDescripcionReceta] = useState("");
+    const [idProfesional, setIdProfesional] = useState("");
     const [nombreProfesional, setNombreProfesional] = useState("");
+    const [rutProfesional, setRutProfesional] = useState("");
     const [diagnostico, setDiagnostico] = useState("");
+    const rutBuscadoRef = useRef("");
 
     function formatearGeneracionPDF(fecha) {
         const fechaTexto = fecha.toLocaleDateString("es-CL");
@@ -27,33 +40,62 @@ export default function RecetaRapida() {
         return `Generado: ${fechaTexto} ${horaTexto}`;
     }
 
+    const especialidadProfesional = useMemo(() => {
+        const profesional = listaProfesionales.find(p => String(p.id_profesional) === String(idProfesional));
+        return profesional?.descripcionProfesional || profesional?.especialidad || "";
+    }, [listaProfesionales, idProfesional]);
+
     const nombreCompletoPaciente = useMemo(() => {
-        return [nombrePaciente, apellidoPaterno, apellidoMaterno].filter(Boolean).join(" ").trim();
-    }, [nombrePaciente, apellidoPaterno, apellidoMaterno]);
+        return [nombrePaciente, apellidoPaciente].filter(Boolean).join(" ").trim();
+    }, [nombrePaciente, apellidoPaciente]);
+
+    async function autocompletarPaciente() {
+        const rutConsultado = rutPaciente.trim();
+        if (!rutConsultado) return;
+        rutBuscadoRef.current = rutConsultado;
+        setBuscandoPaciente(true);
+        try {
+            const paciente = await buscarPacientePorRut(rutConsultado);
+            if (rutBuscadoRef.current !== rutConsultado) return;
+            if (paciente) {
+                setNombrePaciente(paciente.nombre || "");
+                setApellidoPaciente(paciente.apellido || "");
+                toast.success("Datos del paciente completados automáticamente.");
+            }
+        } catch (error) {
+            if (rutBuscadoRef.current === rutConsultado) {
+                toast.error("No fue posible buscar los datos del paciente. Intente nuevamente.");
+            }
+        } finally {
+            if (rutBuscadoRef.current === rutConsultado) setBuscandoPaciente(false);
+        }
+    }
 
     function limpiarFormulario() {
+        rutBuscadoRef.current = "";
+        setBuscandoPaciente(false);
         setIdFicha("");
         setNombrePaciente("");
-        setApellidoPaterno("");
-        setApellidoMaterno("");
+        setApellidoPaciente("");
         setRutPaciente("");
         setFechaEmision(new Date().toISOString().split("T")[0]);
         setFechaCaducidad("");
         setDescripcionReceta("");
+        setIdProfesional("");
         setNombreProfesional("");
+        setRutProfesional("");
         setDiagnostico("");
     }
 
     function validarFormulario() {
         if (!idFicha.trim()) return "Debe ingresar el número de ficha.";
         if (!nombrePaciente.trim()) return "Debe ingresar el nombre del paciente.";
-        if (!apellidoPaterno.trim()) return "Debe ingresar el apellido paterno.";
-        if (!apellidoMaterno.trim()) return "Debe ingresar el apellido materno.";
+        if (!apellidoPaciente.trim()) return "Debe ingresar el apellido del paciente.";
         if (!rutPaciente.trim()) return "Debe ingresar el RUT del paciente.";
         if (!fechaEmision) return "Debe seleccionar la fecha de emisión.";
         if (!fechaCaducidad) return "Debe seleccionar la fecha de caducidad.";
         if (!descripcionReceta.trim()) return "Debe ingresar la descripción de la receta.";
-        if (!nombreProfesional.trim()) return "Debe ingresar el nombre del profesional.";
+        if (!nombreProfesional.trim()) return "Debe seleccionar el profesional.";
         if (!diagnostico.trim()) return "Debe ingresar el diagnóstico.";
 
         const emision = new Date(fechaEmision);
@@ -81,17 +123,17 @@ export default function RecetaRapida() {
             doc.setFont("helvetica", "bold");
             doc.setFontSize(18);
             doc.setTextColor(20, 30, 48);
-            doc.text(PDF_BRAND_TITLE, margin, 20);
+            doc.text(empresaNombre, margin, 20);
 
             doc.setFont("helvetica", "italic");
             doc.setFontSize(8.5);
             doc.setTextColor(92, 108, 128);
-            doc.text(PDF_BRAND_SUBTITLE, margin, 25);
+            doc.text("AgendaClínica — Healthcare Information System", margin, 25);
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(8);
             doc.setTextColor(100, 116, 139);
-            doc.text("Medical prescription", margin, 29);
+            doc.text("Receta médica", margin, 29);
 
             doc.setDrawColor(15, 23, 42);
             doc.setLineWidth(0.45);
@@ -135,7 +177,22 @@ export default function RecetaRapida() {
             doc.setTextColor(15, 23, 42);
             doc.text(new Date(`${fechaEmision}T00:00:00`).toLocaleDateString("es-CL"), margin, y + 7);
             doc.text(new Date(`${fechaCaducidad}T00:00:00`).toLocaleDateString("es-CL"), 84, y + 7);
-            doc.text(nombreProfesional, 148, y + 7);
+            doc.setFontSize(9.5);
+            doc.text(doc.splitTextToSize(nombreProfesional, rightX - 148), 148, y + 7);
+
+            y += 18;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text("RUT PROFESIONAL", margin, y);
+            doc.text("ESPECIALIDAD", 100, y);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9.5);
+            doc.setTextColor(15, 23, 42);
+            doc.text(rutProfesional.trim() || "-", margin, y + 7);
+            doc.text(doc.splitTextToSize(especialidadProfesional || "-", rightX - 100), 100, y + 7);
 
             y += 18;
 
@@ -176,7 +233,7 @@ export default function RecetaRapida() {
             const altoCaja = Math.max(88, alturaTexto + 18);
             doc.roundedRect(margin - 2, inicioCaja, rightX - margin + 4, altoCaja, 1.5, 1.5);
 
-            const firmaY = Math.min(pageH - 36, inicioCaja + altoCaja + 34);
+            const firmaY = Math.min(pageH - 46, inicioCaja + altoCaja + 34);
 
             doc.setDrawColor(148, 163, 184);
             doc.setLineWidth(0.35);
@@ -186,7 +243,11 @@ export default function RecetaRapida() {
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
             doc.text(nombreProfesional, rightX, firmaY + 6, {align: "right"});
-            doc.text("Firma y timbre profesional", rightX, firmaY + 11, {align: "right"});
+            doc.setFontSize(8);
+            doc.text(especialidadProfesional || "-", rightX, firmaY + 11, {align: "right"});
+            doc.text("Firma y timbre profesional", rightX, firmaY + 16, {align: "right"});
+            doc.setTextColor(148, 163, 184);
+            doc.text(empresaNombre, rightX, firmaY + 21, {align: "right"});
 
             const footerY = pageH - 14;
             doc.setDrawColor(226, 232, 240);
@@ -194,8 +255,8 @@ export default function RecetaRapida() {
             doc.setFont("helvetica", "normal");
             doc.setFontSize(7.5);
             doc.setTextColor(148, 163, 184);
-            doc.text("Generated by AgendaClínica | Healthcare Information System", margin, footerY);
-            doc.text("Professional use", rightX, footerY, {align: "right"});
+            doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin, footerY);
+            doc.text("Uso profesional", rightX, footerY, {align: "right"});
 
             const nombreArchivo = `receta-rapida-${nombreCompletoPaciente || "paciente"}`
                 .toLowerCase()
@@ -258,11 +319,14 @@ export default function RecetaRapida() {
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">RUT del paciente</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                                        RUT del paciente {buscandoPaciente && <span className="text-slate-400 font-normal">(buscando...)</span>}
+                                    </label>
                                     <ShadcnInput
                                         value={rutPaciente}
                                         placeholder="Ej: 12.345.678-9"
                                         onChange={(e) => setRutPaciente(e.target.value)}
+                                        onBlur={autocompletarPaciente}
                                         className="w-full"
                                     />
                                 </div>
@@ -278,31 +342,44 @@ export default function RecetaRapida() {
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Apellido paterno</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Apellido</label>
                                     <ShadcnInput
-                                        value={apellidoPaterno}
-                                        placeholder="Ej: González"
-                                        onChange={(e) => setApellidoPaterno(e.target.value)}
+                                        value={apellidoPaciente}
+                                        placeholder="Ej: González Muñoz"
+                                        onChange={(e) => setApellidoPaciente(e.target.value)}
                                         className="w-full"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Apellido materno</label>
-                                    <ShadcnInput
-                                        value={apellidoMaterno}
-                                        placeholder="Ej: Muñoz"
-                                        onChange={(e) => setApellidoMaterno(e.target.value)}
-                                        className="w-full"
-                                    />
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Profesional</label>
+                                    <Select
+                                        value={idProfesional}
+                                        onValueChange={(value) => {
+                                            setIdProfesional(value);
+                                            const prof = listaProfesionales.find(p => String(p.id_profesional) === value);
+                                            setNombreProfesional(prof?.nombreProfesional || "");
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-10 w-full rounded-md border-slate-200 bg-white text-sm text-slate-900 shadow-none">
+                                            <SelectValue placeholder="Seleccionar..." />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-xl border-slate-200 bg-white">
+                                            {listaProfesionales.map((p) => (
+                                                <SelectItem key={p.id_profesional} value={String(p.id_profesional)} className="rounded-lg py-2">
+                                                    {p.nombreProfesional}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Nombre del profesional</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">RUT del profesional</label>
                                     <ShadcnInput
-                                        value={nombreProfesional}
-                                        placeholder="Ej: Dr. Felipe Rojas"
-                                        onChange={(e) => setNombreProfesional(e.target.value)}
+                                        value={rutProfesional}
+                                        placeholder="Ej: 12.345.678-9"
+                                        onChange={(e) => setRutProfesional(e.target.value)}
                                         className="w-full"
                                     />
                                 </div>

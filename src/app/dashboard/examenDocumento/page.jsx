@@ -1,28 +1,69 @@
 'use client'
 
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import toast from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ToasterClient from "@/Componentes/ToasterClient";
 import ShadcnInput from "@/Componentes/shadcnInput2";
+import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
+import {useProfesionales} from "@/hooks/useProfesionales";
+import {buscarPacientePorRut} from "@/lib/buscarPaciente";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 
 export default function ExamenDocumento() {
     const API = process.env.NEXT_PUBLIC_API_URL;
-    const EMPRESA_NOMBRE = process.env.NEXT_PUBLIC_EMPRESA_NOMBRE || "AgendaClinica";
+    const empresaNombre = useEmpresaNombre();
+    const listaProfesionales = useProfesionales();
 
     const [nombrePaciente, setNombrePaciente] = useState("");
     const [rutPaciente, setRutPaciente] = useState("");
+    const [buscandoPaciente, setBuscandoPaciente] = useState(false);
+    const [idProfesional, setIdProfesional] = useState("");
     const [nombreProfesional, setNombreProfesional] = useState("");
+    const [rutProfesional, setRutProfesional] = useState("");
     const [fechaSolicitud, setFechaSolicitud] = useState(new Date().toISOString().split("T")[0]);
     const [listaExamenes, setListaExamenes] = useState([]);
     const [listaExamenesSolicitados, setListaExamenesSolicitados] = useState([]);
     const [busquedaExamen, setBusquedaExamen] = useState("");
+    const rutBuscadoRef = useRef("");
+
+    const especialidadProfesional = useMemo(() => {
+        const profesional = listaProfesionales.find(p => String(p.id_profesional) === String(idProfesional));
+        return profesional?.descripcionProfesional || profesional?.especialidad || "";
+    }, [listaProfesionales, idProfesional]);
 
     function formatearGeneracionPDF(fecha) {
         const fechaTexto = fecha.toLocaleDateString("es-CL");
         const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
         return `Generado: ${fechaTexto} ${horaTexto}`;
+    }
+
+    async function autocompletarPaciente() {
+        const rutConsultado = rutPaciente.trim();
+        if (!rutConsultado) return;
+        rutBuscadoRef.current = rutConsultado;
+        setBuscandoPaciente(true);
+        try {
+            const paciente = await buscarPacientePorRut(rutConsultado);
+            if (rutBuscadoRef.current !== rutConsultado) return;
+            if (paciente) {
+                setNombrePaciente(`${paciente.nombre || ""} ${paciente.apellido || ""}`.trim());
+                toast.success("Datos del paciente completados automáticamente.");
+            }
+        } catch (error) {
+            if (rutBuscadoRef.current === rutConsultado) {
+                toast.error("No fue posible buscar los datos del paciente. Intente nuevamente.");
+            }
+        } finally {
+            if (rutBuscadoRef.current === rutConsultado) setBuscandoPaciente(false);
+        }
     }
 
     const formatoCLP = new Intl.NumberFormat("es-CL", {
@@ -80,9 +121,13 @@ export default function ExamenDocumento() {
     }
 
     function limpiarDocumento() {
+        rutBuscadoRef.current = "";
+        setBuscandoPaciente(false);
         setNombrePaciente("");
         setRutPaciente("");
+        setIdProfesional("");
         setNombreProfesional("");
+        setRutProfesional("");
         setListaExamenesSolicitados([]);
         setBusquedaExamen("");
         setFechaSolicitud(new Date().toISOString().split("T")[0]);
@@ -115,7 +160,7 @@ export default function ExamenDocumento() {
         }
 
         if (!nombreProfesional.trim()) {
-            return toast.error("Debe ingresar el nombre del profesional.");
+            return toast.error("Debe seleccionar el profesional.");
         }
 
         if (!fechaSolicitud) {
@@ -143,16 +188,21 @@ export default function ExamenDocumento() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
         doc.setTextColor(25, 25, 25);
-        doc.text(EMPRESA_NOMBRE.toUpperCase(), contentLeft, 24);
+        doc.text(empresaNombre.toUpperCase(), contentLeft, 24);
+
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(7.5);
+        doc.setTextColor(90, 90, 90);
+        doc.text("AgendaClínica — Healthcare Information System", contentLeft, 29);
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(90, 90, 90);
-        doc.text("Solicitud de exámenes clínicos", contentLeft, 29);
+        doc.text("Solicitud de exámenes clínicos", contentLeft, 33);
 
         doc.setDrawColor(60, 60, 60);
         doc.setLineWidth(0.6);
-        doc.line(contentLeft, 34, contentRight, 34);
+        doc.line(contentLeft, 37, contentRight, 37);
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
@@ -179,15 +229,24 @@ export default function ExamenDocumento() {
         doc.text("Paciente", contentLeft, y + 10);
         doc.text("RUT", contentLeft + 108, y + 10);
         doc.text("Profesional solicitante", contentLeft, y + 21);
+        doc.text("RUT profesional", contentLeft + 108, y + 21);
 
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         doc.setTextColor(25, 25, 25);
         doc.text(nombrePaciente.trim() || "-", contentLeft, y + 16);
         doc.text(rutPaciente.trim() || "-", contentLeft + 108, y + 16);
-        doc.text(nombreProfesional.trim() || "-", contentLeft, y + 27);
+        doc.text(doc.splitTextToSize(nombreProfesional.trim() || "-", contentWidth / 2 - 4), contentLeft, y + 27);
+        doc.text(rutProfesional.trim() || "-", contentLeft + 108, y + 27);
 
-        y = 82;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.text("Especialidad / cargo", contentLeft, y + 34);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.text(doc.splitTextToSize(especialidadProfesional || "-", contentWidth - 4), contentLeft, y + 40);
+
+        y = 90;
 
         const rows = [];
         for (let i = 0; i < listaExamenesSolicitados.length; i += 2) {
@@ -256,7 +315,7 @@ export default function ExamenDocumento() {
         doc.text("Documento de solicitud clínica", contentRight, finalY, {align: "right"});
 
         const footerY = pageH - 18;
-        const firmaY = Math.min(Math.max(finalY + 22, pageH - 52), footerY - 18);
+        const firmaY = Math.min(Math.max(finalY + 22, pageH - 52), footerY - 24);
         doc.setDrawColor(135, 135, 135);
         doc.setLineWidth(0.3);
         doc.line(contentLeft, firmaY, contentLeft + 66, firmaY);
@@ -268,11 +327,15 @@ export default function ExamenDocumento() {
         doc.text("Firma profesional", contentLeft, firmaY + 5);
         doc.text("Recepción paciente", contentRight, firmaY + 5, {align: "right"});
 
+        doc.setFontSize(6.5);
+        doc.setTextColor(120, 120, 120);
+        doc.text(`${nombreProfesional.trim() || "-"} · ${empresaNombre}`, contentLeft, firmaY + 10);
+
         doc.setDrawColor(190, 190, 190);
         doc.line(contentLeft, footerY - 5, contentRight, footerY - 5);
         doc.setFontSize(7);
         doc.setTextColor(110, 110, 110);
-        doc.text("Documento generado desde AgendaClínica para solicitud interna o entrega al paciente.", contentLeft, footerY);
+        doc.text(`Generado por AgendaClínica | ${empresaNombre} — Para solicitud interna o entrega al paciente.`, contentLeft, footerY);
         doc.text("Exámenes clínicos", contentRight, footerY, {align: "right"});
 
         const nombrePacienteArchivo = `${nombrePaciente || "paciente"}`
@@ -336,21 +399,47 @@ export default function ExamenDocumento() {
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">RUT del paciente</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                                        RUT del paciente {buscandoPaciente && <span className="text-slate-400 font-normal">(buscando...)</span>}
+                                    </label>
                                     <ShadcnInput
                                         value={rutPaciente}
                                         placeholder="Ej: 12.345.678-9"
                                         onChange={(e) => setRutPaciente(e.target.value)}
+                                        onBlur={autocompletarPaciente}
                                         className="w-full"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Nombre del profesional</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Profesional solicitante</label>
+                                    <Select
+                                        value={idProfesional}
+                                        onValueChange={(value) => {
+                                            setIdProfesional(value);
+                                            const prof = listaProfesionales.find(p => String(p.id_profesional) === value);
+                                            setNombreProfesional(prof?.nombreProfesional || "");
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-10 w-full rounded-md border-slate-200 bg-white text-sm text-slate-900 shadow-none">
+                                            <SelectValue placeholder="Seleccionar..." />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-xl border-slate-200 bg-white">
+                                            {listaProfesionales.map((p) => (
+                                                <SelectItem key={p.id_profesional} value={String(p.id_profesional)} className="rounded-lg py-2">
+                                                    {p.nombreProfesional}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-700">RUT del profesional</label>
                                     <ShadcnInput
-                                        value={nombreProfesional}
-                                        placeholder="Ej: Dra. María González"
-                                        onChange={(e) => setNombreProfesional(e.target.value)}
+                                        value={rutProfesional}
+                                        placeholder="Ej: 12.345.678-9"
+                                        onChange={(e) => setRutProfesional(e.target.value)}
                                         className="w-full"
                                     />
                                 </div>

@@ -1,39 +1,27 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { obtenerCitasProximas } from '@/lib/citasProximas';
+
+// Frontend-only: no depende de un backend de notificaciones (aún no existe /notificaciones/*).
+// Reusa /reservaPacientes/seleccionarReservados, que ya funciona, para armar el panel.
 
 const API = () => process.env.NEXT_PUBLIC_API_URL;
+const ANTICIPACION_MIN = 30;
+const DESCARTADAS_KEY = 'notif_descartadas';
 
-async function subscribeToPush() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-
-    const reg = await navigator.serviceWorker.register('/sw.js');
-
-    const keyRes = await fetch(`${API()}/notificaciones/vapid-key`);
-    if (!keyRes.ok) return;
-    const { key } = await keyRes.json();
-    if (!key) return;
-
-    const existing = await reg.pushManager.getSubscription();
-    const sub = existing || await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(key),
-    });
-
-    await fetch(`${API()}/notificaciones/push-subscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.toJSON().keys.p256dh, auth: sub.toJSON().keys.auth },
-        }),
-    });
+function getDescartadas() {
+    try {
+        const raw = sessionStorage.getItem(DESCARTADAS_KEY);
+        return new Set(JSON.parse(raw) || []);
+    } catch {
+        return new Set();
+    }
 }
 
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const raw     = window.atob(base64);
-    return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+function saveDescartadas(set) {
+    try {
+        sessionStorage.setItem(DESCARTADAS_KEY, JSON.stringify([...set]));
+    } catch {}
 }
 
 export function useNotificaciones() {
@@ -43,10 +31,19 @@ export function useNotificaciones() {
 
     const fetchNotifs = useCallback(async () => {
         try {
-            const res = await fetch(`${API()}/notificaciones/pendientes`);
+            const res = await fetch(`${API()}/reservaPacientes/seleccionarReservados`, {
+                method: 'GET',
+                headers: { Accept: 'application/json' },
+                mode: 'cors',
+            });
             if (!res.ok) return;
-            const data = await res.json();
-            setNotifs(Array.isArray(data) ? data : []);
+            const reservas = await res.json();
+
+            const descartadas = getDescartadas();
+            const citas = obtenerCitasProximas(reservas, ANTICIPACION_MIN)
+                .filter(n => !descartadas.has(n.id));
+
+            setNotifs(citas);
         } catch {}
     }, []);
 
@@ -59,30 +56,29 @@ export function useNotificaciones() {
     useEffect(() => {
         if (typeof Notification === 'undefined') return;
         setPermiso(Notification.permission);
-        if (Notification.permission === 'granted') subscribeToPush().catch(() => {});
     }, []);
 
     const pedirPermiso = useCallback(async () => {
         if (typeof Notification === 'undefined') return;
         const result = await Notification.requestPermission();
         setPermiso(result);
-        if (result === 'granted') {
-            try { await subscribeToPush(); } catch {}
-        }
     }, []);
 
-    const marcarLeida = useCallback(async (id) => {
-        try {
-            await fetch(`${API()}/notificaciones/${id}/leer`, { method: 'POST' });
-            setNotifs(n => n.filter(x => x.id !== id));
-        } catch {}
+    const marcarLeida = useCallback((id) => {
+        const descartadas = getDescartadas();
+        descartadas.add(id);
+        saveDescartadas(descartadas);
+        setNotifs(n => n.filter(x => x.id !== id));
     }, []);
 
-    const marcarTodasLeidas = useCallback(async () => {
-        try {
-            await fetch(`${API()}/notificaciones/leer-todas`, { method: 'POST' });
-            setNotifs([]);
-        } catch {}
+    const marcarTodasLeidas = useCallback(() => {
+        setNotifs(current => {
+            if (current.length === 0) return current;
+            const descartadas = getDescartadas();
+            current.forEach(n => descartadas.add(n.id));
+            saveDescartadas(descartadas);
+            return [];
+        });
     }, []);
 
     return { notifs, permiso, pedirPermiso, marcarLeida, marcarTodasLeidas };

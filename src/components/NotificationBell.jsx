@@ -125,7 +125,7 @@ export default function NotificationBell() {
             {permiso === 'default' && (
                 <div className="px-4 py-3 bg-violet-50 border-b border-violet-100 shrink-0">
                     <p className="text-xs text-slate-600 mb-2">
-                        Activa las notificaciones para recibir avisos aunque no estés en la plataforma.
+                        Activa las notificaciones para recibir avisos mientras usas AgendaClínica.
                     </p>
                     <button onClick={pedirPermiso}
                         className="text-xs bg-[#6E56CF] hover:bg-[#5b45bc] text-white px-3 py-1.5 rounded-lg transition-colors font-semibold">

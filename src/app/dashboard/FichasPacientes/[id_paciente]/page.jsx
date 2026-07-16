@@ -1,12 +1,13 @@
 "use client"
 import {useParams} from "next/navigation";
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect, useRef, useMemo} from "react";
 import { useUser } from "@clerk/nextjs";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ToasterClient from "@/Componentes/ToasterClient";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales.js"
+import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {useRouter} from "next/navigation";
 import {ShadcnInput} from "@/Componentes/shadcnInput";
@@ -143,6 +144,7 @@ export default function Paciente() {
 
     const {id_paciente} = useParams();
     const { user } = useUser();
+    const empresaNombre = useEmpresaNombre();
     const [detallePaciente, setDetallePaciente] = useState([])
     const API = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
@@ -220,6 +222,64 @@ export default function Paciente() {
 
     const [listaFichas, setListaFichas] = useState([]);
     const [filtroProfesional, setFiltroProfesional] = useState("");
+    const [rutProfesionalFirma, setRutProfesionalFirma] = useState("");
+    const [especialidadProfesionalFirma, setEspecialidadProfesionalFirma] = useState("");
+    const [fichasExpandidas, setFichasExpandidas] = useState(new Set());
+    const [ultimaAtencion, setUltimaAtencion] = useState(null);
+    const pacienteAtencionRef = useRef(null);
+    const primeraExpansionRef = useRef(null);
+
+    function toggleFichaExpandida(id_ficha) {
+        setFichasExpandidas(prev => {
+            const next = new Set(prev);
+            if (next.has(id_ficha)) {
+                next.delete(id_ficha);
+            } else {
+                next.add(id_ficha);
+            }
+            return next;
+        });
+    }
+
+    async function cargarUltimaAtencion(rutPaciente, idPacienteConsultado) {
+        if (!rutPaciente) {
+            if (pacienteAtencionRef.current === idPacienteConsultado) setUltimaAtencion(null);
+            return;
+        }
+        pacienteAtencionRef.current = idPacienteConsultado;
+        try {
+            const res = await fetch(`${API}/reservaPacientes/seleccionarRut`, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({rut: rutPaciente}),
+                mode: "cors"
+            });
+
+            if (pacienteAtencionRef.current !== idPacienteConsultado) return;
+
+            if (!res.ok) {
+                setUltimaAtencion(null);
+                return;
+            }
+
+            const data = await res.json();
+            if (!Array.isArray(data)) {
+                setUltimaAtencion(null);
+                return;
+            }
+
+            const atendidas = data
+                .filter(r => ["asiste", "finalizado"].includes(String(r.estadoReserva || "").toLowerCase()))
+                .sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio));
+
+            setUltimaAtencion(atendidas[0]?.fechaInicio || null);
+        } catch (error) {
+            if (pacienteAtencionRef.current === idPacienteConsultado) setUltimaAtencion(null);
+        }
+    }
 
     async function eliminarFicha(id_ficha) {
         try {
@@ -480,6 +540,7 @@ export default function Paciente() {
         setCorreo(paciente.correo || "");
         setDireccion(paciente.direccion || "");
         setPais(paciente.pais || "");
+        cargarUltimaAtencion(paciente.rut, id_paciente);
     }, [detallePaciente]);
 
     function calcularEdad(fechaNacimiento) {
@@ -508,6 +569,21 @@ export default function Paciente() {
 
     const pacienteActual = detallePaciente[0];
     const totalFichas = listaFichas.length;
+
+    const listaFichasOrdenada = useMemo(() => {
+        return [...listaFichas].sort((a, b) => new Date(b.fechaConsulta) - new Date(a.fechaConsulta));
+    }, [listaFichas]);
+
+    useEffect(() => {
+        if (listaFichasOrdenada.length === 0) return;
+        // Solo auto-expandir la más reciente una vez por paciente — no en cada
+        // recarga de la lista (eliminar, filtrar, limpiar filtro), para no
+        // colapsar fichas que el usuario haya expandido a propósito.
+        if (primeraExpansionRef.current === id_paciente) return;
+        primeraExpansionRef.current = id_paciente;
+        setFichasExpandidas(new Set([listaFichasOrdenada[0].id_ficha]));
+    }, [listaFichasOrdenada, id_paciente]);
+
     const dashboardRole = getDashboardRoleFromUser(user);
     const canSeeOdontograma = canAccessOdontograma(dashboardRole);
     const canSeeRecetaMedica = canAccessRecetasEnFicha(dashboardRole);
@@ -552,16 +628,17 @@ export default function Paciente() {
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(18);
                 doc.setTextColor(20, 30, 48);
-                doc.text("AgendaClínica", margin, 27);
+                doc.text(empresaNombre, margin, 27);
 
                 doc.setFont("helvetica", "italic");
                 doc.setFontSize(8.5);
                 doc.setTextColor(92, 108, 128);
-                doc.text("Ficha clínica del paciente", margin, 32);
+                doc.text("AgendaClínica — Healthcare Information System", margin, 32);
 
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(8);
                 doc.setTextColor(100, 116, 139);
+                doc.text("Ficha clínica del paciente", margin, 36.5);
                 doc.text(`Ficha #${normalizarTextoPDF(ficha.id_ficha)}`, rightX, 27, {align: "right"});
                 const horaDescarga = fechaDescarga.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
                 doc.text(`Descarga: ${formatearFecha(fechaDescarga)} ${horaDescarga}`, rightX, 32, {align: "right"});
@@ -574,7 +651,7 @@ export default function Paciente() {
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(7.5);
                 doc.setTextColor(148, 163, 184);
-                doc.text("Generado por AgendaClínica | Sistema de información clínica", margin, pageH - 12);
+                doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin, pageH - 12);
                 doc.text(`Página ${data.pageNumber}`, rightX, pageH - 12, {align: "right"});
             };
 
@@ -749,8 +826,12 @@ export default function Paciente() {
                 },
             });
 
+            const rutProfesionalVisible = esDatoVisible(rutProfesionalFirma);
+            const especialidadProfesionalVisible = esDatoVisible(especialidadProfesionalFirma);
+            const altoFirma = 21 + (rutProfesionalVisible ? 5 : 0) + (especialidadProfesionalVisible ? 5 : 0);
+
             let firmaY = doc.lastAutoTable.finalY + 14;
-            if (firmaY + 20 > pageH - 24) {
+            if (firmaY + altoFirma > pageH - 24) {
                 doc.addPage();
                 dibujarEncabezado();
                 firmaY = 48 + 14;
@@ -764,7 +845,25 @@ export default function Paciente() {
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
             doc.text(profesionalFicha, rightX, firmaY + 6, {align: "right"});
-            doc.text("Firma y timbre profesional", rightX, firmaY + 11, {align: "right"});
+
+            let offsetFirma = 6;
+            doc.setFontSize(8);
+            if (rutProfesionalVisible) {
+                offsetFirma += 5;
+                doc.text(`RUT: ${rutProfesionalFirma.trim()}`, rightX, firmaY + offsetFirma, {align: "right"});
+            }
+            if (especialidadProfesionalVisible) {
+                offsetFirma += 5;
+                doc.text(especialidadProfesionalFirma.trim(), rightX, firmaY + offsetFirma, {align: "right"});
+            }
+
+            offsetFirma += 5;
+            doc.setFontSize(9);
+            doc.text("Firma y timbre profesional", rightX, firmaY + offsetFirma, {align: "right"});
+
+            offsetFirma += 5;
+            doc.setTextColor(148, 163, 184);
+            doc.text(empresaNombre, rightX, firmaY + offsetFirma, {align: "right"});
 
             const rutPacienteArchivo = sanitizarNombreArchivo(pacienteActual.rut || id_paciente || "paciente");
             doc.save(`ficha_clinica_${rutPacienteArchivo || "paciente"}_${ficha.id_ficha}.pdf`);
@@ -856,6 +955,12 @@ export default function Paciente() {
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sexo</span>
                                             <p className="text-[13px] font-semibold text-slate-700">{pacienteActual.sexo || "-"}</p>
                                         </div>
+                                    </div>
+                                    <div className="rounded-2xl bg-violet-50/60 border border-violet-100 px-4 py-3 flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-[#6E56CF] uppercase tracking-widest">Última atención</span>
+                                        <span className="text-[13px] font-bold text-slate-700">
+                                            {ultimaAtencion ? formatearFecha(ultimaAtencion) : "Sin registro"}
+                                        </span>
                                     </div>
                                     <div className="pt-4 border-t border-slate-100 space-y-4">
                                         <div className="flex items-center gap-3">
@@ -1007,6 +1112,30 @@ export default function Paciente() {
                                 {filtroProfesional && <button onClick={limpiarFiltro} className="h-12 px-5 rounded-2xl bg-slate-100 text-slate-600 text-[13px] font-bold hover:bg-slate-200">Limpiar</button>}
                             </div>
 
+                            {/* RUT y especialidad del profesional para la firma del PDF (opcional, no se guarda en el backend) */}
+                            <div className="bg-white rounded-[28px] border border-slate-200 shadow-sm p-4 flex items-center gap-4">
+                                <div className="flex-1">
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">RUT profesional (opcional, para la firma del PDF)</label>
+                                    <input
+                                        type="text"
+                                        value={rutProfesionalFirma}
+                                        onChange={(e) => setRutProfesionalFirma(e.target.value)}
+                                        placeholder="Ej: 12.345.678-9"
+                                        className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Especialidad (opcional, para la firma del PDF)</label>
+                                    <input
+                                        type="text"
+                                        value={especialidadProfesionalFirma}
+                                        onChange={(e) => setEspecialidadProfesionalFirma(e.target.value)}
+                                        placeholder="Ej: Médico Cirujano"
+                                        className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
+                                    />
+                                </div>
+                            </div>
+
                             {/* Fichas Propiamente Tales */}
                             {listaFichas.length === 0 ? (
                                 <div className="bg-white rounded-[32px] border border-dashed border-slate-200 py-24 text-center">
@@ -1017,7 +1146,9 @@ export default function Paciente() {
                                 </div>
                             ) : (
                                 <div className="space-y-6">
-                                    {listaFichas.map((ficha) => (
+                                    {listaFichasOrdenada.map((ficha, index) => {
+                                        const expandida = fichasExpandidas.has(ficha.id_ficha);
+                                        return (
                                         <div key={ficha.id_ficha} className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
                                             <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                 <div className="flex items-center gap-4">
@@ -1025,8 +1156,11 @@ export default function Paciente() {
                                                         #{ficha.id_ficha}
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-sm font-bold text-slate-800">
+                                                        <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                                                             {parsearDatosDinamicos(ficha.datosDinamicos)?._plantillaNombre || ficha.tipoAtencion || "Consulta General"}
+                                                            {index === 0 && (
+                                                                <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">Más reciente</span>
+                                                            )}
                                                         </h4>
                                                         <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Fecha: {formatearFecha(ficha.fechaConsulta)}</p>
                                                     </div>
@@ -1035,6 +1169,9 @@ export default function Paciente() {
                                                     <div className="h-9 px-3 rounded-xl bg-teal-50 text-teal-700 text-[11px] font-bold flex items-center border border-teal-100">
                                                         Prof: {ficha.observaciones || "N/A"}
                                                     </div>
+                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-9 px-4 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all">
+                                                        {expandida ? "Ocultar" : "Ver detalle"}
+                                                    </button>
                                                     <button onClick={() => descargarFichaPDF(ficha)} className="h-9 px-4 rounded-xl bg-violet-50 border border-violet-100 text-[#6E56CF] text-[11px] font-bold hover:bg-violet-100 transition-all">PDF</button>
                                                     <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-9 px-4 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all">Editar</button>
                                                     <button onClick={() => eliminarFicha(ficha.id_ficha)} className="h-9 w-9 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all">
@@ -1042,6 +1179,7 @@ export default function Paciente() {
                                                     </button>
                                                 </div>
                                             </div>
+                                            {expandida && (
                                             <div className="p-8">
                                                 {(() => {
                                                     const datos = parsearDatosDinamicos(ficha.datosDinamicos)
@@ -1071,8 +1209,10 @@ export default function Paciente() {
                                                     return <p className="text-sm text-slate-400 italic text-center py-4">No hay datos estructurados en esta ficha.</p>
                                                 })()}
                                             </div>
+                                            )}
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
