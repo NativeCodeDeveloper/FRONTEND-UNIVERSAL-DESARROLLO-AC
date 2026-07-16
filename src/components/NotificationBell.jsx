@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { Bell, BellOff, CalendarCheck, CalendarX, Clock, Activity, X, CheckCheck } from 'lucide-react';
 import { useNotificaciones } from '@/hooks/useNotificaciones';
 
@@ -26,7 +27,14 @@ export default function NotificationBell() {
     const [open, setOpen] = useState(false);
     const [pos,  setPos]  = useState({ top: 0, left: 0, maxH: 400 });
     const btnRef = useRef(null);
+    const router = useRouter();
     const { notifs, permiso, pedirPermiso, marcarLeida, marcarTodasLeidas } = useNotificaciones();
+
+    function irACitaDeNotificacion(notif) {
+        if (notif.tipo !== 'recordatorio') return;
+        setOpen(false);
+        router.push(`/dashboard/calendario?id_reserva=${notif.id}`);
+    }
 
     const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 640;
 
@@ -152,7 +160,9 @@ export default function NotificationBell() {
                         const { Icon, bg, color } = getNotifStyle(n.tipo);
                         return (
                             <div key={n.id}
-                                className="flex items-start gap-3 px-4 py-3 border-b border-slate-50 hover:bg-slate-50/60 transition-colors group">
+                                onClick={() => irACitaDeNotificacion(n)}
+                                title={n.tipo === 'recordatorio' ? 'Ver cita en el calendario' : undefined}
+                                className={`flex items-start gap-3 px-4 py-3 border-b border-slate-50 hover:bg-slate-50/60 transition-colors group ${n.tipo === 'recordatorio' ? 'cursor-pointer' : ''}`}>
                                 <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center shrink-0 mt-0.5`}>
                                     <Icon size={14} className={color} />
                                 </div>
@@ -165,7 +175,7 @@ export default function NotificationBell() {
                                         {formatRelativo(n.creado_en)}
                                     </p>
                                 </div>
-                                <button onClick={() => marcarLeida(n.id)} title="Marcar como leída"
+                                <button onClick={(e) => { e.stopPropagation(); marcarLeida(n.id); }} title="Marcar como leída"
                                     className="p-1 text-slate-300 hover:text-slate-500 opacity-0 group-hover:opacity-100 transition-all shrink-0">
                                     <X size={11} />
                                 </button>
@@ -181,26 +191,14 @@ export default function NotificationBell() {
 
     return (
         <>
-            <button ref={btnRef} onClick={toggle}
-                className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-150 ${
-                    open
-                        ? 'bg-[#F3F0FF] text-[#6E56CF]'
-                        : 'text-slate-600 hover:bg-[#F3F0FF] hover:text-[#6E56CF]'
+            <button ref={btnRef} onClick={toggle} title="Notificaciones"
+                className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all duration-150 ${
+                    open ? 'bg-[#EDE9FE] text-[#6E56CF]' : 'bg-slate-100 text-slate-500 hover:bg-[#F3F0FF] hover:text-[#6E56CF]'
                 }`}>
-                <span className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-all duration-150 ${
-                    open ? 'bg-[#EDE9FE] text-[#6E56CF]' : 'bg-slate-100 text-slate-500'
-                }`}>
-                    <Bell size={14} strokeWidth={1.8} />
-                    {notifs.length > 0 && (
-                        <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-[#6E56CF] rounded-full flex items-center justify-center text-[8px] font-bold text-white leading-none">
-                            {notifs.length > 9 ? '9+' : notifs.length}
-                        </span>
-                    )}
-                </span>
-                <span className="flex-1 leading-none">Notificaciones</span>
+                <Bell size={16} strokeWidth={1.8} />
                 {notifs.length > 0 && (
-                    <span className="text-[10px] font-semibold bg-[#6E56CF] text-white rounded-full px-1.5 py-0.5 leading-none">
-                        {notifs.length}
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-[#6E56CF] rounded-full flex items-center justify-center text-[8px] font-bold text-white leading-none">
+                        {notifs.length > 9 ? '9+' : notifs.length}
                     </span>
                 )}
             </button>

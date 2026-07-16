@@ -763,6 +763,35 @@ function CalendarioContent() {
         });
     }
 
+    // Abre el drawer de una reserva específica por id — usado cuando se llega
+    // al calendario desde el clic en una notificación de "cita próxima".
+    async function abrirReservaPorId(idReserva) {
+        try {
+            const res = await fetch(`${API}/reservaPacientes/seleccionarEspecifica`, {
+                method: "POST",
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                mode: "cors",
+                body: JSON.stringify({ id_reserva: idReserva })
+            });
+            if (!res.ok) return toast.error("No fue posible cargar la reserva de la notificación.");
+            const data = await res.json();
+            const reserva = Array.isArray(data) ? data[0] : data;
+            if (!reserva) return toast.error("No se encontró la reserva de la notificación.");
+
+            const start = convertirAFechaCalendario(reserva.fechaInicio, reserva.horaInicio);
+            const end = convertirAFechaCalendario(reserva.fechaFinalizacion, reserva.horaFinalizacion);
+
+            abrirPopupReservaExistente({ resource: reserva, start, end });
+        } catch (error) {
+            toast.error("No fue posible cargar la reserva de la notificación.");
+        }
+    }
+
+    useEffect(() => {
+        const idReservaParam = searchParams.get("id_reserva");
+        if (idReservaParam) abrirReservaPorId(idReservaParam);
+    }, [searchParams]);
+
     function actualizarBorradorSeleccion(start, end) {
         const nextDraft = {
             start,
