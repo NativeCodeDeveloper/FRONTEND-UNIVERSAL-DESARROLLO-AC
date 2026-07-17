@@ -5,9 +5,10 @@ import {toast} from "react-hot-toast";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {ShadcnInput} from "@/Componentes/shadcnInput";
 import {InfoButton} from "@/Componentes/InfoButton";
+import ImageCropperModal from "@/Componentes/ImageCropperModal";
 import * as React from "react";
 
-
+const PORTADA_CROP_ASPECT = 1; // La página pública (/portada) muestra la imagen en un contenedor cuadrado.
 
 export default function CarruselPortada() {
     const API = process.env.NEXT_PUBLIC_API_URL;
@@ -21,21 +22,40 @@ export default function CarruselPortada() {
     const [descripcionPublicacionesPortada, setdescripcionPublicacionesPortada] = useState("");
     const [id_publicacionesPortada, setid_publicacionesPortada] = useState(null);
     const [imagenAnterior, setimagenAnterior] = useState(null);
+    const [imagenParaCrop, setImagenParaCrop] = useState(null);
+    const [cropperAbierto, setCropperAbierto] = useState(false);
 
 
 
     function capturarImagen(event){
         const file = event.target.files?.[0] ?? null;
+        event.target.value = "";
+        if(!file) return;
+
+        const url = URL.createObjectURL(file);
+        setImagenParaCrop(url);
+        setCropperAbierto(true);
+    }
+
+    function onCropConfirm(croppedFile){
         if(vistaPrevia){
-          URL.revokeObjectURL(vistaPrevia);
+            URL.revokeObjectURL(vistaPrevia);
         }
-        setimagen(file)
-        if(file){
-            const url = URL.createObjectURL(file);
-            setVistaPrevia(url);
-        }else{
-            setVistaPrevia(null)
+        if(imagenParaCrop){
+            URL.revokeObjectURL(imagenParaCrop);
         }
+        setimagen(croppedFile);
+        setVistaPrevia(URL.createObjectURL(croppedFile));
+        setCropperAbierto(false);
+        setImagenParaCrop(null);
+    }
+
+    function onCropCancel(){
+        if(imagenParaCrop){
+            URL.revokeObjectURL(imagenParaCrop);
+        }
+        setCropperAbierto(false);
+        setImagenParaCrop(null);
     }
 
 
@@ -285,6 +305,14 @@ export default function CarruselPortada() {
     return (
         <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
             <ToasterClient />
+            <ImageCropperModal
+                open={cropperAbierto}
+                imageSrc={imagenParaCrop}
+                aspectRatio={PORTADA_CROP_ASPECT}
+                title="Ajusta la imagen de portada"
+                onConfirm={onCropConfirm}
+                onCancel={onCropCancel}
+            />
 
             <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
                 
@@ -298,7 +326,7 @@ export default function CarruselPortada() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={'Se recomienda subir imágenes de 2021 × 748 px en formato JPG o PNG para una visualización óptima en el carrusel de portada.'}/>
+                        <InfoButton informacion={'Se recomienda subir imágenes cuadradas de alta resolución (mínimo 1080 × 1080 px) en formato JPG o PNG. Podrás ajustar el encuadre al subir la imagen.'}/>
                     </div>
                 </div>
 
@@ -351,7 +379,7 @@ export default function CarruselPortada() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Imagen de Portada (Proporción 2.7:1)</label>
+                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Imagen de Portada (Proporción 1:1)</label>
                                     <div className="relative group">
                                         <input
                                             type='file'
@@ -400,7 +428,7 @@ export default function CarruselPortada() {
                                     <span className="text-[10px] font-bold text-[#6E56CF] bg-violet-50 px-2 py-1 rounded-lg uppercase tracking-tight">Efecto Carrusel</span>
                                 </div>
                                 <div className="p-4">
-                                    <div className="aspect-[2021/748] rounded-2xl overflow-hidden shadow-inner bg-slate-100">
+                                    <div className="aspect-square rounded-2xl overflow-hidden shadow-inner bg-slate-100 max-w-xs mx-auto">
                                         <img src={vistaPrevia} alt="Preview" className="w-full h-full object-cover" />
                                     </div>
                                 </div>

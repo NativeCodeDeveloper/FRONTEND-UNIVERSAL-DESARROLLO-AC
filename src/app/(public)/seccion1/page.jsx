@@ -66,14 +66,14 @@ export default function Seccion1() {
               <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-tight mb-7">
                 {tituloSobreNosotros}
               </h2>
-              <p className="text-lg text-slate-600 leading-relaxed">
+              <p className="text-lg text-slate-600 leading-relaxed text-justify">
                 {descripcionPrincipal}
               </p>
             </div>
 
             {/* Right */}
             <div className="flex flex-col gap-8 lg:pt-16">
-              <p className="text-lg text-slate-600 leading-relaxed">
+              <p className="text-lg text-slate-600 leading-relaxed text-justify">
                 {descripcionSecundaria}
               </p>
               <Link

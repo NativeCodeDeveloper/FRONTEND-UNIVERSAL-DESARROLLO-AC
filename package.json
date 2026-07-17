@@ -47,6 +47,7 @@
     "react-bootstrap": "^2.10.10",
     "react-day-picker": "^9.13.0",
     "react-dom": "^19.2.1",
+    "react-easy-crop": "^6.2.2",
     "react-floating-whatsapp": "^5.0.8",
     "react-hook-form": "^7.67.0",
     "react-hot-toast": "^2.6.0",

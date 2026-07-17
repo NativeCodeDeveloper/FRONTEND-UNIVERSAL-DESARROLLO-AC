@@ -19,7 +19,7 @@ function PublicationCard({ item }) {
       transition={{ type: "spring", stiffness: 300 }}
     >
       <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div className="relative h-40 w-full overflow-hidden bg-slate-100">
+        <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
           <img
             src={imgError ? FALLBACK_IMAGE : item.image}
             alt="Publicación"
@@ -47,7 +47,7 @@ function SkeletonCard() {
   return (
     <div className="w-64 flex-shrink-0 opacity-50">
       <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-        <div className="h-40 w-full bg-slate-100 animate-pulse" />
+        <div className="w-full aspect-square bg-slate-100 animate-pulse" />
         <div className="p-4 space-y-2">
           <div className="h-3 bg-slate-100 rounded-full animate-pulse" />
           <div className="h-3 bg-slate-100 rounded-full animate-pulse w-3/4" />

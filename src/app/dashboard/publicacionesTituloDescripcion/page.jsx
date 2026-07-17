@@ -13,6 +13,11 @@ import {
 import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import { subirImagenCloudflare } from "@/FuncionesTranversales/FuncionesCloudflare";
 import ToasterClient from "@/Componentes/ToasterClient";
+import ImageCropperModal from "@/Componentes/ImageCropperModal";
+
+// Proporción de compromiso: la tarjeta pública (seccion2) usa ancho responsivo (vw) con alto fijo,
+// por lo que su ratio real varía entre ~0.625:1 (mobile) y ~0.9:1 (desktop). 4:5 es un punto medio razonable.
+const SECCION2_CROP_ASPECT = 4 / 5;
 
 export default function PublicacionesTituloDescripcion() {
     const API = process.env.NEXT_PUBLIC_API_URL;
@@ -30,6 +35,8 @@ export default function PublicacionesTituloDescripcion() {
     const [imageIdSubida, setImageIdSubida] = useState("");
     const [cargandoGuardado, setCargandoGuardado] = useState(false);
     const [publicacionEditando, setPublicacionEditando] = useState(null);
+    const [imagenParaCrop, setImagenParaCrop] = useState(null);
+    const [cropperAbierto, setCropperAbierto] = useState(false);
     const formularioRef = useRef(null);
     const vistaPreviaRef = useRef(null);
 
@@ -86,18 +93,36 @@ export default function PublicacionesTituloDescripcion() {
         }
     }
 
-    // PARTE 2: Capturar imagen local y mostrar vista previa
+    // PARTE 2: Capturar imagen local y abrir el recorte antes de guardar la vista previa
     function capturarImagen(event) {
         const file = event.target.files?.[0] ?? null;
+        event.target.value = "";
+        if (!file) return;
 
+        const url = URL.createObjectURL(file);
+        setImagenParaCrop(url);
+        setCropperAbierto(true);
+    }
+
+    function onCropConfirm(croppedFile) {
         if (vistaPreviaRef.current) URL.revokeObjectURL(vistaPreviaRef.current);
+        if (imagenParaCrop) URL.revokeObjectURL(imagenParaCrop);
 
-        setImagenArchivo(file);
+        setImagenArchivo(croppedFile);
         setImageIdSubida("");
 
-        const newUrl = file ? URL.createObjectURL(file) : null;
+        const newUrl = URL.createObjectURL(croppedFile);
         vistaPreviaRef.current = newUrl;
         setVistaPreviaLocal(newUrl);
+
+        setCropperAbierto(false);
+        setImagenParaCrop(null);
+    }
+
+    function onCropCancel() {
+        if (imagenParaCrop) URL.revokeObjectURL(imagenParaCrop);
+        setCropperAbierto(false);
+        setImagenParaCrop(null);
     }
 
     async function insertarPublicacionesTituloDetalle(imagenId) {
@@ -274,6 +299,14 @@ export default function PublicacionesTituloDescripcion() {
     return (
         <div className="min-h-screen bg-[#FAFAFB]">
             <ToasterClient/>
+            <ImageCropperModal
+                open={cropperAbierto}
+                imageSrc={imagenParaCrop}
+                aspectRatio={SECCION2_CROP_ASPECT}
+                title="Ajusta la imagen de la publicación"
+                onConfirm={onCropConfirm}
+                onCancel={onCropCancel}
+            />
             <div className="mx-auto w-full max-w-6xl px-6 py-10 space-y-8">
 
                 {/* Header */}

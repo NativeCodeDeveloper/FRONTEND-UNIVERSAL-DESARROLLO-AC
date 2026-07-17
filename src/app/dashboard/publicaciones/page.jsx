@@ -3,7 +3,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import {toast, Toaster} from "react-hot-toast";
 import {InfoButton} from "@/Componentes/InfoButton";
+import ImageCropperModal from "@/Componentes/ImageCropperModal";
 
+const PUBLICACIONES_CROP_ASPECT = 1; // Tarjetas cuadradas en /seccion3
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = [
     "image/jpeg",
@@ -26,6 +28,17 @@ export default function Publicaciones() {
     const [descripcionPublicaciones, setDescripcionPublicaciones] = useState("");
     const [listaPublicaciones, setListaPublicaciones] = useState([]);
     const [id_publicaciones, setId_publicaciones] = useState("");
+
+    // Cropper: flujo "Actualizar" (hasta 3 imágenes en cola secuencial)
+    const [cropUpdateAbierto, setCropUpdateAbierto] = useState(false);
+    const [cropUpdateImageSrc, setCropUpdateImageSrc] = useState(null);
+    const [colaCropPendiente, setColaCropPendiente] = useState([]);
+    const [croppedAcumulados, setCroppedAcumulados] = useState([]);
+    const [totalCropBatch, setTotalCropBatch] = useState(0);
+
+    // Cropper: flujo "Insertar" (1 imagen)
+    const [cropInsertAbierto, setCropInsertAbierto] = useState(false);
+    const [cropInsertImageSrc, setCropInsertImageSrc] = useState(null);
 
     const API = process.env.NEXT_PUBLIC_API_URL;
     const CLOUDFLARE_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_HASH;
@@ -257,32 +270,90 @@ export default function Publicaciones() {
         }
     }
 
+    function abrirCropperUpdate(rawFile) {
+        const url = URL.createObjectURL(rawFile);
+        setCropUpdateImageSrc(url);
+        setCropUpdateAbierto(true);
+    }
+
     function handleFileChange(event) {
         const files = Array.from(event.target.files || []);
+        event.target.value = "";
+        if (!files.length) return;
 
-        if (id_publicaciones && Number(id_publicaciones) !== 10) {
-            if (files.length > 1) {
-                toast("Solo se permite 1 imagen para esta publicacion. Se usara la primera seleccionada.");
-            }
-            setfile(files.slice(0, 1));
+        const soloUnaImagen = id_publicaciones && Number(id_publicaciones) !== 10;
+        const limite = soloUnaImagen ? 1 : 3;
+
+        if (soloUnaImagen && files.length > 1) {
+            toast("Solo se permite 1 imagen para esta publicacion. Se usara la primera seleccionada.");
+        } else if (!soloUnaImagen && files.length > 3) {
+            toast("Has seleccionado mas de 3 imagenes. Se usaran las primeras 3.");
+        }
+
+        const seleccionados = files.slice(0, limite);
+        setCroppedAcumulados([]);
+        setColaCropPendiente(seleccionados.slice(1));
+        setTotalCropBatch(seleccionados.length);
+        abrirCropperUpdate(seleccionados[0]);
+    }
+
+    function onCropUpdateConfirm(croppedFile) {
+        if (cropUpdateImageSrc) URL.revokeObjectURL(cropUpdateImageSrc);
+        const nuevosAcumulados = [...croppedAcumulados, croppedFile];
+
+        if (colaCropPendiente.length > 0) {
+            const [siguiente, ...resto] = colaCropPendiente;
+            setCroppedAcumulados(nuevosAcumulados);
+            setColaCropPendiente(resto);
+            abrirCropperUpdate(siguiente);
             return;
         }
 
-        if (files.length > 3) {
-            toast("Has seleccionado mas de 3 imagenes. Se usaran las primeras 3.");
-        }
-        setfile(files.slice(0, 3));
+        setfile(nuevosAcumulados);
+        setCroppedAcumulados([]);
+        setColaCropPendiente([]);
+        setTotalCropBatch(0);
+        setCropUpdateAbierto(false);
+        setCropUpdateImageSrc(null);
+    }
+
+    function onCropUpdateCancel() {
+        if (cropUpdateImageSrc) URL.revokeObjectURL(cropUpdateImageSrc);
+        setColaCropPendiente([]);
+        setCroppedAcumulados([]);
+        setTotalCropBatch(0);
+        setCropUpdateAbierto(false);
+        setCropUpdateImageSrc(null);
+        toast("Selección de imágenes cancelada.");
     }
 
     function handleNewFileChange(event) {
         const selectedFile = event.target.files?.[0] || null;
-        setNewFile(selectedFile);
+        event.target.value = "";
+        if (!selectedFile) return;
 
-        // Revocar el URL anterior antes de crear uno nuevo
+        const url = URL.createObjectURL(selectedFile);
+        setCropInsertImageSrc(url);
+        setCropInsertAbierto(true);
+    }
+
+    function onCropInsertConfirm(croppedFile) {
         if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-        const newUrl = selectedFile ? URL.createObjectURL(selectedFile) : null;
+        if (cropInsertImageSrc) URL.revokeObjectURL(cropInsertImageSrc);
+
+        setNewFile(croppedFile);
+        const newUrl = URL.createObjectURL(croppedFile);
         previewUrlRef.current = newUrl;
         setNewPreview(newUrl);
+
+        setCropInsertAbierto(false);
+        setCropInsertImageSrc(null);
+    }
+
+    function onCropInsertCancel() {
+        if (cropInsertImageSrc) URL.revokeObjectURL(cropInsertImageSrc);
+        setCropInsertAbierto(false);
+        setCropInsertImageSrc(null);
     }
 
     async function handleUpdateSubmit(event) {
@@ -359,6 +430,24 @@ export default function Publicaciones() {
     return (
         <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
             <Toaster position="top-right" reverseOrder={false} />
+            <ImageCropperModal
+                open={cropUpdateAbierto}
+                imageSrc={cropUpdateImageSrc}
+                aspectRatio={PUBLICACIONES_CROP_ASPECT}
+                title={totalCropBatch > 1
+                    ? `Ajusta la imagen ${croppedAcumulados.length + 1} de ${totalCropBatch}`
+                    : "Ajusta la imagen de la publicación"}
+                onConfirm={onCropUpdateConfirm}
+                onCancel={onCropUpdateCancel}
+            />
+            <ImageCropperModal
+                open={cropInsertAbierto}
+                imageSrc={cropInsertImageSrc}
+                aspectRatio={PUBLICACIONES_CROP_ASPECT}
+                title="Ajusta la imagen de la publicación"
+                onConfirm={onCropInsertConfirm}
+                onCancel={onCropInsertCancel}
+            />
 
             <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
                 
@@ -497,7 +586,7 @@ export default function Publicaciones() {
                                         </div>
                                     </div>
                                     
-                                    <div className="aspect-[16/10] rounded-3xl border border-slate-100 bg-slate-50 overflow-hidden relative">
+                                    <div className="aspect-square rounded-3xl border border-slate-100 bg-slate-50 overflow-hidden relative">
                                         {newPreview ? (
                                             <img src={newPreview} alt="Preview" className="w-full h-full object-cover" />
                                         ) : (
