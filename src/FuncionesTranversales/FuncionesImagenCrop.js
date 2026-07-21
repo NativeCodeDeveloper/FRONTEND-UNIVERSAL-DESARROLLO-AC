@@ -1,3 +1,8 @@
+// Ratio compartido entre el cropper de "Tratamientos Destacados" (dashboard/publicacionesTituloDescripcion)
+// y la tarjeta pública de Servicios (public/seccion2). Debe mantenerse igual en ambos lugares:
+// si se cambia uno sin el otro, las imágenes vuelven a verse mal encuadradas.
+export const SECCION2_CARD_ASPECT = 4 / 5;
+
 function cargarImagenDesdeUrl(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();

@@ -20,6 +20,7 @@ import { SelectDinamic } from "@/Componentes/SelectDinamic";
 import { AppointmentDrawer } from "@/Componentes/AppointmentDrawer";
 import { AppointmentCard } from "@/Componentes/AppointmentCard";
 import { StatusFilterChips } from "@/Componentes/StatusFilterChips";
+import { getStateTokens } from "@/lib/designTokens";
 
 const locales = { es: es };
 const dfStartOfWeek = (date) => startOfWeek(date, { locale: es });
@@ -1413,71 +1414,17 @@ function CalendarioContent() {
         setBackgroundCalendarEvents(eventosBloqueos);
     }, [dataAgenda, dataBloqueos, currentView]);
 
+    // Delega en getStateTokens (src/lib/designTokens.js) \u2014 \u00fanica fuente de verdad de color por
+    // estado. Antes esta funci\u00f3n ten\u00eda su propia paleta, distinta a la que usa AppointmentCard.jsx
+    // para pintar el interior de la tarjeta, por lo que el borde/fondo exterior del bloque no
+    // combinaba con su contenido (ej. "Reservada" se ve\u00eda caf\u00e9 afuera y violeta adentro).
     function obtenerPaletaEstadoReserva(estadoReserva = "") {
-        const estadoNormalizado = estadoReserva
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
-
-        if (estadoNormalizado === "reservada" || estadoNormalizado === "reservado") {
-            return {
-                backgroundColor: "rgba(180, 132, 108, 0.24)",
-                color: "#6b4f3f",
-                accentColor: "#8b5e3c",
-                borderColor: "rgba(139, 94, 60, 0.30)"
-            };
-        }
-
-        if (estadoNormalizado === "asiste") {
-            return {
-                backgroundColor: "rgba(34, 211, 238, 0.20)",
-                color: "#0f766e",
-                accentColor: "#0891b2",
-                borderColor: "rgba(6, 182, 212, 0.30)"
-            };
-        }
-
-        if (estadoNormalizado === "no asiste" || estadoNormalizado === "no asistio" || estadoNormalizado === "no asistste") {
-            return {
-                backgroundColor: "rgba(251, 146, 60, 0.18)",
-                color: "#9a3412",
-                accentColor: "#ea580c",
-                borderColor: "rgba(249, 115, 22, 0.28)"
-            };
-        }
-
-        if (estadoNormalizado === "finalizado") {
-            return {
-                backgroundColor: "rgba(37, 99, 235, 0.22)",
-                color: "#1d4ed8",
-                accentColor: "#1e40af",
-                borderColor: "rgba(37, 99, 235, 0.32)"
-            };
-        }
-
-        if (estadoNormalizado === "confirmada" || estadoNormalizado === "confirmado") {
-            return {
-                backgroundColor: "rgba(34, 197, 94, 0.22)",
-                color: "#14532d",
-                accentColor: "#166534",
-                borderColor: "rgba(34, 197, 94, 0.30)"
-            };
-        }
-
-        if (estadoNormalizado === "anulada" || estadoNormalizado === "anulado") {
-            return {
-                backgroundColor: "rgba(220, 38, 38, 0.20)",
-                color: "#991b1b",
-                accentColor: "#b91c1c",
-                borderColor: "rgba(220, 38, 38, 0.30)"
-            };
-        }
-
+        const token = getStateTokens(estadoReserva);
         return {
-            backgroundColor: "rgba(124, 58, 237, 0.20)",
-            color: "#5b21b6",
-            accentColor: "#5b21b6",
-            borderColor: "rgba(124, 58, 237, 0.28)"
+            backgroundColor: token.bg,
+            color: token.text,
+            accentColor: token.accent,
+            borderColor: token.border,
         };
     }
 

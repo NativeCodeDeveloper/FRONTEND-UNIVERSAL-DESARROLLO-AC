@@ -209,7 +209,7 @@ export default function Portada() {
 
                 {/* Descripción del slide o sobreNosotros */}
                 {(currentSlide.descripcion || sobreNosotros) && (
-                  <p className="text-base text-slate-600 leading-relaxed mb-7">
+                  <p className="text-base text-slate-600 leading-relaxed text-justify mb-7">
                     {currentSlide.descripcion || sobreNosotros || fallbackSobreNosotrosTitulo}
                   </p>
                 )}
@@ -298,7 +298,7 @@ export default function Portada() {
                   {currentSlide.titulo || "Tu Centro Médico"}
                 </h1>
                 {(currentSlide.descripcion || sobreNosotros) && (
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  <p className="text-slate-600 text-sm leading-relaxed text-justify mb-6">
                     {currentSlide.descripcion || sobreNosotros || fallbackSobreNosotrosTitulo}
                   </p>
                 )}

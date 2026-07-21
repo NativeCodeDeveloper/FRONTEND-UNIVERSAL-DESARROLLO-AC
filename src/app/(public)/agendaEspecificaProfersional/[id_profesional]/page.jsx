@@ -510,9 +510,10 @@ export default function CalendarioMensualHoras() {
                                 </div>
                             </button>
 
-                            {/* Lista desplegable */}
+                            {/* Lista desplegable — max-h + scroll interno propio: sin esto, con muchos
+                                servicios el panel crecía sin límite y terminaba superpuesto con el footer */}
                             {dropdownServicios && (
-                                <div className="absolute z-20 mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-900/10 overflow-hidden">
+                                <div className="absolute z-20 mt-1 w-full max-h-[280px] overflow-y-auto overflow-x-hidden overscroll-contain rounded-xl border border-slate-200 bg-white shadow-lg shadow-slate-900/10">
                                     {listaServicios.map((tarifa, idx) => {
                                         const activo = servicioActivo?.id_tarifaProfesional === tarifa.id_tarifaProfesional;
                                         return (

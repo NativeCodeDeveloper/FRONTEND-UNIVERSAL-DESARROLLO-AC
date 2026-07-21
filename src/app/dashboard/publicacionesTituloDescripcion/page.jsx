@@ -14,10 +14,11 @@ import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import { subirImagenCloudflare } from "@/FuncionesTranversales/FuncionesCloudflare";
 import ToasterClient from "@/Componentes/ToasterClient";
 import ImageCropperModal from "@/Componentes/ImageCropperModal";
+import { SECCION2_CARD_ASPECT } from "@/FuncionesTranversales/FuncionesImagenCrop";
 
-// Proporción de compromiso: la tarjeta pública (seccion2) usa ancho responsivo (vw) con alto fijo,
-// por lo que su ratio real varía entre ~0.625:1 (mobile) y ~0.9:1 (desktop). 4:5 es un punto medio razonable.
-const SECCION2_CROP_ASPECT = 4 / 5;
+// La tarjeta pública (seccion2) ahora usa aspect-[4/5] en vez de alto fijo,
+// por lo que este ratio coincide exactamente con lo que se ve publicado.
+const SECCION2_CROP_ASPECT = SECCION2_CARD_ASPECT;
 
 export default function PublicacionesTituloDescripcion() {
     const API = process.env.NEXT_PUBLIC_API_URL;

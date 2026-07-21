@@ -129,7 +129,10 @@ export default function Seccion2() {
           {content.map((service, index) => (
             <article
               key={service.id ?? index}
-              className="relative shrink-0 w-[80vw] sm:w-[45vw] lg:w-[30vw] h-120 overflow-hidden rounded-[2.5rem] bg-slate-200 shadow-md group"
+              // aspect-[4/5] debe coincidir con SECCION2_CARD_ASPECT (FuncionesImagenCrop.js),
+              // que es el ratio que usa el cropper de "Tratamientos Destacados". Con ancho responsivo
+              // y aspect-ratio (en vez de un alto fijo), el recorte se ve igual en todos los breakpoints.
+              className="relative shrink-0 w-[80vw] sm:w-[45vw] lg:w-[30vw] aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 shadow-md group"
               draggable={false}
             >
               {/* Background Full Image */}
