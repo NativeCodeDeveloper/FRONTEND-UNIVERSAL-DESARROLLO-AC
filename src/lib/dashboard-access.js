@@ -489,17 +489,9 @@ const DASHBOARD_ROLE_DETAILS = {
     description: "Administra casi toda la operación clínica, documental y de configuración.",
     recommendedFor: "Directores clínicos o encargados operativos con responsabilidades amplias.",
     access: [
-<<<<<<< HEAD
       "Capacitaciones.",
-      "Panel de reservas.",
-      "Agenda: calendario, reservas y bloqueos.",
-      "Pacientes y fichas: ver pacientes, registrar pacientes y trabajar fichas clinicas.",
-      "Documentos clinicos: receta medica y solicitud de examenes.",
-      "Presupuestos: generar presupuestos, tratamientos disponibles y categorias.",
-      "Configuracion clinica: profesionales, agendas, servicios, tarifas y examenes clinicos.",
-      "Contenido web: datos del sitio, banners, tratamientos destacados y publicaciones.",
-=======
       "Panel de reservas, calendario, bloqueos y detalle de citas.",
+      "Ver pacientes y registrar nuevos pacientes.",
       "Crear, revisar y editar fichas clínicas y archivos de pacientes.",
       "Emitir recetas médicas y solicitudes de exámenes.",
       "Crear presupuestos y administrar tratamientos y categorías.",
@@ -509,9 +501,7 @@ const DASHBOARD_ROLE_DETAILS = {
     restrictions: [
       "No puede crear usuarios ni asignar perfiles.",
       "No accede a receta de lentes ni odontograma.",
-      "No dispone de los módulos generales Ver pacientes y Registrar paciente.",
       "No administra stock, pedidos, cupones ni plantillas clínicas generales.",
->>>>>>> 3229aef (MEJORAS DESCERIPCION PERMISOS)
     ],
   },
   "operador-clinico": {

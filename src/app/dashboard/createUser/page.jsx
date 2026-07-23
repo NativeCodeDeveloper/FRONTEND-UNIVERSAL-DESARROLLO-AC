@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  BadgeCheck,
   CheckCircle2,
+  ChevronDown,
   CircleMinus,
   Eye,
   EyeOff,
@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import {
   getAssignableDashboardRoles,
-  getDashboardRoleDescription,
   getDashboardRoleLabel,
 } from "@/lib/dashboard-access";
 
@@ -22,7 +21,7 @@ const initialForm = {
   email: "",
   password: "",
   confirmPassword: "",
-  role: "basico",
+  role: "",
 };
 
 const ROLE_OPTIONS = getAssignableDashboardRoles();
@@ -120,7 +119,7 @@ function RolePermissionDetails({ role }) {
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600" />
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-              Puede realizar
+              Todos los accesos de este perfil
             </h4>
           </div>
           <ul className="mt-3 space-y-2.5">
@@ -166,7 +165,7 @@ export default function CreateUserPage() {
   const [error, setError] = useState("");
   const [createdUser, setCreatedUser] = useState(null);
 
-  const selectedRoleMeta = ROLE_OPTIONS_BY_VALUE.get(form.role) || ROLE_OPTIONS[0];
+  const selectedRoleMeta = ROLE_OPTIONS_BY_VALUE.get(form.role) || null;
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -189,6 +188,11 @@ export default function CreateUserPage() {
 
     if (form.password !== form.confirmPassword) {
       setError("La confirmacion de contrasena no coincide.");
+      return;
+    }
+
+    if (!selectedRoleMeta) {
+      setError("Selecciona un perfil para revisar y asignar sus accesos.");
       return;
     }
 
@@ -257,7 +261,9 @@ export default function CreateUserPage() {
               <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Datos del nuevo usuario</h2>
               <div className="h-9 px-4 rounded-xl border border-slate-200 bg-white flex items-center gap-2 shadow-sm">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Perfil:</span>
-                <span className="text-[12px] font-bold text-[#6E56CF]">{selectedRoleMeta?.label || getDashboardRoleLabel(form.role)}</span>
+                <span className="text-[12px] font-bold text-[#6E56CF]">
+                  {selectedRoleMeta?.label || "Sin seleccionar"}
+                </span>
               </div>
             </div>
 
@@ -289,44 +295,50 @@ export default function CreateUserPage() {
                 </Field>
               </div>
 
-              <Field label="Perfil del sistema" hint="Este valor se guardara en publicMetadata.role y publicMetadata.rol">
-                <div className="rounded-[28px] border border-slate-200 bg-slate-50/80 p-2">
-                  <div className="grid gap-2 md:grid-cols-2" role="radiogroup" aria-label="Perfil del sistema">
-                    {ROLE_OPTIONS.map((option) => {
-                      const isActive = form.role === option.value;
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          role="radio"
-                          aria-checked={isActive}
-                          onClick={() => updateField("role", option.value)}
-                          className={`rounded-2xl border px-4 py-3.5 text-left transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200 ${
-                            isActive
-                              ? "border-violet-200 bg-white shadow-[0_12px_30px_rgba(110,86,207,0.12)]"
-                              : "border-transparent bg-transparent hover:border-slate-200 hover:bg-white"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="text-[13px] font-semibold text-slate-900">{option.label}</p>
-                              <p className="mt-1 text-[11px] leading-5 text-slate-500">{option.description}</p>
-                              <div className="mt-2 flex flex-wrap gap-1.5">
-                                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-emerald-700">
-                                  {option.access.length} capacidades
-                                </span>
-                                <span className="rounded-full bg-amber-50 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-amber-700">
-                                  {option.restrictions.length} restricciones
-                                </span>
-                              </div>
-                            </div>
-                            {isActive ? <BadgeCheck className="mt-0.5 h-4 w-4 text-[#6E56CF]" /> : null}
-                          </div>
-                        </button>
-                      );
-                    })}
+              <Field
+                label="Perfil del sistema"
+                hint="Selecciona un perfil para desplegar todos sus accesos antes de crear el usuario"
+              >
+                <div className="rounded-[28px] border border-slate-200 bg-slate-50/80 p-3 md:p-4">
+                  <div className="relative">
+                    <select
+                      id="dashboard-role"
+                      aria-label="Seleccionar perfil del sistema"
+                      value={form.role}
+                      onChange={(event) => {
+                        updateField("role", event.target.value);
+                        setError("");
+                      }}
+                      className="h-14 w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 pr-12 text-[14px] font-semibold text-slate-800 shadow-sm outline-none transition-all hover:border-violet-300 focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100"
+                    >
+                      <option value="" disabled>
+                        Selecciona un perfil de acceso
+                      </option>
+                      {ROLE_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#6E56CF]"
+                    />
                   </div>
-                  <RolePermissionDetails role={selectedRoleMeta} />
+
+                  {selectedRoleMeta ? (
+                    <RolePermissionDetails role={selectedRoleMeta} />
+                  ) : (
+                    <div className="mt-3 rounded-2xl border border-dashed border-violet-200 bg-white px-5 py-6 text-center">
+                      <UsersRound className="mx-auto h-6 w-6 text-violet-300" />
+                      <p className="mt-2 text-[13px] font-semibold text-slate-700">
+                        Aún no has seleccionado un perfil
+                      </p>
+                      <p className="mt-1 text-[11px] leading-5 text-slate-500">
+                        Al elegirlo se desplegará aquí la lista completa de accesos y restricciones.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </Field>
 
@@ -347,11 +359,15 @@ export default function CreateUserPage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !selectedRoleMeta}
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#6E56CF] px-6 text-[13px] font-bold text-white shadow-lg shadow-indigo-100 transition-all hover:bg-[#5b45bc] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <UserPlus className="h-4 w-4" />
-                  {isSubmitting ? "Creando usuario..." : "Crear usuario"}
+                  {isSubmitting
+                    ? "Creando usuario..."
+                    : selectedRoleMeta
+                      ? "Crear usuario"
+                      : "Selecciona un perfil"}
                 </button>
                 <p className="text-[12px] text-slate-500">
                   El acceso final del usuario quedara determinado por el rol seleccionado.
@@ -369,15 +385,17 @@ export default function CreateUserPage() {
               <div className="p-6 space-y-3">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">publicMetadata.role</p>
-                  <p className="mt-1.5 text-[15px] font-bold text-[#6E56CF]">{form.role}</p>
+                  <p className="mt-1.5 text-[15px] font-bold text-[#6E56CF]">
+                    {form.role || "Pendiente de selección"}
+                  </p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Resumen del perfil</p>
                   <p className="mt-1.5 text-[13px] font-bold text-slate-800">
-                    {selectedRoleMeta?.label || getDashboardRoleLabel(form.role)}
+                    {selectedRoleMeta?.label || "Sin perfil seleccionado"}
                   </p>
                   <p className="mt-1 text-[12px] leading-5 text-slate-500">
-                    {selectedRoleMeta?.description || getDashboardRoleDescription(form.role)}
+                    {selectedRoleMeta?.description || "Selecciona un perfil para revisar el alcance de sus permisos."}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
