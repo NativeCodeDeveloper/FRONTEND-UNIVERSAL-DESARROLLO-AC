@@ -2,14 +2,13 @@
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
 import format from "date-fns/format";
-import parse from "date-fns/parse";
-import startOfWeek from "date-fns/startOfWeek";
-import getDay from "date-fns/getDay";
 import ShadcnInput from "@/Componentes/shadcnInput2";
 import ToasterClient from "@/Componentes/ToasterClient";
 import { toast } from "react-hot-toast";
@@ -22,9 +21,8 @@ import { AppointmentCard } from "@/Componentes/AppointmentCard";
 import { StatusFilterChips } from "@/Componentes/StatusFilterChips";
 import { getStateTokens } from "@/lib/designTokens";
 
-const locales = { es: es };
-const dfStartOfWeek = (date) => startOfWeek(date, { locale: es });
-const localizer = dateFnsLocalizer({ format, parse, startOfWeek: dfStartOfWeek, getDay, locales });
+dayjs.locale("es");
+const localizer = dayjsLocalizer(dayjs);
 const DnDCalendar = withDragAndDrop(Calendar);
 const HORA_MINIMA_AGENDA = 8;
 const HORA_MAXIMA_AGENDA = 23;
