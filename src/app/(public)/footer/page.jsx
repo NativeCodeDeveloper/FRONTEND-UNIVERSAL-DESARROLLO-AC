@@ -1,6 +1,6 @@
 import Link from "next/link";
 import FooterPremiumMedico from "@/Componentes/Footer";
-
+//mejora
 export default function FooterPreviewPage() {
   return (
     <main className="bg-[#f6f7fb] text-slate-900">
