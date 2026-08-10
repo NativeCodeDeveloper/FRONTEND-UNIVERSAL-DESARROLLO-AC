@@ -521,7 +521,7 @@ export default function FormularioReservaProfesional() {
                         {
                             estadoPasarela ?  <ShadcnButton2 nombre="FINALIZAR"
                                                              funcion={()=>pagarMercadoPago(
-                                                                 servicio.nombre,
+                                                                 servicio?.nombre || servicioNombre,
                                                                  totalPago,
                                                                  nombrePaciente,
                                                                  apellidoPaciente,
