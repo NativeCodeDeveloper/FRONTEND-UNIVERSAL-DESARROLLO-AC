@@ -26,7 +26,10 @@ export default function FormularioReservaProfesional() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    /* ── Datos del paciente ── */
+    /* ── Datos del pacientE
+
+
+     ── */
     const [nombrePaciente,   setNombrePaciente]   = useState("");
     const [apellidoPaciente, setApellidoPaciente] = useState("");
     const [rut,              setRut]              = useState("");
@@ -48,7 +51,10 @@ export default function FormularioReservaProfesional() {
     const [servicioNombre,        setServicioNombre]        = useState("");
     const [totalPago,             setTotalPago]             = useState("");
 
-    /* ── Contexto global (fecha, hora y servicio vienen del calendario) ── */
+    /*
+
+
+    Contexto global (fecha, hora y servicio vienen del calendario) ── */
     const {
         horaInicio,
         horaFin,
@@ -159,6 +165,8 @@ export default function FormularioReservaProfesional() {
      *  1. Debe haber fecha y hora (vienen del calendario).
      *  2. Todos los campos del paciente deben estar completos.
      */
+
+
     async function agendarSinPago() {
         const motivoReserva = (servicio?.nombre || servicioNombre || "").trim();
         const montoReserva = String(servicio?.precio ?? totalPago ?? "").trim();
@@ -226,6 +234,123 @@ export default function FormularioReservaProfesional() {
             toast.error("Error de conexión. Intenta nuevamente o contáctanos por WhatsApp.");
         }
     }
+
+
+
+    async function pagarMercadoPago(
+        tituloProducto,
+        precio,
+        nombrePaciente,
+        apellidoPaciente,
+        rut,
+        telefono,
+        email,
+        fechaInicio,
+        horaInicio,
+        fechaFinalizacion,
+        horaFinalizacion,
+        estadoReserva ,
+        totalPago,
+        id_profesional
+    ){
+     try {
+
+         if(
+             !tituloProducto ||
+             !precio ||
+             !nombrePaciente ||
+             !apellidoPaciente ||
+             !rut ||
+             !telefono ||
+             !email ||
+             !fechaInicio ||
+             !horaInicio ||
+             !fechaFinalizacion ||
+             !horaFinalizacion ||
+             !estadoReserva ||
+             !totalPago ||
+             !id_profesional){
+             return toast.error("Por favor completa todos los campos antes de continuar.");
+         }
+
+         const res = await fetch(`${API}/pagosMercadoPago/create-order`, {
+             method: "POST",
+             headers: {Accept: "application/json", "Content-Type": "application/json"},
+             body: JSON.stringify({
+                 tituloProducto,
+                 precio,
+                 nombrePaciente,
+                 apellidoPaciente,
+                 rut,
+                 telefono,
+                 email,
+                 fechaInicio,
+                 horaInicio,
+                 fechaFinalizacion,
+                 horaFinalizacion,
+                 estadoReserva ,
+                 totalPago,
+                 id_profesional
+             }),
+             cors: "no-cors",
+             cache: "no-cache",
+         })
+
+
+         if (!res.ok) {
+             return toast.error("No se puede procesar el pago por favor evalue otro medio de pago contactandonos por WhatsApp");
+         }
+
+         const data = await res.json();
+
+         const checkoutUrl = data.init_point;
+         if (!checkoutUrl) {
+             return toast.error("No se puede procesar el pago por favor evalue otro medio de pago contactandonos por WhatsApp")
+         }
+
+         // Redirigimos al usuario al Checkout Pro de Mercado Pago
+         window.location.href = checkoutUrl;
+
+     }catch{
+         return toast.error(`Error al procesar el pago con Mercado Pago.`);
+     }
+    }
+
+
+
+
+    // ESTA FUNCION PERMITE SABER SI EL USUARIO TIENE UNA CUENTA DE MERCADO PAGO ACTIVA ALMACENADA EN LA BASE  DE DATOS
+    const [estadoPasarela, setEstadoPasarela] = useState(false);
+    async function obtenerEstadoPasarelaPago() {
+        try {
+            const res = await fetch(`${API}/persistence/obtenerPersistencia`, {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"}
+            });
+
+            if(!res.ok){
+                return toast.error(`Error al vincular pasarela de pago. Respuesta inadecuada del servidor`);
+            }
+
+            const respuesta = await res.json();
+
+
+            if (respuesta.primeraRespuesta?.estado_pasarela === 1) {
+                setEstadoPasarela(true);
+            }
+
+        }catch(error){
+            return toast.error(`Error al vincular pasarela de pago. ERROR: ${error}`);
+        }
+
+    }
+
+    useEffect(() => {
+        obtenerEstadoPasarelaPago();
+    }, []);
+
 
     /* ══════════════════════════════════════════
        RENDER
@@ -393,7 +518,25 @@ export default function FormularioReservaProfesional() {
                     {/* ── Botones ── */}
                     <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                         <ShadcnButton2 nombre="RETROCEDER" funcion={() => router.push(`/agendaEspecificaProfersional/${id_profesional}`)}/>
-                        <ShadcnButton2 nombre="FINALIZAR"  funcion={agendarSinPago}/>
+                        {
+                            estadoPasarela ?  <ShadcnButton2 nombre="FINALIZAR"
+                                                             funcion={()=>pagarMercadoPago(
+                                                                 servicio.nombre,
+                                                                 totalPago,
+                                                                 nombrePaciente,
+                                                                 apellidoPaciente,
+                                                                 rut,
+                                                                 telefono,
+                                                                 email,
+                                                                 fechaInicio,
+                                                                 horaInicio,
+                                                                 fechaFinalizacion,
+                                                                 horaFin,
+                                                                 "reservada" ,
+                                                                 totalPago,
+                                                                 id_profesional
+                                                                 )}/> :  <ShadcnButton2 nombre="FINALIZAR"  funcion={agendarSinPago}/>
+                        }
                     </div>
                 </form>
 
