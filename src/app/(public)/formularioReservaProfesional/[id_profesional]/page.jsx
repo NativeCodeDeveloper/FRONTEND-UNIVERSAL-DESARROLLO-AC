@@ -8,6 +8,7 @@ import {useParams, useRouter, useSearchParams} from "next/navigation";
 import {SelectDinamic} from "@/Componentes/SelectDinamic";
 import {RutInput} from "@/Componentes/RutInput";
 import {PhoneInput} from "@/Componentes/PhoneInput";
+import {Banknote, CalendarDays, Clock, Stethoscope} from "lucide-react";
 
 /* ─────────────────────────────────────────────
    FORMATO CLP
@@ -394,7 +395,7 @@ export default function FormularioReservaProfesional() {
                 <ShadcnButton2
                     nombre="CARGANDO..."
                     disabled={true}
-                    className="h-11 w-full rounded-lg px-5 sm:w-auto"
+                    className="h-11 w-full rounded-lg px-6 font-semibold disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 />
             )
         }
@@ -416,7 +417,7 @@ export default function FormularioReservaProfesional() {
                         "reservada" ,
                         totalPago,
                         id_profesional)}
-                    className="h-11 w-full rounded-lg px-5 sm:w-auto"
+                    className="h-11 w-full rounded-lg px-6 font-semibold shadow-sm transition-colors sm:w-auto"
                 />
             )
         }
@@ -425,7 +426,7 @@ export default function FormularioReservaProfesional() {
                 <ShadcnButton2
                     nombre="FINALIZAR"
                     funcion={agendarSinPago}
-                    className="h-11 w-full rounded-lg px-5 sm:w-auto"
+                    className="h-11 w-full rounded-lg px-6 font-semibold shadow-sm transition-colors sm:w-auto"
                 />
             )
         }
@@ -440,7 +441,7 @@ export default function FormularioReservaProfesional() {
         <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 px-4 pt-28 pb-12 sm:pt-32 sm:pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl">
                 <header className="mb-10 text-center">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-slate-500 shadow-sm">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-4 py-1.5 text-xs font-medium tracking-wide text-slate-500 shadow-sm ring-1 ring-white">
                         Reserva Online
                     </div>
                     <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
@@ -449,25 +450,25 @@ export default function FormularioReservaProfesional() {
                     <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
                         {descripcionProfesional}
                     </p>
-                    <div className="mx-auto mt-4 h-px w-20 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent"/>
+                    <div className="mx-auto mt-4 h-px w-20 bg-gradient-to-r from-transparent via-violet-400/50 to-transparent"/>
                 </header>
 
                 <form
-                    className="space-y-8 rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-lg shadow-slate-900/5 sm:p-8"
+                    className="flex flex-col gap-8 rounded-2xl border border-slate-200/80 border-t-2 border-t-violet-400/70 bg-white/95 p-6 shadow-xl shadow-slate-900/5 ring-1 ring-white/80 sm:p-8"
                     onSubmit={e => e.preventDefault()}
                 >
                     <div>
-                        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Servicio</h2>
+                        <h2 className="border-l-2 border-violet-400 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Servicio</h2>
                         <div className="mt-1 h-px w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"/>
 
                         {servicio ? (
-                            <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 shadow-sm">
+                            <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-violet-200 bg-gradient-to-r from-violet-50/80 to-white px-4 py-3 shadow-sm transition-colors hover:border-violet-300">
                                 <div>
                                     <p className="text-sm font-semibold text-slate-800">{servicio.nombre}</p>
                                     <p className="text-xs text-slate-500">{servicio.duracion_min} min de atención</p>
                                 </div>
                                 {Number(servicio.precio) > 0 && (
-                                    <span className="shrink-0 text-sm font-bold text-emerald-700">
+                                    <span className="shrink-0 rounded-full border border-violet-200 bg-white/80 px-3 py-1 text-sm font-bold text-violet-700 shadow-sm">
                                         {formatoCLP.format(servicio.precio)}
                                     </span>
                                 )}
@@ -488,82 +489,92 @@ export default function FormularioReservaProfesional() {
                                         value: i,
                                         label: `${t.nombreServicio}${Number(t.precio) > 0 ? ` — ${formatoCLP.format(t.precio)}` : ""}`,
                                     }))}
-                                    className={tarifaIndexFallback !== "" ? "border-emerald-400 bg-emerald-50/50 font-medium text-slate-900" : ""}
+                                    className={tarifaIndexFallback !== "" ? "h-11 rounded-lg border-violet-400 bg-violet-50/50 font-medium text-slate-900 shadow-sm" : "h-11 rounded-lg border-slate-200 bg-slate-50/40 shadow-sm"}
                                 />
                             </div>
                         )}
                     </div>
 
                     <div>
-                        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Datos personales</h2>
+                        <h2 className="border-l-2 border-violet-400 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Datos personales</h2>
                         <div className="mt-1 h-px w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"/>
                         <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Nombre</label>
-                                <ShadcnInput value={nombrePaciente} onChange={e => setNombrePaciente(e.target.value)} placeholder="Ej: Ana" className="h-11 w-full rounded-lg"/>
+                                <ShadcnInput value={nombrePaciente} onChange={e => setNombrePaciente(e.target.value)} placeholder="Ej: Ana" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Apellido</label>
-                                <ShadcnInput value={apellidoPaciente} onChange={e => setApellidoPaciente(e.target.value)} placeholder="Ej: Pérez" className="h-11 w-full rounded-lg"/>
+                                <ShadcnInput value={apellidoPaciente} onChange={e => setApellidoPaciente(e.target.value)} placeholder="Ej: Pérez" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">RUT</label>
-                                <RutInput value={rut} onChange={clean => setRut(clean)}/>
+                                <RutInput value={rut} onChange={clean => setRut(clean)} className="h-11 rounded-lg shadow-sm"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Correo electrónico</label>
-                                <ShadcnInput value={email} onChange={e => setEmail(e.target.value)} placeholder="ejemplo@correo.cl" className="h-11 w-full rounded-lg"/>
+                                <ShadcnInput value={email} onChange={e => setEmail(e.target.value)} placeholder="ejemplo@correo.cl" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
                             </div>
                             <div className="sm:col-span-2">
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Teléfono</label>
-                                <PhoneInput value={telefono} onChange={full => setTelefono(full)}/>
+                                <PhoneInput value={telefono} onChange={full => setTelefono(full)} className="h-11"/>
                             </div>
                         </div>
                     </div>
 
                     {(fechaInicio || horaInicio || totalPago || servicioNombre) && (
                         <div>
-                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Resumen de tu cita</h2>
+                            <h2 className="border-l-2 border-violet-400 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Resumen de tu cita</h2>
                             <div className="mt-1 h-px w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"/>
-                            <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/80 p-4">
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    {servicioNombre && (
-                                        <div className="flex items-center gap-3 sm:col-span-2">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-xs font-bold text-white">S</div>
-                                            <div>
-                                                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Servicio</p>
-                                                <p className="text-sm font-semibold text-slate-800">{servicioNombre}</p>
-                                            </div>
+                            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
+                                {servicioNombre && (
+                                    <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-4 sm:px-5">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
+                                            <Stethoscope aria-hidden="true" className="size-5" strokeWidth={1.8}/>
                                         </div>
-                                    )}
+                                        <div className="min-w-0">
+                                            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Servicio</p>
+                                            <p className="mt-0.5 truncate text-sm font-semibold text-slate-900 sm:text-base">{servicioNombre}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
                                     {fechaInicio && (
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-xs text-white">D</div>
-                                            <div>
-                                                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Fecha</p>
-                                                <p className="text-sm font-semibold text-slate-800">{fechaInicio}</p>
+                                        <div className="flex items-center gap-3 px-4 py-4 sm:px-5">
+                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-200">
+                                                <CalendarDays aria-hidden="true" className="size-5" strokeWidth={1.8}/>
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Fecha</p>
+                                                <p className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900 sm:text-base">{fechaInicio}</p>
                                             </div>
                                         </div>
                                     )}
                                     {horaInicio && horaFin && (
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-xs text-white">H</div>
-                                            <div>
-                                                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Horario</p>
-                                                <p className="text-sm font-semibold text-slate-800">{horaInicio} – {horaFin}</p>
+                                        <div className="flex items-center gap-3 px-4 py-4 sm:px-5">
+                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-200">
+                                                <Clock aria-hidden="true" className="size-5" strokeWidth={1.8}/>
                                             </div>
-                                        </div>
-                                    )}
-                                    {Number(totalPago) > 0 && (
-                                        <div className="flex items-center gap-3 sm:col-span-2">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-xs font-bold text-white">$</div>
-                                            <div>
-                                                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Valor consulta</p>
-                                                <p className="text-sm font-bold text-emerald-700">{formatoCLP.format(totalPago)}</p>
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Horario</p>
+                                                <p className="mt-0.5 text-sm font-semibold tabular-nums text-slate-900 sm:text-base">{horaInicio} – {horaFin}</p>
                                             </div>
                                         </div>
                                     )}
                                 </div>
+
+                                {Number(totalPago) > 0 && (
+                                    <div className="flex items-center justify-between gap-4 border-t border-violet-100 bg-violet-50/70 px-4 py-4 sm:px-5">
+                                        <div className="flex min-w-0 items-center gap-3">
+                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 ring-1 ring-inset ring-violet-200">
+                                                <Banknote aria-hidden="true" className="size-5" strokeWidth={1.8}/>
+                                            </div>
+                                            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-violet-700">Valor consulta</p>
+                                        </div>
+                                        <p className="shrink-0 text-lg font-bold tracking-tight tabular-nums text-violet-700 sm:text-xl">{formatoCLP.format(totalPago)}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -572,17 +583,17 @@ export default function FormularioReservaProfesional() {
                         <ShadcnButton2
                             nombre="RETROCEDER"
                             funcion={() => router.push(`/agendaEspecificaProfersional/${id_profesional}`)}
-                            className="h-11 w-full rounded-lg px-5 sm:w-auto"
+                            className="h-11 w-full rounded-lg border border-slate-200 !bg-white px-6 font-semibold !text-slate-700 shadow-sm transition-colors hover:!bg-slate-50 sm:w-auto"
                         />
                         {
                             procesando ? (
-                                <ShadcnButton2 nombre="PROCESANDO...." disabled={true} className="h-11 w-full rounded-lg px-5 sm:w-auto"/>
+                                <ShadcnButton2 nombre="PROCESANDO...." disabled={true} className="h-11 w-full rounded-lg px-6 font-semibold disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"/>
                             ) : mostrarBoton(estadoPasarela)
                         }
                     </div>
                 </form>
 
-                <p className="mt-6 text-center text-xs leading-5 text-slate-400">
+                <p className="mt-6 text-center text-xs font-medium leading-5 text-slate-500">
                     Revisa que los datos sean correctos antes de confirmar tu reserva.
                 </p>
             </div>
