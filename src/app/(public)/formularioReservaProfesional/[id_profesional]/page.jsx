@@ -434,6 +434,17 @@ export default function FormularioReservaProfesional() {
 
 
 
+    function costoCero(totalPago) {
+        let pago = Number(totalPago);
+        if(pago === 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+
     /* ══════════════════════════════════════════
        RENDER
     ══════════════════════════════════════════ */
@@ -501,23 +512,23 @@ export default function FormularioReservaProfesional() {
                         <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Nombre</label>
-                                <ShadcnInput value={nombrePaciente} onChange={e => setNombrePaciente(e.target.value)} placeholder="Ej: Ana" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
+                                <ShadcnInput readOnly={procesando} value={nombrePaciente} onChange={e => setNombrePaciente(e.target.value)} placeholder="Ej: Ana" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Apellido</label>
-                                <ShadcnInput value={apellidoPaciente} onChange={e => setApellidoPaciente(e.target.value)} placeholder="Ej: Pérez" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
+                                <ShadcnInput readOnly={procesando} value={apellidoPaciente} onChange={e => setApellidoPaciente(e.target.value)} placeholder="Ej: Pérez" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">RUT</label>
-                                <RutInput value={rut} onChange={clean => setRut(clean)} className="h-11 rounded-lg shadow-sm"/>
+                                <RutInput readOnly={procesando} value={rut} onChange={clean => setRut(clean)} className="h-11 rounded-lg shadow-sm"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Correo electrónico</label>
-                                <ShadcnInput value={email} onChange={e => setEmail(e.target.value)} placeholder="ejemplo@correo.cl" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
+                                <ShadcnInput readOnly={procesando} value={email} onChange={e => setEmail(e.target.value)} placeholder="ejemplo@correo.cl" className="h-11 w-full rounded-lg !border-slate-200 bg-slate-50/40 shadow-sm transition-shadow focus-visible:!border-slate-400 focus-visible:ring-slate-200"/>
                             </div>
                             <div className="sm:col-span-2">
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Teléfono</label>
-                                <PhoneInput value={telefono} onChange={full => setTelefono(full)} className="h-11"/>
+                                <PhoneInput readOnly={procesando} value={telefono} onChange={full => setTelefono(full)} className="h-11"/>
                             </div>
                         </div>
                     </div>
@@ -586,8 +597,12 @@ export default function FormularioReservaProfesional() {
                             className="h-11 w-full rounded-lg border border-slate-200 !bg-white px-6 font-semibold !text-slate-700 shadow-sm transition-colors hover:!bg-slate-50 sm:w-auto"
                         />
                         {
-                            procesando ? (
-                                <ShadcnButton2 nombre="PROCESANDO...." disabled={true} className="h-11 w-full rounded-lg px-6 font-semibold disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"/>
+                           costoCero(totalPago) ? (<ShadcnButton2
+                                   nombre="AGENDAR"
+                                   funcion={agendarSinPago}
+                                   className="h-11 w-full rounded-lg px-6 font-semibold shadow-sm transition-colors sm:w-auto"
+                               />
+                           ): procesando ? ( <ShadcnButton2 nombre="PROCESANDO...." disabled={true} className="h-11 w-full rounded-lg px-6 font-semibold disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"/>
                             ) : mostrarBoton(estadoPasarela)
                         }
                     </div>
