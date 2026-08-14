@@ -27,5 +27,7 @@ export default function FiltroCategorias({ categoriasProductos = [], id_categori
             </svg>
           </div>
         </div>
-
+      </div>
+    </div>
+  );
 }

@@ -2,6 +2,7 @@ import "./globals.css";
 import { AnimatedLayout } from "@/Componentes/AnimatedLayout";
 import AgendaProvider from "@/ContextosGlobales/AgendaContext";
 import { Inter, Outfit, Lora } from "next/font/google";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -89,29 +90,38 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return (
-    <html lang="es" className={`${inter.variable} ${outfit.variable} ${lora.variable}`}>
-      <body className="min-h-screen bg-white">
-        {/*
-          AgendaProvider DEBE envolver AnimatedLayout (no estar dentro).
-          AnimatedLayout desmonta/remonta sus hijos en cada navegación
-          (usa key={pathname} + AnimatePresence). Si AgendaProvider
-          estuviera adentro, su estado (fecha, hora, servicio) se reiniciaría
-          en cada cambio de ruta, perdiendo los datos entre el calendario y el formulario.
-        */}
+    return (
+        <html
+            lang="es"
+            className={`${inter.variable} ${outfit.variable} ${lora.variable}`}
+        >
+        <body className="min-h-screen bg-white">
         <AgendaProvider>
-          <AnimatedLayout>
-            {children}
-          </AnimatedLayout>
+            <AnimatedLayout>
+                {children}
+            </AnimatedLayout>
         </AgendaProvider>
-        <script dangerouslySetInnerHTML={{ __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js').catch(function() {});
-            });
-          }
-        `}} />
-      </body>
-    </html>
-  );
+
+        {process.env.NODE_ENV === "production" && (
+            <Script
+                id="registro-service-worker"
+                strategy="afterInteractive"
+            >
+                {`
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker
+                  .register('/sw.js')
+                  .catch(function(error) {
+                    console.error(
+                      'Error al registrar el Service Worker:',
+                      error
+                    );
+                  });
+              }
+            `}
+            </Script>
+        )}
+        </body>
+        </html>
+    );
 }

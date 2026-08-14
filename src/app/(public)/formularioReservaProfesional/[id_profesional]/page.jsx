@@ -434,9 +434,10 @@ export default function FormularioReservaProfesional() {
 
 
 
+    // esto solo contempla cero, ya que el sistema desde el panel no permite ingresar campos como string vacios o campos no numericos o null
     function costoCero(totalPago) {
         let pago = Number(totalPago);
-        if(pago === 0){
+        if (pago === 0){
             return true;
         }else{
             return false;
