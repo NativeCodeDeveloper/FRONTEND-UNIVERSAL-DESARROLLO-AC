@@ -45,6 +45,8 @@ export default function PasarelaPagoPage() {
             }
             const data = await res.json();
             setIdMercadoPagoPersistence(data?.[0]?.id_mercadoPago_persistence)
+            setNombreCliente(data?.[0]?.nombre_cliente);
+            setaccess_token(data?.[0]?.access_token);
             return setMercadoPagoData(data);
         }catch (e) {
             return toast.error(`Error al cargar datos de Mercado Pago: ${e.message}`)
@@ -74,12 +76,6 @@ export default function PasarelaPagoPage() {
             return estadoString;
         }
     }
-
-
-
-
-
-
 
 
     const [nombre_cliente, setNombreCliente] = useState("");
@@ -284,8 +280,6 @@ export default function PasarelaPagoPage() {
                                 Actualizar datos
                             </button>
                         </div>
-
-
                     </section>
                 </div>
             </div>
