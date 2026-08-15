@@ -22,12 +22,18 @@ const DASHBOARD_ROLE_SET = new Set(DASHBOARD_ROLES);
 const globallyDeniedDashboardMatchers = [
   /^\/dashboard\/agendaCitas$/,
 ];
+const paymentGatewayPathMatcher = /^\/dashboard\/pasarelaPago$/;
+const PAYMENT_GATEWAY_ROLES = new Set([
+  "admin",
+  "super-usuario-nativecode",
+]);
 
 const routeMatchersByRole = {
   "super-usuario-nativecode": [
     /^\/dashboard$/,
     /^\/dashboard\/no-access$/,
     /^\/dashboard\/createUser$/,
+    /^\/dashboard\/pasarelaPago$/,
   ],
   "administrador-clinico": [
     /^\/dashboard$/,
@@ -57,7 +63,6 @@ const routeMatchersByRole = {
     /^\/dashboard\/tarifaServicio$/,
     /^\/dashboard\/examenesClinicos$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -149,7 +154,6 @@ const routeMatchersByRole = {
     /^\/dashboard\/NuevaFicha\/[^/]+$/,
     /^\/dashboard\/EdicionFicha\/[^/]+$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -177,7 +181,6 @@ const routeMatchersByRole = {
     /^\/dashboard\/NuevaFicha\/[^/]+$/,
     /^\/dashboard\/EdicionFicha\/[^/]+$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -204,7 +207,6 @@ const routeMatchersByRole = {
     /^\/dashboard\/NuevaFicha\/[^/]+$/,
     /^\/dashboard\/EdicionFicha\/[^/]+$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -232,7 +234,6 @@ const routeMatchersByRole = {
     /^\/dashboard\/NuevaFicha\/[^/]+$/,
     /^\/dashboard\/EdicionFicha\/[^/]+$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -264,7 +265,6 @@ const routeMatchersByRole = {
     /^\/dashboard\/NuevaFicha\/[^/]+$/,
     /^\/dashboard\/EdicionFicha\/[^/]+$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -297,7 +297,6 @@ const routeMatchersByRole = {
   configuracion: [
     /^\/dashboard\/no-access$/,
     /^\/dashboard\/datosEmpresa$/,
-    /^\/dashboard\/pasarelaPago$/,
     /^\/dashboard\/portadaEdit$/,
     /^\/dashboard\/publicacionesTituloDescripcion$/,
     /^\/dashboard\/publicaciones$/,
@@ -772,6 +771,10 @@ function hasFullDashboardAccess(role) {
   return normalizedRole === "admin" || normalizedRole === "default";
 }
 
+function canAccessPaymentGateway(role) {
+  return PAYMENT_GATEWAY_ROLES.has(normalizeDashboardRole(role));
+}
+
 function canAccessDashboardPath(role, pathname) {
   if (!pathname?.startsWith("/dashboard")) {
     return true;
@@ -779,6 +782,10 @@ function canAccessDashboardPath(role, pathname) {
 
   if (globallyDeniedDashboardMatchers.some((matcher) => matcher.test(pathname))) {
     return false;
+  }
+
+  if (paymentGatewayPathMatcher.test(pathname)) {
+    return canAccessPaymentGateway(role);
   }
 
   if (hasFullDashboardAccess(role)) {
@@ -897,6 +904,7 @@ export {
   DASHBOARD_ROLE_DETAILS,
   DASHBOARD_ROLES,
   canAccessDashboardPath,
+  canAccessPaymentGateway,
   canAccessFichasClinicas,
   canAccessOdontograma,
   canAccessRecetasEnFicha,
