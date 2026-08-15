@@ -346,8 +346,7 @@ export default function FormularioReservaProfesional() {
                 method: "GET",
                 headers: {
                     Accept: "application/json",
-                    "Content-Type": "application/json"},
-                cache: "no-cache",
+                    "Content-Type": "application/json"}
             });
 
             if(!res.ok){
@@ -357,19 +356,19 @@ export default function FormularioReservaProfesional() {
             const respuesta = await res.json();
 
 
-            if (respuesta.primeraRespuesta?.estado_pasarela === 1) {
+            if (respuesta[0].estado_pasarela === 1) {
                 return setEstadoPasarela(true);
             }
 
-            if (respuesta.primeraRespuesta?.estado_pasarela === 0) {
+            if (respuesta[0].estado_pasarela === 0) {
                 return setEstadoPasarela(false);
             }
 
-            if (respuesta.primeraRespuesta?.estado_pasarela > 1) {
+            if (respuesta[0].estado_pasarela > 1) {
                 return setEstadoPasarela(null);
             }
 
-            if(respuesta.primeraRespuesta?.estado_pasarela === null || respuesta.primeraRespuesta?.estado_pasarela === undefined) {
+            if(respuesta[0].estado_pasarela === null || respuesta[0].estado_pasarela === undefined) {
                 return setEstadoPasarela(null);
             }
 
