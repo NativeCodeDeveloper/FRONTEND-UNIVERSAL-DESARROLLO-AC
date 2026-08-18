@@ -611,6 +611,10 @@ function CalendarioContent() {
             return event.title || "Bloqueo";
         }
 
+        if (event?.tipo === "pago-curso") {
+            return "Pago en curso";
+        }
+
         if (event?.tipo === "reserva") {
             const nombre = (event.resource?.nombrePaciente ?? "").trim();
             const apellido = (event.resource?.apellidoPaciente ?? "").trim();
@@ -1387,11 +1391,11 @@ function CalendarioContent() {
 
         const eventosReservas = (dataAgenda || []).map((cita) => ({
             id_reserva: cita.id_reserva,
-            title: obtenerTituloReserva(cita),
+            title: Number(cita.estadoPeticion) === 0 ? "Pago en curso" : obtenerTituloReserva(cita),
             start: convertirAFechaCalendario(cita.fechaInicio, cita.horaInicio),
             end: convertirAFechaCalendario(cita.fechaFinalizacion, cita.horaFinalizacion),
             allDay: false,
-            tipo: "reserva",
+            tipo: Number(cita.estadoPeticion) === 0 ? "pago-curso" : "reserva",
             resource: {
                 ...cita,
                 _nombreProfesional: resolverNombreProfesional(cita),
@@ -1454,11 +1458,12 @@ function CalendarioContent() {
 
     const eventStyleGetter = (event) => {
         const esBloqueo = event.tipo === "bloqueo";
+        const esPagoEnCurso = event.tipo === "pago-curso";
         const esSeleccion = event.tipo === "seleccion";
         const esVistaMes = currentView === "month";
         const paletteReserva = obtenerPaletaEstadoReserva(event.resource?.estadoReserva);
 
-        if (esBloqueo) {
+        if (esBloqueo || esPagoEnCurso) {
             return {
                 style: {
                     display: 'flex',
@@ -1473,12 +1478,12 @@ function CalendarioContent() {
                     padding: esVistaMes ? '0 4px' : '0',
                     boxSizing: 'border-box',
                     borderRadius: esVistaMes ? '4px' : '8px',
-                    backgroundColor: 'rgba(107, 114, 128, 0.28)',
-                    color: '#334155',
+                    backgroundColor: esPagoEnCurso ? 'rgba(245, 158, 11, 0.18)' : 'rgba(107, 114, 128, 0.28)',
+                    color: esPagoEnCurso ? '#92400E' : '#334155',
                     fontWeight: '600',
                     wordBreak: 'break-word',
-                    border: '1px solid rgba(107, 114, 128, 0.38)',
-                    borderLeft: '4px solid rgba(71, 85, 105, 0.95)',
+                    border: esPagoEnCurso ? '1px solid rgba(245, 158, 11, 0.38)' : '1px solid rgba(107, 114, 128, 0.38)',
+                    borderLeft: esPagoEnCurso ? '4px solid rgba(217, 119, 6, 0.95)' : '4px solid rgba(71, 85, 105, 0.95)',
                     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)',
                 },
             };
@@ -1878,6 +1883,24 @@ function CalendarioContent() {
     // ── Nuevo EventComponent premium ────────────────────────────────────────
     const PremiumEventComponent = (props) => <AppointmentCard {...props} currentView={currentView} />;
 
+    const PagoEnCursoEvent = ({ event }) => (
+        <div
+            title="Pago en curso"
+            className="flex h-full w-full items-center gap-1 overflow-hidden px-1.5 py-1"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+            </svg>
+            <span className="truncate text-[11px] font-semibold">Pago en curso</span>
+        </div>
+    );
+
+    const EventoCalendario = (props) => (
+        props.event?.tipo === "pago-curso"
+            ? <PagoEnCursoEvent {...props} />
+            : <PremiumEventComponent {...props} />
+    );
+
     // ── Custom Headers ──────────────────────────────────────────────────────
     const CustomHeader = ({ date }) => {
         const today = new Date();
@@ -2157,9 +2180,9 @@ function CalendarioContent() {
                             eventPropGetter={eventStyleGetterPremium}
                             backgroundEventPropGetter={backgroundEventStyleGetter}
                             components={{
-                                event: PremiumEventComponent,
-                                day: { event: PremiumEventComponent },
-                                agenda: { event: PremiumEventComponent },
+                                event: EventoCalendario,
+                                day: { event: EventoCalendario },
+                                agenda: { event: EventoCalendario },
                                 header: CustomHeader,
                                 timeGutterHeader: CustomTimeGutterHeader
                             }}
