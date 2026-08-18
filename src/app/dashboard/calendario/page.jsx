@@ -1463,7 +1463,13 @@ function CalendarioContent() {
         const esVistaMes = currentView === "month";
         const paletteReserva = obtenerPaletaEstadoReserva(event.resource?.estadoReserva);
 
-        if (esBloqueo || esPagoEnCurso) {
+        if (esPagoEnCurso) {
+            return {
+                className: "!z-[4] !overflow-hidden !rounded-xl !border !border-violet-200 !border-l-4 !border-l-violet-500 !bg-violet-50 !p-0 !text-violet-950 shadow-[0_4px_14px_rgba(76,29,149,0.12)] ring-1 ring-inset ring-white/80",
+            };
+        }
+
+        if (esBloqueo) {
             return {
                 style: {
                     display: 'flex',
@@ -1478,12 +1484,12 @@ function CalendarioContent() {
                     padding: esVistaMes ? '0 4px' : '0',
                     boxSizing: 'border-box',
                     borderRadius: esVistaMes ? '4px' : '8px',
-                    backgroundColor: esPagoEnCurso ? 'rgba(244, 114, 182, 0.18)' : 'rgba(107, 114, 128, 0.28)',
-                    color: esPagoEnCurso ? '#9D174D' : '#334155',
+                    backgroundColor: 'rgba(107, 114, 128, 0.28)',
+                    color: '#334155',
                     fontWeight: '600',
                     wordBreak: 'break-word',
-                    border: esPagoEnCurso ? '1px solid rgba(244, 114, 182, 0.38)' : '1px solid rgba(107, 114, 128, 0.38)',
-                    borderLeft: esPagoEnCurso ? '4px solid rgba(219, 39, 119, 0.95)' : '4px solid rgba(71, 85, 105, 0.95)',
+                    border: '1px solid rgba(107, 114, 128, 0.38)',
+                    borderLeft: '4px solid rgba(71, 85, 105, 0.95)',
                     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)',
                 },
             };
@@ -1885,13 +1891,22 @@ function CalendarioContent() {
 
     const PagoEnCursoEvent = ({ event }) => (
         <div
-            title="Pago en curso"
-            className="flex h-full w-full items-center gap-1 overflow-hidden px-1.5 py-1"
+            title="Pago en curso · Reserva protegida y disponible solo para lectura"
+            className="flex h-full w-full min-w-0 items-start gap-2 overflow-hidden px-2 py-2 sm:px-2.5"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
-            </svg>
-            <span className="truncate text-[11px] font-semibold">Pago en curso</span>
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700 ring-1 ring-inset ring-violet-200">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 10V8a4 4 0 00-8 0v2m-1 0h10a1 1 0 011 1v8a1 1 0 01-1 1H7a1 1 0 01-1-1v-8a1 1 0 011-1z" />
+                </svg>
+            </span>
+            <span className="min-w-0 flex-1">
+                <span className="block truncate text-[11px] font-bold leading-4 text-violet-950">
+                    Pago en curso
+                </span>
+                <span className="block truncate text-[9px] font-semibold uppercase leading-3 tracking-[0.08em] text-violet-600">
+                    Solo lectura
+                </span>
+            </span>
         </div>
     );
 
