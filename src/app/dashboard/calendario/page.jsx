@@ -1391,11 +1391,11 @@ function CalendarioContent() {
 
         const eventosReservas = (dataAgenda || []).map((cita) => ({
             id_reserva: cita.id_reserva,
-            title: Number(cita.estadoPeticion) === 0 ? "Pago en curso" : obtenerTituloReserva(cita),
+            title: Number(cita.estadoPeticion) === 3 ? "Pago en curso" : obtenerTituloReserva(cita),
             start: convertirAFechaCalendario(cita.fechaInicio, cita.horaInicio),
             end: convertirAFechaCalendario(cita.fechaFinalizacion, cita.horaFinalizacion),
             allDay: false,
-            tipo: Number(cita.estadoPeticion) === 0 ? "pago-curso" : "reserva",
+            tipo: Number(cita.estadoPeticion) === 3 ? "pago-curso" : "reserva",
             resource: {
                 ...cita,
                 _nombreProfesional: resolverNombreProfesional(cita),
@@ -1478,12 +1478,12 @@ function CalendarioContent() {
                     padding: esVistaMes ? '0 4px' : '0',
                     boxSizing: 'border-box',
                     borderRadius: esVistaMes ? '4px' : '8px',
-                    backgroundColor: esPagoEnCurso ? 'rgba(245, 158, 11, 0.18)' : 'rgba(107, 114, 128, 0.28)',
-                    color: esPagoEnCurso ? '#92400E' : '#334155',
+                    backgroundColor: esPagoEnCurso ? 'rgba(244, 114, 182, 0.18)' : 'rgba(107, 114, 128, 0.28)',
+                    color: esPagoEnCurso ? '#9D174D' : '#334155',
                     fontWeight: '600',
                     wordBreak: 'break-word',
-                    border: esPagoEnCurso ? '1px solid rgba(245, 158, 11, 0.38)' : '1px solid rgba(107, 114, 128, 0.38)',
-                    borderLeft: esPagoEnCurso ? '4px solid rgba(217, 119, 6, 0.95)' : '4px solid rgba(71, 85, 105, 0.95)',
+                    border: esPagoEnCurso ? '1px solid rgba(244, 114, 182, 0.38)' : '1px solid rgba(107, 114, 128, 0.38)',
+                    borderLeft: esPagoEnCurso ? '4px solid rgba(219, 39, 119, 0.95)' : '4px solid rgba(71, 85, 105, 0.95)',
                     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)',
                 },
             };
