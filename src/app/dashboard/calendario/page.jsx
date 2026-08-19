@@ -1465,7 +1465,28 @@ function CalendarioContent() {
 
         if (esPagoEnCurso) {
             return {
-                className: "!z-[4] !overflow-hidden !rounded-xl !border !border-violet-200 !border-l-4 !border-l-violet-500 !bg-violet-50 !p-0 !text-violet-950 shadow-[0_4px_14px_rgba(76,29,149,0.12)] ring-1 ring-inset ring-white/80",
+                style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: esVistaMes ? 'auto' : '100%',
+                    minHeight: esVistaMes ? '20px' : '0',
+                    maxHeight: 'none',
+                    whiteSpace: 'normal',
+                    overflow: 'hidden',
+                    textOverflow: 'clip',
+                    lineHeight: esVistaMes ? '1' : '1.3',
+                    padding: esVistaMes ? '0 4px' : '0',
+                    boxSizing: 'border-box',
+                    borderRadius: esVistaMes ? '4px' : '8px',
+                    backgroundColor: 'rgba(107, 114, 128, 0.28)',
+                    color: '#334155',
+                    fontWeight: '600',
+                    wordBreak: 'break-word',
+                    border: '1px solid rgba(107, 114, 128, 0.38)',
+                    borderLeft: '4px solid rgba(71, 85, 105, 0.95)',
+                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.18)',
+                    cursor: 'not-allowed',
+                },
             };
         }
 
@@ -1892,20 +1913,28 @@ function CalendarioContent() {
     const PagoEnCursoEvent = ({ event }) => (
         <div
             title="Pago en curso · Reserva protegida y disponible solo para lectura"
-            className="flex h-full w-full min-w-0 items-start gap-2 overflow-hidden px-2 py-2 sm:px-2.5"
+            className="flex h-full w-full items-center gap-1.5 px-1.5 py-1"
+            style={{
+                borderLeft: "3px solid rgba(107,114,128,0.8)",
+                background: "repeating-linear-gradient(45deg,rgba(156,163,175,0.08) 0px,rgba(156,163,175,0.08) 4px,transparent 4px,transparent 10px)",
+            }}
         >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-700 ring-1 ring-inset ring-violet-200">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 10V8a4 4 0 00-8 0v2m-1 0h10a1 1 0 011 1v8a1 1 0 01-1 1H7a1 1 0 01-1-1v-8a1 1 0 011-1z" />
-                </svg>
-            </span>
-            <span className="min-w-0 flex-1">
-                <span className="block truncate text-[11px] font-bold leading-4 text-violet-950">
-                    Pago en curso
-                </span>
-                <span className="block truncate text-[9px] font-semibold uppercase leading-3 tracking-[0.08em] text-violet-600">
-                    Solo lectura
-                </span>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3 flex-shrink-0 text-slate-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+            >
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+            </svg>
+            <span className="truncate text-[11px] font-semibold text-slate-600">
+                Pago en curso
             </span>
         </div>
     );
@@ -2240,6 +2269,10 @@ function CalendarioContent() {
                                     abrirModalBloqueo(event.resource ?? event);
                                     return;
                                 }
+                                if (event?.tipo === "pago-curso") {
+                                    toast("Esta reserva está en proceso de pago y no puede ser modificada.", { icon: "🔒" });
+                                    return;
+                                }
                                 if (!event?.id_reserva) { toast.error("No se encontró el ID de la reserva"); return; }
                                 setid_reserva(event.id_reserva);
                                 seleccionarReservaEspecifica(event.id_reserva);
@@ -2267,11 +2300,19 @@ function CalendarioContent() {
                                     toast("Los bloqueos aún no soportan movimiento desde la grilla.", { icon: "🔒" });
                                     return;
                                 }
+                                if (event.tipo === "pago-curso") {
+                                    toast("Esta reserva está en proceso de pago y no puede ser movida.", { icon: "🔒" });
+                                    return;
+                                }
                                 await actualizarReservaDesdeCalendario(event.resource, start, end);
                             }}
                             onEventResize={async ({ event, start, end }) => {
                                 if (event.tipo === "bloqueo") {
                                     toast("Los bloqueos aún no soportan redimensionamiento desde la grilla.", { icon: "🔒" });
+                                    return;
+                                }
+                                if (event.tipo === "pago-curso") {
+                                    toast("Esta reserva está en proceso de pago y no puede ser redimensionada.", { icon: "🔒" });
                                     return;
                                 }
                                 await actualizarReservaDesdeCalendario(event.resource, start, end);
@@ -2314,8 +2355,9 @@ function CalendarioContent() {
                             <div className="flex flex-col gap-0.5 max-h-[260px] overflow-y-auto px-1">
                                 {monthPopover.events.map((ev, i) => {
                                     const esBloqueo = ev.tipo === "bloqueo";
-                                    const paleta = !esBloqueo ? obtenerPaletaEstadoReserva(ev.resource?.estadoReserva) : null;
-                                    const dot = esBloqueo ? "#9ca3af" : paleta?.accentColor;
+                                    const esPagoCurso = ev.tipo === "pago-curso";
+                                    const paleta = (!esBloqueo && !esPagoCurso) ? obtenerPaletaEstadoReserva(ev.resource?.estadoReserva) : null;
+                                    const dot = esBloqueo || esPagoCurso ? "#9ca3af" : paleta?.accentColor;
                                     return (
                                         <div
                                             key={ev.id_reserva || ev.id_bloqueo || i}
@@ -2324,6 +2366,10 @@ function CalendarioContent() {
                                                 setMonthPopover(null);
                                                 if (ev.tipo === "bloqueo") {
                                                     abrirModalBloqueo(ev.resource ?? ev);
+                                                    return;
+                                                }
+                                                if (ev.tipo === "pago-curso") {
+                                                    toast("Esta reserva está en proceso de pago y no puede ser modificada.", { icon: "🔒" });
                                                     return;
                                                 }
                                                 if (ev.id_reserva) {

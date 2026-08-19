@@ -79,6 +79,9 @@ export default function CalendarioMensualHoras() {
     const [blockedHours, setBlockedHours] = useState(new Set());
     const [checkingBlocked, setCheckingBlocked] = useState(false);
 
+    /* ── Slots bloqueados por "Pago en curso" (estadoPeticion === 3) ── */
+    const [pagoEnCursoSlots, setPagoEnCursoSlots] = useState(new Set());
+
     /* ── Contexto global de agenda (comparte datos con el formulario del paso 2) ── */
     const {
         horaInicio,
@@ -159,6 +162,46 @@ export default function CalendarioMensualHoras() {
     }, [cargandoServicios, listaServicios]);
     // Dependencias intencionales: solo corre cuando la lista termina de cargar.
     // `servicio` y `servicioActivo` se usan como guards, no como triggers.
+
+    /**
+     * Reservas no disponibles (estadoPeticion !== 0).
+     * Las reservas con estadoPeticion === 0 SÍ deben mostrarse como disponibles.
+     */
+    useEffect(() => {
+        if (!id_profesional || !fechaSeleccionada) {
+            setPagoEnCursoSlots(new Set());
+            return;
+        }
+
+        const fechaYMD = formatDateToYMD(fechaSeleccionada);
+        fetch(`${API}/reservaPacientes/seleccionarReservados`, {
+            method: "POST",
+            headers: {Accept: "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                id_profesional,
+                fechaInicio: fechaYMD,
+                fechaFinalizacion: fechaYMD,
+            }),
+        })
+            .then(r => r.ok ? r.json() : [])
+            .then(data => {
+                if (!Array.isArray(data)) return;
+                const noDisponiblesSet = new Set();
+                data.forEach(reserva => {
+                    const estadoPeticion = Number(reserva.estadoPeticion);
+                    // Bloquear solo si NO es estado 0 (estado 0 = disponible)
+                    if (estadoPeticion !== 0) {
+                        const hora = (reserva.horaInicio || "").slice(0, 5);
+                        if (hora) noDisponiblesSet.add(hora);
+                    }
+                });
+                setPagoEnCursoSlots(noDisponiblesSet);
+            })
+            .catch(err => {
+                console.error("[Agenda] error cargando no disponibles:", err);
+                setPagoEnCursoSlots(new Set());
+            });
+    }, [id_profesional, fechaSeleccionada]);
 
     /**
      * Días bloqueados por jornada completa (09:00–22:00).
@@ -660,6 +703,7 @@ export default function CalendarioMensualHoras() {
                                     {attentionSlots
                                         .filter(s => {
                                             if (blockedHours.has(s.start)) return false;
+                                            if (pagoEnCursoSlots.has(s.start)) return false; // Pago en curso
                                             // Ocultar horas pasadas si es hoy
                                             if (fechaSeleccionada) {
                                                 const hoy = new Date(); const dia = new Date(fechaSeleccionada);
@@ -694,7 +738,7 @@ export default function CalendarioMensualHoras() {
                                         })}
 
                                     {/* Sin horarios disponibles */}
-                                    {!checkingBlocked && attentionSlots.filter(s => !blockedHours.has(s.start)).length === 0 && (
+                                    {!checkingBlocked && attentionSlots.filter(s => !blockedHours.has(s.start) && !pagoEnCursoSlots.has(s.start)).length === 0 && (
                                         <div className="text-center py-8 text-red-500">
                                             <p className="text-sm">No hay horarios disponibles para esta fecha</p>
                                             <p className="text-xs mt-1">Por favor selecciona otra fecha</p>

@@ -289,6 +289,10 @@ export default function AgendaCitas() {
 
     function aplicarFiltrosCombinados(reservas = []) {
         return reservas.filter((reserva) => {
+            // Solo mostrar reservas con estadoPeticion === 0
+            const esEstadoCorrecto = Number(reserva?.estadoPeticion) === 0;
+            if (!esEstadoCorrecto) return false;
+
             const coincideProfesional = !id_profesional || String(reserva?.id_profesional) === String(id_profesional);
             const coincideEstado = !estadoReserva || normalizarEstadoReserva(reserva?.estadoReserva) === normalizarEstadoReserva(estadoReserva);
             const coincideFecha = coincideConRangoFechas(reserva);
