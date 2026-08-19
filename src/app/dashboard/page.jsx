@@ -419,8 +419,10 @@ export default function AgendaCitas() {
                 return toast.error("Debe ingresar datos para filtrar.");
             } else {
                 const respuestaBackend = await res.json();
-                if (respuestaBackend.length > 0) {
-                    setdataLista(respuestaBackend);
+                // Filtrar solo estadoPeticion === 1
+                const filtradas = respuestaBackend.filter(r => Number(r?.estadoPeticion) === 1);
+                if (filtradas.length > 0) {
+                    setdataLista(filtradas);
                     return toast.success("Similitud de RUT encontrada")
                 } else {
                     return toast.error("No se han encontrado similitudes")
@@ -448,8 +450,10 @@ export default function AgendaCitas() {
                 return toast.error("Debe ingresar datos para filtrar.");
             } else {
                 const respuestaBackend = await res.json();
-                if (respuestaBackend.length > 0) {
-                    setdataLista(respuestaBackend);
+                // Filtrar solo estadoPeticion === 1
+                const filtradas = respuestaBackend.filter(r => Number(r?.estadoPeticion) === 1);
+                if (filtradas.length > 0) {
+                    setdataLista(filtradas);
                     return toast.success("Similitud de nombre encontrada")
                 } else {
                     return toast.error("No se han encontrado similitudes de nombres")
