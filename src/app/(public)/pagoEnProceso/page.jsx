@@ -1,34 +1,33 @@
-import { MoveRight, PhoneCall } from "lucide-react";
+import { Clock3, MoveRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-const CORREO = process.env.CORREO_OFICIAL;
-
 const CTA1 = () => (
-    <div className="w-full py-20 lg:py-40">
-        <div className="container mx-auto">
-            <div className="flex flex-col text-center text-amber-700 bg-amber-50 rounded-md p-4 lg:p-14 gap-8 items-center">
-                <div>
-                    <Badge className="bg-amber-100 text-amber-700 border-amber-300">Notificacion</Badge>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <h3 className="text-3xl md:text-5xl tracking-tighter max-w-xl font-regular">
-                        Su pago se encuentra en proceso.
-                    </h3>
-                    <p className="text-lg leading-relaxed tracking-tight text-amber-800 text-muted-foreground max-w-xl">
-                        Tu pago se encuentra en proceso de validación
-                        La plataforma de pagos está verificando la transacción. Este proceso puede tardar algunos minutos dependiendo del método de pago o del banco emisor.
-
-                        Te notificaremos automáticamente cuando el pago sea aprobado o rechazado.
-                        Si necesitas asistencia mientras tanto, puedes escribirnos a: <br/>
-
-                        {CORREO}
-                    </p>
-                </div>
-                <div className="flex flex-row gap-4">
-                    <Link href="/">
-                        <Button className="gap-4 bg-amber-200 text-amber-800 hover:bg-amber-300">
-                            Volver a pagina principal <MoveRight className="w-4 h-4" />
+    <div className="w-full bg-gradient-to-b from-amber-50 via-slate-50 to-slate-50 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        <div className="mx-auto flex max-w-3xl items-center justify-center">
+            <div className="mt-8 w-full overflow-hidden rounded-3xl border border-amber-100 bg-white shadow-xl shadow-amber-100/60 lg:mt-14">
+                <div className="h-2 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300" />
+                <div className="flex flex-col items-center gap-5 px-6 py-8 text-center sm:px-10 sm:py-10 lg:px-16">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 ring-8 ring-amber-50/70">
+                        <Clock3 className="h-9 w-9 text-amber-500" strokeWidth={1.7} aria-hidden="true" />
+                    </div>
+                    <Badge className="border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                        Pago en proceso
+                    </Badge>
+                    <div className="flex max-w-xl flex-col gap-3">
+                        <h3 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                            Estamos validando tu pago
+                        </h3>
+                        <p className="text-base leading-7 text-slate-600 sm:text-lg">
+                            La plataforma de pagos está verificando la transacción. Este proceso puede tardar algunos minutos dependiendo del método de pago o del banco emisor.
+                        </p>
+                        <p className="text-base leading-7 text-slate-600 sm:text-lg">
+                            Te notificaremos automáticamente cuando el pago sea aprobado o rechazado.
+                        </p>
+                    </div>
+                    <Link href="/" className="w-full sm:w-auto">
+                        <Button className="h-12 w-full gap-3 rounded-xl bg-amber-500 px-6 text-sm font-semibold text-white shadow-lg shadow-amber-200 transition-all hover:bg-amber-600 hover:shadow-amber-300 sm:w-auto">
+                            Volver a la página principal <MoveRight className="h-4 w-4" />
                         </Button>
                     </Link>
                 </div>
