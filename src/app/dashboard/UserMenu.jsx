@@ -31,7 +31,7 @@ export default function UserMenu() {
         return (
             <div className="shrink-0 px-4 pb-0 pt-5">
                 <div className="flex flex-col items-center gap-2">
-                    <div className="h-24 w-24 animate-pulse rounded-full bg-slate-100" />
+                    <div className="h-28 w-28 animate-pulse rounded-full bg-slate-100" />
                     <div className="flex flex-col items-center gap-1.5">
                         <div className="h-3 w-28 animate-pulse rounded bg-slate-100" />
                         <div className="h-2.5 w-20 animate-pulse rounded bg-slate-100" />
@@ -50,7 +50,7 @@ export default function UserMenu() {
         return (
             <div className="shrink-0 px-4 pb-0 pt-5">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#EDE9FE] text-[#6E56CF] ring-2 ring-violet-100">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#EDE9FE] text-[#6E56CF] ring-2 ring-violet-100">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c0-1.105.895-2 2-2s2 .895 2 2v1m-7 0V9a3 3 0 016 0m-8 3h10a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2v-5a2 2 0 012-2z" />
                         </svg>
@@ -71,10 +71,10 @@ export default function UserMenu() {
     return (
         <div className="shrink-0 px-4 pb-0 pt-5">
             <details className="group">
-                <summary className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
+                <summary aria-label="Abrir menú de usuario" title="Abrir menú de usuario" className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
 
                     {/* Avatar */}
-                    <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#EDE9FE] shadow-lg ring-2 ring-violet-100 transition-transform duration-200 group-hover:scale-[1.03]">
+                    <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#EDE9FE] shadow-lg ring-2 ring-violet-100 transition-transform duration-200 group-hover:scale-[1.03]">
                         {avatar ? (
                             <img src={avatar} alt={name} className="h-full w-full object-cover" />
                         ) : (
@@ -97,13 +97,6 @@ export default function UserMenu() {
                         )}
                     </div>
 
-                    {/* Chevron */}
-                    <svg
-                        className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-180"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
                 </summary>
 
                 {/* Dropdown */}
