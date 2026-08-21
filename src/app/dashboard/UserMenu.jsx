@@ -71,7 +71,7 @@ export default function UserMenu() {
     return (
         <div className="shrink-0 px-4 pb-0 pt-5">
             <details className="group">
-                <summary className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1.5 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
+                <summary className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
 
                     {/* Avatar */}
                     <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#EDE9FE] shadow-lg ring-2 ring-violet-100 transition-transform duration-200 group-hover:scale-[1.03]">
@@ -84,14 +84,14 @@ export default function UserMenu() {
 
                     {/* Info */}
                     <div className="min-w-0 w-full px-1 text-center">
-                        <p className="break-words text-[15px] font-semibold leading-snug text-slate-800">
+                        <p className="break-words text-[14px] font-semibold leading-tight text-slate-800">
                             {name}
                         </p>
-                        <p className="mt-1 break-words text-[11px] font-medium capitalize leading-snug text-[#6E56CF]">
+                        <p className="mt-0.5 break-words text-[11px] font-medium capitalize leading-tight text-[#6E56CF]">
                             {roleLabel}
                         </p>
                         {empresaNombre && (
-                            <p className="mt-2 break-words text-[9px] font-semibold uppercase leading-snug tracking-[0.08em] text-slate-400">
+                            <p className="mt-1 break-words text-[8px] font-medium leading-tight tracking-normal text-slate-400">
                                 {empresaNombre}
                             </p>
                         )}
@@ -99,7 +99,7 @@ export default function UserMenu() {
 
                     {/* Chevron */}
                     <svg
-                        className="mt-1 h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-180"
+                        className="h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-180"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
