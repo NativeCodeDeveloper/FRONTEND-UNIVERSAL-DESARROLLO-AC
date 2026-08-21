@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import UserMenu from "./UserMenu";
-import NotificationBell from "@/components/NotificationBell";
 import { getDashboardRoleFromUser, getVisibleDashboardSections } from "@/lib/dashboard-access";
 
 const ICONS = {
@@ -344,9 +343,6 @@ export default function SidebarNav() {
           })}
       </nav>
 
-      <div className="px-3 pb-1">
-        <NotificationBell />
-      </div>
     </>
   );
 }
