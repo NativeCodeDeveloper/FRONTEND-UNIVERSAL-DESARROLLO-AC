@@ -376,6 +376,8 @@ const DASHBOARD_NAV_SECTIONS = [
   {
     id: "capacitaciones",
     title: "CAPACITACIONES",
+    accordionLabel: "Capacitaciones",
+    icon: "academy",
     items: [
       { label: "Videos", href: "https://academia.agendaclinicas.cl/dashboard", icon: "academy", visibleForAllRoles: true },
     ],
@@ -383,6 +385,8 @@ const DASHBOARD_NAV_SECTIONS = [
   {
     id: "principal",
     title: "Principal",
+    accordionLabel: "Principal",
+    icon: "home",
     items: [
       { label: "Panel de Reservas", href: "/dashboard", icon: "home" },
       { label: "Crear Usuarios", href: "/dashboard/createUser", icon: "shield" },

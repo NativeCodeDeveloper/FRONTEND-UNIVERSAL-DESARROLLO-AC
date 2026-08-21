@@ -29,8 +29,8 @@ export default function UserMenu() {
 
     if (!isLoaded) {
         return (
-            <div className="shrink-0 px-4 pb-0 pt-5">
-                <div className="flex flex-col items-center gap-2">
+            <div className="shrink-0 px-4 pb-3 pt-4">
+                <div className="flex flex-col items-center gap-2.5">
                     <div className="h-28 w-28 animate-pulse rounded-full bg-slate-100" />
                     <div className="flex flex-col items-center gap-1.5">
                         <div className="h-3 w-28 animate-pulse rounded bg-slate-100" />
@@ -47,9 +47,9 @@ export default function UserMenu() {
 
     if (!user) {
         return (
-            <div className="shrink-0 px-4 pb-0 pt-5">
+            <div className="shrink-0 px-4 pb-3 pt-4">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#EDE9FE] text-[#6E56CF] ring-2 ring-violet-100">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] text-[#6E56CF] shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c0-1.105.895-2 2-2s2 .895 2 2v1m-7 0V9a3 3 0 016 0m-8 3h10a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2v-5a2 2 0 012-2z" />
                         </svg>
@@ -68,9 +68,9 @@ export default function UserMenu() {
     }
 
     return (
-        <div className="shrink-0 px-4 pb-0 pt-5">
+        <div className="shrink-0 px-4 pb-3 pt-4">
             <details className="group" data-user-role={role} data-company-name={empresaNombre || undefined}>
-                <summary aria-label="Abrir menú de usuario" title="Abrir menú de usuario" className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
+                <summary aria-label="Abrir menú de usuario" title="Abrir menú de usuario" className="relative flex cursor-pointer list-none select-none flex-col items-center px-1 [&::-webkit-details-marker]:hidden">
 
                     {/* Avatar */}
                     <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] shadow-sm transition-transform duration-200 group-hover:scale-[1.03]">
@@ -82,12 +82,12 @@ export default function UserMenu() {
                     </div>
 
                     {/* Info */}
-                    <div className="min-w-0 w-full px-1 text-center">
-                        <p className="break-words text-[14px] font-semibold leading-tight text-slate-800">
+                    <div className="mt-2.5 min-w-0 w-full px-1 text-center">
+                        <p className="break-words text-[14px] font-semibold leading-none text-slate-800">
                             {name}
                         </p>
                         {empresaNombre && (
-                            <p className="mt-1 break-words text-[9px] font-medium leading-tight tracking-normal text-slate-400">
+                            <p className="mt-1.5 break-words text-[9px] font-medium leading-tight tracking-normal text-slate-400">
                                 {empresaNombre}
                             </p>
                         )}
@@ -96,7 +96,7 @@ export default function UserMenu() {
                 </summary>
 
                 {/* Dropdown */}
-                <div className="mt-1 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+                <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                     <button
                         type="button"
                         onClick={() => openUserProfile()}

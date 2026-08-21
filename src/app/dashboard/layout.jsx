@@ -161,7 +161,7 @@ export default function DashboardLayout({ children }) {
                 <div className="flex h-full w-full">
 
                     {/* ═══════════════ SIDEBAR PREMIUM ═══════════════ */}
-                    <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col bg-[#FCFCFD] border-r border-[#EAEAEC]">
+                    <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col border-r border-[#EAEAEC] bg-white">
 
                         {/* ── Navegación + UserMenu (componente cliente para persistencia) ── */}
                         <SidebarNav />

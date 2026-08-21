@@ -127,9 +127,9 @@ function SubNavItem({ href, label }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center gap-2 rounded-md px-2 py-[5px] text-[11.5px] font-medium transition-all duration-150 ${
+      className={`group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 ${
         isActive
-          ? "bg-[#EDE9FE]/60 text-[#6E56CF]"
+          ? "bg-violet-50 text-[#6E56CF]"
           : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       }`}
     >
@@ -155,28 +155,29 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle }) {
   }, [isOpen, children]);
 
   return (
-    <div className="mt-0.5">
+    <div className="mt-1.5">
       <button
         type="button"
         onClick={() => onToggle(id)}
-        className={`w-full flex cursor-pointer items-center justify-between rounded-lg px-3 py-[7px] text-[12.5px] font-medium transition-all duration-150 ${
+        aria-expanded={isOpen}
+        className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-xl border px-2.5 py-2 text-[12px] font-medium transition-all duration-200 ${
           isOpen
-            ? "bg-[#F3F0FF] text-[#6E56CF]"
-            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            ? "border-violet-100 bg-gradient-to-r from-[#F4F1FF] via-[#FAF9FF] to-white text-slate-800 shadow-[0_8px_24px_rgba(110,86,207,0.08)] before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-r-full before:bg-[#7C5CE7]"
+            : "border-transparent text-slate-600 hover:border-slate-100 hover:bg-slate-50/80 hover:text-slate-900"
         }`}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex min-w-0 items-center gap-3">
           <span
-            className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg transition-all duration-150 ${
-              isOpen ? "bg-[#EDE9FE] text-[#6E56CF]" : "bg-slate-100/80 text-slate-400"
+            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
+              isOpen ? "bg-[#EDE9FE] text-[#6E56CF] shadow-sm" : "bg-slate-50 text-slate-500"
             }`}
           >
             {icon}
           </span>
-          <span className="leading-none">{label}</span>
+          <span className="truncate leading-none">{label}</span>
         </div>
         <svg
-          className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`h-3 w-3 flex-shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180 text-[#6E56CF]" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -192,7 +193,7 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle }) {
           opacity: isOpen ? 1 : 0,
         }}
       >
-        <div ref={contentRef} className="flex flex-col gap-px pl-[2.6rem] pr-2 pt-0.5 pb-0.5">
+        <div ref={contentRef} className="flex flex-col gap-px pb-1 pl-11 pr-1 pt-1">
           {children}
         </div>
       </div>
@@ -311,7 +312,7 @@ export default function SidebarNav() {
   return (
     <>
       <UserMenu />
-      <nav className="flex-1 overflow-y-auto px-2 pb-3 pt-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <nav className="mx-4 flex-1 overflow-y-auto border-t border-slate-100 pb-4 pt-2.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {sections.map((section) => {
             if (!section.accordionLabel) {
               return (
@@ -325,8 +326,7 @@ export default function SidebarNav() {
             }
 
             return (
-              <div key={section.id}>
-                <SectionLabel label={section.title} />
+              <div key={section.id} className="mt-1">
                 <NavAccordion
                   id={section.id}
                   label={section.accordionLabel}
