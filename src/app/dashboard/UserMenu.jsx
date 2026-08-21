@@ -3,7 +3,7 @@
 import { useUser, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getDashboardRoleFromUser, getDashboardRoleLabel } from "@/lib/dashboard-access";
+import { getDashboardRoleFromUser } from "@/lib/dashboard-access";
 
 export default function UserMenu() {
     const { user, isLoaded } = useUser();
@@ -43,7 +43,6 @@ export default function UserMenu() {
 
     const name = user?.fullName || user?.firstName || "Usuario";
     const role = getDashboardRoleFromUser(user);
-    const roleLabel = getDashboardRoleLabel(role);
     const avatar = user?.imageUrl;
 
     if (!user) {
@@ -70,11 +69,11 @@ export default function UserMenu() {
 
     return (
         <div className="shrink-0 px-4 pb-0 pt-5">
-            <details className="group">
+            <details className="group" data-user-role={role} data-company-name={empresaNombre || undefined}>
                 <summary aria-label="Abrir menú de usuario" title="Abrir menú de usuario" className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
 
                     {/* Avatar */}
-                    <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#EDE9FE] shadow-lg ring-2 ring-violet-100 transition-transform duration-200 group-hover:scale-[1.03]">
+                    <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] shadow-sm transition-transform duration-200 group-hover:scale-[1.03]">
                         {avatar ? (
                             <img src={avatar} alt={name} className="h-full w-full object-cover" />
                         ) : (
@@ -87,11 +86,8 @@ export default function UserMenu() {
                         <p className="break-words text-[14px] font-semibold leading-tight text-slate-800">
                             {name}
                         </p>
-                        <p className="mt-0.5 break-words text-[11px] font-medium capitalize leading-tight text-[#6E56CF]">
-                            {roleLabel}
-                        </p>
                         {empresaNombre && (
-                            <p className="mt-1 break-words text-[8px] font-medium leading-tight tracking-normal text-slate-400">
+                            <p className="mt-1 break-words text-[9px] font-medium leading-tight tracking-normal text-slate-400">
                                 {empresaNombre}
                             </p>
                         )}
