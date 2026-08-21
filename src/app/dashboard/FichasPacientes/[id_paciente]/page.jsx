@@ -156,21 +156,19 @@ export default function Paciente() {
     }
 
     function editarPaciente() {
-        setMostrarFormulario((prev) => {
-            const siguienteEstado = !prev;
-
-            if (siguienteEstado) {
-                setTimeout(() => {
-                    formularioEdicionRef.current?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-                }, 50);
-            }
-
-            return siguienteEstado;
-        });
+        setMostrarFormulario((prev) => !prev);
     }
+
+    useEffect(() => {
+        if (!mostrarFormulario) return;
+
+        const overflowAnterior = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = overflowAnterior;
+        };
+    }, [mostrarFormulario]);
 
 
     function verOdontogramas() {
@@ -204,6 +202,12 @@ export default function Paciente() {
     const [correo, setCorreo] = useState("");
     const [direccion, setDireccion] = useState("");
     const [pais, setPais] = useState("");
+    const [observacion1, setObservacion1] = useState("");
+    const [apoderado, setApoderado] = useState("");
+    const [apoderadoRut, setApoderadoRut] = useState("");
+    const [medicamentosUsados, setMedicamentosUsados] = useState("");
+    const [habitos, setHabitos] = useState("");
+    const [comentariosAdicionales, setComentariosAdicionales] = useState("");
 
     const [checked, setChecked] = useState(true);
 
@@ -443,14 +447,14 @@ export default function Paciente() {
                 correo: correoNormalizado,
                 direccion: direccionNormalizada,
                 pais: paisNormalizado,
-                observacion1: pacienteBase.observacion1 ?? "",
+                observacion1,
                 observacion2: pacienteBase.observacion2 ?? "",
                 observacion3: pacienteBase.observacion3 ?? "",
-                apoderado: pacienteBase.apoderado ?? "",
-                apoderado_rut: pacienteBase.apoderado_rut ?? "",
-                medicamentosUsados: pacienteBase.medicamentosUsados ?? "",
-                habitos: pacienteBase.habitos ?? "",
-                comentariosAdicionales: pacienteBase.comentariosAdicionales ?? "",
+                apoderado,
+                apoderado_rut: apoderadoRut,
+                medicamentosUsados,
+                habitos,
+                comentariosAdicionales,
                 id_paciente
             };
 
@@ -480,6 +484,12 @@ export default function Paciente() {
                     setRut("");
                     setSexo("");
                     setPais("");
+                    setObservacion1("");
+                    setApoderado("");
+                    setApoderadoRut("");
+                    setMedicamentosUsados("");
+                    setHabitos("");
+                    setComentariosAdicionales("");
                     setMostrarFormulario(false);
                     await buscarPacientePorId(id_paciente);
                     return toast.success("Datos del paciente actualizados con Exito!");
@@ -540,6 +550,12 @@ export default function Paciente() {
         setCorreo(paciente.correo || "");
         setDireccion(paciente.direccion || "");
         setPais(paciente.pais || "");
+        setObservacion1(paciente.observacion1 || "");
+        setApoderado(paciente.apoderado || "");
+        setApoderadoRut(paciente.apoderado_rut || "");
+        setMedicamentosUsados(paciente.medicamentosUsados || "");
+        setHabitos(paciente.habitos || "");
+        setComentariosAdicionales(paciente.comentariosAdicionales || "");
         cargarUltimaAtencion(paciente.rut, id_paciente);
     }, [detallePaciente]);
 
@@ -885,13 +901,9 @@ export default function Paciente() {
                 {/* ── Header Principal ── */}
                 <div className="mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Ficha Individual</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
                             Carpeta Clínica: <span className="text-[#6E56CF]">{pacienteActual ? `${pacienteActual.nombre} ${pacienteActual.apellido}` : "Paciente"}</span>
                         </h1>
-                        <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
-                            Gestión integral del historial médico, documentos y evoluciones clínicas del paciente.
-                        </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
@@ -928,17 +940,17 @@ export default function Paciente() {
                     <div className="xl:col-span-4">
                         {pacienteActual && (
                             <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden sticky top-6 transition-all hover:shadow-md">
-                                <div className="p-8 border-b border-slate-100 bg-slate-50/30 flex items-center gap-4">
-                                    <div className="h-16 w-16 rounded-[24px] bg-[#6E56CF] text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-indigo-100">
+                                <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/30 px-5 py-4">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#6E56CF] text-base font-bold text-white shadow-lg shadow-indigo-100">
                                         {pacienteActual.nombre?.charAt(0)}{pacienteActual.apellido?.charAt(0)}
                                     </div>
                                     <div>
-                                        <h2 className="text-lg font-bold text-slate-900 leading-tight">{pacienteActual.nombre} {pacienteActual.apellido}</h2>
-                                        <p className="text-[12px] text-slate-400 font-medium uppercase tracking-wider mt-1">ID Paciente #{id_paciente}</p>
+                                        <h2 className="text-base font-bold leading-tight text-slate-900">{pacienteActual.nombre} {pacienteActual.apellido}</h2>
+                                        <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-slate-400">ID Paciente #{id_paciente}</p>
                                     </div>
                                 </div>
-                                <div className="p-8 space-y-6">
-                                    <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-3 px-5 py-4">
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                                         <div className="space-y-1">
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nacimiento</span>
                                             <p className="text-[13px] font-semibold text-slate-700">{formatearFecha(pacienteActual.nacimiento)}</p>
@@ -956,32 +968,32 @@ export default function Paciente() {
                                             <p className="text-[13px] font-semibold text-slate-700">{pacienteActual.sexo || "-"}</p>
                                         </div>
                                     </div>
-                                    <div className="rounded-2xl bg-violet-50/60 border border-violet-100 px-4 py-3 flex items-center justify-between">
+                                    <div className="flex items-center justify-between rounded-xl border border-violet-100 bg-violet-50/60 px-3 py-2">
                                         <span className="text-[10px] font-bold text-[#6E56CF] uppercase tracking-widest">Última atención</span>
                                         <span className="text-[13px] font-bold text-slate-700">
                                             {ultimaAtencion ? formatearFecha(ultimaAtencion) : "Sin registro"}
                                         </span>
                                     </div>
-                                    <div className="pt-4 border-t border-slate-100 space-y-4">
+                                    <div className="space-y-2.5 border-t border-slate-100 pt-2.5">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+                                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                                             </div>
                                             <span className="text-[13px] text-slate-600">{pacienteActual.telefono || "No registrado"}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+                                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                             </div>
                                             <span className="text-[13px] text-slate-600 break-all">{pacienteActual.correo || "No registrado"}</span>
                                         </div>
                                     </div>
-                                    <div className="pt-6">
+                                    <div>
                                         <button
                                             onClick={editarPaciente}
-                                            className="w-full h-11 bg-slate-900 text-white text-[13px] font-bold rounded-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+                                            className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-[12px] font-bold text-white transition-all hover:bg-slate-800"
                                         >
-                                            Editar Datos Paciente
+                                            Editar Información de Ingreso
                                         </button>
                                     </div>
                                 </div>
@@ -993,21 +1005,21 @@ export default function Paciente() {
                     <div className="xl:col-span-8 space-y-8">
                         
                         {/* Acciones Rápidas */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="h-28 bg-white border border-slate-200 rounded-[28px] p-6 flex flex-col justify-between hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50 transition-all group text-left">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
                                 <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 </div>
                                 <span className="text-[13px] font-bold text-slate-700">Nueva Ficha</span>
                             </button>
-                            <button onClick={agendarPaciente} className="h-28 bg-white border border-slate-200 rounded-[28px] p-6 flex flex-col justify-between hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50 transition-all group text-left">
+                            <button onClick={agendarPaciente} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
                                 <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </div>
                                 <span className="text-[13px] font-bold text-slate-700">Agendar Cita</span>
                             </button>
                             {canSeeOdontograma && (
-                                <button onClick={verOdontogramas} className="h-28 bg-white border border-slate-200 rounded-[28px] p-6 flex flex-col justify-between hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50 transition-all group text-left">
+                                <button onClick={verOdontogramas} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
                                     <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
                                     </div>
@@ -1015,47 +1027,120 @@ export default function Paciente() {
                                 </button>
                             )}
                             {canSeeRecetaMedica && (
-                                <button onClick={() => irAReceta(id_paciente)} className="h-28 bg-white border border-slate-200 rounded-[28px] p-6 flex flex-col justify-between hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50 transition-all group text-left">
+                                <button onClick={() => irAReceta(id_paciente)} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
                                     <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
                                     </div>
                                     <span className="text-[13px] font-bold text-slate-700">Receta Médica</span>
                                 </button>
                             )}
-                            <button onClick={irADocumentos} className="h-28 bg-white border border-slate-200 rounded-[28px] p-6 flex flex-col justify-between hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50 transition-all group text-left">
+                            <button onClick={irADocumentos} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
                                 <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                 </div>
-                                <span className="text-[13px] font-bold text-slate-700">Adjuntar Documentos</span>
+                                <span className="text-[13px] font-bold text-slate-700">Documentos</span>
                             </button>
                         </div>
 
+                        {pacienteActual && (
+                            <details className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+                                <summary className="flex cursor-pointer list-none items-center gap-4 bg-slate-50/50 px-6 py-4 transition-colors hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-base font-bold text-slate-900">Información de ingreso</h3>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            editarPaciente();
+                                        }}
+                                        aria-label="Editar información de ingreso"
+                                        title="Editar información de ingreso"
+                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF]"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487a2.1 2.1 0 113 2.97L8.33 18.99l-4.33 1.36 1.36-4.33L16.862 4.487z" />
+                                        </svg>
+                                    </button>
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-transform duration-200 group-open:rotate-180">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </div>
+                                </summary>
+                                <div className="grid grid-cols-1 gap-px bg-slate-100 sm:grid-cols-2 xl:grid-cols-4">
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Dirección</p>
+                                        <p className="mt-0.5 break-words text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.direccion || "Sin registro"}</p>
+                                    </div>
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">País</p>
+                                        <p className="mt-0.5 break-words text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.pais || "Sin registro"}</p>
+                                    </div>
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Apoderado</p>
+                                        <p className="mt-0.5 break-words text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.apoderado || "Sin registro"}</p>
+                                    </div>
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">RUT del apoderado</p>
+                                        <p className="mt-0.5 break-words font-mono text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.apoderado_rut || "Sin registro"}</p>
+                                    </div>
+                                    <div className="bg-violet-50/40 px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#6E56CF]">Antecedentes</p>
+                                        <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.observacion1 || "Sin antecedentes registrados"}</p>
+                                    </div>
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Medicamentos</p>
+                                        <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.medicamentosUsados || "Sin información"}</p>
+                                    </div>
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Hábitos</p>
+                                        <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.habitos || "Sin información"}</p>
+                                    </div>
+                                    <div className="bg-white px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Comentarios</p>
+                                        <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.comentariosAdicionales || "Sin información"}</p>
+                                    </div>
+                                </div>
+                            </details>
+                        )}
+
                         {/* Formulario de Edición (Cerrable) */}
                         {mostrarFormulario && (
-                            <div ref={formularioEdicionRef} className="bg-white rounded-[32px] border border-slate-200 shadow-md overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-                                <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Edición de Datos Maestros</h3>
-                                    <button onClick={() => setMostrarFormulario(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm sm:p-6">
+                                <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-white/80 bg-white shadow-2xl shadow-slate-950/25 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex shrink-0 items-center justify-between border-b border-violet-100 bg-gradient-to-r from-violet-50 via-white to-white px-5 py-3 sm:px-6">
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6E56CF]">Paciente</p>
+                                        <h3 className="mt-0.5 text-sm font-bold text-slate-900">Editar Información de Ingreso</h3>
+                                    </div>
+                                    <button onClick={() => setMostrarFormulario(false)} aria-label="Cerrar edición" className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                     </button>
                                 </div>
-                                <div className="p-8 space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        <div className="space-y-2">
+                                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50/50 p-3 sm:p-4 [&_input]:h-9">
+                                    <div className="grid grid-cols-1 gap-2 rounded-xl border border-slate-100 bg-white p-3 md:grid-cols-2 lg:grid-cols-4">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre</label>
                                             <ShadcnInput value={nombre} onChange={(e) => setNombre(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Apellido</label>
                                             <ShadcnInput value={apellido} onChange={(e) => setApellido(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT</label>
-                                            <ShadcnInput value={rut} onChange={(e) => setRut(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <ShadcnInput value={rut} onChange={(e) => setRut(e.target.value.replace(/[^0-9kK]/g, "").toUpperCase())} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Fecha de nacimiento</label>
-                                            <div className="w-full [&_button]:h-11 [&_button]:w-full [&_button]:justify-between [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm [&_label]:hidden">
+                                            <div className="w-full [&_button]:h-9 [&_button]:w-full [&_button]:justify-between [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm [&_label]:hidden">
                                                 <ShadcnDatePicker
                                                     label="Fecha de nacimiento"
                                                     value={nacimiento}
@@ -1063,13 +1148,13 @@ export default function Paciente() {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sexo</label>
                                             <ShadcnInput value={sexo} onChange={(e) => setSexo(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Previsión</label>
-                                            <div className="w-full [&_button]:h-11 [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm">
+                                            <div className="w-full [&_button]:h-9 [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm">
                                                 <ShadcnSelect
                                                     nombreDefault={prevision || "Seleccionar..."}
                                                     value1={"FONASA"} value2={"ISAPRE"} value3={"CONVENIO"} value4={"SIN PREVISION"}
@@ -1077,45 +1162,107 @@ export default function Paciente() {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Teléfono</label>
                                             <ShadcnInput value={telefono} onChange={(e) => setTelefono(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
                                         </div>
                                     </div>
-                                    <div className="pt-4 flex justify-end gap-3">
-                                        <button onClick={() => setMostrarFormulario(false)} className="h-11 px-6 rounded-xl border border-slate-200 text-slate-500 font-bold text-sm hover:bg-slate-50">Cancelar</button>
-                                        <button onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente)} className="h-11 px-8 rounded-xl bg-[#6E56CF] text-white font-bold text-sm hover:bg-[#5b45bc] shadow-lg shadow-indigo-100">Guardar Cambios</button>
+                                    <div className="space-y-2 rounded-xl border border-violet-100 bg-white p-3">
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6E56CF]">Ficha de ingreso</p>
+                                            <p className="mt-0.5 text-sm font-semibold text-slate-800">Información complementaria</p>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
+                                            <div className="space-y-1.5">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Dirección</label>
+                                                <ShadcnInput value={direccion} onChange={(e) => setDireccion(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">País</label>
+                                                <ShadcnInput value={pais} onChange={(e) => setPais(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Apoderado</label>
+                                                <ShadcnInput value={apoderado} onChange={(e) => setApoderado(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">RUT del apoderado</label>
+                                                <ShadcnInput value={apoderadoRut} onChange={(e) => setApoderadoRut(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5 lg:col-span-1">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Antecedentes</label>
+                                                <textarea value={observacion1} onChange={(e) => setObservacion1(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Medicamentos</label>
+                                                <textarea value={medicamentosUsados} onChange={(e) => setMedicamentosUsados(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Hábitos</label>
+                                                <textarea value={habitos} onChange={(e) => setHabitos(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                            </div>
+                                            <div className="space-y-1.5 lg:col-span-1">
+                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Comentarios</label>
+                                                <textarea value={comentariosAdicionales} onChange={(e) => setComentariosAdicionales(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="flex shrink-0 items-center justify-end gap-2.5 border-t border-slate-200 bg-slate-50/95 px-4 py-2.5 sm:px-5">
+                                    <button onClick={() => setMostrarFormulario(false)} className="h-9 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-500 transition-colors hover:bg-slate-50">Cancelar</button>
+                                    <button onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente)} className="h-9 rounded-lg bg-[#6E56CF] px-5 text-xs font-bold text-white shadow-md shadow-violet-200 transition-colors hover:bg-[#5b45bc]">Guardar Cambios</button>
+                                </div>
+                            </div>
                             </div>
                         )}
 
                         {/* Listado de Fichas */}
                         <div className="space-y-6">
                             
-                            {/* Barra de Filtro */}
-                            <div className="bg-white rounded-[28px] border border-slate-200 shadow-sm p-4 flex items-center gap-4">
-                                <div className="flex-1 relative">
-                                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            {/* Filtros y firma PDF */}
+                            <details className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+                                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-gradient-to-r from-violet-50/70 via-white to-white px-6 py-4 transition-colors hover:from-violet-100/60 [&::-webkit-details-marker]:hidden">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100/70 text-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18l-7 8v6l-4 2v-8L3 4z" />
+                                        </svg>
                                     </div>
-                                    <input
-                                        type="text"
-                                        value={filtroProfesional}
-                                        onChange={(e) => setFiltroProfesional(e.target.value)}
-                                        onKeyDown={(e) => e.key === "Enter" && buscarPorProfesional()}
-                                        placeholder="Filtrar por profesional..."
-                                        className="h-12 w-full bg-slate-50 border-none rounded-2xl pl-11 pr-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
-                                    />
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-base font-bold text-slate-900">Filtros</h3>
+                                    </div>
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-transform duration-200 group-open:rotate-180">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </div>
+                                </summary>
+                                <div className="space-y-3 border-t border-slate-100 p-4">
+                                    <div>
+                                        <p className="text-[11px] font-bold text-slate-800">Buscar fichas por profesional</p>
+                                        <p className="mt-0.5 text-[12px] text-slate-500">Escribe un nombre y presiona Buscar.</p>
+                                    </div>
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                        <div className="relative min-w-0 flex-1">
+                                            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={filtroProfesional}
+                                                onChange={(e) => setFiltroProfesional(e.target.value)}
+                                                onKeyDown={(e) => e.key === "Enter" && buscarPorProfesional()}
+                                                placeholder="Ej: Dra. María González"
+                                                className="h-11 w-full rounded-xl border-none bg-slate-50 pl-11 pr-4 text-sm transition-all focus:ring-2 focus:ring-violet-100"
+                                            />
+                                        </div>
+                                        <button onClick={buscarPorProfesional} className="h-11 rounded-xl bg-slate-900 px-6 text-[13px] font-bold text-white transition-all hover:bg-slate-800">Buscar</button>
+                                        {filtroProfesional && <button onClick={limpiarFiltro} className="h-11 rounded-xl bg-slate-100 px-5 text-[13px] font-bold text-slate-600 hover:bg-slate-200">Limpiar</button>}
+                                    </div>
                                 </div>
-                                <button onClick={buscarPorProfesional} className="h-12 px-6 rounded-2xl bg-slate-900 text-white text-[13px] font-bold hover:bg-slate-800 transition-all">Buscar</button>
-                                {filtroProfesional && <button onClick={limpiarFiltro} className="h-12 px-5 rounded-2xl bg-slate-100 text-slate-600 text-[13px] font-bold hover:bg-slate-200">Limpiar</button>}
-                            </div>
-
-                            {/* RUT y especialidad del profesional para la firma del PDF (opcional, no se guarda en el backend) */}
-                            <div className="bg-white rounded-[28px] border border-slate-200 shadow-sm p-4 flex items-center gap-4">
-                                <div className="flex-1">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">RUT profesional (opcional, para la firma del PDF)</label>
+                                <div className="border-t border-slate-100 p-4">
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <label className="ml-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">RUT del profesional</label>
                                     <input
                                         type="text"
                                         value={rutProfesionalFirma}
@@ -1124,8 +1271,8 @@ export default function Paciente() {
                                         className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Especialidad (opcional, para la firma del PDF)</label>
+                                <div>
+                                    <label className="ml-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">Especialidad profesional</label>
                                     <input
                                         type="text"
                                         value={especialidadProfesionalFirma}
@@ -1134,7 +1281,9 @@ export default function Paciente() {
                                         className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
                                     />
                                 </div>
-                            </div>
+                                    </div>
+                                </div>
+                            </details>
 
                             {/* Fichas Propiamente Tales */}
                             {listaFichas.length === 0 ? (
@@ -1145,59 +1294,64 @@ export default function Paciente() {
                                     <p className="text-slate-400 text-sm font-medium">No se han encontrado registros clínicos.</p>
                                 </div>
                             ) : (
-                                <div className="space-y-6">
+                                <div className="space-y-4">
                                     {listaFichasOrdenada.map((ficha, index) => {
                                         const expandida = fichasExpandidas.has(ficha.id_ficha);
                                         return (
-                                        <div key={ficha.id_ficha} className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300">
-                                            <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center font-bold text-xs shadow-sm">
-                                                        #{ficha.id_ficha}
+                                        <div key={ficha.id_ficha} className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
+                                            <div className="flex flex-col gap-2.5 border-b border-slate-100 bg-slate-50/50 px-4 py-3 xl:flex-row xl:items-center xl:justify-between">
+                                                <div className="flex min-w-0 items-center gap-3">
+                                                    <div className="flex h-7 shrink-0 items-center rounded-lg border border-violet-100 bg-violet-50 px-2 text-[9px] font-bold text-[#6E56CF] shadow-sm">
+                                                        Ficha {ficha.id_ficha}
                                                     </div>
-                                                    <div>
-                                                        <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                                            {parsearDatosDinamicos(ficha.datosDinamicos)?._plantillaNombre || ficha.tipoAtencion || "Consulta General"}
+                                                    <div className="min-w-0">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Ficha clínica</p>
                                                             {index === 0 && (
-                                                                <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">Más reciente</span>
+                                                                <span className="rounded-lg border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600">Más reciente</span>
                                                             )}
+                                                        </div>
+                                                        <h4 className="mt-0.5 truncate text-[15px] font-bold text-slate-800">
+                                                            {parsearDatosDinamicos(ficha.datosDinamicos)?._plantillaNombre || ficha.tipoAtencion || "Consulta General"}
                                                         </h4>
-                                                        <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Fecha: {formatearFecha(ficha.fechaConsulta)}</p>
+                                                        <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                            {formatearFecha(ficha.fechaConsulta)}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="h-9 px-3 rounded-xl bg-teal-50 text-teal-700 text-[11px] font-bold flex items-center border border-teal-100">
-                                                        Prof: {ficha.observaciones || "N/A"}
+                                                <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+                                                    <div className="flex h-9 max-w-full items-center rounded-xl border border-teal-100 bg-teal-50 px-3 text-[11px] font-bold text-teal-700">
+                                                        <span className="mr-1 text-teal-500">Prof.</span>{ficha.observaciones || "No informado"}
                                                     </div>
-                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-9 px-4 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all">
+                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-9 rounded-xl border border-slate-200 bg-white px-3.5 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50">
                                                         {expandida ? "Ocultar" : "Ver detalle"}
                                                     </button>
-                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-9 px-4 rounded-xl bg-violet-50 border border-violet-100 text-[#6E56CF] text-[11px] font-bold hover:bg-violet-100 transition-all">PDF</button>
-                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-9 px-4 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all">Editar</button>
-                                                    <button onClick={() => eliminarFicha(ficha.id_ficha)} className="h-9 w-9 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                    </button>
+                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-9 rounded-xl border border-violet-100 bg-violet-50 px-3.5 text-[11px] font-bold text-[#6E56CF] transition-all hover:bg-violet-100">PDF</button>
+                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-9 rounded-xl border border-slate-200 bg-white px-3.5 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50">Editar</button>
                                                 </div>
                                             </div>
                                             {expandida && (
-                                            <div className="p-8">
+                                            <div className="p-5">
                                                 {(() => {
                                                     const datos = parsearDatosDinamicos(ficha.datosDinamicos)
                                                     if (datos && datos._plantillaNombre) {
                                                         const categorias = agruparPorCategoria(datos)
                                                         return (
-                                                            <div className="space-y-8">
+                                                            <div className="space-y-5">
                                                                 {categorias.map(cat => (
-                                                                    <div key={cat.nombre} className="space-y-4">
+                                                                    <div key={cat.nombre} className="space-y-2.5">
                                                                         <div className="flex items-center gap-3">
                                                                             <span className="text-[10px] font-bold text-[#6E56CF] uppercase tracking-[0.15em]">{cat.nombre}</span>
                                                                             <div className="flex-1 h-px bg-slate-100"></div>
                                                                         </div>
-                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                                                             {cat.campos.map((campo, idx) => (
-                                                                                <div key={idx} className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 transition-colors hover:bg-slate-50">
+                                                                                <div key={idx} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 transition-colors hover:bg-slate-50">
                                                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{campo.nombre}</span>
-                                                                                    <p className="mt-1.5 text-[13px] text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">{campo.valor || "-"}</p>
+                                                                                    <p className="mt-1 whitespace-pre-wrap text-[12px] font-medium leading-snug text-slate-700">{campo.valor || "-"}</p>
                                                                                 </div>
                                                                             ))}
                                                                         </div>
