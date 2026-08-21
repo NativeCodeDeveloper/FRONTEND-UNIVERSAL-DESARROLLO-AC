@@ -154,10 +154,15 @@ export default function Seccion2() {
                 {service.name}
               </div>
 
-              {/* Bottom Description */}
-              <div className="absolute bottom-6 left-6 right-6 p-2 pointer-events-none text-left">
-                <h3 className="text-white font-bold text-lg leading-tight mb-1 drop-shadow-md">{service.name}</h3>
-                <p className="text-white/80 text-sm line-clamp-2">{service.description}</p>
+              {/* Bottom Description: título fijo en su posición original (no se mueve, no se
+                  desconfigura la imagen). La descripción queda en una caja de alto fijo con
+                  scroll interno propio: si el texto entra completo no se ve ninguna barra,
+                  y solo aparece scroll cuando el texto es más largo de lo que cabe. */}
+              <div className="absolute bottom-6 left-6 right-6 p-2 text-left">
+                <h3 className="text-white font-bold text-lg leading-tight mb-1 drop-shadow-md pointer-events-none">{service.name}</h3>
+                <p className="text-white/80 text-sm leading-relaxed text-left max-h-24 overflow-y-auto pr-1">
+                  {service.description}
+                </p>
               </div>
             </article>
           ))}

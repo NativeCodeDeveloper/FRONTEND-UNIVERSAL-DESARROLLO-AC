@@ -28,13 +28,14 @@ function PublicationCard({ item }) {
             onError={() => setImgError(true)}
           />
         </div>
+        {/* p-4 con alto fijo: title + description siempre reservan el mismo espacio
+            (título con " " si no hay dato, descripción con min-h de 3 líneas)
+            para que ninguna tarjeta quede más corta o más larga que las demás. */}
         <div className="p-4">
-          {item.titulo && (
-            <h3 className="text-sm font-semibold text-slate-900 leading-tight mb-1 line-clamp-1">
-              {item.titulo}
-            </h3>
-          )}
-          <p className="text-sm text-slate-500 leading-relaxed line-clamp-3">
+          <h3 className="text-sm font-semibold text-slate-900 leading-tight mb-1 line-clamp-1 min-h-[1.25rem]">
+            {item.titulo || " "}
+          </h3>
+          <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 min-h-[3.75rem]">
             {item.descripcion || "Publicación del centro médico."}
           </p>
         </div>

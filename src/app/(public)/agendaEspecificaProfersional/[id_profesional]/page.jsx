@@ -378,7 +378,7 @@ export default function CalendarioMensualHoras() {
         const dia = new Date(fecha); dia.setHours(0, 0, 0, 0);
         if (dia < hoy) { toast.error("No puedes agendar en fechas pasadas"); return; }
         if (fecha.getDay() === 0) {
-            toast.error("Las atenciones son de Lunes a Sábado.\nLun-Sáb: 9:00-22:00", {
+            toast.error("No hay atención los días domingo.", {
                 duration: 4000,
                 style: {background: "#FEE2E2", color: "#991B1B", border: "1px solid #FCA5A5"},
             });
@@ -484,11 +484,11 @@ export default function CalendarioMensualHoras() {
                     <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                         Agenda · Online
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-black tracking-widest">
-                        <span className="bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 text-transparent bg-clip-text">
-                            {nombreProfesional || "Cargando..."}
-                        </span>
-                        <span className="relative mt-1 block h-1 w-40 max-w-full rounded-full bg-gradient-to-r from-slate-400 via-slate-200 to-transparent"/>
+                    <h1
+                        className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900"
+                        style={{ fontFamily: "var(--font-outfit)" }}
+                    >
+                        {nombreProfesional || "Cargando..."}
                     </h1>
                     <p className="max-w-md text-sm leading-6 text-slate-500">
                         Selecciona un servicio, luego elige fecha y horario disponible.
@@ -762,9 +762,11 @@ export default function CalendarioMensualHoras() {
 
                 <footer className="mt-10 text-center text-xs text-slate-600">
                     <p>Atención clínica con un servicio personalizado para cada paciente.</p>
+                    {/* Horarios comentados: cada cliente tiene su propio horario en la plataforma
                     <p className="mt-2 text-[11px] text-slate-400">
                         Horarios: Lun-Sáb 9:00-22:00 | Dom Cerrado
                     </p>
+                    */}
                 </footer>
             </div>
         </div>
