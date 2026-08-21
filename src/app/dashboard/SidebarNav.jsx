@@ -277,6 +277,7 @@ export default function SidebarNav() {
   if (role === "cancelado") {
     return (
       <>
+        <UserMenu />
         <div className="flex-1 overflow-y-auto px-3 py-4">
           <div className="rounded-2xl border border-rose-200 bg-[linear-gradient(135deg,rgba(255,241,242,0.95),rgba(254,226,226,0.88))] p-4">
             <div className="flex items-center gap-2.5">
@@ -304,14 +305,14 @@ export default function SidebarNav() {
           </div>
         </div>
 
-        <UserMenu />
       </>
     );
   }
 
   return (
     <>
-      <nav className="flex-1 overflow-y-auto px-2 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <UserMenu />
+      <nav className="flex-1 overflow-y-auto px-2 pb-3 pt-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {sections.map((section) => {
             if (!section.accordionLabel) {
               return (
@@ -346,7 +347,6 @@ export default function SidebarNav() {
       <div className="px-3 pb-1">
         <NotificationBell />
       </div>
-      <UserMenu />
     </>
   );
 }

@@ -7,7 +7,7 @@ import { getDashboardRoleFromUser, getDashboardRoleLabel } from "@/lib/dashboard
 
 export default function UserMenu() {
     const { user, isLoaded } = useUser();
-    const { signOut } = useClerk();
+    const { signOut, openUserProfile } = useClerk();
     const [empresaNombre, setEmpresaNombre] = useState("");
 
     useEffect(() => {
@@ -29,10 +29,10 @@ export default function UserMenu() {
 
     if (!isLoaded) {
         return (
-            <div className="px-3 pb-3 pt-2 border-t border-[#EAEAEC]">
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3">
-                    <div className="h-10 w-10 animate-pulse rounded-full bg-slate-100 flex-shrink-0" />
-                    <div className="flex-1 space-y-2">
+            <div className="shrink-0 px-4 pb-0 pt-5">
+                <div className="flex flex-col items-center gap-2">
+                    <div className="h-24 w-24 animate-pulse rounded-full bg-slate-100" />
+                    <div className="flex flex-col items-center gap-1.5">
                         <div className="h-3 w-28 animate-pulse rounded bg-slate-100" />
                         <div className="h-2.5 w-20 animate-pulse rounded bg-slate-100" />
                     </div>
@@ -48,59 +48,58 @@ export default function UserMenu() {
 
     if (!user) {
         return (
-            <div className="px-3 pb-3 pt-2 border-t border-[#EAEAEC]">
-                <div className="flex items-center gap-3 rounded-2xl border border-violet-100 bg-[#F8F7FC] px-3 py-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#EDE9FE] text-[#6E56CF]">
+            <div className="shrink-0 px-4 pb-0 pt-5">
+                <div className="flex flex-col items-center gap-2 text-center">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#EDE9FE] text-[#6E56CF] ring-2 ring-violet-100">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c0-1.105.895-2 2-2s2 .895 2 2v1m-7 0V9a3 3 0 016 0m-8 3h10a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2v-5a2 2 0 012-2z" />
                         </svg>
                     </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] font-semibold leading-tight text-slate-800">
+                    <div className="min-w-0 w-full">
+                        <p className="truncate text-[14px] font-semibold leading-tight text-slate-800">
                             Acceso temporal
                         </p>
-                        <p className="mt-0.5 truncate text-[11px] leading-tight text-slate-400">
+                        <p className="mt-1 truncate text-[11px] leading-tight text-slate-400">
                             Dashboard sin autenticación
                         </p>
                     </div>
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" title="Acceso habilitado" />
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="px-3 pb-3 pt-2 border-t border-[#EAEAEC]">
+        <div className="shrink-0 px-4 pb-0 pt-5">
             <details className="group">
-                <summary className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3 select-none list-none [&::-webkit-details-marker]:hidden transition-all hover:border-slate-300 hover:shadow-sm group-open:border-violet-200 group-open:shadow-sm">
+                <summary className="relative flex cursor-pointer list-none select-none flex-col items-center gap-1.5 px-2 pb-1 pt-1 [&::-webkit-details-marker]:hidden">
 
                     {/* Avatar */}
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full overflow-hidden border-2 border-white shadow-sm bg-[#EDE9FE]">
+                    <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#EDE9FE] shadow-lg ring-2 ring-violet-100 transition-transform duration-200 group-hover:scale-[1.03]">
                         {avatar ? (
                             <img src={avatar} alt={name} className="h-full w-full object-cover" />
                         ) : (
-                            <span className="text-sm font-bold text-[#6E56CF]">{name.charAt(0)}</span>
+                            <span className="text-xl font-bold text-[#6E56CF]">{name.charAt(0)}</span>
                         )}
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 w-full px-1 text-center">
+                        <p className="break-words text-[15px] font-semibold leading-snug text-slate-800">
+                            {name}
+                        </p>
+                        <p className="mt-1 break-words text-[11px] font-medium capitalize leading-snug text-[#6E56CF]">
+                            {roleLabel}
+                        </p>
                         {empresaNombre && (
-                            <p className="truncate text-[10px] font-semibold text-[#6E56CF] leading-tight uppercase tracking-wide">
+                            <p className="mt-2 break-words text-[9px] font-semibold uppercase leading-snug tracking-[0.08em] text-slate-400">
                                 {empresaNombre}
                             </p>
                         )}
-                        <p className="truncate text-[13px] font-semibold text-slate-800 leading-tight">
-                            {name}
-                        </p>
-                        <p className="truncate text-[11px] text-slate-400 leading-tight mt-0.5 capitalize">
-                            {roleLabel}
-                        </p>
                     </div>
 
                     {/* Chevron */}
                     <svg
-                        className="h-4 w-4 text-slate-400 transition-transform duration-200 group-open:rotate-180 flex-shrink-0"
+                        className="mt-1 h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-180"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -109,6 +108,16 @@ export default function UserMenu() {
 
                 {/* Dropdown */}
                 <div className="mt-1 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+                    <button
+                        type="button"
+                        onClick={() => openUserProfile()}
+                        className="flex w-full items-center gap-2.5 border-b border-slate-100 px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-violet-50 hover:text-[#6E56CF]"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                        </svg>
+                        <span>Editar perfil</span>
+                    </button>
                     <Link
                         href="/"
                         className="flex items-center gap-2.5 px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-[#6E56CF] border-b border-slate-100"

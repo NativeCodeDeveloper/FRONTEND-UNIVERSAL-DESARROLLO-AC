@@ -6,14 +6,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ClerkProvider } from "@clerk/nextjs";
-import { Michroma } from "next/font/google";
 import MobileNav from "./MobileNav";
 import SidebarNav from "./SidebarNav";
 import NotificationProvider from "@/components/NotificationProvider";
 import DashboardPageTransition from "@/components/DashboardPageTransition";
 import CortexAssistant from "@/Componentes/CortexAssistant";
-
-const michroma = Michroma({ weight: "400", subsets: ["latin"], display: "swap" });
 
 export const metadata = {
     title: "Dashboard — Agenda Clínica",
@@ -165,24 +162,6 @@ export default function DashboardLayout({ children }) {
 
                     {/* ═══════════════ SIDEBAR PREMIUM ═══════════════ */}
                     <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col bg-[#FCFCFD] border-r border-[#EAEAEC]">
-
-                       {/* ── Brand ── */}
-                    <div className="relative px-4 pb-3 pt-4 shrink-0">
-                        <div className="relative flex justify-center">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="h-20 w-20 rounded-full bg-violet-500/[0.06] blur-2xl" />
-                            </div>
-                            <img
-                                src="/logo.png"
-                                alt="AgendaClinica"
-                                className="relative h-32 w-full object-contain object-center drop-shadow-[0_0_12px_rgba(139,92,246,0.15)]"
-                            />
-                        </div>
-                        <div className={`${michroma.className} -mt-1 text-center`}>
-                            <p className="text-[11.5px] leading-tight text-black tracking-[0.08em]">AgendaClinica</p>
-                        </div>
-                        <div className="mt-3 h-px bg-gradient-to-r from-transparent via-violet-500/20 to-transparent" />
-                    </div>
 
                         {/* ── Navegación + UserMenu (componente cliente para persistencia) ── */}
                         <SidebarNav />
