@@ -590,6 +590,39 @@ export default function Paciente() {
         return [...listaFichas].sort((a, b) => new Date(b.fechaConsulta) - new Date(a.fechaConsulta));
     }, [listaFichas]);
 
+    const fichasAgrupadasPorMes = useMemo(() => {
+        const grupos = [];
+
+        listaFichasOrdenada.forEach((ficha) => {
+            const fechaLimpia = String(ficha.fechaConsulta || "").split("T")[0];
+            const [anio, mes] = fechaLimpia.split("-").map(Number);
+            const fechaValida = Number.isInteger(anio) && Number.isInteger(mes) && mes >= 1 && mes <= 12;
+            const clave = fechaValida ? `${anio}-${String(mes).padStart(2, "0")}` : "sin-fecha";
+            let grupo = grupos.find((item) => item.clave === clave);
+
+            if (!grupo) {
+                const etiqueta = fechaValida
+                    ? new Intl.DateTimeFormat("es-CL", {
+                        month: "long",
+                        year: "numeric",
+                        timeZone: "UTC",
+                    }).format(new Date(Date.UTC(anio, mes - 1, 1)))
+                    : "Sin fecha";
+
+                grupo = {
+                    clave,
+                    etiqueta: etiqueta.charAt(0).toUpperCase() + etiqueta.slice(1),
+                    fichas: [],
+                };
+                grupos.push(grupo);
+            }
+
+            grupo.fichas.push(ficha);
+        });
+
+        return grupos;
+    }, [listaFichasOrdenada]);
+
     useEffect(() => {
         if (listaFichasOrdenada.length === 0) return;
         // Solo auto-expandir la más reciente una vez por paciente — no en cada
@@ -939,7 +972,7 @@ export default function Paciente() {
                     {/* Tarjeta de Datos Personales (4 slots) */}
                     <div className="xl:col-span-4">
                         {pacienteActual && (
-                            <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden sticky top-6 transition-all hover:shadow-md">
+                            <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
                                 <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/30 px-5 py-4">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#6E56CF] text-base font-bold text-white shadow-lg shadow-indigo-100">
                                         {pacienteActual.nombre?.charAt(0)}{pacienteActual.apellido?.charAt(0)}
@@ -1002,56 +1035,98 @@ export default function Paciente() {
                     </div>
 
                     {/* ── Contenido Principal (8 slots) ── */}
-                    <div className="xl:col-span-8 space-y-8">
+                    <div className="xl:col-span-8 space-y-5">
                         
                         {/* Acciones Rápidas */}
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
-                                <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                                </div>
-                                <span className="text-[13px] font-bold text-slate-700">Nueva Ficha</span>
+                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                <span className="relative z-10 flex w-full flex-col">
+                                    <span className="flex items-start justify-between gap-3">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                        </span>
+                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                    </span>
+                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Nueva Ficha</span>
+                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Crear registro clínico</span>
+                                </span>
                             </button>
-                            <button onClick={agendarPaciente} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
-                                <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                </div>
-                                <span className="text-[13px] font-bold text-slate-700">Agendar Cita</span>
+                            <button onClick={agendarPaciente} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                <span className="relative z-10 flex w-full flex-col">
+                                    <span className="flex items-start justify-between gap-3">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        </span>
+                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                    </span>
+                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Agendar Cita</span>
+                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Programar atención</span>
+                                </span>
                             </button>
                             {canSeeOdontograma && (
-                                <button onClick={verOdontogramas} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
-                                    <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
-                                    </div>
-                                    <span className="text-[13px] font-bold text-slate-700">Odontograma</span>
+                                <button onClick={verOdontogramas} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                    <span className="relative z-10 flex w-full flex-col">
+                                        <span className="flex items-start justify-between gap-3">
+                                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
+                                            </span>
+                                            <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                        </span>
+                                        <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Odontograma</span>
+                                        <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Revisar ficha dental</span>
+                                    </span>
                                 </button>
                             )}
                             {canSeeRecetaMedica && (
-                                <button onClick={() => irAReceta(id_paciente)} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
-                                    <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
-                                    </div>
-                                    <span className="text-[13px] font-bold text-slate-700">Receta Médica</span>
+                                <button onClick={() => irAReceta(id_paciente)} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                    <span className="relative z-10 flex w-full flex-col">
+                                        <span className="flex items-start justify-between gap-3">
+                                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
+                                            </span>
+                                            <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                        </span>
+                                        <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Receta Médica</span>
+                                        <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Emitir prescripción</span>
+                                    </span>
                                 </button>
                             )}
-                            <button onClick={irADocumentos} className="group flex h-20 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-[#6E56CF] hover:shadow-lg hover:shadow-indigo-50/50">
-                                <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center group-hover:bg-[#6E56CF] group-hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                                </div>
-                                <span className="text-[13px] font-bold text-slate-700">Documentos</span>
+                            <button onClick={irADocumentos} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                <span className="relative z-10 flex w-full flex-col">
+                                    <span className="flex items-start justify-between gap-3">
+                                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                        </span>
+                                            <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                    </span>
+                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Documentos</span>
+                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Gestionar archivos</span>
+                                </span>
                             </button>
                         </div>
 
                         {pacienteActual && (
-                            <details className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-                                <summary className="flex cursor-pointer list-none items-center gap-4 bg-slate-50/50 px-6 py-4 transition-colors hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-[#6E56CF]">
+                            <details className="group relative overflow-hidden rounded-[26px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/80 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)] transition-all duration-300 open:border-violet-200 open:shadow-[0_22px_50px_-32px_rgba(109,40,217,0.28)]">
+                                <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
+                                    <span aria-hidden="true" className="absolute left-0 top-5 h-12 w-1 rounded-r-full bg-[#6E56CF]" />
+                                    <span aria-hidden="true" className="absolute -left-16 -top-16 h-32 w-32 rounded-full bg-violet-100/60 blur-3xl" />
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
-                                    <div className="min-w-0 flex-1">
-                                        <h3 className="text-base font-bold text-slate-900">Información de ingreso</h3>
+                                    <div className="relative min-w-0 flex-1">
+                                        <h3 className="text-[17px] font-extrabold leading-tight tracking-[-0.02em] text-slate-900">Información de ingreso</h3>
                                     </div>
                                     <button
                                         type="button"
@@ -1062,14 +1137,14 @@ export default function Paciente() {
                                         }}
                                         aria-label="Editar información de ingreso"
                                         title="Editar información de ingreso"
-                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF]"
+                                        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487a2.1 2.1 0 113 2.97L8.33 18.99l-4.33 1.36 1.36-4.33L16.862 4.487z" />
                                         </svg>
                                     </button>
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-transform duration-200 group-open:rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                                         </svg>
                                     </div>
@@ -1220,18 +1295,20 @@ export default function Paciente() {
                         <div className="space-y-6">
                             
                             {/* Filtros y firma PDF */}
-                            <details className="group overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-                                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-gradient-to-r from-violet-50/70 via-white to-white px-6 py-4 transition-colors hover:from-violet-100/60 [&::-webkit-details-marker]:hidden">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100/70 text-[#6E56CF]">
+                            <details className="group relative overflow-hidden rounded-[26px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/80 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)] transition-all duration-300 open:border-violet-200 open:shadow-[0_22px_50px_-32px_rgba(109,40,217,0.28)]">
+                                <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
+                                    <span aria-hidden="true" className="absolute left-0 top-5 h-12 w-1 rounded-r-full bg-[#6E56CF]" />
+                                    <span aria-hidden="true" className="absolute -left-16 -top-16 h-32 w-32 rounded-full bg-violet-100/60 blur-3xl" />
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18l-7 8v6l-4 2v-8L3 4z" />
                                         </svg>
                                     </div>
-                                    <div className="min-w-0 flex-1">
-                                        <h3 className="text-base font-bold text-slate-900">Filtros</h3>
+                                    <div className="relative min-w-0 flex-1">
+                                        <h3 className="text-[17px] font-extrabold leading-tight tracking-[-0.02em] text-slate-900">Filtros</h3>
                                     </div>
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-transform duration-200 group-open:rotate-180">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                                         </svg>
                                     </div>
@@ -1294,64 +1371,96 @@ export default function Paciente() {
                                     <p className="text-slate-400 text-sm font-medium">No se han encontrado registros clínicos.</p>
                                 </div>
                             ) : (
-                                <div className="space-y-4">
-                                    {listaFichasOrdenada.map((ficha, index) => {
+                                <div className="space-y-7">
+                                    {fichasAgrupadasPorMes.map((grupo, indiceGrupo) => (
+                                    <section
+                                        key={grupo.clave}
+                                        className="grid grid-cols-1 gap-3 md:grid-cols-[132px_24px_minmax(0,1fr)] md:gap-4"
+                                    >
+                                        <div className="relative z-30 flex items-center gap-2.5 md:block md:pt-3 md:text-right">
+                                            <span className="inline-flex items-center whitespace-nowrap rounded-xl border border-violet-100 bg-white/90 px-2.5 py-1 text-[9px] font-bold tracking-[0.04em] text-violet-600 shadow-[0_8px_20px_-16px_rgba(109,40,217,0.55)]">
+                                                {grupo.etiqueta}
+                                            </span>
+                                            <p className="text-[9px] font-medium text-slate-400 md:mt-1.5">
+                                                {grupo.fichas.length} {grupo.fichas.length === 1 ? "registro" : "registros"}
+                                            </p>
+                                        </div>
+
+                                        <div className="relative z-30 hidden md:block">
+                                            <span
+                                                aria-hidden="true"
+                                                className={`absolute left-1/2 top-0 -translate-x-1/2 border-l-2 border-dashed border-violet-200 ${indiceGrupo === fichasAgrupadasPorMes.length - 1 ? "bottom-0" : "-bottom-7"}`}
+                                            />
+                                            <span
+                                                aria-hidden="true"
+                                                className={`absolute left-1/2 top-5 z-30 h-4 w-4 -translate-x-1/2 rounded-full border-4 border-white shadow-[0_0_0_2px_rgba(139,92,246,0.28)] ${indiceGrupo === 0 ? "bg-[#6E56CF]" : "bg-violet-300"}`}
+                                            />
+                                        </div>
+
+                                        <div className="space-y-4">
+                                    {grupo.fichas.map((ficha) => {
                                         const expandida = fichasExpandidas.has(ficha.id_ficha);
+                                        const esMasReciente = ficha.id_ficha === listaFichasOrdenada[0]?.id_ficha;
                                         return (
-                                        <div key={ficha.id_ficha} className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
-                                            <div className="flex flex-col gap-2.5 border-b border-slate-100 bg-slate-50/50 px-4 py-3 xl:flex-row xl:items-center xl:justify-between">
-                                                <div className="flex min-w-0 items-center gap-3">
-                                                    <div className="flex h-7 shrink-0 items-center rounded-lg border border-violet-100 bg-violet-50 px-2 text-[9px] font-bold text-[#6E56CF] shadow-sm">
-                                                        Ficha {ficha.id_ficha}
-                                                    </div>
+                                        <div key={ficha.id_ficha} className="relative z-10">
+                                        <div className="group/ficha relative overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_55px_-38px_rgba(15,23,42,0.7)] transition-all duration-300 hover:border-slate-300 hover:shadow-[0_26px_65px_-36px_rgba(30,41,59,0.4)]">
+                                            <span aria-hidden="true" className="absolute inset-y-0 left-0 z-20 w-1 bg-gradient-to-b from-[#6E56CF] via-violet-400 to-transparent" />
+                                            <div className="relative flex flex-col gap-3 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-white via-white to-slate-50/90 px-5 py-3.5 xl:flex-row xl:items-center xl:justify-between">
+                                                <span aria-hidden="true" className="absolute -left-16 -top-20 h-40 w-40 rounded-full bg-violet-100/55 blur-3xl" />
+                                                <span aria-hidden="true" className="absolute -right-20 -top-24 h-48 w-48 rounded-full bg-slate-100/90 blur-3xl transition-colors duration-300 group-hover/ficha:bg-violet-50" />
+                                                <div className="relative z-10 flex min-w-0 items-center gap-3.5">
                                                     <div className="min-w-0">
                                                         <div className="flex flex-wrap items-center gap-2">
-                                                            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Ficha clínica</p>
-                                                            {index === 0 && (
-                                                                <span className="rounded-lg border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600">Más reciente</span>
+                                                            <p className="truncate text-[9px] font-bold uppercase tracking-[0.18em] text-teal-700">Prof. {ficha.observaciones || "No informado"}</p>
+                                                            {esMasReciente && (
+                                                                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-700 shadow-sm">Más reciente</span>
                                                             )}
                                                         </div>
-                                                        <h4 className="mt-0.5 truncate text-[15px] font-bold text-slate-800">
+                                                        <h4 className="mt-1 truncate text-[16px] font-extrabold tracking-[-0.02em] text-slate-900">
                                                             {parsearDatosDinamicos(ficha.datosDinamicos)?._plantillaNombre || ficha.tipoAtencion || "Consulta General"}
                                                         </h4>
-                                                        <p className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                            </svg>
-                                                            {formatearFecha(ficha.fechaConsulta)}
-                                                        </p>
+                                                        <div className="mt-2 flex flex-wrap items-center gap-2.5">
+                                                            <p className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                                {formatearFecha(ficha.fechaConsulta)}
+                                                            </p>
+                                                            <span className="inline-flex h-6 items-center rounded-lg border border-violet-100 bg-violet-50/80 px-2 text-[9px] font-bold text-[#6E56CF]">
+                                                                N° Registro {ficha.id_ficha}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-                                                    <div className="flex h-9 max-w-full items-center rounded-xl border border-teal-100 bg-teal-50 px-3 text-[11px] font-bold text-teal-700">
-                                                        <span className="mr-1 text-teal-500">Prof.</span>{ficha.observaciones || "No informado"}
-                                                    </div>
-                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-9 rounded-xl border border-slate-200 bg-white px-3.5 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50">
+                                                <div className="relative z-10 flex flex-wrap items-center gap-2 xl:justify-end">
+                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-800 bg-[#151A2D] px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6E56CF] hover:bg-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
                                                         {expandida ? "Ocultar" : "Ver detalle"}
                                                     </button>
-                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-9 rounded-xl border border-violet-100 bg-violet-50 px-3.5 text-[11px] font-bold text-[#6E56CF] transition-all hover:bg-violet-100">PDF</button>
-                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-9 rounded-xl border border-slate-200 bg-white px-3.5 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50">Editar</button>
+                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-10 rounded-xl border border-violet-200 bg-violet-50 px-4 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">PDF</button>
+                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[11px] font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">Editar</button>
                                                 </div>
                                             </div>
                                             {expandida && (
-                                            <div className="p-5">
+                                            <div className="bg-slate-50/30 p-5 sm:p-6">
                                                 {(() => {
                                                     const datos = parsearDatosDinamicos(ficha.datosDinamicos)
                                                     if (datos && datos._plantillaNombre) {
                                                         const categorias = agruparPorCategoria(datos)
                                                         return (
-                                                            <div className="space-y-5">
+                                                            <div className="space-y-6">
                                                                 {categorias.map(cat => (
-                                                                    <div key={cat.nombre} className="space-y-2.5">
+                                                                    <div key={cat.nombre} className="space-y-3.5">
                                                                         <div className="flex items-center gap-3">
-                                                                            <span className="text-[10px] font-bold text-[#6E56CF] uppercase tracking-[0.15em]">{cat.nombre}</span>
-                                                                            <div className="flex-1 h-px bg-slate-100"></div>
+                                                                            <span className="h-2 w-2 rounded-full bg-[#6E56CF] shadow-[0_0_0_4px_rgba(110,86,207,0.1)]" />
+                                                                            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6E56CF]">{cat.nombre}</span>
+                                                                            <div className="h-px flex-1 bg-gradient-to-r from-violet-200 via-slate-200 to-transparent"></div>
                                                                         </div>
-                                                                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                                             {cat.campos.map((campo, idx) => (
-                                                                                <div key={idx} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 transition-colors hover:bg-slate-50">
-                                                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{campo.nombre}</span>
-                                                                                    <p className="mt-1 whitespace-pre-wrap text-[12px] font-medium leading-snug text-slate-700">{campo.valor || "-"}</p>
+                                                                                <div key={idx} className="group/campo relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-28px_rgba(15,23,42,0.75)] transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_20px_42px_-26px_rgba(109,40,217,0.28)]">
+                                                                                    <span aria-hidden="true" className="absolute left-0 top-4 h-8 w-0.5 rounded-r-full bg-violet-300 transition-all duration-300 group-hover/campo:h-10 group-hover/campo:bg-[#6E56CF]" />
+                                                                                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 transition-colors group-hover/campo:text-[#6E56CF]">{campo.nombre}</span>
+                                                                                    <p className="mt-2 whitespace-pre-wrap text-[13px] font-semibold leading-relaxed text-slate-700">{campo.valor || "-"}</p>
                                                                                 </div>
                                                                             ))}
                                                                         </div>
@@ -1365,8 +1474,12 @@ export default function Paciente() {
                                             </div>
                                             )}
                                         </div>
+                                        </div>
                                         );
                                     })}
+                                        </div>
+                                    </section>
+                                    ))}
                                 </div>
                             )}
                         </div>
