@@ -1361,7 +1361,21 @@ export default function Paciente() {
                                     </div>
                                 </div>
                             </details>
+                        </div>
+                    </div>
 
+                        <div className="xl:col-span-12">
+                            <div className="mb-5 grid grid-cols-1 xl:grid-cols-12 xl:gap-8">
+                                <div className="flex items-center gap-3 xl:col-start-5 xl:col-span-8">
+                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M7 4h7l3 3v13H7V4z" />
+                                        </svg>
+                                    </span>
+                                    <h2 className="whitespace-nowrap text-[15px] font-bold tracking-[-0.01em] text-slate-700">Registros clínicos</h2>
+                                    <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
+                                </div>
+                            </div>
                             {/* Fichas Propiamente Tales */}
                             {listaFichas.length === 0 ? (
                                 <div className="bg-white rounded-[32px] border border-dashed border-slate-200 py-24 text-center">
@@ -1375,29 +1389,26 @@ export default function Paciente() {
                                     {fichasAgrupadasPorMes.map((grupo, indiceGrupo) => (
                                     <section
                                         key={grupo.clave}
-                                        className="grid grid-cols-1 gap-3 md:grid-cols-[132px_24px_minmax(0,1fr)] md:gap-4"
+                                        className="grid grid-cols-1 gap-3 xl:grid-cols-12 xl:gap-8"
                                     >
-                                        <div className="relative z-30 flex items-center gap-2.5 md:block md:pt-3 md:text-right">
+                                        <div className="relative z-30 flex items-center gap-2.5 xl:col-span-4 xl:block xl:pt-3 xl:pr-10 xl:text-right">
                                             <span className="inline-flex items-center whitespace-nowrap rounded-xl border border-violet-100 bg-white/90 px-2.5 py-1 text-[9px] font-bold tracking-[0.04em] text-violet-600 shadow-[0_8px_20px_-16px_rgba(109,40,217,0.55)]">
                                                 {grupo.etiqueta}
                                             </span>
-                                            <p className="text-[9px] font-medium text-slate-400 md:mt-1.5">
+                                            <p className="text-[9px] font-medium text-slate-400 xl:mt-1.5">
                                                 {grupo.fichas.length} {grupo.fichas.length === 1 ? "registro" : "registros"}
                                             </p>
-                                        </div>
-
-                                        <div className="relative z-30 hidden md:block">
                                             <span
                                                 aria-hidden="true"
-                                                className={`absolute left-1/2 top-0 -translate-x-1/2 border-l-2 border-dashed border-violet-200 ${indiceGrupo === fichasAgrupadasPorMes.length - 1 ? "bottom-0" : "-bottom-7"}`}
+                                                className={`absolute -right-[17px] top-0 hidden border-l-2 border-dashed border-violet-200 xl:block ${indiceGrupo === fichasAgrupadasPorMes.length - 1 ? "bottom-0" : "-bottom-7"}`}
                                             />
                                             <span
                                                 aria-hidden="true"
-                                                className={`absolute left-1/2 top-5 z-30 h-4 w-4 -translate-x-1/2 rounded-full border-4 border-white shadow-[0_0_0_2px_rgba(139,92,246,0.28)] ${indiceGrupo === 0 ? "bg-[#6E56CF]" : "bg-violet-300"}`}
+                                                className={`absolute -right-[25px] top-5 z-30 hidden h-4 w-4 rounded-full border-4 border-white shadow-[0_0_0_2px_rgba(139,92,246,0.28)] xl:block ${indiceGrupo === 0 ? "bg-[#6E56CF]" : "bg-violet-300"}`}
                                             />
                                         </div>
 
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 xl:col-span-8">
                                     {grupo.fichas.map((ficha) => {
                                         const expandida = fichasExpandidas.has(ficha.id_ficha);
                                         const esMasReciente = ficha.id_ficha === listaFichasOrdenada[0]?.id_ficha;
@@ -1483,7 +1494,6 @@ export default function Paciente() {
                                 </div>
                             )}
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
