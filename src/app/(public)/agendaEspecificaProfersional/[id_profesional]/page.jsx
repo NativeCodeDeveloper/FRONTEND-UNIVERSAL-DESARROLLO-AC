@@ -287,17 +287,14 @@ export default function CalendarioMensualHoras() {
      * Reglas:
      *  - Lunes a Sábado, 09:00 – 22:00.
      *  - Duración de cada bloque = duracionMinutos (configurado en tarifaServicio).
-     *  - Bloques consecutivos desde las 09:00, sin gap entre ellos.
-     *    (Si se necesita buffer de limpieza, aumentar duracion_min en el dashboard.)
-     *  - Además, por cada bloqueo parcial del día, se agrega SOLO el hueco real entre
-     *    el fin del bloqueo y el próximo punto que la grilla original ya iba a cubrir
-     *    (sin redondear a ningún horario fijo). La cadena de reanudación se detiene
-     *    apenas alcanza ese punto — nunca sigue corriendo en paralelo el resto del día,
-     *    porque de ahí en adelante la grilla original ya ofrece esas horas. La grilla
-     *    original nunca se remueve — solo se agregan candidatos adicionales para el
-     *    hueco puntual, y todos (los de siempre y los nuevos) se siguen validando igual
-     *    contra el backend en `checkBlocked`. Si no hay bloqueos ese día, el resultado
-     *    es idéntico al de antes de este cambio.
+     *  - Es UNA sola cadena consecutiva (nunca dos horarios simultáneos que se
+     *    solapen): arranca en 09:00 y avanza de a `dur` minutos. Si el siguiente
+     *    bloque candidato se solaparía con algún bloqueo del día, la cadena salta
+     *    directo al minuto exacto en que termina ese bloqueo (sin redondear a
+     *    ningún horario fijo) y continúa avanzando de a `dur` desde ahí. Así se
+     *    recupera el tiempo libre que deja un bloqueo parcial sin nunca ofrecer
+     *    dos horarios que un mismo profesional no podría cumplir a la vez.
+     *  - Sin bloqueos ese día, el resultado es idéntico al de antes de este cambio.
      *
      * Se recalcula solo cuando cambia la fecha seleccionada, el servicio activo,
      * o los bloqueos del día.
@@ -309,26 +306,26 @@ export default function CalendarioMensualHoras() {
         const inicio = 9 * 60;   // 09:00 en minutos
         const fin    = 22 * 60;  // 22:00 en minutos
         const dur    = duracionMinutos;
-
-        const puntosInicio = new Set();
-        for (let cur = inicio; cur + dur <= fin; cur += dur) puntosInicio.add(cur);
-
-        bloqueosDelDia.forEach(b => {
-            const finBloqueo = toMinutes(b.fin);
-            if (finBloqueo <= inicio || finBloqueo >= fin) return;
-            // Próximo punto de la grilla original en o después del fin del bloqueo:
-            // ahí es donde la cobertura original retoma, así que la cadena para justo antes.
-            const siguientePuntoOriginal = inicio + Math.ceil((finBloqueo - inicio) / dur) * dur;
-            for (let cur = finBloqueo; cur + dur <= fin && cur < siguientePuntoOriginal; cur += dur) {
-                puntosInicio.add(cur);
-            }
-        });
-
         const pad = (n) => String(n).padStart(2, "0");
-        return [...puntosInicio].sort((a, b) => a - b).map(cur => ({
-            start: `${pad(Math.floor(cur / 60))}:${pad(cur % 60)}`,
-            end:   `${pad(Math.floor((cur + dur) / 60))}:${pad((cur + dur) % 60)}`,
-        }));
+        const formatMin = (m) => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+
+        const slots = [];
+        let cur = inicio;
+        while (cur + dur <= fin) {
+            const candidateEnd = cur + dur;
+            // ¿Este candidato se solapa con algún bloqueo del día?
+            const bloqueo = bloqueosDelDia.find(b => {
+                const bIni = toMinutes(b.ini), bFin = toMinutes(b.fin);
+                return cur < bFin && bIni < candidateEnd;
+            });
+            if (bloqueo) {
+                cur = toMinutes(bloqueo.fin); // salta al fin exacto del bloqueo y reintenta
+                continue;
+            }
+            slots.push({start: formatMin(cur), end: formatMin(candidateEnd)});
+            cur += dur;
+        }
+        return slots;
     }, [fechaSeleccionada, servicioActivo, duracionMinutos, bloqueosDelDia]);
 
     /* ══════════════════════════════════════════
