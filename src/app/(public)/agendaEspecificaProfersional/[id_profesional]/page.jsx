@@ -289,14 +289,15 @@ export default function CalendarioMensualHoras() {
      *  - Duración de cada bloque = duracionMinutos (configurado en tarifaServicio).
      *  - Bloques consecutivos desde las 09:00, sin gap entre ellos.
      *    (Si se necesita buffer de limpieza, aumentar duracion_min en el dashboard.)
-     *  - Además, por cada bloqueo parcial del día, se agrega una cadena extra de
-     *    bloques consecutivos que arranca exactamente al minuto en que termina ese
-     *    bloqueo (sin redondear a ningún horario fijo), para no perder el tiempo
-     *    libre que quede hasta el próximo bloque de la grilla original. La grilla
-     *    original nunca se remueve — solo se agregan candidatos adicionales, y todos
-     *    (los de siempre y los nuevos) se siguen validando igual contra el backend
-     *    en `checkBlocked`. Si no hay bloqueos ese día, el resultado es idéntico al
-     *    de antes de este cambio.
+     *  - Además, por cada bloqueo parcial del día, se agrega SOLO el hueco real entre
+     *    el fin del bloqueo y el próximo punto que la grilla original ya iba a cubrir
+     *    (sin redondear a ningún horario fijo). La cadena de reanudación se detiene
+     *    apenas alcanza ese punto — nunca sigue corriendo en paralelo el resto del día,
+     *    porque de ahí en adelante la grilla original ya ofrece esas horas. La grilla
+     *    original nunca se remueve — solo se agregan candidatos adicionales para el
+     *    hueco puntual, y todos (los de siempre y los nuevos) se siguen validando igual
+     *    contra el backend en `checkBlocked`. Si no hay bloqueos ese día, el resultado
+     *    es idéntico al de antes de este cambio.
      *
      * Se recalcula solo cuando cambia la fecha seleccionada, el servicio activo,
      * o los bloqueos del día.
@@ -315,7 +316,12 @@ export default function CalendarioMensualHoras() {
         bloqueosDelDia.forEach(b => {
             const finBloqueo = toMinutes(b.fin);
             if (finBloqueo <= inicio || finBloqueo >= fin) return;
-            for (let cur = finBloqueo; cur + dur <= fin; cur += dur) puntosInicio.add(cur);
+            // Próximo punto de la grilla original en o después del fin del bloqueo:
+            // ahí es donde la cobertura original retoma, así que la cadena para justo antes.
+            const siguientePuntoOriginal = inicio + Math.ceil((finBloqueo - inicio) / dur) * dur;
+            for (let cur = finBloqueo; cur + dur <= fin && cur < siguientePuntoOriginal; cur += dur) {
+                puntosInicio.add(cur);
+            }
         });
 
         const pad = (n) => String(n).padStart(2, "0");
