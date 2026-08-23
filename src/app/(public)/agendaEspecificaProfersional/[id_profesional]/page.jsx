@@ -58,6 +58,15 @@ export default function CalendarioMensualHoras() {
     const [diasBloqueados, setDiasBloqueados] = useState(new Set());
 
     /*
+     * ── Bloqueos crudos del profesional ──
+     * Se conservan (además de `diasBloqueados`) para poder reanudar la grilla
+     * de horarios justo al terminar un bloqueo parcial del día (ver `bloqueosDelDia`
+     * y `attentionSlots` más abajo). No dispara ningún fetch adicional: se llena
+     * desde la misma respuesta que ya se usa para calcular `diasBloqueados`.
+     */
+    const [bloqueosProfesional, setBloqueosProfesional] = useState([]);
+
+    /*
      * ── Servicios/tarifas del profesional ──
      * Se carga al montar y al cambiar de profesional.
      * Cada item: { id_tarifaProfesional, nombreServicio, duracion_min, precio }
@@ -217,6 +226,7 @@ export default function CalendarioMensualHoras() {
             .then(r => r.ok ? r.json() : [])
             .then(data => {
                 if (!Array.isArray(data)) return;
+                setBloqueosProfesional(data);
                 const set = new Set();
                 data.forEach(b => {
                     const ini = (b.horaInicio ?? "").slice(0, 5);
@@ -250,34 +260,70 @@ export default function CalendarioMensualHoras() {
     ══════════════════════════════════════════ */
 
     /**
+     * Bloqueos parciales que caen dentro del día seleccionado (solo horaInicio/horaFinalizacion).
+     * Se usan para reanudar la grilla de horarios justo donde termina cada bloqueo,
+     * en vez de perder el tiempo libre restante hasta el próximo bloque de la grilla fija.
+     * No afecta el cálculo de `diasBloqueados` (jornada completa), que sigue igual.
+     */
+    const bloqueosDelDia = useMemo(() => {
+        if (!fechaSeleccionada) return [];
+        const ymd = formatDateToYMD(fechaSeleccionada);
+        return bloqueosProfesional
+            .filter(b => {
+                const fIni = (b.fechaInicio ?? "").slice(0, 10);
+                const fFin = (b.fechaFinalizacion ?? "").slice(0, 10);
+                return fIni && fFin && fIni <= ymd && ymd <= fFin;
+            })
+            .map(b => ({
+                ini: (b.horaInicio ?? "").slice(0, 5),
+                fin: (b.horaFinalizacion ?? "").slice(0, 5),
+            }))
+            .filter(b => b.ini && b.fin);
+    }, [fechaSeleccionada, bloqueosProfesional]);
+
+    /**
      * Genera los bloques de atención para el día seleccionado.
      *
      * Reglas:
      *  - Lunes a Sábado, 09:00 – 22:00.
      *  - Duración de cada bloque = duracionMinutos (configurado en tarifaServicio).
-     *  - Bloques consecutivos, sin gap entre ellos.
+     *  - Bloques consecutivos desde las 09:00, sin gap entre ellos.
      *    (Si se necesita buffer de limpieza, aumentar duracion_min en el dashboard.)
+     *  - Además, por cada bloqueo parcial del día, se agrega una cadena extra de
+     *    bloques consecutivos que arranca exactamente al minuto en que termina ese
+     *    bloqueo (sin redondear a ningún horario fijo), para no perder el tiempo
+     *    libre que quede hasta el próximo bloque de la grilla original. La grilla
+     *    original nunca se remueve — solo se agregan candidatos adicionales, y todos
+     *    (los de siempre y los nuevos) se siguen validando igual contra el backend
+     *    en `checkBlocked`. Si no hay bloqueos ese día, el resultado es idéntico al
+     *    de antes de este cambio.
      *
-     * Se recalcula solo cuando cambia la fecha seleccionada o el servicio activo.
+     * Se recalcula solo cuando cambia la fecha seleccionada, el servicio activo,
+     * o los bloqueos del día.
      */
     const attentionSlots = useMemo(() => {
         if (!fechaSeleccionada || !servicioActivo) return [];
         if (fechaSeleccionada.getDay() === 0) return []; // domingo cerrado
 
-        const slots = [];
         const inicio = 9 * 60;   // 09:00 en minutos
         const fin    = 22 * 60;  // 22:00 en minutos
         const dur    = duracionMinutos;
 
-        for (let cur = inicio; cur + dur <= fin; cur += dur) {
-            const pad = (n) => String(n).padStart(2, "0");
-            slots.push({
-                start: `${pad(Math.floor(cur / 60))}:${pad(cur % 60)}`,
-                end:   `${pad(Math.floor((cur + dur) / 60))}:${pad((cur + dur) % 60)}`,
-            });
-        }
-        return slots;
-    }, [fechaSeleccionada, servicioActivo, duracionMinutos]);
+        const puntosInicio = new Set();
+        for (let cur = inicio; cur + dur <= fin; cur += dur) puntosInicio.add(cur);
+
+        bloqueosDelDia.forEach(b => {
+            const finBloqueo = toMinutes(b.fin);
+            if (finBloqueo <= inicio || finBloqueo >= fin) return;
+            for (let cur = finBloqueo; cur + dur <= fin; cur += dur) puntosInicio.add(cur);
+        });
+
+        const pad = (n) => String(n).padStart(2, "0");
+        return [...puntosInicio].sort((a, b) => a - b).map(cur => ({
+            start: `${pad(Math.floor(cur / 60))}:${pad(cur % 60)}`,
+            end:   `${pad(Math.floor((cur + dur) / 60))}:${pad((cur + dur) % 60)}`,
+        }));
+    }, [fechaSeleccionada, servicioActivo, duracionMinutos, bloqueosDelDia]);
 
     /* ══════════════════════════════════════════
        VALIDACIÓN DE DISPONIBILIDAD (backend)
