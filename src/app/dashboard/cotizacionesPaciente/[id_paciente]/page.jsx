@@ -21,6 +21,18 @@ import {
 } from "lucide-react";
 import {toast, Toaster} from "react-hot-toast";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales.js";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogMedia,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 function calcularEdadPaciente(fechaNacimiento) {
     if (!fechaNacimiento) return "-";
@@ -460,9 +472,6 @@ function formatearFechaHora(fechaISO) {
                                     )
                                 })
                             }
-                            <p className="mt-2 max-w-2xl text-[13px] text-slate-500">
-                                Historial de propuestas clínicas, prestaciones incluidas y vigencia de cada documento.
-                            </p>
                         </div>
                     </div>
 
@@ -483,69 +492,69 @@ function formatearFechaHora(fechaISO) {
                     </div>
                 </header>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[290px_minmax(0,1fr)] xl:gap-8">
-                    <aside className="self-start overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6">
-                        <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50/30 p-8">
-                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-[#6E56CF] text-xl font-bold text-white shadow-lg shadow-indigo-100">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)] xl:gap-6">
+                    <aside className="self-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6">
+                        <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/30 p-4">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] text-base font-bold text-white shadow-md shadow-indigo-100">
                                 {paciente[0]?.nombre?.charAt(0) ?? ""}{paciente[0]?.apellido?.charAt(0) ?? ""}
                             </div>
                             <div className="min-w-0">
-                                <h2 className="truncate text-lg font-bold leading-tight text-slate-900">
+                                <h2 className="truncate text-[15px] font-bold leading-tight text-slate-900">
                                     {paciente[0]?.nombre} {paciente[0]?.apellido}
                                 </h2>
-                                <p className="mt-1 text-[12px] font-medium uppercase tracking-wider text-slate-400">
+                                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">
                                     ID Paciente #{id_paciente}
                                 </p>
                             </div>
                         </div>
 
                         {paciente.map((elemento, index) => (
-                            <div key={index} className="space-y-6 p-8">
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nacimiento</span>
-                                        <p className="text-[13px] font-semibold text-slate-700">{formatearFecha(elemento.nacimiento) || "-"}</p>
+                            <div key={index} className="space-y-4 p-4">
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                    <div className="space-y-0.5">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Nacimiento</span>
+                                        <p className="text-[12px] font-semibold text-slate-700">{formatearFecha(elemento.nacimiento) || "-"}</p>
                                     </div>
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Edad</span>
-                                        <p className="text-[13px] font-semibold text-slate-700">{calcularEdadPaciente(elemento.nacimiento)} años</p>
+                                    <div className="space-y-0.5">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Edad</span>
+                                        <p className="text-[12px] font-semibold text-slate-700">{calcularEdadPaciente(elemento.nacimiento)} años</p>
                                     </div>
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Previsión</span>
-                                        <p className="text-[13px] font-semibold text-slate-700">{previsionDeterminacionPaciente(elemento.prevision_id)}</p>
+                                    <div className="space-y-0.5">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Previsión</span>
+                                        <p className="text-[12px] font-semibold text-slate-700">{previsionDeterminacionPaciente(elemento.prevision_id)}</p>
                                     </div>
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sexo</span>
-                                        <p className="text-[13px] font-semibold text-slate-700">{elemento.sexo || "-"}</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 border-t border-slate-100 pt-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
-                                            <UserRound className="h-4 w-4"/>
-                                        </div>
-                                        <span className="font-mono text-[13px] text-slate-600">{elemento.rut || "No registrado"}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
-                                            <Phone className="h-4 w-4"/>
-                                        </div>
-                                        <span className="text-[13px] text-slate-600">{elemento.telefono || "No registrado"}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
-                                            <Mail className="h-4 w-4"/>
-                                        </div>
-                                        <span className="break-all text-[13px] text-slate-600">{elemento.correo || "No registrado"}</span>
+                                    <div className="space-y-0.5">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Sexo</span>
+                                        <p className="text-[12px] font-semibold text-slate-700">{elemento.sexo || "-"}</p>
                                     </div>
                                 </div>
 
-                                <div className="pt-2">
+                                <div className="space-y-2.5 border-t border-slate-100 pt-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
+                                            <UserRound className="h-3.5 w-3.5"/>
+                                        </div>
+                                        <span className="font-mono text-[12px] text-slate-600">{elemento.rut || "No registrado"}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
+                                            <Phone className="h-3.5 w-3.5"/>
+                                        </div>
+                                        <span className="text-[12px] text-slate-600">{elemento.telefono || "No registrado"}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
+                                            <Mail className="h-3.5 w-3.5"/>
+                                        </div>
+                                        <span className="break-all text-[12px] leading-snug text-slate-600">{elemento.correo || "No registrado"}</span>
+                                    </div>
+                                </div>
+
+                                <div>
                                     <button
                                         type="button"
                                         onClick={volverACarpetaClinica}
-                                        className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 text-[13px] font-bold text-white transition-all hover:bg-slate-800"
+                                        className="flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-[11px] font-bold text-white transition-all hover:bg-slate-800"
                                     >
                                         Ver carpeta clínica
                                     </button>
@@ -671,87 +680,87 @@ function formatearFechaHora(fechaISO) {
                                 return (
                                     <article
                                         key={cotizacion.id_cotizacion_paciente}
-                                        className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_2px_10px_rgba(15,23,42,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_12px_30px_rgba(79,70,229,0.09)]"
+                                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_16px_-10px_rgba(15,23,42,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_14px_32px_-18px_rgba(79,70,229,0.28)]"
                                     >
-                                        <div className="p-5 sm:p-6">
-                                            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                                                <div className="flex min-w-0 items-start gap-4">
-                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF] transition-colors group-hover:bg-[#6E56CF] group-hover:text-white">
-                                                        <FileText className="h-5 w-5"/>
+                                        <div className="p-4 sm:p-5">
+                                            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                                <div className="flex min-w-0 items-start gap-3">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF] transition-colors group-hover:bg-[#6E56CF] group-hover:text-white">
+                                                        <FileText className="h-4 w-4"/>
                                                     </div>
 
                                                     <div className="min-w-0">
-                                                        <div className="mb-2 flex flex-wrap items-center gap-2">
-                                                            <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-[10px] font-bold tracking-wide text-slate-500">
+                                                        <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+                                                            <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wide text-slate-500">
                                                                 COT-{cotizacion.id_cotizacion_paciente}
                                                             </span>
-                                                            <span className={`rounded-md px-2 py-1 text-[10px] font-bold ${estadoActual.clases}`}>
-                                                                <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-current align-middle"/>
+                                                            <span className={`rounded-md px-2 py-0.5 text-[9px] font-bold ${estadoActual.clases}`}>
+                                                                <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-current align-middle"/>
                                                                 {estadoActual.etiqueta}
                                                             </span>
                                                         </div>
-                                                        <h3 className="break-words text-[17px] font-bold leading-snug text-slate-900 sm:text-lg">
+                                                        <h3 className="break-words text-[15px] font-bold leading-snug text-slate-900 sm:text-base">
                                                             {cotizacion.nombre_cotizacion}
                                                         </h3>
-                                                        <p className="mt-1 text-[12px] leading-relaxed text-slate-500">
+                                                        <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
                                                             Propuesta de tratamiento y presupuesto clínico.
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex min-w-[190px] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 lg:justify-end">
-                                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#6E56CF] shadow-sm">
+                                                <div className="flex min-w-[170px] items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2.5 lg:justify-end">
+                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#6E56CF] shadow-sm">
                                                         <CircleDollarSign className="h-4 w-4"/>
                                                     </div>
                                                     <div>
                                                         <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
                                                             Total cotizado
                                                         </p>
-                                                        <p className="mt-1 text-lg font-extrabold leading-none text-[#6E56CF]">
+                                                        <p className="mt-0.5 text-base font-extrabold leading-none text-[#6E56CF]">
                                                             {formatearMonto(cotizacion.total_presupuesto_cotizado)}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="mt-5 grid gap-3 border-t border-slate-100 pt-5 sm:grid-cols-3">
-                                                <div className="flex min-w-0 items-center gap-3 rounded-lg bg-slate-50/80 px-3 py-3">
-                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#6E56CF] shadow-sm">
-                                                        <Stethoscope className="h-4 w-4"/>
+                                            <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-3">
+                                                <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-100/90 px-3 py-2.5">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-[#6E56CF] shadow-sm">
+                                                        <Stethoscope className="h-3.5 w-3.5"/>
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                                                            Profesional solicitante
+                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                                                            Solicitante
                                                         </p>
-                                                        <p className="mt-1 truncate text-[12px] font-bold text-slate-700">
+                                                        <p className="mt-0.5 truncate text-[11px] font-bold text-slate-700">
                                                             {cotizacion.profesional_solicitante_nombre}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex min-w-0 items-center gap-3 rounded-lg bg-slate-50/80 px-3 py-3">
-                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm">
-                                                        <CalendarDays className="h-4 w-4"/>
+                                                <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-100/90 px-3 py-2.5">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
+                                                        <CalendarDays className="h-3.5 w-3.5"/>
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
                                                             Fecha de creación
                                                         </p>
-                                                        <p className="mt-1 text-[12px] font-semibold text-slate-700">
+                                                        <p className="mt-0.5 text-[11px] font-semibold text-slate-700">
                                                             {formatearFechaHora(cotizacion.fecha_creacion)}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex min-w-0 items-center gap-3 rounded-lg bg-slate-50/80 px-3 py-3">
-                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 shadow-sm">
-                                                        <Clock3 className="h-4 w-4"/>
+                                                <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-100/90 px-3 py-2.5">
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
+                                                        <Clock3 className="h-3.5 w-3.5"/>
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
                                                             Última modificación
                                                         </p>
-                                                        <p className="mt-1 text-[12px] font-semibold text-slate-700">
+                                                        <p className="mt-0.5 text-[11px] font-semibold text-slate-700">
                                                             {formatearFechaHora(cotizacion.fecha_actualizacion)}
                                                         </p>
                                                     </div>
@@ -759,9 +768,9 @@ function formatearFechaHora(fechaISO) {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-col gap-4 border-t border-slate-200 bg-slate-50/70 px-5 py-4 sm:px-6 xl:flex-row xl:items-end xl:justify-between">
-                                            <label className="block w-full xl:max-w-[310px]">
-                                                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                                        <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-3 sm:px-5 xl:flex-row xl:items-center xl:justify-between">
+                                            <label className="block w-full xl:max-w-[340px]">
+                                                <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">
                                                     Cambiar estado de la cotización
                                                 </span>
                                                 {/* UI ONLY: conectar onChange con el servicio que actualiza esta cotización. */}
@@ -771,7 +780,7 @@ function formatearFechaHora(fechaISO) {
                                                     onChange={(e) => cambiarEstado( e.target.value ,cotizacion.id_cotizacion_paciente,)}
                                                     data-cotizacion-id={cotizacion.id_cotizacion_paciente}
                                                     aria-label={`Cambiar estado de la cotización ${cotizacion.id_cotizacion_paciente}`}
-                                                    className="h-10 w-full cursor-pointer rounded-lg border border-slate-300 bg-white px-3 text-[12px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                                                    className="h-9 w-full cursor-pointer rounded-lg border border-slate-300 bg-white px-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
                                                 >
                                                     <option value="" disabled>Seleccionar estado</option>
                                                     <option value="1">Activa</option>
@@ -779,30 +788,51 @@ function formatearFechaHora(fechaISO) {
                                                     <option value="3">Tratamiento finalizado</option>
                                                     <option value="4">Tratamiento abandonado</option>
                                                 </select>
-                                                <span className="mt-1.5 block text-[10px] text-slate-400">
-                                                    Seguimiento administrativo del tratamiento.
-                                                </span>
                                             </label>
 
                                             <div className="flex w-full flex-col gap-2 sm:flex-row xl:w-auto xl:justify-end">
                                                 <button
                                                     type="button"
                                                     onClick={() => router.push(`/dashboard/detalleCotizacion/${cotizacion.id_cotizacion_paciente}`)}
-                                                    className="flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-violet-200 bg-white px-4 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:border-violet-300 hover:bg-violet-50 sm:w-auto"
+                                                    className="flex h-9 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-violet-200 bg-white px-4 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:border-violet-300 hover:bg-violet-50 sm:w-auto"
                                                     aria-label={`Ver detalle de la cotización ${cotizacion.id_cotizacion_paciente}`}
                                                 >
                                                     Ver detalle
                                                     <ChevronRight className="h-3.5 w-3.5"/>
                                                 </button>
-                                                <button
-                                                    onClick={()=> eliminarCotizacion(cotizacion.id_cotizacion_paciente)}
-                                                    type="button"
-                                                    className="flex h-10 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-rose-200 bg-white px-4 text-[11px] font-bold text-rose-600 transition-colors hover:border-rose-300 hover:bg-rose-50 sm:w-auto"
-                                                    aria-label={`Eliminar la cotización ${cotizacion.id_cotizacion_paciente}`}
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5 shrink-0"/>
-                                                    Eliminar
-                                                </button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            className="flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-rose-200 bg-white px-4 text-[11px] font-bold text-rose-600 transition-colors hover:border-rose-300 hover:bg-rose-50 sm:w-auto"
+                                                            aria-label={`Eliminar la cotización ${cotizacion.id_cotizacion_paciente}`}
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5 shrink-0"/>
+                                                            Eliminar
+                                                        </button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogMedia>
+                                                                <Trash2 className="text-destructive"/>
+                                                            </AlertDialogMedia>
+                                                            <AlertDialogTitle>Eliminar cotización</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                ¿Está seguro de que desea eliminar esta cotización? Una vez eliminada, no podrá recuperar los datos.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                variant="destructive"
+                                                                onClick={() => eliminarCotizacion(cotizacion.id_cotizacion_paciente)}
+                                                            >
+                                                                <Trash2 data-icon="inline-start"/>
+                                                                Sí, eliminar
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </div>
                                         </div>
                                     </article>
