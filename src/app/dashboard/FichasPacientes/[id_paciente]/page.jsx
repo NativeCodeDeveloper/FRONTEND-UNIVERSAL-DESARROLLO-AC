@@ -175,6 +175,10 @@ export default function Paciente() {
         router.push(`/dashboard/odontogramasPaciente/${id_paciente}`);
     }
 
+    function irACotizaciones() {
+        router.push(`/dashboard/cotizacionesPaciente/${id_paciente}`);
+    }
+
     function editarFichaClinica(id_ficha) {
         router.push(`/dashboard/EdicionFicha/${id_ficha}`);
     }
@@ -1038,7 +1042,7 @@ export default function Paciente() {
                     <div className="xl:col-span-8 space-y-5">
                         
                         {/* Acciones Rápidas */}
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                             <button onClick={() => nuevaFichaClinica(id_paciente)} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
                                 <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
                                 <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
@@ -1099,6 +1103,20 @@ export default function Paciente() {
                                     </span>
                                 </button>
                             )}
+                            <button type="button" onClick={irACotizaciones} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                <span className="relative z-10 flex w-full flex-col">
+                                    <span className="flex items-start justify-between gap-3">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4 1.12-4 2.5S9.79 13 12 13s4 1.12 4 2.5S14.21 18 12 18m0-10V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </span>
+                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                    </span>
+                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Cotizaciones</span>
+                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Gestionar presupuestos</span>
+                                </span>
+                            </button>
                             <button onClick={irADocumentos} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
                                 <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
                                 <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
