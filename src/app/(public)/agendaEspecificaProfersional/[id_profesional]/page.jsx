@@ -732,7 +732,7 @@ export default function CalendarioMensualHoras() {
                         {fechaSeleccionada && (
                             <div className="mt-5">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-semibold text-slate-800">Agenda (09:00–22:00)</h3>
+                                    <h3 className="text-sm font-semibold text-slate-800">Horarios disponibles</h3>
                                     <div className="flex items-center gap-3">
                                         {/* Duración dinámica según servicio elegido */}
                                         <p className="text-xs text-slate-500">Bloques de {duracionMinutos} min</p>
