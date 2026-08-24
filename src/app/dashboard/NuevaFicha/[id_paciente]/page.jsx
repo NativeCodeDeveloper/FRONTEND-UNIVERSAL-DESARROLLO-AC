@@ -11,6 +11,13 @@ import {ShadcnInput} from "@/Componentes/shadcnInput";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {useRouter} from "next/navigation";
 import { formatRut } from "@/lib/designTokens";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
+import {Button} from "@/components/ui/button";
 
 function transformarPlantilla(filas) {
     if (!filas || filas.length === 0) return null
@@ -251,102 +258,116 @@ export default function NuevaFicha() {
                 </div>
 
                 {/* ── Acciones ── */}
-                <div className="mb-6 flex flex-wrap items-center gap-2">
-                    {paciente && (
-                        <button
-                            onClick={() => retroceder(paciente.id_paciente)}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl bg-[#6E56CF] hover:bg-[#5B47B0] shadow-sm transition-all"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => retroceder(id_paciente)}
+                        className="w-full rounded-xl sm:w-auto"
+                    >
+                        <svg data-icon="inline-start" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Volver
+                    </Button>
+
+                    <Button asChild size="lg" className="w-full rounded-xl shadow-sm sm:w-auto">
+                        <Link href="/dashboard">
+                            <svg data-icon="inline-start" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M5 11h14M6 21h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            Carpeta del Paciente
-                        </button>
-                    )}
-                    <Link href="/dashboard">
-                        <button className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                            </svg>
-                            Volver
-                        </button>
-                    </Link>
+                            Volver al Panel de Reservas
+                        </Link>
+                    </Button>
                 </div>
 
                 {/* ── Tarjeta del paciente ── */}
                 {paciente && (
-                    <div className="mb-6 rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
-                        {/* Identidad */}
-                        <div className="flex items-center gap-4 px-6 py-5 border-b border-slate-100">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE] text-base font-bold text-[#6E56CF]">
+                    <Accordion
+                        type="single"
+                        collapsible
+                        className="mb-6 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)]"
+                    >
+                        <AccordionItem value="datos-paciente" className="border-0">
+                            {/* Identidad */}
+                            <AccordionTrigger className="relative items-center overflow-hidden rounded-none bg-gradient-to-br from-white via-white to-violet-50/50 px-4 py-4 no-underline hover:no-underline sm:px-5">
+                            <span aria-hidden="true" className="absolute left-0 top-4 h-12 w-1 rounded-r-full bg-[#6E56CF]" />
+                            <span aria-hidden="true" className="absolute -left-12 -top-12 h-28 w-28 rounded-full bg-violet-100/60 blur-3xl" />
+                            <div className="relative flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] text-sm font-bold text-white shadow-md shadow-violet-200">
                                 {paciente.nombre?.charAt(0)}{paciente.apellido?.charAt(0)}
                             </div>
-                            <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                                    <span className="text-[11px] font-semibold text-[#6E56CF] bg-[#F3F0FF] border border-[#DDD6FE] rounded-lg px-2 py-0.5 uppercase tracking-wide">
+                            <div className="relative min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <p className="truncate text-[15px] font-extrabold leading-tight text-slate-900">{paciente.nombre} {paciente.apellido}</p>
+                                    <span className="rounded-md border border-violet-200 bg-violet-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#6E56CF]">
                                         ID #{paciente.id_paciente}
                                     </span>
                                 </div>
-                                <p className="text-base font-bold text-slate-900">{paciente.nombre} {paciente.apellido}</p>
-                                <p className="text-[13px] text-slate-500 font-mono">RUT {formatRut(paciente.rut)}</p>
+                                <p className="mt-1 font-mono text-[11px] text-slate-500">RUT {formatRut(paciente.rut)}</p>
                             </div>
-                        </div>
-                        {/* Datos rápidos */}
-                        <div className="grid grid-cols-2 gap-px bg-slate-100 md:grid-cols-4">
+                            </AccordionTrigger>
+                            <AccordionContent className="pb-0">
+                            {/* Datos rápidos */}
+                            <div className="grid grid-cols-1 gap-2 border-t border-slate-100 bg-slate-50/70 p-3 sm:grid-cols-2 lg:grid-cols-4">
                             {[
                                 { label: "Teléfono",   value: paciente.telefono },
                                 { label: "Correo",     value: paciente.correo },
                                 { label: "Apoderado",  value: paciente.apoderado },
                                 { label: "RUT apoderado", value: paciente.apoderado_rut },
                             ].map(({ label, value }) => (
-                                <div key={label} className="bg-white px-5 py-4">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
-                                    <p className="text-[13px] font-medium text-slate-800 break-words">{value || "---"}</p>
+                                <div key={label} className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_4px_12px_-10px_rgba(15,23,42,0.35)]">
+                                    <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+                                    <p className="break-words text-[12px] font-semibold leading-snug text-slate-700">{value || "No registrado"}</p>
                                 </div>
                             ))}
-                        </div>
-                        {/* Antecedentes */}
-                        {(paciente.medicamentosUsados || paciente.habitos || paciente.comentariosAdicionales) && (
-                            <div className="grid grid-cols-1 gap-px bg-slate-100 md:grid-cols-3 border-t border-slate-100">
+                            </div>
+                            {/* Antecedentes */}
+                            {(paciente.medicamentosUsados || paciente.habitos || paciente.comentariosAdicionales) && (
+                                <div className="grid grid-cols-1 gap-2 border-t border-slate-100 bg-white p-3 md:grid-cols-3">
                                 {[
                                     { label: "Medicamentos usados",     value: paciente.medicamentosUsados },
                                     { label: "Hábitos",                 value: paciente.habitos },
                                     { label: "Comentarios adicionales", value: paciente.comentariosAdicionales },
                                 ].map(({ label, value }) => value ? (
-                                    <div key={label} className="bg-white px-5 py-4">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
-                                        <p className="text-[13px] text-slate-700 leading-relaxed break-words whitespace-pre-wrap">{value}</p>
+                                    <div key={label} className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5">
+                                        <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+                                        <p className="whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{value}</p>
                                     </div>
                                 ) : null)}
-                            </div>
-                        )}
-                    </div>
+                                </div>
+                            )}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 )}
 
                 {/* ── Formulario de ficha ── */}
-                <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)]">
 
                     {/* Sección: Información de la consulta */}
-                    <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
-                        <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <div className="relative flex items-center gap-2.5 overflow-hidden border-b border-violet-100 bg-gradient-to-r from-violet-50 via-white to-white px-4 py-3">
+                        <span aria-hidden="true" className="absolute left-0 top-3 h-9 w-1 rounded-r-full bg-[#6E56CF]" />
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#6E56CF] text-white shadow-md shadow-violet-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
-                        <h2 className="text-sm font-semibold text-slate-800">Información de la Consulta</h2>
+                        <div>
+                            <h2 className="text-sm font-bold text-slate-900">Información de la consulta</h2>
+                            <p className="mt-0.5 text-[10px] text-slate-500">Completa los datos esenciales antes de registrar la ficha.</p>
+                        </div>
                     </div>
 
-                    <div className="p-6 space-y-5">
+                    <div className="flex flex-col gap-3 p-3.5 sm:p-4">
                         {/* Selector de plantilla */}
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+                            <label className="mb-1 block text-[9px] font-bold uppercase tracking-[0.14em] text-slate-500">
                                 Plantilla de ficha <span className="text-red-400 normal-case">*</span>
                             </label>
                             <select
                                 value={idPlantilla}
                                 onChange={(e) => seleccionarPlantilla(e.target.value)}
-                                className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all text-slate-700"
-                                style={{ colorScheme: "light" }}
+                                className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-[12px] font-medium text-slate-700 scheme-light transition-all focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-100"
                             >
                                 <option value="">Seleccione una plantilla...</option>
                                 {plantillas.map((p) => (
@@ -356,17 +377,32 @@ export default function NuevaFicha() {
                         </div>
 
                         {/* Fecha + Profesional */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Fecha de consulta</label>
-                                <ShadcnDatePicker label="" value={fechaConsulta} onChange={(fecha) => setFechaConsulta(fecha)} />
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                            <div className="relative overflow-hidden rounded-xl border-2 border-violet-200 bg-gradient-to-br from-violet-50 via-white to-white p-3 shadow-[0_10px_24px_-20px_rgba(109,40,217,0.7)] ring-2 ring-violet-50/80">
+                                <span aria-hidden="true" className="absolute right-0 top-0 size-16 rounded-full bg-violet-100/70 blur-2xl" />
+                                <div className="relative flex items-start justify-between gap-2">
+                                    <div>
+                                        <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#6E56CF]">
+                                            Fecha de consulta <span className="text-rose-500">*</span>
+                                        </label>
+                                        <p className="mt-0.5 text-[9px] text-slate-500">Selecciona la fecha de la atención.</p>
+                                    </div>
+                                    <span className="shrink-0 rounded-full bg-[#6E56CF] px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white shadow-sm">
+                                        Obligatoria
+                                    </span>
+                                </div>
+                                <div className="relative mt-2 [&_[data-slot=button]]:h-9 [&_[data-slot=button]]:w-full [&_[data-slot=button]]:rounded-lg [&_[data-slot=label]]:hidden">
+                                    <ShadcnDatePicker label="" value={fechaConsulta} onChange={(fecha) => setFechaConsulta(fecha)} />
+                                </div>
                             </div>
-                            <div>
-                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Profesional a cargo</label>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+                                <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Profesional a cargo</label>
+                                <p className="mb-2 mt-0.5 text-[9px] text-slate-400">Indica quién realizó la atención.</p>
                                 <ShadcnInput
                                     value={observacionesPrecio}
                                     placeholder="Ej: Dra. Andrea Morán"
                                     onChange={(e) => setObservacionesPrecio(e.target.value)}
+                                    className="h-9 rounded-lg border-slate-200 bg-white text-[12px]"
                                 />
                             </div>
                         </div>

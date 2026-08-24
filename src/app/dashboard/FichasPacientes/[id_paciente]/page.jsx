@@ -175,6 +175,10 @@ export default function Paciente() {
         router.push(`/dashboard/odontogramasPaciente/${id_paciente}`);
     }
 
+    function irACotizaciones() {
+        router.push(`/dashboard/cotizacionesPaciente/${id_paciente}`);
+    }
+
     function editarFichaClinica(id_ficha) {
         router.push(`/dashboard/EdicionFicha/${id_ficha}`);
     }
@@ -978,32 +982,50 @@ export default function Paciente() {
                                         {pacienteActual.nombre?.charAt(0)}{pacienteActual.apellido?.charAt(0)}
                                     </div>
                                     <div>
-                                        <h2 className="text-base font-bold leading-tight text-slate-900">{pacienteActual.nombre} {pacienteActual.apellido}</h2>
-                                        <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-slate-400">ID Paciente #{id_paciente}</p>
+                                        <h2 className="text-[14px] font-bold leading-tight text-slate-900">{pacienteActual.nombre} {pacienteActual.apellido}</h2>
+                                        <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">ID Paciente #{id_paciente}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-3 px-5 py-4">
                                     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nacimiento</span>
-                                            <p className="text-[13px] font-semibold text-slate-700">{formatearFecha(pacienteActual.nacimiento)}</p>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Nacimiento</span>
+                                            <p className="text-[12px] font-semibold text-slate-700">{formatearFecha(pacienteActual.nacimiento)}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Edad</span>
-                                            <p className="text-[13px] font-semibold text-slate-700">{calcularEdad(pacienteActual.nacimiento)} años</p>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Edad</span>
+                                            <p className="text-[12px] font-semibold text-slate-700">{calcularEdad(pacienteActual.nacimiento)} años</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Previsión</span>
-                                            <p className="text-[13px] font-semibold text-slate-700">{previsionDeterminacion(pacienteActual.prevision_id)}</p>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Previsión</span>
+                                            <p className="text-[12px] font-semibold text-slate-700">{previsionDeterminacion(pacienteActual.prevision_id)}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sexo</span>
-                                            <p className="text-[13px] font-semibold text-slate-700">{pacienteActual.sexo || "-"}</p>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sexo</span>
+                                            <p className="text-[12px] font-semibold text-slate-700">{pacienteActual.sexo || "-"}</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-slate-100 pt-3">
+                                        <div className="min-w-0 space-y-1">
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Dirección</span>
+                                            <p className="break-words text-[11px] font-semibold leading-snug text-slate-700">{pacienteActual.direccion || "Por completar"}</p>
+                                        </div>
+                                        <div className="min-w-0 space-y-1">
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Nacionalidad</span>
+                                            <p className="break-words text-[11px] font-semibold leading-snug text-slate-700">{pacienteActual.pais || "Por completar"}</p>
+                                        </div>
+                                        <div className="min-w-0 space-y-1">
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Apoderado</span>
+                                            <p className="break-words text-[11px] font-semibold leading-snug text-slate-700">{pacienteActual.apoderado || "No especificado"}</p>
+                                        </div>
+                                        <div className="min-w-0 space-y-1">
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">RUT. Apod.</span>
+                                            <p className="break-words font-mono text-[11px] font-semibold leading-snug text-slate-700">{formatRut(pacienteActual.apoderado_rut) || pacienteActual.apoderado_rut || "No especificado"}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between rounded-xl border border-violet-100 bg-violet-50/60 px-3 py-2">
-                                        <span className="text-[10px] font-bold text-[#6E56CF] uppercase tracking-widest">Última atención</span>
-                                        <span className="text-[13px] font-bold text-slate-700">
+                                        <span className="text-[9px] font-bold text-[#6E56CF] uppercase tracking-widest">Última atención</span>
+                                        <span className="text-[12px] font-bold text-slate-700">
                                             {ultimaAtencion ? formatearFecha(ultimaAtencion) : "Sin registro"}
                                         </span>
                                     </div>
@@ -1012,19 +1034,19 @@ export default function Paciente() {
                                             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                                             </div>
-                                            <span className="text-[13px] text-slate-600">{pacienteActual.telefono || "No registrado"}</span>
+                                            <span className="text-[12px] text-slate-600">{pacienteActual.telefono || "No registrado"}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-400">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                             </div>
-                                            <span className="text-[13px] text-slate-600 break-all">{pacienteActual.correo || "No registrado"}</span>
+                                            <span className="text-[12px] text-slate-600 break-all">{pacienteActual.correo || "No registrado"}</span>
                                         </div>
                                     </div>
                                     <div>
                                         <button
                                             onClick={editarPaciente}
-                                            className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-[12px] font-bold text-white transition-all hover:bg-slate-800"
+                                            className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-[11px] font-bold text-white transition-all hover:bg-slate-800"
                                         >
                                             Editar Información de Ingreso
                                         </button>
@@ -1038,7 +1060,7 @@ export default function Paciente() {
                     <div className="xl:col-span-8 space-y-5">
                         
                         {/* Acciones Rápidas */}
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                             <button onClick={() => nuevaFichaClinica(id_paciente)} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
                                 <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
                                 <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
@@ -1049,8 +1071,7 @@ export default function Paciente() {
                                         </span>
                                         <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
                                     </span>
-                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Nueva Ficha</span>
-                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Crear registro clínico</span>
+                                    <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Ficha</span>
                                 </span>
                             </button>
                             <button onClick={agendarPaciente} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
@@ -1063,8 +1084,7 @@ export default function Paciente() {
                                         </span>
                                         <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
                                     </span>
-                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Agendar Cita</span>
-                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Programar atención</span>
+                                    <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Agendar</span>
                                 </span>
                             </button>
                             {canSeeOdontograma && (
@@ -1078,8 +1098,7 @@ export default function Paciente() {
                                             </span>
                                             <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
                                         </span>
-                                        <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Odontograma</span>
-                                        <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Revisar ficha dental</span>
+                                        <span className="mt-4 flex items-start justify-center text-center text-[14px] font-bold leading-tight text-slate-800">Odontograma</span>
                                     </span>
                                 </button>
                             )}
@@ -1094,11 +1113,23 @@ export default function Paciente() {
                                             </span>
                                             <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
                                         </span>
-                                        <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Receta Médica</span>
-                                        <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Emitir prescripción</span>
+                                        <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Recetas</span>
                                     </span>
                                 </button>
                             )}
+                            <button type="button" onClick={irACotizaciones} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
+                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
+                                <span className="relative z-10 flex w-full flex-col">
+                                    <span className="flex items-start justify-between gap-3">
+                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7" /></svg>
+                                        </span>
+                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
+                                    </span>
+                                    <span className="mt-4 flex items-start justify-center text-center text-[14px] font-bold leading-tight text-slate-800">Cotizaciones</span>
+                                </span>
+                            </button>
                             <button onClick={irADocumentos} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
                                 <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
                                 <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
@@ -1109,8 +1140,7 @@ export default function Paciente() {
                                         </span>
                                             <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
                                     </span>
-                                    <span className="mt-4 text-[14px] font-bold leading-tight text-slate-800">Documentos</span>
-                                    <span className="mt-1.5 text-[10px] font-medium leading-tight tracking-[0.01em] text-slate-400">Gestionar archivos</span>
+                                    <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Documentos</span>
                                 </span>
                             </button>
                         </div>
@@ -1149,36 +1179,20 @@ export default function Paciente() {
                                         </svg>
                                     </div>
                                 </summary>
-                                <div className="grid grid-cols-1 gap-px bg-slate-100 sm:grid-cols-2 xl:grid-cols-4">
-                                    <div className="bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Dirección</p>
-                                        <p className="mt-0.5 break-words text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.direccion || "Sin registro"}</p>
-                                    </div>
-                                    <div className="bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">País</p>
-                                        <p className="mt-0.5 break-words text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.pais || "Sin registro"}</p>
-                                    </div>
-                                    <div className="bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Apoderado</p>
-                                        <p className="mt-0.5 break-words text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.apoderado || "Sin registro"}</p>
-                                    </div>
-                                    <div className="bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">RUT del apoderado</p>
-                                        <p className="mt-0.5 break-words font-mono text-[12px] font-medium leading-snug text-slate-700">{pacienteActual.apoderado_rut || "Sin registro"}</p>
-                                    </div>
-                                    <div className="bg-violet-50/40 px-3 py-2.5">
+                                <div className="grid grid-cols-1 gap-3 border-t border-slate-100 bg-slate-50/60 p-3 sm:grid-cols-2">
+                                    <div className="min-w-0 rounded-xl border border-violet-100 bg-violet-50/60 px-3 py-2.5">
                                         <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#6E56CF]">Antecedentes</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.observacion1 || "Sin antecedentes registrados"}</p>
                                     </div>
-                                    <div className="bg-white px-3 py-2.5">
+                                    <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
                                         <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Medicamentos</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.medicamentosUsados || "Sin información"}</p>
                                     </div>
-                                    <div className="bg-white px-3 py-2.5">
+                                    <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
                                         <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Hábitos</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.habitos || "Sin información"}</p>
                                     </div>
-                                    <div className="bg-white px-3 py-2.5">
+                                    <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
                                         <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Comentarios</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.comentariosAdicionales || "Sin información"}</p>
                                     </div>
