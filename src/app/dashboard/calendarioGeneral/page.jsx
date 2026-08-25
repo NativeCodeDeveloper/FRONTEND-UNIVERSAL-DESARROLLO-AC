@@ -983,7 +983,7 @@ export default function Calendario() {
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Agenda Global</p>
-                        <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Vista <span className="text-[#6E56CF]">General</span>
                         </h1>
                         <p className="mt-2 text-[14px] text-slate-500 font-medium max-w-2xl">
@@ -1015,7 +1015,14 @@ export default function Calendario() {
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                         </button>
 
-                        <InfoButton informacion={'Visualiza la disponibilidad completa. Haz clic en una cita para gestionar estados o ver el expediente.'}/>
+                        <InfoButton
+                            informacion={'Vista centralizada de todas las citas y bloqueos de la clínica.'}
+                            pasos={[
+                                'Filtra por profesional para ver solo su disponibilidad.',
+                                'Presiona el botón de refrescar para actualizar el calendario.',
+                                'Haz clic en una cita para gestionar su estado o ver el expediente del paciente.',
+                            ]}
+                        />
                     </div>
                 </div>
 

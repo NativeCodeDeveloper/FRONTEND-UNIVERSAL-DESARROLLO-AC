@@ -370,13 +370,20 @@ export default function AgendaCitas() {
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Gestión de Pacientes</p>
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Listado de Reservaciones</h1>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Listado de Reservaciones</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Monitorea y gestiona el estado de todas las citas. Puedes filtrar por profesional, fecha o datos del paciente para realizar confirmaciones rápidas.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={'Visualiza el historial completo de citas. Puedes cambiar el estado de asistencia directamente desde la tabla o ver el detalle completo de la ficha clínica.'}/>
+                        <InfoButton
+                            informacion={'Historial completo de citas registradas en el sistema.'}
+                            pasos={[
+                                'Filtra por profesional, fecha o datos del paciente para ubicar una cita.',
+                                'Cambia el estado de asistencia directamente desde la tabla.',
+                                'Presiona sobre una cita para ver el detalle completo de la ficha clínica.',
+                            ]}
+                        />
                     </div>
                 </div>
 

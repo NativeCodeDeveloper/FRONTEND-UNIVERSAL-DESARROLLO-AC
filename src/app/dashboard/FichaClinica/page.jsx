@@ -134,13 +134,20 @@ export default function FichaClinica() {
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Historial Médico</p>
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Carpetas Clínicas</h1>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Carpetas Clínicas</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Accede al historial completo de atenciones, documentos y evolución de cada paciente registrado en la plataforma.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={'Busca al paciente para gestionar sus fichas de atención. Cada carpeta contiene el registro cronológico de sus consultas y documentos adjuntos.'}/>
+                        <InfoButton
+                            informacion={'Busca al paciente para gestionar sus fichas de atención. Cada carpeta contiene el registro cronológico de sus consultas y documentos adjuntos.'}
+                            pasos={[
+                                'Busca por nombre o RUT en el buscador de carpeta.',
+                                'O revisa directamente el listado de pacientes registrados.',
+                                'Presiona "Abrir Carpeta" para ver el historial completo del paciente.',
+                            ]}
+                        />
                         <button
                             onClick={() => router.push("/dashboard")}
                             className="h-10 px-5 rounded-2xl bg-[#6E56CF] text-white flex items-center gap-2 shadow-sm hover:bg-[#5b45bc] transition-all"
@@ -222,7 +229,7 @@ export default function FichaClinica() {
                     </div>
 
                     {/* ── Listado de Pacientes ── */}
-                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
+                    <div data-tour="ficha-lista-pacientes" className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                             <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Pacientes Registrados</h2>
                             <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-xs font-bold flex items-center justify-center">
@@ -275,6 +282,8 @@ export default function FichaClinica() {
                                                 <div className="flex justify-center">
                                                     <button
                                                         onClick={() => verDetallePaciente(paciente.id_paciente)}
+                                                        data-tour="ficha-abrir-carpeta"
+                                                        data-tour-href={`/dashboard/FichasPacientes/${paciente.id_paciente}`}
                                                         className="h-10 px-4 flex items-center justify-center gap-2 rounded-2xl bg-[#6E56CF]/10 text-[#6E56CF] font-bold text-xs hover:bg-[#6E56CF] hover:text-white transition-all active:scale-95 shadow-sm border border-[#6E56CF]/10"
                                                     >
                                                         <BookOpenIcon className="h-4 w-4" />

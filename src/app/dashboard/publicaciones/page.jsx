@@ -455,7 +455,7 @@ export default function Publicaciones() {
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
                     <div className="max-w-3xl">
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Gestión de Contenido</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Publicaciones del Carrusel</h1>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Publicaciones del Carrusel</h1>
                         <p className="mt-2 text-[13px] text-slate-500 leading-relaxed">
                             Administra las piezas visuales que aparecen en el portal público. Mantén la imagen de tu clínica actualizada cargando nuevos contenidos y promociones.
                         </p>
@@ -465,7 +465,14 @@ export default function Publicaciones() {
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total Piezas</span>
                             <span className="text-xl font-bold text-slate-900 mt-1 leading-none">{listaPublicaciones.length}</span>
                         </div>
-                        <InfoButton informacion={'Este apartado permite cargar imágenes para el carrusel de la página principal. La publicación con ID 10 es especial y admite hasta 3 imágenes simultáneas.'}/>
+                        <InfoButton
+                            informacion={'Carga y administra las imágenes del carrusel que se muestra en la página principal.'}
+                            pasos={[
+                                'Completa el formulario y sube la imagen que quieres publicar.',
+                                'Guarda para que aparezca en el carrusel del portal público.',
+                            ]}
+                            nota={'La publicación con ID 10 es especial: admite hasta 3 imágenes simultáneas.'}
+                        />
                     </div>
                 </div>
 

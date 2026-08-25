@@ -239,13 +239,20 @@ export default function GestionPaciente() {
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Clínica</p>
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Gestión de Pacientes</h1>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Gestión de Pacientes</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Registra y administra la base de datos de tus pacientes. La creación de un perfil es el primer paso para generar fichas clínicas y planes de tratamiento personalizados.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={"Este módulo permite registrar pacientes nuevos. Es fundamental ingresar los datos correctamente para mantener un historial clínico preciso. Una vez registrado, podrás acceder a su ficha desde la sección de 'Ficha Clínica'."}/>
+                        <InfoButton
+                            informacion={'Registra pacientes nuevos en la base de datos de la clínica.'}
+                            pasos={[
+                                'Completa el formulario con los datos personales y de contacto del paciente.',
+                                'Guarda el registro: es importante que los datos sean correctos para mantener un historial clínico preciso.',
+                                'Accede a su ficha desde la sección "Ficha Clínica" una vez registrado.',
+                            ]}
+                        />
                     </div>
                 </div>
 

@@ -245,7 +245,14 @@ export default function AgendaDetalle() {
                                 Volver a Agenda
                             </button>
                         </Link>
-                        <InfoButton informacion={'En esta seccion puedes enviar mensajes automaticos de recordatorio a tus pacientes. El mensaje se enviara al correo que registraron al momento de agendar su hora.\n\nAdemas, puedes gestionar el estado de cada cita (Reservada, Confirmada, Asiste, No asiste, Finalizado, Anulada o Pendiente de pago).\n\nImportante: al eliminar una cita, esta se borrara de forma permanente y no podra recuperarse.'}/>
+                        <InfoButton
+                            informacion={'Detalle de la cita: gestiona el estado, envía recordatorios y administra la reserva del paciente.'}
+                            pasos={[
+                                'Envía un recordatorio automático al correo que el paciente registró al agendar.',
+                                'Actualiza el estado de la cita: Reservada, Confirmada, Asiste, No asiste, Finalizado, Anulada o Pendiente de pago.',
+                            ]}
+                            nota={'Al eliminar una cita, se borra de forma permanente y no se puede recuperar.'}
+                        />
                     </div>
                 </div>
 

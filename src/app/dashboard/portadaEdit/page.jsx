@@ -320,13 +320,20 @@ export default function CarruselPortada() {
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
                     <div className="max-w-3xl">
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración de Portal</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Imágenes de Portada</h1>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Imágenes de Portada</h1>
                         <p className="mt-2 text-[13px] text-slate-500 leading-relaxed">
                             Gestiona las imágenes de gran formato que rotan en la cabecera del sitio. Asegúrate de usar imágenes de alta resolución para mantener la calidad visual.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={'Se recomienda subir imágenes cuadradas de alta resolución (mínimo 1080 × 1080 px) en formato JPG o PNG. Podrás ajustar el encuadre al subir la imagen.'}/>
+                        <InfoButton
+                            informacion={'Gestiona las imágenes de gran formato que rotan en la cabecera del sitio público.'}
+                            pasos={[
+                                'Sube una imagen cuadrada de alta resolución (mínimo 1080 × 1080 px) en formato JPG o PNG.',
+                                'Ajusta el encuadre en el editor que se abre al subir la imagen.',
+                                'Guarda para publicarla en la portada del sitio.',
+                            ]}
+                        />
                     </div>
                 </div>
 

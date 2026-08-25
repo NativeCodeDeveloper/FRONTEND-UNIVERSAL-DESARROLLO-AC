@@ -596,6 +596,7 @@ export function AppointmentDrawer({
       {/* Panel lateral */}
       <aside
         ref={drawerRef}
+        data-tour="reserva-drawer"
         className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.10)] border-l border-slate-200"
         style={{ animation: "slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1)" }}
       >
@@ -675,6 +676,7 @@ export function AppointmentDrawer({
                 {mode === "create" && (
                   <button
                     type="button"
+                    data-tour="reserva-guardar"
                     onClick={() => {
                       if (popupForm.motivoBloqueo?.trim()) {
                         onBloquear?.(popupForm.motivoBloqueo);

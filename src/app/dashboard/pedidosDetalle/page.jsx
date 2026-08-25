@@ -217,7 +217,7 @@ function PedidoDetalleInner(){
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Panel de Administrador</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Detalle del <span className="text-[#6E56CF]">Pedido</span>
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -225,7 +225,14 @@ function PedidoDetalleInner(){
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={"En este apartado, usted puede cambiar el estado del pedido mediante el botón 'Cambiar estado'. Debajo de este botón se muestra el estado actual de la compra.\n\nAdemás, puede enviar correos de seguimiento directamente al cliente para recuperar carritos perdidos.\n\nAl final de la pantalla, encontrará el listado detallado de los productos o servicios que el cliente agregó al carrito de compras."}/>
+                        <InfoButton
+                            informacion={'Detalle del pedido: revisa el estado de la compra y su listado de productos.'}
+                            pasos={[
+                                'Presiona "Cambiar estado" para actualizar el estado de la compra (el estado actual se muestra debajo del botón).',
+                                'Envía un correo de seguimiento al cliente para recuperar carritos abandonados.',
+                                'Revisa el listado de productos o servicios agregados al carrito al final de la pantalla.',
+                            ]}
+                        />
                         <Link href={"/dashboard/pedidosCompras"}
                             className="h-10 px-5 rounded-xl border border-slate-200 text-slate-600 text-[12px] font-bold hover:bg-slate-50 transition-all flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>

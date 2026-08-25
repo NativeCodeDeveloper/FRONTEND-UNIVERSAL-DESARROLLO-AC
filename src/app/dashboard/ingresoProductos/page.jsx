@@ -416,8 +416,8 @@ useEffect(() => {
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Presupuestos</p>
-                        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
-                            Gestion de Prestaciones y Servicios
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                            Gestión de Prestaciones y Servicios
                         </h1>
                         <p className="mt-1 max-w-xl text-[13px] text-slate-500">
                             Cree y administre los productos y servicios disponibles para presupuestos de tratamiento.
@@ -429,7 +429,16 @@ useEffect(() => {
                             <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total</p>
                             <p className="text-lg font-bold text-slate-900">{productos.length}</p>
                         </div>
-                        <InfoButton informacion={"Los servicios, prestaciones y productos que ingrese en este modulo seran los que estaran disponibles para la generacion de presupuestos de tratamiento. Es fundamental que cada registro este completo para que el sistema funcione correctamente.\n\nTodos los campos son obligatorios: debe seleccionar la Categoria Principal, la Sub-Categoria, la Sub-Sub Categoria, ingresar el Nombre del servicio o producto, una Descripcion y el Valor. Si algun campo queda vacio, el sistema no permitira guardar el registro.\n\nPara editar un servicio o producto ya existente, busquelo en la tabla inferior utilizando los filtros por categoria o por nombre. Una vez localizado, presione el boton \"Editar\" en la fila correspondiente. Los datos del registro se cargaran automaticamente en el formulario superior, donde podra modificar la informacion que necesite. Al terminar, presione el boton \"Actualizar\" para guardar los cambios.\n\nPara ingresar un nuevo registro, simplemente complete todos los campos del formulario y presione \"Ingresar\". Si desea limpiar el formulario en cualquier momento, presione el boton \"Limpiar\"."}/>
+                        <InfoButton
+                            informacion={'Registra los servicios, prestaciones y productos disponibles para generar presupuestos de tratamiento.'}
+                            pasos={[
+                                'Completa los campos obligatorios: Categoría Principal, Sub-Categoría, Sub-Sub Categoría, Nombre, Descripción y Valor.',
+                                'Presiona "Ingresar" para guardar un registro nuevo (o "Limpiar" para vaciar el formulario).',
+                                'Para editar uno existente, búscalo en la tabla inferior y presiona "Editar": sus datos se cargan en el formulario.',
+                                'Modifica lo necesario y presiona "Actualizar" para guardar los cambios.',
+                            ]}
+                            nota={'Si algún campo obligatorio queda vacío, el sistema no permitirá guardar el registro.'}
+                        />
                     </div>
                 </div>
             </div>

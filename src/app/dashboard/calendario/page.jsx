@@ -2052,7 +2052,15 @@ function CalendarioContent() {
                             </svg>
                             Nueva reserva
                         </button>
-                        <InfoButton informacion={"Calendario de reservas.\n\nAtajos de teclado:\n- N → Nueva reserva\n- T → Ir a hoy\n- 1 → Vista Mes\n- 2 → Vista Semana\n- 3 → Vista Día\n- 4 → Vista Agenda\n- Esc → Cerrar panel"} />
+                        <InfoButton
+                            informacion={'Calendario de reservas: visualiza, crea y gestiona las citas de tus profesionales.'}
+                            pasos={[
+                                'Presiona "N" para crear una nueva reserva.',
+                                'Presiona "T" para ir directo a la fecha de hoy.',
+                                'Usa "1", "2", "3" o "4" para cambiar entre vista Mes, Semana, Día o Agenda.',
+                                'Presiona "Esc" para cerrar el panel abierto.',
+                            ]}
+                        />
                     </div>
                 </div>
 

@@ -325,7 +325,15 @@ export default function Paciente(){
                         Eliminar
                     </button>
                     {canSeeFichasClinicas && (
-                        <InfoButton informacion={"⚠️ Si un paciente es eliminado, no será posible acceder a sus fichas clínicas."}/>
+                        <InfoButton
+                            informacion={'Ficha de datos personales del paciente.'}
+                            pasos={[
+                                'Presiona "Editar datos" para actualizar la información de contacto y personal.',
+                                'Presiona "Volver" para regresar al listado de pacientes.',
+                                'Presiona "Eliminar" solo si necesitas dar de baja al paciente de forma definitiva.',
+                            ]}
+                            nota={'Si eliminas un paciente, no podrás acceder a sus fichas clínicas asociadas.'}
+                        />
                     )}
                 </div>
 

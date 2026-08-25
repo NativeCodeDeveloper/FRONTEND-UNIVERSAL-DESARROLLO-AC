@@ -131,7 +131,7 @@ export default function ListaPacientes() {
                 <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Base</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Listado de <span className="text-[#6E56CF]">Pacientes</span>
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -143,7 +143,13 @@ export default function ListaPacientes() {
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
                             <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{listaPacientes.length} Registros</span>
                         </div>
-                        <InfoButton informacion={"Este módulo permite buscar pacientes registrados y agendarlos rápidamente. Utiliza los filtros por nombre o RUT para localizar un perfil, y usa el botón 'Agendar' para pre-cargar los datos en el calendario clínico."}/>
+                        <InfoButton
+                            informacion={'Busca pacientes registrados y agéndalos rápidamente desde este listado.'}
+                            pasos={[
+                                'Filtra por nombre o RUT para localizar el perfil que buscas.',
+                                'Presiona "Agendar" para pre-cargar sus datos directamente en el calendario clínico.',
+                            ]}
+                        />
                     </div>
                 </div>
 

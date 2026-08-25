@@ -332,13 +332,20 @@ export default function BloqueosAgendas() {
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración de Disponibilidad</p>
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Bloqueo de Agenda</h1>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Bloqueo de Agenda</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Selecciona uno o varios días del calendario y define el rango horario. Cada día se bloquea de forma independiente para que puedas liberarlos por separado.
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <InfoButton informacion={"Selecciona los días que deseas bloquear haciendo clic en el calendario. Puedes elegir días no consecutivos (por ejemplo, solo los miércoles del mes). Luego define la hora de inicio y término que aplicará a todos los días seleccionados."} />
+                        <InfoButton
+                            informacion={'Bloquea días u horarios específicos para que no queden disponibles en la agenda pública.'}
+                            pasos={[
+                                'Haz clic en el calendario para seleccionar los días que deseas bloquear (pueden ser no consecutivos, por ejemplo solo los miércoles del mes).',
+                                'Define la hora de inicio y término que aplicará a todos los días seleccionados.',
+                                'Guarda el bloqueo: cada día queda bloqueado de forma independiente y puedes liberarlo por separado.',
+                            ]}
+                        />
                     </div>
                 </div>
 
@@ -378,7 +385,7 @@ export default function BloqueosAgendas() {
                                 {/* Selector de modo */}
                                 <div className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Días a bloquear</label>
-                                    <div className="flex rounded-xl border border-slate-200 bg-slate-100/60 p-1 gap-1">
+                                    <div data-tour="bloqueo-modo-selector" className="flex rounded-xl border border-slate-200 bg-slate-100/60 p-1 gap-1">
                                         <button
                                             onClick={() => setModoSeleccion("especifico")}
                                             className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "especifico" ? "bg-white text-[#6E56CF] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
@@ -452,7 +459,7 @@ export default function BloqueosAgendas() {
 
                                 {/* Modo: Días específicos — Calendario */}
                                 {modoSeleccion === "especifico" && (
-                                <div className="rounded-2xl border border-slate-200 bg-slate-50/50 flex justify-center py-2">
+                                <div data-tour="bloqueo-calendario" className="rounded-2xl border border-slate-200 bg-slate-50/50 flex justify-center py-2">
                                     <Calendar
                                         mode="multiple"
                                         selected={diasSeleccionados}
@@ -515,7 +522,7 @@ export default function BloqueosAgendas() {
                                 </div>
 
                                 {/* Rango horario */}
-                                <div className="space-y-2">
+                                <div data-tour="bloqueo-rango-horario" className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Rango horario</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1">
@@ -538,7 +545,7 @@ export default function BloqueosAgendas() {
                                 </div>
 
                                 {/* Motivo */}
-                                <div className="space-y-2">
+                                <div data-tour="bloqueo-motivo" className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Motivo del bloqueo</label>
                                     <InputTextDinamic
                                         value={motivo}
@@ -561,6 +568,7 @@ export default function BloqueosAgendas() {
 
                                 <div className="pt-1">
                                     <button
+                                        data-tour="bloqueo-guardar"
                                         onClick={insertarBloqueosMultiples}
                                         disabled={cargandoInsercion}
                                         className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#6E56CF] text-white text-sm font-bold rounded-2xl hover:bg-[#5b45bc] transition-all duration-200 shadow-lg shadow-indigo-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"

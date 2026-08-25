@@ -106,7 +106,7 @@ export default function PedidosCompra() {
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Panel de Administrador</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Compras <span className="text-[#6E56CF]">en Línea</span>
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -118,7 +118,15 @@ export default function PedidosCompra() {
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
                             <span className="text-[13px] font-bold text-slate-800 mt-0.5 leading-none">{pedidos.length} pedidos</span>
                         </div>
-                        <InfoButton informacion={"En este apartado, usted puede visualizar los precios y valores de las transacciones que se van realizando en el sistema, junto con su estado según el flujo de entrega del producto o servicio.\nEl sistema contempla los siguientes estados:\n• PAGO SIN COMPLETAR: el cliente llegó a la pasarela de pago, pero la transacción no se concretó.\n• COMPRA REALIZADA: el pago fue realizado correctamente.\n• COMPRA ANULADA: proceso manual para anular la compra y mantener trazabilidad.\nPara ver el detalle de cada compra, seleccione el nombre del pedido en el listado."}/>
+                        <InfoButton
+                            informacion={'Historial de compras y transacciones del sistema, con su estado según el flujo de entrega.'}
+                            pasos={[
+                                'PAGO SIN COMPLETAR: el cliente llegó a la pasarela de pago, pero la transacción no se concretó.',
+                                'COMPRA REALIZADA: el pago fue realizado correctamente.',
+                                'COMPRA ANULADA: proceso manual para anular la compra y mantener trazabilidad.',
+                                'Selecciona el nombre del pedido en el listado para ver su detalle completo.',
+                            ]}
+                        />
                     </div>
                 </div>
 

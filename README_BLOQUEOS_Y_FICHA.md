@@ -1,6 +1,6 @@
-# Actualización: Bloqueo de Agenda, Edición de Ficha Clínica y Notificaciones
+# Actualización: Bloqueo de Agenda, Edición de Ficha Clínica, Notificaciones y Calendario Público
 
-Este documento describe en detalle los cambios implementados en tres módulos del dashboard. Está pensado para que otro desarrollador (o instancia de Claude) entienda exactamente qué se hizo, por qué, y cómo funciona.
+Este documento describe en detalle los cambios implementados en varios módulos del dashboard y del calendario público. Está pensado para que otro desarrollador (o instancia de Claude) entienda exactamente qué se hizo, por qué, y cómo funciona.
 
 ---
 
@@ -282,6 +282,71 @@ Cuerpo: "En ~30 min · Juan Pérez con Dra. Andrea Moran a las 10:00"
 - Las notificaciones solo funcionan mientras la pestaña del dashboard está abierta.
 - En iOS Safari solo funciona si la app está instalada como PWA (iOS 16.4+).
 - Si se desea notificaciones con pestaña cerrada, se debe implementar Opción B (Web Push + Service Worker + backend que almacene suscripciones VAPID y dispare pushes al crear/recordar reservas).
+
+---
+
+## 4. Calendario público — recuperación de horarios tras bloqueos parciales
+
+**Archivo:** `src/app/(public)/agendaEspecificaProfersional/[id_profesional]/page.jsx`
+**Fecha:** 2026-08-23 · **Estado:** integrado en `main`, pendiente de paso a producción.
+
+### 4.1 El problema reportado
+
+El calendario público genera bloques de horario consecutivos según la duración del servicio elegido (`duracion_min` de la tarifa), ej. servicio de 60 min → 09:00–10:00, 10:00–11:00, 11:00–12:00... Cuando un profesional creaba un **bloqueo parcial** (ej. 30 min o 15 min) dentro de esa grilla, el bloque completo que lo contenía quedaba inválido y el calendario "saltaba" directo al siguiente bloque de la grilla fija, perdiendo el tiempo libre real que quedaba entre el fin del bloqueo y el siguiente bloque (hasta 45 min perdidos por bloqueo, según el caso). Esto le generó al negocio la pérdida de al menos 2 clientes.
+
+### 4.2 Intentos descartados (documentados para que no se repitan)
+
+1. **Granularidad fija de paso (ej. cada 15 min) en vez de `dur`:** resuelve el hueco, pero genera candidatos que se solapan entre sí cuando `duracionMinutos` no es múltiplo de la granularidad (ej. servicio de 25 min → aparecían opciones cada 15 min en vez de cada 25, algo que nunca pasaba antes del cambio). **Descartado.**
+2. **Grilla original intacta + candidato extra pegado al fin del bloqueo, cortando la cadena extra en el próximo punto de la grilla original:** el candidato extra podía **terminar después** de ese próximo punto (ej. bloqueo 09:30–10:30 con servicio de 60 min generaba el candidato 10:30–11:30, que se solapa 30 min con el candidato original 11:00–12:00 que seguía mostrándose al lado). Esto llegó a probarse visualmente en el calendario real y mostró **dos horarios solapados simultáneamente disponibles** — inaceptable, porque implicaría que el profesional podría quedar doble-agendado si dos pacientes distintos tomaban cada opción. **Descartado** (capturas de pantalla del 2026-08-23 muestran el bug: día con bloqueo mostraba `10:45–11:45` y `11:00–12:00` como opciones simultáneas).
+
+### 4.3 Solución final integrada
+
+`attentionSlots` (dentro del componente) genera **una sola cadena consecutiva** — nunca dos fuentes de horarios en paralelo, por lo tanto nunca puede haber dos candidatos que se solapen entre sí, por construcción:
+
+```js
+const attentionSlots = useMemo(() => {
+    if (!fechaSeleccionada || !servicioActivo) return [];
+    if (fechaSeleccionada.getDay() === 0) return []; // domingo cerrado
+
+    const inicio = 9 * 60, fin = 22 * 60, dur = duracionMinutos;
+    const slots = [];
+    let cur = inicio;
+    while (cur + dur <= fin) {
+        const candidateEnd = cur + dur;
+        const bloqueo = bloqueosDelDia.find(b => {
+            const bIni = toMinutes(b.ini), bFin = toMinutes(b.fin);
+            return cur < bFin && bIni < candidateEnd; // overlap real
+        });
+        if (bloqueo) {
+            cur = toMinutes(bloqueo.fin); // salta al minuto EXACTO en que termina el bloqueo
+            continue;
+        }
+        slots.push({start: formatMin(cur), end: formatMin(candidateEnd)});
+        cur += dur;
+    }
+    return slots;
+}, [fechaSeleccionada, servicioActivo, duracionMinutos, bloqueosDelDia]);
+```
+
+- La cadena arranca en 09:00 y avanza de a `duracionMinutos` (la duración del servicio activo — funciona igual sin importar si es un servicio de 10, 25, 35 o 60 min, porque el paso y la duración nunca se desacoplan de una grilla fija externa).
+- Si el candidato se solaparía con un bloqueo del día, la cadena **salta exactamente al minuto en que termina ese bloqueo** (sin redondear a ningún horario fijo — funciona igual con bloqueos creados a cualquier hora, ej. 10:07) y continúa desde ahí.
+- Si no hay bloqueos ese día, el resultado es **idéntico** al comportamiento anterior (cero regresión).
+- Cada candidato generado sigue pasando por la validación existente contra el backend (`validarSlot` → `POST /reservaPacientes/validar`) dentro de `checkBlocked` — este cambio no toca esa validación, solo cambia qué candidatos se le proponen. El backend sigue siendo la única fuente de verdad final sobre disponibilidad real (reservas incluidas).
+
+### 4.4 Datos nuevos que alimentan la cadena
+
+- **`bloqueosProfesional`** (estado nuevo): guarda la respuesta cruda de `POST /bloqueoAgenda/seleccionarBloqueosPorProfesional` (ya se pedía antes solo para calcular `diasBloqueados`; no se agregó ningún fetch nuevo).
+- **`bloqueosDelDia`** (`useMemo` nuevo): filtra `bloqueosProfesional` por el día seleccionado y extrae `{ini, fin}` en formato `"HH:MM"`.
+- El cálculo de `diasBloqueados` (bloqueo de jornada completa, día no seleccionable) **no se tocó** — sigue funcionando exactamente igual que antes.
+
+### 4.5 Verificación realizada antes de integrar
+
+Se simuló el algoritmo exacto (extraído literal del archivo) en Node con 12 escenarios — sin bloqueos (60/25/35 min, para confirmar cero regresión), bloqueos de 15/30 min, bloqueos en horario arbitrario no alineado (ej. termina a las 10:07), bloqueo que termina justo en un punto ya cubierto por la grilla, dos bloqueos el mismo día, bloqueos adyacentes, un bloqueo que cubre casi todo el día, y bloqueos desordenados en el array de entrada. Cada escenario se pasó por un assert automático que compara **todos los pares de slots generados** y lanza error si alguno se solapa. Los 12 casos pasaron sin solapamientos. Luego se confirmó visualmente en el navegador con bloqueos reales creados desde el dashboard.
+
+### 4.6 Fuera de alcance (a tener en cuenta a futuro)
+
+- Esta lógica de "salto por bloqueo" **no** considera reservas ya confirmadas al generar candidatos (solo bloqueos). Las reservas siguen dependiendo exclusivamente de la validación del backend (`validarSlot`) para ser excluidas — funciona hoy porque toda reserva se crea a partir de un candidato de la grilla, pero si en el futuro se detectan huecos perdidos alrededor de reservas parciales (no solo bloqueos), aplicaría el mismo patrón aquí descrito.
+- No se tocó `src/app/dashboard/calendario/page.jsx` (calendario del dashboard) ni `src/app/dashboard/calendarioGeneral/page.jsx` (copia legacy huérfana, ver auditoría previa) — ninguno de los dos tiene este problema porque no arman una grilla de slots fijos por duración.
 
 ---
 

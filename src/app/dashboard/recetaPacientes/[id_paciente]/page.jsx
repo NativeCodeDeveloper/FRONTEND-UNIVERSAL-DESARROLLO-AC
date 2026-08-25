@@ -669,7 +669,7 @@ export default function ReecetasPacientes() {
                 {/* ── Header ── */}
                 <div className="mb-8">
                     <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Documentos Clínicos</p>
-                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+                    <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                         Receta Médica
                     </h1>
                     <p className="mt-1 text-[13px] text-slate-500">
@@ -688,7 +688,14 @@ export default function ReecetasPacientes() {
                         </svg>
                         Carpeta del Paciente
                     </button>
-                    <InfoButton informacion={"Registre y gestione las recetas médicas del paciente. El PDF generado incluye los datos del profesional, diagnóstico e indicaciones."}/>
+                    <InfoButton
+                        informacion={'Registra y genera la receta médica del paciente en formato PDF.'}
+                        pasos={[
+                            'Completa la descripción de la receta (indicaciones y/o medicamentos).',
+                            'Agrega el diagnóstico si corresponde.',
+                            'Genera el PDF: incluirá los datos del profesional, diagnóstico e indicaciones.',
+                        ]}
+                    />
                 </div>
 
                 {cargando ? (

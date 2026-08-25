@@ -938,7 +938,7 @@ export default function Paciente() {
                 {/* ── Header Principal ── */}
                 <div className="mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Carpeta Clínica: <span className="text-[#6E56CF]">{pacienteActual ? `${pacienteActual.nombre} ${pacienteActual.apellido}` : "Paciente"}</span>
                         </h1>
                     </div>
@@ -1060,103 +1060,59 @@ export default function Paciente() {
                     <div className="xl:col-span-8 space-y-5">
                         
                         {/* Acciones Rápidas */}
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
-                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
-                                <span className="relative z-10 flex w-full flex-col">
-                                    <span className="flex items-start justify-between gap-3">
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                                        </span>
-                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
-                                    </span>
-                                    <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Ficha</span>
+                        <div data-tour="ficha-acciones-rapidas" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Ficha</span>
                             </button>
-                            <button onClick={agendarPaciente} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
-                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
-                                <span className="relative z-10 flex w-full flex-col">
-                                    <span className="flex items-start justify-between gap-3">
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                        </span>
-                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
-                                    </span>
-                                    <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Agendar</span>
+                            <button onClick={agendarPaciente} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Agendar</span>
                             </button>
                             {canSeeOdontograma && (
-                                <button onClick={verOdontogramas} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
-                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
-                                    <span className="relative z-10 flex w-full flex-col">
-                                        <span className="flex items-start justify-between gap-3">
-                                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
-                                            </span>
-                                            <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
-                                        </span>
-                                        <span className="mt-4 flex items-start justify-center text-center text-[14px] font-bold leading-tight text-slate-800">Odontograma</span>
+                                <button onClick={verOdontogramas} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
                                     </span>
+                                    <span className="text-[13px] font-semibold text-slate-800">Odontograma</span>
                                 </button>
                             )}
                             {canSeeRecetaMedica && (
-                                <button onClick={() => irAReceta(id_paciente)} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
-                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
-                                    <span className="relative z-10 flex w-full flex-col">
-                                        <span className="flex items-start justify-between gap-3">
-                                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
-                                            </span>
-                                            <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
-                                        </span>
-                                        <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Recetas</span>
+                                <button onClick={() => irAReceta(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
                                     </span>
+                                    <span className="text-[13px] font-semibold text-slate-800">Recetas</span>
                                 </button>
                             )}
-                            <button type="button" onClick={irACotizaciones} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
-                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
-                                <span className="relative z-10 flex w-full flex-col">
-                                    <span className="flex items-start justify-between gap-3">
-                                        <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7" /></svg>
-                                        </span>
-                                        <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
-                                    </span>
-                                    <span className="mt-4 flex items-start justify-center text-center text-[14px] font-bold leading-tight text-slate-800">Cotizaciones</span>
+                            <button type="button" onClick={irACotizaciones} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7" /></svg>
                                 </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Cotizaciones</span>
                             </button>
-                            <button onClick={irADocumentos} className="group relative isolate flex min-h-[120px] overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/90 p-4 text-left shadow-[0_16px_40px_-30px_rgba(15,23,42,0.65)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_48px_-28px_rgba(30,41,59,0.45)] active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span aria-hidden="true" className="absolute left-0 top-5 h-10 w-1 rounded-r-full bg-[#6E56CF]/60 transition-all duration-300 group-hover:h-14 group-hover:bg-[#6E56CF]" />
-                                <span aria-hidden="true" className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-slate-100/90 blur-2xl transition-colors duration-300 group-hover:bg-violet-100/80" />
-                                <span className="relative z-10 flex w-full flex-col">
-                                    <span className="flex items-start justify-between gap-3">
-                                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_10px_22px_-12px_rgba(15,23,42,0.75)] transition-all duration-300 group-hover:border-[#6E56CF] group-hover:bg-[#6E56CF] group-hover:shadow-[0_12px_26px_-12px_rgba(109,40,217,0.7)]">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                                        </span>
-                                            <svg aria-hidden="true" className="h-8 w-8 rounded-full border border-slate-200 bg-white p-2 text-slate-400 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-violet-200 group-hover:bg-violet-50 group-hover:text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M8 7h9v9" /></svg>
-                                    </span>
-                                    <span className="mt-4 flex items-start text-[14px] font-bold leading-tight text-slate-800">Documentos</span>
+                            <button onClick={irADocumentos} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                 </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Documentos</span>
                             </button>
                         </div>
 
                         {pacienteActual && (
-                            <details className="group relative overflow-hidden rounded-[26px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/80 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)] transition-all duration-300 open:border-violet-200 open:shadow-[0_22px_50px_-32px_rgba(109,40,217,0.28)]">
+                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <span aria-hidden="true" className="absolute left-0 top-5 h-12 w-1 rounded-r-full bg-[#6E56CF]" />
-                                    <span aria-hidden="true" className="absolute -left-16 -top-16 h-32 w-32 rounded-full bg-violet-100/60 blur-3xl" />
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
                                     <div className="relative min-w-0 flex-1">
-                                        <h3 className="text-[17px] font-extrabold leading-tight tracking-[-0.02em] text-slate-900">Información de ingreso</h3>
+                                        <h3 className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-slate-900">Información de ingreso</h3>
                                     </div>
                                     <button
                                         type="button"
@@ -1278,21 +1234,23 @@ export default function Paciente() {
                                                 <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">RUT del apoderado</label>
                                                 <ShadcnInput value={apoderadoRut} onChange={(e) => setApoderadoRut(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
                                             </div>
-                                            <div className="space-y-1.5 lg:col-span-1">
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-3 pt-1 md:grid-cols-2">
+                                            <div className="space-y-1.5">
                                                 <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Antecedentes</label>
-                                                <textarea value={observacion1} onChange={(e) => setObservacion1(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <textarea value={observacion1} onChange={(e) => setObservacion1(e.target.value)} placeholder="Antecedentes médicos relevantes del paciente..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
                                             </div>
                                             <div className="space-y-1.5">
                                                 <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Medicamentos</label>
-                                                <textarea value={medicamentosUsados} onChange={(e) => setMedicamentosUsados(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <textarea value={medicamentosUsados} onChange={(e) => setMedicamentosUsados(e.target.value)} placeholder="Medicamentos que utiliza actualmente..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
                                             </div>
                                             <div className="space-y-1.5">
                                                 <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Hábitos</label>
-                                                <textarea value={habitos} onChange={(e) => setHabitos(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <textarea value={habitos} onChange={(e) => setHabitos(e.target.value)} placeholder="Hábitos alimenticios, actividad física, consumo de alcohol o tabaco..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
                                             </div>
-                                            <div className="space-y-1.5 lg:col-span-1">
+                                            <div className="space-y-1.5">
                                                 <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Comentarios</label>
-                                                <textarea value={comentariosAdicionales} onChange={(e) => setComentariosAdicionales(e.target.value)} className="min-h-[42px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <textarea value={comentariosAdicionales} onChange={(e) => setComentariosAdicionales(e.target.value)} placeholder="Observaciones adicionales..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
                                             </div>
                                         </div>
                                     </div>
@@ -1309,17 +1267,15 @@ export default function Paciente() {
                         <div className="space-y-6">
                             
                             {/* Filtros y firma PDF */}
-                            <details className="group relative overflow-hidden rounded-[26px] border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50/80 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)] transition-all duration-300 open:border-violet-200 open:shadow-[0_22px_50px_-32px_rgba(109,40,217,0.28)]">
+                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <span aria-hidden="true" className="absolute left-0 top-5 h-12 w-1 rounded-r-full bg-[#6E56CF]" />
-                                    <span aria-hidden="true" className="absolute -left-16 -top-16 h-32 w-32 rounded-full bg-violet-100/60 blur-3xl" />
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18l-7 8v6l-4 2v-8L3 4z" />
                                         </svg>
                                     </div>
                                     <div className="relative min-w-0 flex-1">
-                                        <h3 className="text-[17px] font-extrabold leading-tight tracking-[-0.02em] text-slate-900">Filtros</h3>
+                                        <h3 className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-slate-900">Filtros</h3>
                                     </div>
                                     <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1380,7 +1336,7 @@ export default function Paciente() {
 
                         <div className="xl:col-span-12">
                             <div className="mb-5 grid grid-cols-1 xl:grid-cols-12 xl:gap-8">
-                                <div className="flex items-center gap-3 xl:col-start-5 xl:col-span-8">
+                                <div data-tour="ficha-registros" className="flex items-center gap-3 xl:col-start-5 xl:col-span-8">
                                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M7 4h7l3 3v13H7V4z" />
@@ -1428,11 +1384,8 @@ export default function Paciente() {
                                         const esMasReciente = ficha.id_ficha === listaFichasOrdenada[0]?.id_ficha;
                                         return (
                                         <div key={ficha.id_ficha} className="relative z-10">
-                                        <div className="group/ficha relative overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_55px_-38px_rgba(15,23,42,0.7)] transition-all duration-300 hover:border-slate-300 hover:shadow-[0_26px_65px_-36px_rgba(30,41,59,0.4)]">
-                                            <span aria-hidden="true" className="absolute inset-y-0 left-0 z-20 w-1 bg-gradient-to-b from-[#6E56CF] via-violet-400 to-transparent" />
-                                            <div className="relative flex flex-col gap-3 overflow-hidden border-b border-slate-100 bg-gradient-to-br from-white via-white to-slate-50/90 px-5 py-3.5 xl:flex-row xl:items-center xl:justify-between">
-                                                <span aria-hidden="true" className="absolute -left-16 -top-20 h-40 w-40 rounded-full bg-violet-100/55 blur-3xl" />
-                                                <span aria-hidden="true" className="absolute -right-20 -top-24 h-48 w-48 rounded-full bg-slate-100/90 blur-3xl transition-colors duration-300 group-hover/ficha:bg-violet-50" />
+                                        <div className="group/ficha relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-slate-300">
+                                            <div className="relative flex flex-col gap-3 overflow-hidden border-b border-slate-100 px-5 py-3.5 xl:flex-row xl:items-center xl:justify-between">
                                                 <div className="relative z-10 flex min-w-0 items-center gap-3.5">
                                                     <div className="min-w-0">
                                                         <div className="flex flex-wrap items-center gap-2">
@@ -1482,9 +1435,8 @@ export default function Paciente() {
                                                                         </div>
                                                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                                             {cat.campos.map((campo, idx) => (
-                                                                                <div key={idx} className="group/campo relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-28px_rgba(15,23,42,0.75)] transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_20px_42px_-26px_rgba(109,40,217,0.28)]">
-                                                                                    <span aria-hidden="true" className="absolute left-0 top-4 h-8 w-0.5 rounded-r-full bg-violet-300 transition-all duration-300 group-hover/campo:h-10 group-hover/campo:bg-[#6E56CF]" />
-                                                                                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400 transition-colors group-hover/campo:text-[#6E56CF]">{campo.nombre}</span>
+                                                                                <div key={idx} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:border-slate-300">
+                                                                                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{campo.nombre}</span>
                                                                                     <p className="mt-2 whitespace-pre-wrap text-[13px] font-semibold leading-relaxed text-slate-700">{campo.valor || "-"}</p>
                                                                                 </div>
                                                                             ))}

@@ -380,6 +380,7 @@ const DASHBOARD_NAV_SECTIONS = [
     icon: "academy",
     items: [
       { label: "Videos", href: "https://academia.agendaclinicas.cl/dashboard", icon: "academy", visibleForAllRoles: true },
+      { label: "Tutorial Guiado", action: "startTour", icon: "compass", visibleForAllRoles: true },
     ],
   },
   {

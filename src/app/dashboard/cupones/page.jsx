@@ -252,14 +252,21 @@ function mostrarIdSeleccionado(id_cupon) {
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Marketing y Descuentos</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Gestión de <span className="text-[#6E56CF]">Cupones</span>
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                             Crea y administra cupones de descuento. Para desactivar un cupón, simplemente elimínalo del listado.
                         </p>
                     </div>
-                    <InfoButton informacion={"En este apartado, usted podrá crear cupones de descuento para que sus clientes obtengan rebajas en los productos o servicios ofrecidos. Estos cupones no son individuales ni se desactivan automáticamente al ser utilizados, por lo que deben desactivarse de forma manual cuando usted lo estime conveniente.\n\nEn el último campo del formulario, usted puede indicar el porcentaje de descuento que se aplicará al producto. Este valor solo puede ingresarse como un número entero entre 1 y 100; no se permiten letras ni caracteres especiales.\n\nPara desactivar un cupón, únicamente debe eliminarlo, y este dejará de estar activo de manera inmediata."}/>
+                    <InfoButton
+                        informacion={'Crea cupones de descuento para que tus clientes obtengan rebajas en productos o servicios.'}
+                        pasos={[
+                            'Completa el formulario e indica el porcentaje de descuento (número entero entre 1 y 100).',
+                            'Guarda el cupón: quedará activo y no se desactiva solo, incluso si se usa varias veces.',
+                            'Para desactivarlo, elimínalo desde el listado: queda inactivo de inmediato.',
+                        ]}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

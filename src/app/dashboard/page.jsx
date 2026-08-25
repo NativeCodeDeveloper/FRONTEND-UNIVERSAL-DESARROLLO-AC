@@ -541,7 +541,7 @@ export default function AgendaCitas() {
 
     function obtenerEstiloBotonEstado(estadoReserva = "") {
         const paleta = obtenerPaletaEstadoReserva(estadoReserva);
-        return { backgroundColor: paleta.backgroundColor, color: paleta.color, border: `1px solid ${paleta.borderColor}`, borderLeft: `4px solid ${paleta.accentColor}`, boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.55)" };
+        return { backgroundColor: paleta.backgroundColor, color: paleta.color, border: `1px solid ${paleta.borderColor}` };
     }
 
     const accionesRapidasEstado = [
@@ -657,11 +657,11 @@ export default function AgendaCitas() {
             <div className="relative">
                 <button
                     onClick={() => setMenuEstadoAbiertoId(menuEstadoAbiertoId === data.id_reserva ? null : data.id_reserva)}
-                    className="h-9 px-4 rounded-xl flex items-center gap-2 transition-all hover:brightness-95 disabled:opacity-50"
+                    className="h-9 px-4 rounded-full flex items-center justify-center gap-2 transition-all hover:brightness-95 disabled:opacity-50"
                     style={obtenerEstiloBotonEstado(data.estadoReserva)}
                     disabled={actualizandoReservaId === data.id_reserva}
                 >
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
+                    <span className="text-[11px] font-bold uppercase tracking-wide leading-none">
                         {actualizandoReservaId === data.id_reserva ? "Cargando..." : data.estadoReserva || "Reservada"}
                     </span>
                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 opacity-60 transition-transform duration-200 ${menuEstadoAbiertoId === data.id_reserva ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -670,7 +670,8 @@ export default function AgendaCitas() {
                 </button>
                 {menuEstadoAbiertoId === data.id_reserva && (
                     <div className={`absolute ${menuPositionClass} w-56 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200`}>
-                        <div className="p-2 grid grid-cols-1 gap-1">
+                        <p className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Cambiar estado</p>
+                        <div className="p-2 pt-1 grid grid-cols-1 gap-1">
                             {accionesRapidasEstado.map((accion) => (
                                 <button
                                     key={accion.valor}
@@ -697,7 +698,7 @@ export default function AgendaCitas() {
                                         </svg>
                                     </div>
                                     <span className="text-[12px] font-bold text-rose-700">
-                                        {eliminandoReservaId === data.id_reserva ? "Eliminando..." : "Eliminar Reserv."}
+                                        {eliminandoReservaId === data.id_reserva ? "Eliminando..." : "Eliminar reserva"}
                                     </span>
                                 </button>
                             </div>
@@ -753,7 +754,7 @@ export default function AgendaCitas() {
                 <div className="mb-6 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4 xl:gap-8">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Agenda Clínica</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Panel de <span className="text-[#6E56CF]">Citas</span>
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -761,48 +762,83 @@ export default function AgendaCitas() {
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
-                            <span className="text-lg font-bold text-slate-900 mt-1 leading-none">{dataLista.length}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div data-tour="dashboard-kpis" className="flex flex-wrap items-center gap-2">
+                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
+                                <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{dataLista.length}</span>
+                            </div>
                         </div>
-                        <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-teal-500 uppercase tracking-widest leading-none">Confirmadas</span>
-                            <span className="text-lg font-bold text-slate-900 mt-1 leading-none">{resumenEstados.confirmadas}</span>
+                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#F3F0FF] text-[#6E56CF]">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Confirmadas</span>
+                                <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.confirmadas}</span>
+                            </div>
                         </div>
-                        <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-sky-500 uppercase tracking-widest leading-none">Asiste</span>
-                            <span className="text-lg font-bold text-slate-900 mt-1 leading-none">{resumenEstados.asiste}</span>
+                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Asiste</span>
+                                <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.asiste}</span>
+                            </div>
                         </div>
-                        <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest leading-none">Anuladas</span>
-                            <span className="text-lg font-bold text-slate-900 mt-1 leading-none">{resumenEstados.anuladas}</span>
+                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-rose-50 text-rose-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636L5.636 18.364M5.636 5.636l12.728 12.728"/></svg>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Anuladas</span>
+                                <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.anuladas}</span>
+                            </div>
                         </div>
-                        <div className="h-16 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest leading-none">Finalizadas</span>
-                            <span className="text-lg font-bold text-slate-900 mt-1 leading-none">{resumenEstados.finalizadas}</span>
+                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14 9V5a3 3 0 00-3-3l-1 9V21h9.28a2 2 0 001.97-1.66l1.38-9A2 2 0 0020.66 8H14z" /><path strokeLinecap="round" strokeLinejoin="round" d="M7 11H4a2 2 0 00-2 2v6a2 2 0 002 2h3" /></svg>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Finalizadas</span>
+                                <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.finalizadas}</span>
+                            </div>
+                        </div>
                         </div>
                         {canSeeFichasClinicas && (
                             <button
                                 onClick={() => router.push("/dashboard/FichaClinica")}
-                                className="h-16 px-6 rounded-2xl bg-[#6E56CF] text-white flex items-center gap-2 shadow-sm hover:bg-[#5b45bc] transition-all"
+                                className="h-11 px-4 rounded-xl bg-[#6E56CF] text-white flex items-center gap-2 shadow-sm hover:bg-[#5b45bc] transition-all"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 <span className="text-[12px] font-bold">Fichas Clínicas</span>
                             </button>
                         )}
-                        <InfoButton informacion={'Gestiona las citas del día. Usa los filtros para localizar pacientes específicos y actualiza el estado de asistencia con un solo clic.'}/>
+                        <InfoButton
+                            informacion={'Panel principal de la agenda: aquí ves y gestionas todas las citas registradas en el sistema.'}
+                            pasos={[
+                                'Abre el panel de filtros para buscar por paciente, profesional, fecha o estado.',
+                                'Revisa las tarjetas superiores (Total, Confirmadas, Asiste, Anuladas, Finalizadas) para un resumen rápido.',
+                                'Usa el menú de acciones de cada fila para cambiar el estado de asistencia de una cita.',
+                                'Presiona "Fichas Clínicas" para ir directo al historial médico del paciente.',
+                            ]}
+                        />
                     </div>
                 </div>
 
                 <div className="space-y-8">
                     {/* Panel de Filtros */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
-                        <div onClick={() => setMostrarFiltros(!mostrarFiltros)} className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
+                        <div data-tour="dashboard-filtros-header" onClick={() => setMostrarFiltros(!mostrarFiltros)} className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
                             <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-lg bg-violet-50 text-[#6E56CF] flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-lg bg-[#F3F0FF] text-[#6E56CF] flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
                                 </div>
                                 <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Filtros Avanzados y Búsqueda</h2>
@@ -810,73 +846,66 @@ export default function AgendaCitas() {
                             <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-slate-400 transition-transform ${mostrarFiltros ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                         </div>
                         {mostrarFiltros && (
-                            <div className="p-4 md:p-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre Paciente</label>
-                                            <div className="flex gap-2">
-                                                <ShadcnInput value={nombrePaciente} onChange={(e) => setnombrePaciente(e.target.value)} placeholder="Ej: Nicolas..." className="h-11 rounded-xl border-slate-200" />
-                                                <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-11 px-4 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT Paciente</label>
-                                            <div className="flex gap-2">
-                                                <ShadcnInput value={rut} onChange={(e) => setrut(e.target.value)} placeholder="12.345.678-9" className="h-11 rounded-xl border-slate-200" />
-                                                <button onClick={() => buscarPorRut(rut)} className="h-11 px-4 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
-                                            </div>
+                            <div className="p-4 md:p-8 animate-in fade-in slide-in-from-top-4 duration-300 space-y-6">
+                                {/* Fila 1: búsqueda por campo */}
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre Paciente</label>
+                                        <div className="flex gap-2">
+                                            <ShadcnInput value={nombrePaciente} onChange={(e) => setnombrePaciente(e.target.value)} placeholder="Ej: Nicolas..." className="h-11 rounded-xl border-slate-200" />
+                                            <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-11 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
                                         </div>
                                     </div>
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Rango de Fechas</label>
-                                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                                <Calendar28 nombre="Desde" value={fechaInicio} onChange={(v) => setfechaInicio(v)} />
-                                                <Calendar28 nombre="Hasta" value={fechaFinalizacion} onChange={(v) => setfechaFinalizacion(v)} />
-                                            </div>
-                                        </div>
-                                        <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="w-full h-11 bg-[#6E56CF] text-white text-[13px] font-bold rounded-xl hover:bg-[#5b45bc] shadow-lg shadow-indigo-100 transition-all">Filtrar por Período</button>
-                                    </div>
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
-                                            <Select value={String(id_profesional || "null")} onValueChange={(v) => setId_profesional(v)}>
-                                                <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Seleccionar profesional..." /></SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="null">Todos los profesionales</SelectItem>
-                                                    {listaProfesionales.map((p) => (<SelectItem key={p.id_profesional} value={String(p.id_profesional)}>{p.nombreProfesional}</SelectItem>))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Estado Reserva</label>
-                                            <Select value={estadoReserva || "null"} onValueChange={(v) => setestadoReserva(v)}>
-                                                <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Cualquier estado..." /></SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="null">Todos los estados</SelectItem>
-                                                    {accionesRapidasEstado.map((e) => (<SelectItem key={e.valor} value={e.valor}>{e.etiqueta}</SelectItem>))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="pt-2">
-                                            <button onClick={() => { limpiarFiltrosPersistidos(); listarTablaCitas(); }} className="w-full h-11 border border-slate-200 text-slate-500 text-[13px] font-bold rounded-xl hover:bg-slate-50 transition-all">Limpiar Filtros</button>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT Paciente</label>
+                                        <div className="flex gap-2">
+                                            <ShadcnInput value={rut} onChange={(e) => setrut(e.target.value)} placeholder="12.345.678-9" className="h-11 rounded-xl border-slate-200" />
+                                            <button onClick={() => buscarPorRut(rut)} className="h-11 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
                                         </div>
                                     </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
+                                        <Select value={String(id_profesional || "null")} onValueChange={(v) => setId_profesional(v)}>
+                                            <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Seleccionar profesional..." /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="null">Todos los profesionales</SelectItem>
+                                                {listaProfesionales.map((p) => (<SelectItem key={p.id_profesional} value={String(p.id_profesional)}>{p.nombreProfesional}</SelectItem>))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Estado Reserva</label>
+                                        <Select value={estadoReserva || "null"} onValueChange={(v) => setestadoReserva(v)}>
+                                            <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Cualquier estado..." /></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="null">Todos los estados</SelectItem>
+                                                {accionesRapidasEstado.map((e) => (<SelectItem key={e.valor} value={e.valor}>{e.etiqueta}</SelectItem>))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                {/* Fila 2: rango de fechas + acciones */}
+                                <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4 pt-6 border-t border-slate-100">
+                                    <Calendar28 nombre="Desde" value={fechaInicio} onChange={(v) => setfechaInicio(v)} />
+                                    <Calendar28 nombre="Hasta" value={fechaFinalizacion} onChange={(v) => setfechaFinalizacion(v)} />
+                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-11 w-full bg-[#6E56CF] text-white text-[13px] font-bold rounded-xl hover:bg-[#5b45bc] shadow-sm transition-all">Filtrar por Período</button>
+                                    <button onClick={() => { limpiarFiltrosPersistidos(); listarTablaCitas(); }} className="h-11 w-full border border-slate-200 text-slate-500 text-[13px] font-bold rounded-xl hover:bg-slate-50 transition-all">Limpiar Filtros</button>
                                 </div>
                             </div>
                         )}
                     </div>
 
                     {/* Tabla de Resultados */}
-                    <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                    <div data-tour="dashboard-tabla-citas" className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
                             <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Citas Agendadas</h2>
                             <div className="flex items-center gap-3">
                                 <span className="text-[11px] font-bold text-slate-400">{dataLista.length} {dataLista.length === 1 ? "cita" : "citas"}</span>
                                 <button
+                                    data-tour="dashboard-exportar-excel"
                                     onClick={exportarAExcel}
-                                    className="h-8 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold hover:bg-emerald-100 transition-all flex items-center gap-1.5"
+                                    className="h-8 px-3 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all flex items-center gap-1.5"
                                     title="Exportar a Excel"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
@@ -902,7 +931,7 @@ export default function AgendaCitas() {
                                                 <span className="inline-flex items-center rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-[13px] font-bold text-slate-900">
                                                     {formatearFechaDashboard(data.fechaInicio)}
                                                 </span>
-                                                <span className="inline-flex items-center rounded-lg bg-violet-50 border border-violet-200 px-3 py-1.5 text-[13px] font-bold text-[#6E56CF]">
+                                                <span className="inline-flex items-center rounded-lg bg-[#F3F0FF] border border-[#EDE9FE] px-3 py-1.5 text-[13px] font-bold text-[#6E56CF]">
                                                     {formatearHoraDashboard(data.horaInicio)}
                                                 </span>
                                                 <span className="inline-flex min-w-[96px] items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-bold" style={obtenerEstiloBadgeEstado(data.estadoReserva)}>

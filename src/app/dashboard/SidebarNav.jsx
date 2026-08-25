@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import UserMenu from "./UserMenu";
 import { getDashboardRoleFromUser, getVisibleDashboardSections } from "@/lib/dashboard-access";
+import { useTour } from "@/ContextosGlobales/TourContext";
 
 const ICONS = {
   home: (
@@ -56,8 +57,14 @@ const ICONS = {
   ),
   academy: (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.42A12.08 12.08 0 0119 15.12V18m-7-4l-6.16-3.42A12.08 12.08 0 005 15.12V18m7-4v6" />
+      <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 8.5v7l6-3.5-6-3.5z" />
+    </svg>
+  ),
+  compass: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-2 5-4 1 2-5 4-1z" />
     </svg>
   ),
 };
@@ -117,8 +124,23 @@ function NavItem({ href, icon, label }) {
   );
 }
 
-function SubNavItem({ href, label }) {
+function SubNavItem({ href, label, action }) {
   const pathname = usePathname();
+  const { start: startTour } = useTour();
+
+  if (action === "startTour") {
+    return (
+      <button
+        type="button"
+        onClick={() => startTour()}
+        className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 transition-all duration-150 hover:bg-slate-50 hover:text-slate-700"
+      >
+        <div className="h-1 w-1 rounded-full bg-slate-300 transition-colors group-hover:bg-slate-400" />
+        <span className="leading-tight">{label}</span>
+      </button>
+    );
+  }
+
   const isExternal = href.startsWith("http");
   const isActive = !isExternal && pathname.startsWith(href);
 
@@ -129,7 +151,7 @@ function SubNavItem({ href, label }) {
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={`group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 ${
         isActive
-          ? "bg-violet-50 text-[#6E56CF]"
+          ? "bg-[#F3F0FF] text-[#6E56CF]"
           : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       }`}
     >
@@ -143,7 +165,7 @@ function SubNavItem({ href, label }) {
   );
 }
 
-function NavAccordion({ id, label, icon, children, openAccordions, onToggle }) {
+function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dataTour, highlight }) {
   const isOpen = openAccordions.has(id);
   const contentRef = useRef(null);
   const [contentHeight, setContentHeight] = useState(0);
@@ -158,18 +180,21 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle }) {
     <div className="mt-1.5">
       <button
         type="button"
+        data-tour={dataTour}
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
         className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-xl border px-2.5 py-2 text-[12px] font-medium transition-all duration-200 ${
           isOpen
-            ? "border-violet-100 bg-gradient-to-r from-[#F4F1FF] via-[#FAF9FF] to-white text-slate-800 shadow-[0_8px_24px_rgba(110,86,207,0.08)] before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-r-full before:bg-[#7C5CE7]"
-            : "border-transparent text-slate-600 hover:border-slate-100 hover:bg-slate-50/80 hover:text-slate-900"
+            ? "border-[#EDE9FE] bg-[#F4F1FF] text-slate-800"
+            : highlight
+              ? "border-[#EDE9FE] bg-[#FAF9FF] text-slate-700 hover:border-[#E4DEFC] hover:bg-[#F4F1FF] hover:text-slate-900"
+              : "border-transparent text-slate-600 hover:border-slate-100 hover:bg-slate-50/80 hover:text-slate-900"
         }`}
       >
         <div className="flex min-w-0 items-center gap-3">
           <span
             className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
-              isOpen ? "bg-[#EDE9FE] text-[#6E56CF] shadow-sm" : "bg-slate-50 text-slate-500"
+              isOpen || highlight ? "bg-[#EDE9FE] text-[#6E56CF] shadow-sm" : "bg-slate-50 text-slate-500"
             }`}
           >
             {icon}
@@ -279,9 +304,9 @@ export default function SidebarNav() {
       <>
         <UserMenu />
         <div className="flex-1 overflow-y-auto px-3 py-4">
-          <div className="rounded-2xl border border-rose-200 bg-[linear-gradient(135deg,rgba(255,241,242,0.95),rgba(254,226,226,0.88))] p-4">
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-rose-600 text-white shadow-sm">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 9v4" />
                   <path d="M12 17h.01" />
@@ -298,7 +323,7 @@ export default function SidebarNav() {
             </p>
             <Link
               href="/"
-              className="mt-3 flex h-8 w-full items-center justify-center rounded-lg bg-gradient-to-r from-rose-600 to-orange-600 text-[11px] font-semibold text-white shadow-sm transition-all hover:from-rose-500 hover:to-orange-500"
+              className="mt-3 flex h-8 w-full items-center justify-center rounded-lg bg-rose-600 text-[11px] font-semibold text-white shadow-sm transition-all hover:bg-rose-700"
             >
               Volver al sitio
             </Link>
@@ -333,9 +358,11 @@ export default function SidebarNav() {
                   icon={ICONS[section.icon]}
                   openAccordions={openAccordions}
                   onToggle={toggleAccordion}
+                  dataTour={`nav-${section.id}`}
+                  highlight={section.id === "capacitaciones"}
                 >
                   {section.items.map((item) => (
-                    <SubNavItem key={item.href} href={item.href} label={item.label} />
+                    <SubNavItem key={item.href || item.action} href={item.href} label={item.label} action={item.action} />
                   ))}
                 </NavAccordion>
               </div>

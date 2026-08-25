@@ -11,6 +11,7 @@ import SidebarNav from "./SidebarNav";
 import NotificationProvider from "@/components/NotificationProvider";
 import DashboardPageTransition from "@/components/DashboardPageTransition";
 import CortexAssistant from "@/Componentes/CortexAssistant";
+import { TourProvider } from "@/ContextosGlobales/TourContext";
 
 export const metadata = {
     title: "Dashboard — Agenda Clínica",
@@ -157,30 +158,32 @@ const IcoFichas = (
 export default function DashboardLayout({ children }) {
     return (
         <ClerkProvider>
-            <div className="h-screen w-full overflow-hidden bg-[#FAFAFB]">
-                <div className="flex h-full w-full">
+            <TourProvider>
+                <div className="h-screen w-full overflow-hidden bg-[#FAFAFB]">
+                    <div className="flex h-full w-full">
 
-                    {/* ═══════════════ SIDEBAR PREMIUM ═══════════════ */}
-                    <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col border-r border-[#EAEAEC] bg-white">
+                        {/* ═══════════════ SIDEBAR PREMIUM ═══════════════ */}
+                        <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col border-r border-[#EAEAEC] bg-white">
 
-                        {/* ── Navegación + UserMenu (componente cliente para persistencia) ── */}
-                        <SidebarNav />
-                    </aside>
+                            {/* ── Navegación + UserMenu (componente cliente para persistencia) ── */}
+                            <SidebarNav />
+                        </aside>
 
-                    {/* ═══════════════ CONTENT ═══════════════ */}
-                    <div className="flex-1 min-w-0 h-full overflow-y-auto">
-                        <MobileNav />
-                        <main className="min-w-0">
-                            <DashboardPageTransition>
-                                {children}
-                            </DashboardPageTransition>
-                        </main>
+                        {/* ═══════════════ CONTENT ═══════════════ */}
+                        <div className="flex-1 min-w-0 h-full overflow-y-auto">
+                            <MobileNav />
+                            <main className="min-w-0">
+                                <DashboardPageTransition>
+                                    {children}
+                                </DashboardPageTransition>
+                            </main>
+                        </div>
+
+                        <CortexAssistant />
+
                     </div>
-
-                    <CortexAssistant />
-
                 </div>
-            </div>
+            </TourProvider>
             <NotificationProvider />
         </ClerkProvider>
     );
