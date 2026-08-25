@@ -5,7 +5,6 @@ import { InputTextDinamic } from "@/Componentes/InputTextDinamic";
 import { InputNumberDinamic } from "@/Componentes/InputNumberDinamic";
 import { TextAreaDinamic } from "@/Componentes/TextAreaDinamic";
 import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
-import { SelectDinamic } from "@/Componentes/SelectDinamic";
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 
@@ -322,42 +321,108 @@ export default function Profesionales() {
                                 Actualizar Profesional
                             </ButtonDinamic>
 
-
-                            <ButtonDinamic
-                                onClick={() => eliminarProfesional(id_profesional)}
-                                className="rounded-xl bg-rose-700 hover:bg-rose-600"
-                            >
-                                Eliminar Profesional
-                            </ButtonDinamic>
                         </div>
                     </div>
                 </div>
 
-                {/* Selector */}
-                <div className="mt-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
-                    <div className="space-y-1 mb-5">
-                        <h2 className="text-base font-semibold text-slate-900">Seleccionar profesional</h2>
-                        <p className="text-sm text-slate-500">Seleccione un profesional para editar o eliminar.</p>
-                    </div>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                        <div className="flex-1">
-                            <SelectDinamic
-                                value={id_profesional}
-                                onChange={(e) => setIdProfesional(e.target.value)}
-                                className="rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
-                                options={listaProfesionales.map(profesional => ({
-                                    value: profesional.id_profesional,
-                                    label: profesional.nombreProfesional
-                                }))}
-
-                                placeholder="Selecciona un profesional"
-                            />
+                {/* Tabla de profesionales registrados */}
+                <div className="mt-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_45px_-32px_rgba(15,23,42,0.35)]">
+                    <div className="flex flex-col gap-4 border-b border-slate-100 bg-slate-50/40 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-violet-100 bg-[#F3F0FF] text-[#6E56CF] shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 className="text-base font-bold tracking-tight text-slate-900">Profesionales registrados</h2>
+                                <p className="mt-0.5 text-sm text-slate-500">Administre el equipo profesional disponible en la plataforma.</p>
+                            </div>
                         </div>
-                        <ButtonDinamic
-                            onClick={() => seleccionarProfesional(id_profesional)}
-                            className="rounded-xl border border-[#DDD6FE] bg-[#F3F0FF] text-[#6E56CF] hover:bg-[#EDE9FE]">
-                            Seleccionar
-                        </ButtonDinamic>
+                        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm">
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></span>
+                            <span className="text-xs font-semibold text-slate-600">
+                                {listaProfesionales.length} {listaProfesionales.length === 1 ? 'profesional registrado' : 'profesionales registrados'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[760px] border-collapse text-left">
+                            <thead>
+                                <tr className="border-b border-slate-100 bg-slate-50/70">
+                                    <th scope="col" className="w-[30%] px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Profesional</th>
+                                    <th scope="col" className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Descripción</th>
+                                    <th scope="col" className="w-[130px] px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Estado</th>
+                                    <th scope="col" className="w-[250px] px-6 py-3.5 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {listaProfesionales.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-14 text-center">
+                                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-300">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2a5 5 0 00-10 0v2m0 0H2v-2a3 3 0 015.356-1.857M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                            </div>
+                                            <p className="mt-3 text-sm font-medium text-slate-500">No hay profesionales registrados.</p>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    listaProfesionales.map((profesional) => (
+                                        <tr key={profesional.id_profesional} className="group transition-colors hover:bg-slate-50/60">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors group-hover:border-violet-200 group-hover:bg-[#F3F0FF] group-hover:text-[#6E56CF]">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="truncate text-sm font-bold text-slate-800">{profesional.nombreProfesional}</p>
+                                                        <p className="mt-0.5 text-[11px] font-medium text-slate-400">ID #{profesional.id_profesional}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="max-w-md px-6 py-4 text-sm leading-6 text-slate-500">{profesional.descripcionProfesional}</td>
+                                            <td className="px-6 py-4">
+                                                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                                    Registrado
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => seleccionarProfesional(profesional.id_profesional)}
+                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-white px-3.5 text-xs font-bold text-[#6E56CF] shadow-sm transition-all hover:border-violet-300 hover:bg-[#F3F0FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                                        aria-label={`Editar ${profesional.nombreProfesional}`}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 13H9v-2.828l6.586-6.586z" />
+                                                        </svg>
+                                                        Editar
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => eliminarProfesional(profesional.id_profesional)}
+                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-3.5 text-xs font-bold text-rose-600 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+                                                        aria-label={`Eliminar ${profesional.nombreProfesional}`}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        Eliminar
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

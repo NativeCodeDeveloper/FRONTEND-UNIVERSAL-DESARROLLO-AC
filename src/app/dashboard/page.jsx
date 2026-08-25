@@ -763,7 +763,7 @@ export default function AgendaCitas() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <div data-tour="dashboard-kpis" className="flex flex-wrap items-center gap-2">
+                        <div data-tour="dashboard-kpis" className="flex flex-wrap items-center gap-2 xl:shrink-0 xl:flex-nowrap xl:gap-1">
                         <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -810,15 +810,29 @@ export default function AgendaCitas() {
                             </div>
                         </div>
                         </div>
+                        <a
+                            href="https://youtu.be/ga44dJoW62c?si=7lr5NnDPFcJfgzNI"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial del panel de citas"
+                        >
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </span>
+                            <span>Video Tutorial</span>
+                        </a>
                         {canSeeFichasClinicas && (
                             <button
                                 onClick={() => router.push("/dashboard/FichaClinica")}
-                                className="h-11 px-4 rounded-xl bg-[#6E56CF] text-white flex items-center gap-2 shadow-sm hover:bg-[#5b45bc] transition-all"
+                                className="flex h-9 items-center gap-1.5 rounded-lg bg-[#6E56CF] px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-[#5b45bc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <span className="text-[12px] font-bold">Fichas Clínicas</span>
+                                <span>Fichas Clínicas</span>
                             </button>
                         )}
                         <InfoButton
@@ -848,25 +862,25 @@ export default function AgendaCitas() {
                         {mostrarFiltros && (
                             <div className="p-4 md:p-8 animate-in fade-in slide-in-from-top-4 duration-300 space-y-6">
                                 {/* Fila 1: búsqueda por campo */}
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre Paciente</label>
                                         <div className="flex gap-2">
-                                            <ShadcnInput value={nombrePaciente} onChange={(e) => setnombrePaciente(e.target.value)} placeholder="Ej: Nicolas..." className="h-11 rounded-xl border-slate-200" />
-                                            <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-11 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
+                                            <ShadcnInput value={nombrePaciente} onChange={(e) => setnombrePaciente(e.target.value)} placeholder="Ej: Nicolas..." className="h-9 rounded-xl border-slate-200" />
+                                            <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-9 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT Paciente</label>
                                         <div className="flex gap-2">
-                                            <ShadcnInput value={rut} onChange={(e) => setrut(e.target.value)} placeholder="12.345.678-9" className="h-11 rounded-xl border-slate-200" />
-                                            <button onClick={() => buscarPorRut(rut)} className="h-11 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
+                                            <ShadcnInput value={rut} onChange={(e) => setrut(e.target.value)} placeholder="12.345.678-9" className="h-9 rounded-xl border-slate-200" />
+                                            <button onClick={() => buscarPorRut(rut)} className="h-9 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
                                         <Select value={String(id_profesional || "null")} onValueChange={(v) => setId_profesional(v)}>
-                                            <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Seleccionar profesional..." /></SelectTrigger>
+                                            <SelectTrigger className="h-9 w-full rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Seleccionar profesional..." /></SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="null">Todos los profesionales</SelectItem>
                                                 {listaProfesionales.map((p) => (<SelectItem key={p.id_profesional} value={String(p.id_profesional)}>{p.nombreProfesional}</SelectItem>))}
@@ -876,7 +890,7 @@ export default function AgendaCitas() {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Estado Reserva</label>
                                         <Select value={estadoReserva || "null"} onValueChange={(v) => setestadoReserva(v)}>
-                                            <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Cualquier estado..." /></SelectTrigger>
+                                            <SelectTrigger className="h-9 w-full rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Cualquier estado..." /></SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="null">Todos los estados</SelectItem>
                                                 {accionesRapidasEstado.map((e) => (<SelectItem key={e.valor} value={e.valor}>{e.etiqueta}</SelectItem>))}
@@ -889,16 +903,16 @@ export default function AgendaCitas() {
                                 <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4 pt-6 border-t border-slate-100">
                                     <Calendar28 nombre="Desde" value={fechaInicio} onChange={(v) => setfechaInicio(v)} />
                                     <Calendar28 nombre="Hasta" value={fechaFinalizacion} onChange={(v) => setfechaFinalizacion(v)} />
-                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-11 w-full bg-[#6E56CF] text-white text-[13px] font-bold rounded-xl hover:bg-[#5b45bc] shadow-sm transition-all">Filtrar por Período</button>
-                                    <button onClick={() => { limpiarFiltrosPersistidos(); listarTablaCitas(); }} className="h-11 w-full border border-slate-200 text-slate-500 text-[13px] font-bold rounded-xl hover:bg-slate-50 transition-all">Limpiar Filtros</button>
+                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-9 w-full bg-[#6E56CF] text-white text-[13px] font-bold rounded-xl hover:bg-[#5b45bc] shadow-sm transition-all">Filtrar por Período</button>
+                                    <button onClick={() => { limpiarFiltrosPersistidos(); listarTablaCitas(); }} className="h-9 w-full border border-slate-200 text-slate-500 text-[13px] font-bold rounded-xl hover:bg-slate-50 transition-all">Limpiar Filtros</button>
                                 </div>
                             </div>
                         )}
                     </div>
 
                     {/* Tabla de Resultados */}
-                    <div data-tour="dashboard-tabla-citas" className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
-                        <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                    <div data-tour="dashboard-tabla-citas" className="overflow-visible rounded-[32px] border border-slate-200 bg-white shadow-sm">
+                        <div className="flex items-center justify-between rounded-t-[32px] border-b border-slate-100 bg-slate-50/30 px-4 py-4 md:px-8 md:py-5">
                             <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Citas Agendadas</h2>
                             <div className="flex items-center gap-3">
                                 <span className="text-[11px] font-bold text-slate-400">{dataLista.length} {dataLista.length === 1 ? "cita" : "citas"}</span>
@@ -967,7 +981,7 @@ export default function AgendaCitas() {
                         </div>
 
                         {/* Vista desktop: tabla */}
-                        <div className="hidden xl:block overflow-x-auto">
+                        <div className="hidden overflow-visible [&_[data-slot=table-container]]:overflow-visible xl:block">
                             <Table className="min-w-[800px]">
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
