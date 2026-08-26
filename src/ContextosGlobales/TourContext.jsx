@@ -103,6 +103,11 @@ export function TourProvider({ children }) {
             return {
                 element: step.selector,
                 advanceOnClick: isInteractive,
+                onHighlighted: (element) => {
+                    if (step.skipIfExpanded && element?.getAttribute("aria-expanded") === "true") {
+                        driverRef.current?.moveNext();
+                    }
+                },
                 popover: {
                     side: step.side || "right",
                     align: step.align || "start",

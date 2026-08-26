@@ -233,6 +233,19 @@ export function getInitials(name = "") {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
+// ─── Utilidad: formato de moneda (CLP) ──────────────────────────────────────
+/**
+ * Formatea un monto como pesos chilenos, ej: 50000 -> "$50.000".
+ * Misma convención ya usada en AppointmentDrawer.jsx (Number().toLocaleString("es-CL")).
+ * @param {number|string} monto
+ * @returns {string}
+ */
+export function formatCLP(monto) {
+  const numero = Number(monto);
+  if (!Number.isFinite(numero)) return "$0";
+  return `$${numero.toLocaleString("es-CL")}`;
+}
+
 // ─── Acento primario y constantes ───────────────────────────────────────────
 export const ACCENT = {
   DEFAULT: "#6E56CF",

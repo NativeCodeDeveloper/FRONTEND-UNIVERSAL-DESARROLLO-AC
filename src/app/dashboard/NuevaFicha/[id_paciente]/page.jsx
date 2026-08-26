@@ -271,7 +271,7 @@ export default function NuevaFicha() {
                         Volver
                     </Button>
 
-                    <Button asChild size="lg" className="w-full rounded-xl shadow-sm sm:w-auto">
+                    <Button asChild size="lg" className="w-full rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 sm:w-auto">
                         <Link href="/dashboard">
                             <svg data-icon="inline-start" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M5 11h14M6 21h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -290,9 +290,7 @@ export default function NuevaFicha() {
                     >
                         <AccordionItem value="datos-paciente" className="border-0">
                             {/* Identidad */}
-                            <AccordionTrigger className="relative items-center overflow-hidden rounded-none bg-gradient-to-br from-white via-white to-violet-50/50 px-4 py-4 no-underline hover:no-underline sm:px-5">
-                            <span aria-hidden="true" className="absolute left-0 top-4 h-12 w-1 rounded-r-full bg-[#6E56CF]" />
-                            <span aria-hidden="true" className="absolute -left-12 -top-12 h-28 w-28 rounded-full bg-violet-100/60 blur-3xl" />
+                            <AccordionTrigger className="relative items-center overflow-hidden rounded-none bg-white px-4 py-4 no-underline hover:no-underline sm:px-5">
                             <div className="relative flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] text-sm font-bold text-white shadow-md shadow-violet-200">
                                 {paciente.nombre?.charAt(0)}{paciente.apellido?.charAt(0)}
                             </div>
@@ -345,8 +343,7 @@ export default function NuevaFicha() {
                 <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_18px_45px_-34px_rgba(15,23,42,0.65)]">
 
                     {/* Sección: Información de la consulta */}
-                    <div className="relative flex items-center gap-2.5 overflow-hidden border-b border-violet-100 bg-gradient-to-r from-violet-50 via-white to-white px-4 py-3">
-                        <span aria-hidden="true" className="absolute left-0 top-3 h-9 w-1 rounded-r-full bg-[#6E56CF]" />
+                    <div className="relative flex items-center gap-2.5 overflow-hidden border-b border-slate-100 bg-white px-4 py-3">
                         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#6E56CF] text-white shadow-md shadow-violet-200">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -378,8 +375,7 @@ export default function NuevaFicha() {
 
                         {/* Fecha + Profesional */}
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-                            <div className="relative overflow-hidden rounded-xl border-2 border-violet-200 bg-gradient-to-br from-violet-50 via-white to-white p-3 shadow-[0_10px_24px_-20px_rgba(109,40,217,0.7)] ring-2 ring-violet-50/80">
-                                <span aria-hidden="true" className="absolute right-0 top-0 size-16 rounded-full bg-violet-100/70 blur-2xl" />
+                            <div className="relative overflow-hidden rounded-xl border-2 border-violet-200 bg-white p-3 shadow-[0_10px_24px_-20px_rgba(109,40,217,0.7)]">
                                 <div className="relative flex items-start justify-between gap-2">
                                     <div>
                                         <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-[#6E56CF]">
@@ -460,7 +456,7 @@ export default function NuevaFicha() {
                         </Link>
                         <button
                             onClick={() => insertarFicha()}
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-[#6E56CF] hover:bg-[#5B47B0] rounded-xl transition-all shadow-sm"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-black hover:bg-slate-800 rounded-xl transition-all shadow-sm"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>

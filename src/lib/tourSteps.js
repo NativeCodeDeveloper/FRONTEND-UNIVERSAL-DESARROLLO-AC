@@ -13,6 +13,12 @@
  * noPrevious: true   -> oculta el botón "Atrás" en este paso (usado después
  *                        de un paso interactivo, donde volver atrás no aplica
  *                        de forma segura).
+ * skipIfExpanded: true -> para pasos interactivos que abren un acordeón con
+ *                        toggle: si el usuario repite el tour y ya lo dejó
+ *                        abierto de una corrida anterior, el clic normal lo
+ *                        cerraría en vez de abrirlo. Con esta bandera el paso
+ *                        se salta solo (avanza al siguiente) si el elemento
+ *                        ya está expandido (aria-expanded="true").
  * selector: null      -> paso sin elemento anclado (mensaje centrado, usado
  *                        solo para el cierre del tour).
  */
@@ -25,9 +31,10 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="nav-configuracion"]',
     title: "Configuración inicial",
-    description: "Haz clic acá para abrir esta sección y ver qué podés configurar antes de empezar a operar.",
+    description: "Haz clic aquí para abrir esta sección y ver qué puedes configurar antes de empezar a operar.",
     side: "right",
     interactive: true,
+    skipIfExpanded: true,
   },
   {
     id: "config-profesionales",
@@ -35,7 +42,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: 'a[href="/dashboard/profesionales"]',
     title: "Configuración inicial",
-    description: "Acá creas a tus profesionales y defines sus horarios de atención. Es el primer paso: sin al menos un profesional creado no vas a poder agendar citas.",
+    description: "Aquí creas a tus profesionales y defines sus horarios de atención. Es el primer paso: sin al menos un profesional creado no vas a poder agendar citas.",
     side: "right",
     noPrevious: true,
   },
@@ -45,7 +52,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: 'a[href="/dashboard/serviciosAgendamiento"]',
     title: "Configuración inicial",
-    description: "Acá defines los servicios que ofreces. Después, en \"Tarifas de Consulta\", asígnales precio y duración: sin al menos un servicio con tarifa, no vas a poder completar una reserva más adelante en este tutorial.",
+    description: "Aquí defines los servicios que ofreces. Después, en \"Tarifas de Consulta\", asígnales precio y duración: sin al menos un servicio con tarifa, no vas a poder completar una reserva más adelante en este tutorial.",
     side: "right",
   },
   {
@@ -54,7 +61,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="nav-contenido"]',
     title: "Configuración inicial",
-    description: "Acá administras lo que tus pacientes ven en el sitio público: datos de tu clínica, banners y tratamientos destacados.",
+    description: "Aquí administras lo que tus pacientes ven en el sitio público: datos de tu clínica, banners y tratamientos destacados.",
     side: "right",
   },
 
@@ -125,7 +132,7 @@ export const TOUR_STEPS = [
     route: "/dashboard",
     selector: '[data-tour="dashboard-tabla-citas"]',
     title: "Pacientes y Fichas",
-    description: "Tu reserva de prueba ya aparece acá (la vas a reconocer por tu propio nombre). Búscala y presiona el ícono de ojo: si el paciente todavía no tiene ficha, el sistema te va a preguntar si quieres crearla con esos datos.",
+    description: "Tu reserva de prueba ya aparece aquí (la vas a reconocer por tu propio nombre). Búscala y presiona el ícono de ojo: si el paciente todavía no tiene ficha, el sistema te va a preguntar si quieres crearla con esos datos.",
     side: "top",
   },
   {
@@ -134,7 +141,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="ficha-acciones-rapidas"]',
     title: "Pacientes y Fichas",
-    description: "Esta es la ficha del paciente. Desde acá creas una nueva ficha clínica (el registro de una atención), agendas otra cita, o abres Odontograma, Receta y Documentos según tus permisos.",
+    description: "Esta es la ficha del paciente. Desde aquí creas una nueva ficha clínica (el registro de una atención), agendas otra cita, o abres Odontograma, Receta y Documentos según tus permisos.",
     side: "bottom",
   },
   {
@@ -143,7 +150,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="ficha-registros"]',
     title: "Pacientes y Fichas",
-    description: "Todo el historial clínico del paciente queda ordenado cronológicamente acá, agrupado por mes.",
+    description: "Todo el historial clínico del paciente queda ordenado cronológicamente aquí, agrupado por mes.",
     side: "top",
   },
 

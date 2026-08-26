@@ -38,6 +38,7 @@ const routeMatchersByRole = {
   "administrador-clinico": [
     /^\/dashboard$/,
     /^\/dashboard\/no-access$/,
+    /^\/dashboard\/finanzas$/,
     /^\/dashboard\/calendario$/,
     /^\/dashboard\/bloqueosAgenda$/,
     /^\/dashboard\/AgendaDetalle\/[^/]+$/,
@@ -391,6 +392,15 @@ const DASHBOARD_NAV_SECTIONS = [
     items: [
       { label: "Panel de Reservas", href: "/dashboard", icon: "home" },
       { label: "Crear Usuarios", href: "/dashboard/createUser", icon: "shield" },
+    ],
+  },
+  {
+    id: "finanzas",
+    title: "Finanzas",
+    accordionLabel: "Finanzas",
+    icon: "finance",
+    items: [
+      { label: "Resumen financiero", href: "/dashboard/finanzas", icon: "finance" },
     ],
   },
   {

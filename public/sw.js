@@ -2,7 +2,7 @@
 // CRÍTICO: Este SW NUNCA cachea datos de pacientes, fichas clínicas ni reservas.
 // Solo se cachea el shell de la app y assets estáticos.
 
-const CACHE_NAME = 'ac-shell-v1';
+const CACHE_NAME = 'ac-shell-v2';
 
 const SHELL_ASSETS = [
     '/',

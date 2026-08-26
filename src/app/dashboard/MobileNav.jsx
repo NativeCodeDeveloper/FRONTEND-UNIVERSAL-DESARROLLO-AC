@@ -20,12 +20,12 @@ import {
   PanelsTopLeft,
   Settings,
   ShieldCheck,
+  TrendingUp,
   Users,
   Wallet,
   X,
 } from "lucide-react";
 import { getDashboardRoleFromUser, getVisibleDashboardSections } from "@/lib/dashboard-access";
-import { useTour } from "@/ContextosGlobales/TourContext";
 
 const ICONS = {
   home: Home,
@@ -44,6 +44,7 @@ const ICONS = {
   shield: ShieldCheck,
   academy: GraduationCap,
   compass: Compass,
+  finance: TrendingUp,
 };
 
 export default function MobileNav() {
@@ -54,7 +55,6 @@ export default function MobileNav() {
   const sections = getVisibleDashboardSections(role);
   const name = user?.fullName || user?.firstName || "Usuario";
   const avatar = user?.imageUrl;
-  const { start: startTour } = useTour();
 
   return (
     <div className="md:hidden sticky top-0 z-40">
@@ -156,22 +156,11 @@ export default function MobileNav() {
                         const Icon = ICONS[item.icon] || Home;
 
                         if (item.action === "startTour") {
-                          return (
-                            <button
-                              key={item.action}
-                              type="button"
-                              onClick={() => {
-                                setOpen(false);
-                                startTour();
-                              }}
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[13px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900"
-                            >
-                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
-                                <Icon className="h-4 w-4" />
-                              </span>
-                              <span className="flex-1 leading-tight">{item.label}</span>
-                            </button>
-                          );
+                          // El tour guiado depende de marcadores data-tour que solo
+                          // existen en el sidebar de escritorio (SidebarNav): en
+                          // mobile queda roto (elementos ocultos o sin renderizar).
+                          // Se omite aquí hasta tener soporte real para mobile.
+                          return null;
                         }
 
                         const isExternal = item.href.startsWith("http");
