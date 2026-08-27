@@ -35,6 +35,7 @@ import { AvatarInitials } from "@/Componentes/AvatarInitials";
 import { RutInput } from "@/Componentes/RutInput";
 import { PhoneInput } from "@/Componentes/PhoneInput";
 import { RutDisplay } from "@/Componentes/RutDisplay";
+import { RecordatorioPaciente } from "@/Componentes/RecordatorioPaciente";
 import { getStateTokens } from "@/lib/designTokens";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -184,6 +185,16 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Recordatorio (correo / WhatsApp) */}
+      {(reserva?.email || reserva?.telefono) && (
+        <RecordatorioPaciente
+          email={reserva?.email}
+          telefono={reserva?.telefono}
+          nombreProfesional={reserva?.nombreProfesional}
+          compact
+        />
       )}
 
       {/* Acciones clínicas rápidas */}
@@ -502,6 +513,16 @@ function FormSection({
             />
           </div>
         </div>
+      )}
+
+      {/* Recordatorio (correo / WhatsApp) — solo tiene sentido si ya existe la reserva */}
+      {mode === "edit" && (popupForm.email || popupForm.telefono) && (
+        <RecordatorioPaciente
+          email={popupForm.email}
+          telefono={popupForm.telefono}
+          nombreProfesional={selectionDraft?.profesional}
+          compact
+        />
       )}
 
       {/* Cambio de estado en modo edición */}

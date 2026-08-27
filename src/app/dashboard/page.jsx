@@ -657,14 +657,14 @@ export default function AgendaCitas() {
             <div className="relative">
                 <button
                     onClick={() => setMenuEstadoAbiertoId(menuEstadoAbiertoId === data.id_reserva ? null : data.id_reserva)}
-                    className="h-9 px-4 rounded-full flex items-center justify-center gap-2 transition-all hover:brightness-95 disabled:opacity-50"
+                    className="h-9 w-[172px] px-4 rounded-full flex items-center justify-between gap-2 transition-all hover:brightness-95 disabled:opacity-50"
                     style={obtenerEstiloBotonEstado(data.estadoReserva)}
                     disabled={actualizandoReservaId === data.id_reserva}
                 >
-                    <span className="text-[11px] font-bold uppercase tracking-wide leading-none">
+                    <span className="truncate text-[11px] font-bold uppercase tracking-wide leading-none">
                         {actualizandoReservaId === data.id_reserva ? "Cargando..." : data.estadoReserva || "Reservada"}
                     </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 opacity-60 transition-transform duration-200 ${menuEstadoAbiertoId === data.id_reserva ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 shrink-0 opacity-60 transition-transform duration-200 ${menuEstadoAbiertoId === data.id_reserva ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>

@@ -5,9 +5,9 @@ import {useParams} from "next/navigation";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import ShadcnButton2 from "@/Componentes/shadcnButton2";
-import ShadcnInput from "@/Componentes/shadcnInput2";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales";
 import {InfoButton} from "@/Componentes/InfoButton";
+import {RecordatorioPaciente} from "@/Componentes/RecordatorioPaciente";
 
 import {
     Select,
@@ -18,8 +18,6 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-import {Textarea} from "@/components/ui/textarea";
-
 export default function AgendaDetalle() {
     const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,58 +26,6 @@ export default function AgendaDetalle() {
     const [estadoReserva, setEstadoReserva] = useState("");
     const [mensajeEliminacion, setmensajeEliminacion] = useState("");
     const [confirmarEliminacion, setConfirmarEliminacion] = useState(false);
-    const [isEnviandoSeguimiento, setIsEnviandoSeguimiento] = useState(false);
-
-    const [asunto, setAsunto] = useState("Recordatorio de su proxima cita");
-    const [email, setEmail] = useState("");
-    const [mensaje, setMensaje] = useState(
-        "Estimado/a paciente,\n\n" +
-        "Le recordamos que tiene una cita programada. Le solicitamos confirmar su asistencia o comunicarse con nosotros en caso de necesitar reagendar.\n\n" +
-        "Ante cualquier duda o inconveniente, no dude en contactarnos.\n\n" +
-        "Atentamente,\n" +
-        "Equipo AgendaClinica"
-    );
-
-
-    async function seguimientoCliente(asunto, email, mensaje) {
-        try {
-            if (!asunto || !email || !mensaje) {
-                return toast.error('Para hacer el seguimiento debe llenar todos los campos de texto');
-            }
-
-            const res = await fetch(`${API}/correo/seguimiento`, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({asunto, email, mensaje}),
-                cache: "no-cache"
-            })
-            if (!res.ok) {
-                return toast.error('El correo del cliente NO es valido. No existe.');
-            }
-
-            const respuestaBackend = await res.json();
-
-            if (respuestaBackend.message === true) {
-                return toast.success("Seguimiento enviado correctamente al correo del paciente.")
-            } else {
-                return toast.error('El correo del cliente NO es valido. No existe.');
-            }
-
-        } catch (error) {
-            return toast.error('Ha ocurrido un error porfavor contacte a soporte de NativeCode');
-        }
-    }
-
-
-    useEffect(() => {
-        dataReservaId.map((paciente) => {
-            setEmail(paciente.email);
-        })
-    }, [dataReservaId]);
-
 
     async function seleccionarEspecifica(id_reserva) {
         try {
@@ -189,16 +135,6 @@ export default function AgendaDetalle() {
         } catch (e) {
             console.log(e);
             return toast.error("No hay conexion con el servidor por favor contacte a Soporte");
-        }
-    }
-
-    async function handleEnviarSeguimiento() {
-        if (isEnviandoSeguimiento) return;
-        try {
-            setIsEnviandoSeguimiento(true);
-            await seguimientoCliente(asunto, email, mensaje);
-        } finally {
-            setIsEnviandoSeguimiento(false);
         }
     }
 
@@ -319,60 +255,12 @@ export default function AgendaDetalle() {
                             </div>
                         </div>
 
-                        {/* Seguimiento por correo */}
-                        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
-                                </svg>
-                                <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Seguimiento por Correo</h2>
-                            </div>
-
-                            <div className="p-5 md:p-6 space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Destinatario</label>
-                                    <ShadcnInput
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="correo@paciente.cl"
-                                        className="w-full"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Asunto</label>
-                                    <ShadcnInput
-                                        placeholder="Ej: Recordatorio de su proxima cita"
-                                        value={asunto}
-                                        onChange={(e) => setAsunto(e.target.value)}
-                                        className="w-full"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Mensaje</label>
-                                    <Textarea
-                                        value={mensaje}
-                                        onChange={(e) => setMensaje(e.target.value)}
-                                        placeholder="Escribe aqui el mensaje para el paciente..."
-                                        className="w-full text-sm min-h-[160px] resize-none rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 leading-relaxed shadow-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 placeholder:text-slate-400 transition"
-                                    />
-                                </div>
-
-                                <div className="pt-2">
-                                    <button
-                                        onClick={handleEnviarSeguimiento}
-                                        disabled={isEnviandoSeguimiento}
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
-                                        </svg>
-                                        {isEnviandoSeguimiento ? "Enviando..." : "Enviar Seguimiento"}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Recordatorio (correo / WhatsApp) */}
+                        <RecordatorioPaciente
+                            email={dataReservaId[0]?.email}
+                            telefono={dataReservaId[0]?.telefono}
+                            nombreProfesional={dataReservaId[0]?.nombreProfesional}
+                        />
                     </div>
 
                     {/* Acciones de la reserva */}

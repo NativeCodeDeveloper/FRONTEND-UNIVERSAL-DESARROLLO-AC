@@ -17,6 +17,7 @@ import { RutInput } from "@/Componentes/RutInput";
 import { PhoneInput } from "@/Componentes/PhoneInput";
 import { formatRut } from "@/lib/designTokens";
 import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
+import {RecordatorioPaciente} from "@/Componentes/RecordatorioPaciente";
 
 
 
@@ -443,6 +444,9 @@ export default function Paciente(){
                                 </div>
                             </div>
                         </div>
+
+                        {/* ── Recordatorio (correo / WhatsApp) ── */}
+                        <RecordatorioPaciente email={paciente.correo} telefono={paciente.telefono} />
 
                         {/* ── Antecedentes clínicos ── */}
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">

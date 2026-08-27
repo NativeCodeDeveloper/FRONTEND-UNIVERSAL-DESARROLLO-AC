@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { toast } from "react-hot-toast";
+import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import ToasterClient from "@/Componentes/ToasterClient";
 import ShadcnDatePicker from "@/Componentes/shadcnDatePicker";
 import { formatCLP } from "@/lib/designTokens";
@@ -19,6 +22,8 @@ import {
     CalendarCheck2,
     CalendarClock,
     ChevronDown,
+    FileDown,
+    FileSpreadsheet,
     Percent,
     Users,
 } from "lucide-react";
@@ -84,6 +89,27 @@ export default function Finanzas() {
     const [fechaHastaCustom, setFechaHastaCustom] = useState("");
 
     const [distribucion, setDistribucion] = useState({}); // { [id_profesional]: pctProfesional }
+
+    const [datosEmpresa, setDatosEmpresa] = useState(null);
+
+    useEffect(() => {
+        async function cargarDatosEmpresa() {
+            try {
+                const res = await fetch(`${API}/datosempresa/seleccionartodos`, {
+                    method: "GET",
+                    headers: { Accept: "application/json" },
+                    mode: "cors",
+                    cache: "no-cache",
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                setDatosEmpresa(Array.isArray(data) ? data[0] : data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        cargarDatosEmpresa();
+    }, [API]);
 
     useEffect(() => {
         async function cargarReservas() {
@@ -153,9 +179,13 @@ export default function Finanzas() {
             }
         }
 
-        const tasaConfirmacion = citasReservadas > 0 ? Math.round((citasConfirmadas / citasReservadas) * 100) : 0;
+        // La tasa de confirmación se mide contra TODAS las reservas del período (incluidas
+        // las anuladas), no solo contra las que cuentan para el ingreso reservado — así
+        // penaliza las cancelaciones en vez de excluirlas del cálculo.
+        const totalReservasPeriodo = reservasDelPeriodo.length;
+        const tasaConfirmacion = totalReservasPeriodo > 0 ? Math.round((citasConfirmadas / totalReservasPeriodo) * 100) : 0;
 
-        return { ingresoReservado, ingresoConfirmado, citasReservadas, citasConfirmadas, tasaConfirmacion };
+        return { ingresoReservado, ingresoConfirmado, citasReservadas, citasConfirmadas, totalReservasPeriodo, tasaConfirmacion };
     }, [reservasDelPeriodo]);
 
     const porProfesional = useMemo(() => {
@@ -258,6 +288,336 @@ export default function Finanzas() {
         setDistribucion((prev) => ({ ...prev, [idProfesional]: numero }));
     }
 
+    const periodoLabelTexto =
+        periodo === "personalizado"
+            ? "Rango personalizado"
+            : rangoPeriodo.desde.format("MMMM YYYY").replace(/^./, (c) => c.toUpperCase());
+    const rangoPeriodoTexto = `${rangoPeriodo.desde.format("DD/MM/YYYY")} — ${rangoPeriodo.hasta.format("DD/MM/YYYY")}`;
+
+    function descargarInformeFinancieroPDF() {
+        if (porProfesional.length === 0) {
+            return toast.error("No hay datos financieros en el período seleccionado para exportar.");
+        }
+
+        // Las fuentes estándar de jsPDF (helvetica) solo soportan Latin-1: cualquier
+        // emoji o símbolo fuera de ese rango se dibuja como glifos corruptos, así que
+        // se limpia todo texto libre (nombre de empresa, profesional, servicio) antes de imprimirlo.
+        function limpiarTextoPDF(texto) {
+            return String(texto ?? "")
+                .normalize("NFC")
+                .split("")
+                .filter((caracter) => caracter.charCodeAt(0) <= 255)
+                .join("")
+                .trim();
+        }
+
+        // Estima el alto que ocupará una tabla (cabecera + filas + pie opcional) para decidir
+        // si conviene saltar de página ANTES de dibujarla completa, en vez de dejar que
+        // autoTable corte una sola fila huérfana al final de la página actual.
+        function altoEstimadoTabla(numFilas, { altoFila = 9.5, altoHeader = 10, conPie = false } = {}) {
+            return altoHeader + numFilas * altoFila + (conPie ? 9.5 : 0);
+        }
+
+        const nombreEmpresa = limpiarTextoPDF(datosEmpresa?.empresaNombre) || "AgendaClínica";
+        const contactoLinea = [datosEmpresa?.contactoDireccion, datosEmpresa?.contactoTelefono, datosEmpresa?.contactoEmail]
+            .map((v) => limpiarTextoPDF(v))
+            .filter(Boolean)
+            .join("  ·  ");
+
+        const documento = new jsPDF("p", "mm", "letter");
+        const anchoPagina = documento.internal.pageSize.getWidth();
+        const altoPagina = documento.internal.pageSize.getHeight();
+        const margen = 20;
+        const rightX = anchoPagina - margen;
+
+        // Paleta clínica estándar Agenda Clínica: solo negro, grises y blanco. Sin gradientes.
+        const BLACK = [15, 23, 42];
+        const DARK = [51, 65, 85];
+        const MID = [100, 116, 139];
+        const LIGHT = [148, 163, 184];
+        const BGLIGHT = [248, 250, 252];
+        const BGMID = [241, 245, 249];
+        const BORDE = [203, 213, 225];
+
+        const fechaGeneracion = dayjs().format("DD/MM/YYYY HH:mm");
+
+        function dibujarEncabezado() {
+            documento.setFillColor(...BGLIGHT);
+            documento.rect(0, 0, anchoPagina, 32, "F");
+            documento.setDrawColor(...BORDE);
+            documento.setLineWidth(0.4);
+            documento.line(0, 32, anchoPagina, 32);
+
+            // El nombre de la empresa puede ser largo: el tamaño de fuente se reduce
+            // hasta que quepa sin invadir el recuadro "INFORME FINANCIERO" de la derecha.
+            const tituloTexto = nombreEmpresa.toUpperCase();
+            const anchoDisponibleTitulo = rightX - 65 - margen;
+            documento.setFont("helvetica", "bold");
+            let tamanoTitulo = 16;
+            documento.setFontSize(tamanoTitulo);
+            while (tamanoTitulo > 10 && documento.getTextWidth(tituloTexto) > anchoDisponibleTitulo) {
+                tamanoTitulo -= 0.5;
+                documento.setFontSize(tamanoTitulo);
+            }
+            documento.setTextColor(...BLACK);
+            documento.text(tituloTexto, margen, 14);
+
+            documento.setFont("helvetica", "italic");
+            documento.setFontSize(7.5);
+            documento.setTextColor(...MID);
+            documento.text("AgendaClínica — Healthcare Information System", margen, 20);
+
+            documento.setFont("helvetica", "normal");
+            documento.setFontSize(7.5);
+            documento.text(contactoLinea || "Centro de Atención Clínica", margen, 25);
+
+            documento.setFillColor(...BGMID);
+            documento.roundedRect(rightX - 60, 6, 60, 20, 1, 1, "F");
+            documento.setFont("helvetica", "bold");
+            documento.setFontSize(8);
+            documento.setTextColor(...BLACK);
+            documento.text("INFORME FINANCIERO", rightX - 30, 14, { align: "center" });
+            documento.setFont("helvetica", "normal");
+            documento.setFontSize(7);
+            documento.setTextColor(...MID);
+            documento.text(periodoLabelTexto, rightX - 30, 20, { align: "center" });
+        }
+
+        function dibujarPiePagina() {
+            const posicionPie = altoPagina - 12;
+            documento.setDrawColor(...BORDE);
+            documento.setLineWidth(0.3);
+            documento.line(margen, posicionPie - 4, rightX, posicionPie - 4);
+            documento.setFont("helvetica", "normal");
+            documento.setFontSize(6.5);
+            documento.setTextColor(...LIGHT);
+            documento.text(`Generado por AgendaClínica | ${nombreEmpresa}`, margen, posicionPie);
+            documento.text(`Emitido: ${fechaGeneracion}`, rightX, posicionPie, { align: "right" });
+        }
+
+        dibujarEncabezado();
+
+        let y = 42;
+        documento.setFillColor(...BGMID);
+        documento.roundedRect(margen, y, rightX - margen, 20, 1, 1, "F");
+        documento.setDrawColor(...BORDE);
+        documento.setLineWidth(0.3);
+        documento.roundedRect(margen, y, rightX - margen, 20, 1, 1, "S");
+
+        documento.setFont("helvetica", "bold");
+        documento.setFontSize(6.5);
+        documento.setTextColor(...MID);
+        documento.text("PERÍODO DEL INFORME", margen + 5, y + 8);
+        documento.setFont("helvetica", "normal");
+        documento.setFontSize(10);
+        documento.setTextColor(...BLACK);
+        documento.text(`${periodoLabelTexto}  ·  ${rangoPeriodoTexto}`, margen + 5, y + 15);
+
+        y += 28;
+
+        documento.setFont("helvetica", "bold");
+        documento.setFontSize(10);
+        documento.setTextColor(...BLACK);
+        documento.text("Resumen general", margen, y);
+        y += 4;
+
+        autoTable(documento, {
+            head: [["Indicador", "Valor"]],
+            body: [
+                ["Ingreso reservado", formatCLP(resumen.ingresoReservado)],
+                ["Ingreso confirmado", formatCLP(resumen.ingresoConfirmado)],
+                ["Citas reservadas", String(resumen.citasReservadas)],
+                ["Citas confirmadas", String(resumen.citasConfirmadas)],
+                ["Tasa de confirmación", `${resumen.tasaConfirmacion}%`],
+            ],
+            startY: y,
+            margin: { left: margen, right: margen, bottom: 26 },
+            theme: "plain",
+            headStyles: {
+                fillColor: DARK,
+                textColor: [255, 255, 255],
+                fontStyle: "bold",
+                fontSize: 7.5,
+                cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+                halign: "left",
+            },
+            columnStyles: {
+                0: { cellWidth: 100 },
+                1: { cellWidth: "auto", halign: "right", fontStyle: "bold" },
+            },
+            bodyStyles: { fontSize: 9, cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 }, textColor: BLACK },
+            alternateRowStyles: { fillColor: BGLIGHT },
+            styles: { lineWidth: 0.15, lineColor: BORDE, overflow: "linebreak" },
+            didDrawPage: (data) => {
+                if (data.pageNumber > 1) dibujarEncabezado();
+                dibujarPiePagina();
+            },
+        });
+
+        let finalY = documento.lastAutoTable.finalY + 10;
+
+        const altoRendimiento =
+            4 + altoEstimadoTabla(porProfesional.length, { altoFila: 9.5, altoHeader: 10, conPie: true });
+        if (finalY + altoRendimiento > altoPagina - 30) {
+            documento.addPage();
+            dibujarEncabezado();
+            finalY = 42;
+        }
+
+        documento.setFont("helvetica", "bold");
+        documento.setFontSize(10);
+        documento.setTextColor(...BLACK);
+        documento.text("Rendimiento por profesional", margen, finalY);
+        finalY += 4;
+
+        autoTable(documento, {
+            head: [["Profesional", "Reservadas", "Confirmadas", "Ingreso confirmado"]],
+            body: porProfesional.map((p) => [
+                limpiarTextoPDF(p.nombreProfesional),
+                String(p.reservadas),
+                String(p.confirmadas),
+                formatCLP(p.ingresoConfirmado),
+            ]),
+            foot: [["Total", "", "", formatCLP(resumen.ingresoConfirmado)]],
+            startY: finalY,
+            margin: { left: margen, right: margen, bottom: 26 },
+            theme: "plain",
+            headStyles: {
+                fillColor: DARK,
+                textColor: [255, 255, 255],
+                fontStyle: "bold",
+                fontSize: 7.5,
+                cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+                halign: "left",
+            },
+            footStyles: {
+                fillColor: BGMID,
+                textColor: BLACK,
+                fontStyle: "bold",
+                fontSize: 8.5,
+                cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 },
+            },
+            columnStyles: {
+                0: { cellWidth: 70 },
+                1: { cellWidth: 30, halign: "center", textColor: MID },
+                2: { cellWidth: 30, halign: "center", textColor: MID },
+                3: { cellWidth: "auto", halign: "right", fontStyle: "bold" },
+            },
+            bodyStyles: { fontSize: 9, cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 }, textColor: BLACK },
+            alternateRowStyles: { fillColor: BGLIGHT },
+            styles: { lineWidth: 0.15, lineColor: BORDE, overflow: "linebreak" },
+            didDrawPage: (data) => {
+                if (data.pageNumber > 1) dibujarEncabezado();
+                dibujarPiePagina();
+            },
+        });
+
+        finalY = documento.lastAutoTable.finalY + 10;
+
+        const filasServicios = porProfesional.flatMap((p) =>
+            p.servicios.map((s) => [
+                limpiarTextoPDF(p.nombreProfesional),
+                limpiarTextoPDF(s.nombre),
+                String(s.citas),
+                formatCLP(s.total),
+            ])
+        );
+
+        if (filasServicios.length > 0) {
+            const altoDetalle = 4 + altoEstimadoTabla(filasServicios.length, { altoFila: 10, altoHeader: 11 });
+            if (finalY + altoDetalle > altoPagina - 30) {
+                documento.addPage();
+                dibujarEncabezado();
+                finalY = 42;
+            }
+
+            documento.setFont("helvetica", "bold");
+            documento.setFontSize(10);
+            documento.setTextColor(...BLACK);
+            documento.text("Detalle por servicio", margen, finalY);
+            finalY += 4;
+
+            autoTable(documento, {
+                head: [["Profesional", "Servicio", "Citas", "Total"]],
+                body: filasServicios,
+                startY: finalY,
+                margin: { left: margen, right: margen, bottom: 26 },
+                theme: "plain",
+                headStyles: {
+                    fillColor: DARK,
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    fontSize: 7.5,
+                    cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+                    halign: "left",
+                },
+                columnStyles: {
+                    0: { cellWidth: 55 },
+                    1: { cellWidth: 65 },
+                    2: { cellWidth: 20, halign: "center", textColor: MID },
+                    3: { cellWidth: "auto", halign: "right", fontStyle: "bold" },
+                },
+                bodyStyles: { fontSize: 8.5, cellPadding: { top: 3, bottom: 3, left: 5, right: 5 }, textColor: BLACK },
+                alternateRowStyles: { fillColor: BGLIGHT },
+                styles: { lineWidth: 0.15, lineColor: BORDE, overflow: "linebreak" },
+                didDrawPage: (data) => {
+                    if (data.pageNumber > 1) dibujarEncabezado();
+                    dibujarPiePagina();
+                },
+            });
+        }
+
+        const sufijoArchivo = periodo === "personalizado" ? `${fechaDesdeCustom}_a_${fechaHastaCustom}` : periodo;
+        documento.save(`informe-financiero-${sufijoArchivo}.pdf`);
+    }
+
+    function exportarFinanzasExcel() {
+        if (porProfesional.length === 0) {
+            return toast.error("No hay datos financieros en el período seleccionado para exportar.");
+        }
+
+        const hojaResumen = XLSX.utils.json_to_sheet([
+            { Indicador: "Período", Valor: `${periodoLabelTexto} (${rangoPeriodoTexto})` },
+            { Indicador: "Ingreso reservado", Valor: resumen.ingresoReservado },
+            { Indicador: "Ingreso confirmado", Valor: resumen.ingresoConfirmado },
+            { Indicador: "Citas reservadas", Valor: resumen.citasReservadas },
+            { Indicador: "Citas confirmadas", Valor: resumen.citasConfirmadas },
+            { Indicador: "Tasa de confirmación (%)", Valor: resumen.tasaConfirmacion },
+        ]);
+        hojaResumen["!cols"] = [{ wch: 26 }, { wch: 28 }];
+
+        const hojaProfesionales = XLSX.utils.json_to_sheet(
+            porProfesional.map((p) => ({
+                Profesional: p.nombreProfesional,
+                "Citas reservadas": p.reservadas,
+                "Citas confirmadas": p.confirmadas,
+                "Ingreso confirmado (CLP)": p.ingresoConfirmado,
+            }))
+        );
+        hojaProfesionales["!cols"] = [{ wch: 30 }, { wch: 16 }, { wch: 16 }, { wch: 20 }];
+
+        const hojaServicios = XLSX.utils.json_to_sheet(
+            porProfesional.flatMap((p) =>
+                p.servicios.map((s) => ({
+                    Profesional: p.nombreProfesional,
+                    Servicio: s.nombre,
+                    Citas: s.citas,
+                    "Total (CLP)": s.total,
+                }))
+            )
+        );
+        hojaServicios["!cols"] = [{ wch: 30 }, { wch: 30 }, { wch: 10 }, { wch: 16 }];
+
+        const libro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen");
+        XLSX.utils.book_append_sheet(libro, hojaProfesionales, "Por profesional");
+        XLSX.utils.book_append_sheet(libro, hojaServicios, "Detalle por servicio");
+
+        const sufijoArchivo = periodo === "personalizado" ? `${fechaDesdeCustom}_a_${fechaHastaCustom}` : periodo;
+        XLSX.writeFile(libro, `finanzas-${sufijoArchivo}.xlsx`);
+        toast.success("Archivo Excel exportado correctamente.");
+    }
+
     return (
         <div className="min-h-screen bg-[#FAFAFB]">
             <ToasterClient />
@@ -302,6 +662,29 @@ export default function Finanzas() {
                                 <ShadcnDatePicker label="" value={fechaHastaCustom} onChange={setFechaHastaCustom} />
                             </div>
                         )}
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={descargarInformeFinancieroPDF}
+                                disabled={cargando || porProfesional.length === 0}
+                                className="h-9 flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
+                                title="Descargar informe en PDF"
+                            >
+                                <FileDown className="h-3.5 w-3.5" />
+                                Descargar PDF
+                            </button>
+                            <button
+                                type="button"
+                                onClick={exportarFinanzasExcel}
+                                disabled={cargando || porProfesional.length === 0}
+                                className="h-9 flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
+                                title="Exportar a Excel"
+                            >
+                                <FileSpreadsheet className="h-3.5 w-3.5" />
+                                Exportar Excel
+                            </button>
+                        </div>
                     </div>
                 </div>
 
