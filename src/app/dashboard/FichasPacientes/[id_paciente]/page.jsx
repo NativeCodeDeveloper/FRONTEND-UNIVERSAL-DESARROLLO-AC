@@ -18,7 +18,7 @@ import {CheckboxIcon} from "@radix-ui/react-icons";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {InfoButton} from "@/Componentes/InfoButton";
-import { formatRut } from "@/lib/designTokens";
+import { formatRut, cleanRut } from "@/lib/designTokens";
 import {
     canAccessOdontograma,
     canAccessRecetasEnFicha,
@@ -165,8 +165,14 @@ export default function Paciente() {
         const overflowAnterior = document.body.style.overflow;
         document.body.style.overflow = "hidden";
 
+        function handleKey(e) {
+            if (e.key === "Escape") setMostrarFormulario(false);
+        }
+        document.addEventListener("keydown", handleKey);
+
         return () => {
             document.body.style.overflow = overflowAnterior;
+            document.removeEventListener("keydown", handleKey);
         };
     }, [mostrarFormulario]);
 
@@ -1158,8 +1164,8 @@ export default function Paciente() {
 
                         {/* Formulario de Edición (Cerrable) */}
                         {mostrarFormulario && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm sm:p-6">
-                                <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-white/80 bg-white shadow-2xl shadow-slate-950/25 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm sm:p-6" onClick={() => setMostrarFormulario(false)}>
+                                <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" onClick={(e) => e.stopPropagation()} className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-white/80 bg-white shadow-2xl shadow-slate-950/25 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex shrink-0 items-center justify-between border-b border-violet-100 bg-gradient-to-r from-violet-50 via-white to-white px-5 py-3 sm:px-6">
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6E56CF]">Paciente</p>
@@ -1181,7 +1187,7 @@ export default function Paciente() {
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT</label>
-                                            <ShadcnInput value={rut} onChange={(e) => setRut(e.target.value.replace(/[^0-9kK]/g, "").toUpperCase())} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <ShadcnInput value={rut} onChange={(e) => setRut(cleanRut(e.target.value).slice(0, 9))} maxLength={9} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Fecha de nacimiento</label>
