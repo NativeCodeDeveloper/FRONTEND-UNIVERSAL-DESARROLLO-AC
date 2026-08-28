@@ -132,7 +132,7 @@ export default function ListaPacientes() {
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Base</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Listado de <span className="text-[#6E56CF]">Pacientes</span>
+                            Listado de Pacientes
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                             Busca y gestiona la base de datos de pacientes. Envía registros directamente al calendario de agendamiento para optimizar el flujo de atención.

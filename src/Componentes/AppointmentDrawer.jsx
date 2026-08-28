@@ -190,6 +190,11 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
       {/* Recordatorio (correo / WhatsApp) */}
       {(reserva?.email || reserva?.telefono) && (
         <RecordatorioPaciente
+          // key fuerza el remonte al cambiar de paciente: sin esto, si el usuario
+          // pasa de una reserva a otra sin cerrar el drawer, React reutiliza la
+          // misma instancia y el asunto/mensaje editados a mano para el paciente
+          // anterior quedan pegados aunque email/telefono ya cambiaron por props.
+          key={reserva?.rut || reserva?.email || reserva?.telefono}
           email={reserva?.email}
           telefono={reserva?.telefono}
           nombreProfesional={reserva?.nombreProfesional}
@@ -518,6 +523,8 @@ function FormSection({
       {/* Recordatorio (correo / WhatsApp) — solo tiene sentido si ya existe la reserva */}
       {mode === "edit" && (popupForm.email || popupForm.telefono) && (
         <RecordatorioPaciente
+          // key fuerza el remonte al cambiar de reserva (ver comentario análogo en InfoSection).
+          key={selectionDraft?.id_reserva || popupForm.rut || popupForm.email || popupForm.telefono}
           email={popupForm.email}
           telefono={popupForm.telefono}
           nombreProfesional={selectionDraft?.profesional}

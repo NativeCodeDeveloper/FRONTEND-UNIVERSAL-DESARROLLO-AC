@@ -30,8 +30,8 @@ export default function NoAccessPage() {
         {/* ── Header ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="mb-10">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Control de Acceso</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-            Módulo <span className="text-[#6E56CF]">Restringido</span>
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+            Módulo Restringido
           </h1>
           <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
             El módulo que intentas acceder se encuentra protegido por permisos. Si necesitas utilizarlo, solicita habilitación al administrador del sistema.

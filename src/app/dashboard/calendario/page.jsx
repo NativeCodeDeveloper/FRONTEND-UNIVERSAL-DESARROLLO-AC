@@ -290,19 +290,21 @@ function CalendarioContent() {
     const [telefono, setTelefono] = useState("");
     const [email, setEmail] = useState("");
 
-    // Precargar datos del paciente si vienen por query params
+    // Precargar datos del paciente si vienen por query params.
+    // Depende de `searchParams` (no de []) porque Next.js puede reutilizar la
+    // misma instancia de este componente entre navegaciones a /dashboard/calendario
+    // con distintos query params (ej. "Agendar Cita" para dos pacientes seguidos);
+    // sin esta dependencia, el segundo paciente nunca refrescaba estos campos y
+    // quedaban los datos del paciente anterior. Los setters ya no usan un chequeo
+    // "truthy" (if (nombre) ...) para que un campo vacío en el paciente nuevo
+    // también limpie el valor que hubiera quedado del paciente anterior.
     useEffect(() => {
-        const nombre = searchParams.get("nombre");
-        if (nombre) setNombrePaciente(nombre);
-        const apellido = searchParams.get("apellido");
-        if (apellido) setApellidoPaciente(apellido);
-        const rutParam = searchParams.get("rut");
-        if (rutParam) setRut(rutParam);
-        const tel = searchParams.get("telefono");
-        if (tel) setTelefono(tel);
-        const correo = searchParams.get("email");
-        if (correo) setEmail(correo);
-    }, []);
+        setNombrePaciente(searchParams.get("nombre") || "");
+        setApellidoPaciente(searchParams.get("apellido") || "");
+        setRut(searchParams.get("rut") || "");
+        setTelefono(searchParams.get("telefono") || "");
+        setEmail(searchParams.get("email") || "");
+    }, [searchParams]);
     const [fechaInicio, setfechaInicio] = useState("");
     const [fechaFinalizacion, setfechaFinalizacion] = useState("");
     const [horaInicio, setHoraInicio] = useState("");

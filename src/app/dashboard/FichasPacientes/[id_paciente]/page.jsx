@@ -939,7 +939,7 @@ export default function Paciente() {
                 <div className="mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                     <div>
                         <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Carpeta Clínica: <span className="text-[#6E56CF]">{pacienteActual ? `${pacienteActual.nombre} ${pacienteActual.apellido}` : "Paciente"}</span>
+                            Carpeta Clínica: {pacienteActual ? `${pacienteActual.nombre} ${pacienteActual.apellido}` : "Paciente"}
                         </h1>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">

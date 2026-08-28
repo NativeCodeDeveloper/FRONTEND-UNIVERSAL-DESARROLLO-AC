@@ -388,8 +388,8 @@ export default function EdicionPagina() {
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración Web</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-                            Gestión de <span className="text-[#6E56CF]">Contenido</span>
+                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                            Gestión de Contenido
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                             Personaliza los textos y contenido de la página web pública.

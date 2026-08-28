@@ -245,8 +245,8 @@ export default function CreateUserPage() {
         {/* ── Header ── */}
         <div className="mb-10">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración del Sistema</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-            Crear <span className="text-[#6E56CF]">Usuario</span>
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+            Crear Usuario
           </h1>
           <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
             Crea un usuario en Clerk con correo y contraseña, y asígnale un perfil. El rol queda guardado en <code className="mx-0.5 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-700">publicMetadata.role</code> para que el middleware y el menú respeten sus permisos.

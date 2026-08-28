@@ -257,6 +257,7 @@ export default function AgendaDetalle() {
 
                         {/* Recordatorio (correo / WhatsApp) */}
                         <RecordatorioPaciente
+                            key={id_reserva}
                             email={dataReservaId[0]?.email}
                             telefono={dataReservaId[0]?.telefono}
                             nombreProfesional={dataReservaId[0]?.nombreProfesional}

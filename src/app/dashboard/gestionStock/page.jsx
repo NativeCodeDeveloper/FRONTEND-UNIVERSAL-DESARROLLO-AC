@@ -131,8 +131,8 @@ export default function GestionStock() {
                 {/* ── Header ── */}
                 <div className="mb-10">
                     <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Tienda</p>
-                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-                        Gestión de <span className="text-[#6E56CF]">Inventario</span>
+                    <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                        Gestión de Inventario
                     </h1>
                     <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                         Administra el stock de tus productos de forma clara y profesional.

@@ -218,7 +218,7 @@ function PedidoDetalleInner(){
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Panel de Administrador</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Detalle del <span className="text-[#6E56CF]">Pedido</span>
+                            Detalle del Pedido
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                             Revisa la información del cliente y el estado del pedido desde un solo lugar.

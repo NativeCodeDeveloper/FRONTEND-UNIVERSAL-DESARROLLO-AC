@@ -253,7 +253,7 @@ function mostrarIdSeleccionado(id_cupon) {
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Marketing y Descuentos</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Gestión de <span className="text-[#6E56CF]">Cupones</span>
+                            Gestión de Cupones
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
                             Crea y administra cupones de descuento. Para desactivar un cupón, simplemente elimínalo del listado.
