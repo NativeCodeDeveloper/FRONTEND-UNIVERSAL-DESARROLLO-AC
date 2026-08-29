@@ -83,17 +83,15 @@ export default function Page() {
       <NeuralBg hue={220} saturation={0.8} chroma={0.6} />
       <div style={{ fontFamily: SF }} className="relative z-10 flex min-h-dvh flex-col px-4 py-6 sm:px-6 lg:px-8">
 
-        {/* ── Top bar ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="mx-auto flex w-full max-w-6xl items-center justify-start">
-          <img src="/logo-full.png" alt="AgendaClínica" className="h-14 w-auto object-contain" />
-        </motion.div>
-
         {/* ── Contenido principal ── */}
         <div className="flex flex-1 items-center justify-center">
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={1}
             className="w-full max-w-[360px] rounded-[2rem] border border-white/60 bg-white/30 p-7 shadow-[0_20px_60px_rgba(15,23,42,0.10)]"
             style={{ backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)" }}>
+
+            <div className="mb-8 flex justify-center">
+              <img src="/1.png" alt="NativeCode" className="h-auto w-48 object-contain" />
+            </div>
 
             <h2 className="text-[19px] font-semibold tracking-tight text-slate-900">
               Iniciar sesión
@@ -157,17 +155,11 @@ export default function Page() {
               ¿Sin acceso? Contacta al administrador.
             </p>
 
-            <div className="mt-4 flex items-center justify-center gap-1.5">
-              <span className="text-[11px] text-slate-400">Secured by</span>
-              <img src="/clerk-logo.png" alt="Clerk" className="h-3.5 w-auto object-contain opacity-70" />
-            </div>
           </motion.div>
         </div>
 
-        <div className="mx-auto mt-6 flex w-full max-w-6xl flex-wrap items-center justify-center gap-4 pb-2 text-[10px] text-slate-400">
-          <span>AgendaClínica v2.0</span>
-          <span className="hidden h-3 w-px bg-slate-200 sm:block" />
-          <span>Powered by NativeCode</span>
+        <div className="mx-auto mt-6 flex w-full max-w-6xl items-center justify-center pb-2">
+          <img src="/nc2.png" alt="NativeCode" className="h-20 w-auto object-contain" />
         </div>
 
       </div>
