@@ -15,7 +15,7 @@ const DELAY_CLASSES = [
   "[animation-delay:840ms]",
 ];
 
-export function Component({ size = 180, text = "Cargando" }) {
+export function Component({ size = 180, text = "Cargando", label = text }) {
   const sizeClass = SIZE_CLASSES[size] || SIZE_CLASSES[180];
   const letters = text.split("");
 
@@ -24,7 +24,7 @@ export function Component({ size = 180, text = "Cargando" }) {
       className="fixed inset-0 z-50 grid min-h-dvh place-items-center overflow-hidden bg-[#0d0718] text-white"
       role="status"
       aria-live="polite"
-      aria-label={text}
+      aria-label={label}
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.24),transparent_52%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(168,85,247,0.22),transparent_56%)]" />
@@ -56,7 +56,7 @@ export function Component({ size = 180, text = "Cargando" }) {
         </div>
 
         <span className="mt-7 text-xs font-medium uppercase tracking-[0.32em] text-violet-100/75">
-          {text}
+          {label}
         </span>
       </div>
     </div>
