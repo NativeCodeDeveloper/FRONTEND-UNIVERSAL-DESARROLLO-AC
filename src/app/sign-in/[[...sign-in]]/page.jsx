@@ -22,7 +22,7 @@ export default function Page() {
   const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
   const { isLoaded, signIn, setActive } = useSignIn();
 
-  const [email,      setEmail]      = useState("");
+  const [username,   setUsername]   = useState("");
   const [password,   setPassword]   = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPass,   setShowPass]   = useState(false);
@@ -48,7 +48,7 @@ export default function Page() {
     try {
       const res = await signIn.create({
         strategy: "password",
-        identifier: email.trim(),
+        identifier: username.trim(),
         password,
       });
 
@@ -56,7 +56,7 @@ export default function Page() {
         await setActive({ session: res.createdSessionId });
         router.push("/dashboard");
       } else {
-        setError("No pudimos completar el inicio de sesión. Revisa que el correo tenga contraseña habilitada en Clerk.");
+        setError("No pudimos completar el inicio de sesión. Revisa que el usuario tenga contraseña habilitada en Clerk.");
       }
     } catch (err) {
       setError(err?.errors?.[0]?.message || "No pudimos iniciar sesión. Revisa tus datos e inténtalo nuevamente.");
@@ -102,13 +102,13 @@ export default function Page() {
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[13px] font-medium text-slate-700" htmlFor="email">
-                  Correo electrónico
+                <label className="text-[13px] font-medium text-slate-700" htmlFor="username">
+                  Nombre de usuario
                 </label>
                 <input
-                  id="email" type="email" autoComplete="email" required
-                  value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@correo.com"
+                  id="username" type="text" autoComplete="username" required
+                  value={username} onChange={(e) => setUsername(e.target.value)}
+                  placeholder="soporte"
                   className="h-11 w-full rounded-lg border border-slate-200 bg-white/40 px-3.5 text-[14px] text-slate-900 placeholder:text-slate-300 outline-none transition-colors focus:border-slate-400"
                 />
               </div>
