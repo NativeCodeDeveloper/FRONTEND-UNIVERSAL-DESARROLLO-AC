@@ -155,7 +155,7 @@ export default function FichaClinica() {
                         </a>
                         <button
                             type="button"
-                            onClick={() => router.push("/dashboard/calendarioGeneral")}
+                            onClick={() => router.push("/dashboard/calendario")}
                             className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
