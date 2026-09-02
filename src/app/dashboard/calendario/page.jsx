@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -14,7 +14,6 @@ import ToasterClient from "@/Componentes/ToasterClient";
 import { toast } from "react-hot-toast";
 
 import es from "date-fns/locale/es";
-import { InfoButton } from "@/Componentes/InfoButton";
 import { SelectDinamic } from "@/Componentes/SelectDinamic";
 import { AppointmentDrawer } from "@/Componentes/AppointmentDrawer";
 import { AppointmentCard } from "@/Componentes/AppointmentCard";
@@ -282,7 +281,9 @@ function CalendarioContent() {
     const [monthPopover, setMonthPopover] = useState(null);
     const lastClickPos = useRef({ x: 0, y: 0 });
 
+    const router = useRouter();
     const searchParams = useSearchParams();
+    const [abriendoFichaClinica, setAbriendoFichaClinica] = useState(false);
 
     const [nombrePaciente, setNombrePaciente] = useState("");
     const [apellidoPaciente, setApellidoPaciente] = useState("");
@@ -522,6 +523,137 @@ function CalendarioContent() {
 
     function normalizarRut(valor = "") {
         return String(valor).replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    }
+
+    function formatearRutBusqueda(rutValor) {
+        const rutNormalizado = normalizarRut(rutValor);
+        if (rutNormalizado.length < 2) return "";
+
+        const dv = rutNormalizado.slice(-1);
+        let cuerpo = rutNormalizado.slice(0, -1);
+        let rutFormateado = "";
+
+        while (cuerpo.length > 3) {
+            rutFormateado = `.${cuerpo.slice(-3)}${rutFormateado}`;
+            cuerpo = cuerpo.slice(0, -3);
+        }
+
+        return `${cuerpo}${rutFormateado}-${dv}`;
+    }
+
+    async function buscarPacientePorRut(rutPaciente) {
+        const rutOriginal = String(rutPaciente || "").trim();
+        const rutFormateado = formatearRutBusqueda(rutOriginal);
+        const rutNormalizado = normalizarRut(rutOriginal);
+        const variantes = [...new Set([rutOriginal, rutFormateado, rutNormalizado].filter(Boolean))];
+
+        for (const rutBusqueda of variantes) {
+            const resPaciente = await fetch(`${API}/pacientes/contieneRut`, {
+                method: "POST",
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ rut: rutBusqueda }),
+                mode: "cors"
+            });
+
+            if (!resPaciente.ok) continue;
+
+            const pacientes = await resPaciente.json();
+            if (!Array.isArray(pacientes) || pacientes.length === 0) continue;
+
+            const pacienteExacto = pacientes.find(
+                (paciente) => normalizarRut(paciente.rut) === rutNormalizado
+            );
+
+            if (pacienteExacto?.id_paciente) return pacienteExacto;
+            if (pacientes[0]?.id_paciente) return pacientes[0];
+        }
+
+        return null;
+    }
+
+    async function crearPacienteDesdeReserva(reserva) {
+        const rutNormalizado = normalizarRut(reserva?.rut);
+        const telefonoNormalizado = String(reserva?.telefono || "").trim() || "NO INDICADO";
+        const correoNormalizado = String(reserva?.email || "").trim() || null;
+
+        const resInsercion = await fetch(`${API}/pacientes/pacientesInsercion`, {
+            method: "POST",
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            mode: "cors",
+            body: JSON.stringify({
+                nombre: reserva?.nombrePaciente || "NO INDICADO",
+                apellido: reserva?.apellidoPaciente || "NO INDICADO",
+                rut: rutNormalizado,
+                nacimiento: "1900-01-01",
+                sexo: "No especifica",
+                prevision_id: 4,
+                telefono: telefonoNormalizado,
+                correo: correoNormalizado,
+                direccion: "NO INDICADO",
+                pais: "Chile",
+                observacion1: "Paciente creado desde reservaciones",
+                observacion2: "NO INDICADO",
+                observacion3: "NO INDICADO",
+                apoderado: "NO INDICADO",
+                apoderado_rut: "NO INDICADO",
+                medicamentosUsados: "NO INDICADO",
+                habitos: "NO INDICADO",
+                comentariosAdicionales: "Creado desde agenda con los datos disponibles de la reservacion"
+            })
+        });
+
+        if (!resInsercion.ok) {
+            throw new Error("No se pudo crear el paciente desde la reservación");
+        }
+
+        const respuestaBackend = await resInsercion.json();
+        if (respuestaBackend.message !== true && respuestaBackend.message !== "duplicado") {
+            throw new Error("La creación del paciente no fue aceptada por el servidor");
+        }
+
+        const pacienteCreado = await buscarPacientePorRut(rutNormalizado);
+        if (!pacienteCreado?.id_paciente) {
+            throw new Error("No se pudo recuperar el paciente recién creado");
+        }
+
+        return pacienteCreado;
+    }
+
+    async function verFichaClinicaPaciente(reserva) {
+        const rutNormalizado = normalizarRut(reserva?.rut);
+
+        if (!rutNormalizado) {
+            return toast.error("No se ha podido identificar el RUT del paciente.");
+        }
+
+        if (rutNormalizado === "RUTDESCONOCIDO") {
+            return toast.error("No se puede generar una ficha con un RUT desconocido.");
+        }
+
+        try {
+            setAbriendoFichaClinica(true);
+            const pacienteEncontrado = await buscarPacientePorRut(reserva.rut);
+
+            if (pacienteEncontrado?.id_paciente) {
+                router.push(`/dashboard/FichasPacientes/${pacienteEncontrado.id_paciente}`);
+                return;
+            }
+
+            const confirmarCreacion = window.confirm(
+                "No existe una ficha para este paciente. ¿Desea crearla ahora con los datos disponibles de la reservación?"
+            );
+
+            if (!confirmarCreacion) return;
+
+            const nuevoPaciente = await crearPacienteDesdeReserva(reserva);
+            toast.success("Paciente creado correctamente. Complete ahora la ficha clínica.");
+            router.push(`/dashboard/NuevaFicha/${nuevoPaciente.id_paciente}`);
+        } catch (error) {
+            console.log(error);
+            toast.error("No se ha podido abrir o crear la ficha clínica de este paciente.");
+        } finally {
+            setAbriendoFichaClinica(false);
+        }
     }
 
     function obtenerTipoSolapamiento(start, end, ignoredReservaId = null) {
@@ -1980,7 +2112,7 @@ function CalendarioContent() {
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">
-                            Planificación Médica
+                            Reservación de pacientes
                         </p>
                         <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
                             Calendario
@@ -2008,9 +2140,9 @@ function CalendarioContent() {
                             })()}
                         </p>
                     </div>
-                    <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                    <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                         {/* Selector de profesional */}
-                        <div className="relative w-full sm:min-w-[280px]">
+                        <div className="relative w-full sm:w-[280px] sm:flex-none">
                             <SelectDinamic
                                 value={id_profesional}
                                 onChange={(e) => setId_profesional(e.target.value)}
@@ -2054,15 +2186,53 @@ function CalendarioContent() {
                             </svg>
                             Nueva reserva
                         </button>
-                        <InfoButton
-                            informacion={'Calendario de reservas: visualiza, crea y gestiona las citas de tus profesionales.'}
-                            pasos={[
-                                'Presiona "N" para crear una nueva reserva.',
-                                'Presiona "T" para ir directo a la fecha de hoy.',
-                                'Usa "1", "2", "3" o "4" para cambiar entre vista Mes, Semana, Día o Agenda.',
-                                'Presiona "Esc" para cerrar el panel abierto.',
-                            ]}
-                        />
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard")}
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir a reservaciones"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>Reservaciones</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/FichaClinica")}
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir a fichas clínicas"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Ver Fichas</span>
+                        </button>
+                        <a
+                            href="https://youtu.be/ga44dJoW62c?si=EgpcoP0G2QetqFJy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial del calendario de reservas"
+                        >
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </span>
+                            <span>Video Tutorial</span>
+                        </a>
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/bloqueosAgenda")}
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir a bloqueos de agenda"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span>Bloqueos</span>
+                        </button>
                     </div>
                 </div>
 
@@ -2563,6 +2733,7 @@ function CalendarioContent() {
                 {selectionDraft && (
                     <AppointmentDrawer
                         reserva={selectionDraft?.id_reserva ? {
+                            id_reserva: selectionDraft.id_reserva,
                             nombrePaciente: popupForm.nombrePaciente,
                             apellidoPaciente: popupForm.apellidoPaciente,
                             rut: popupForm.rut,
@@ -2578,6 +2749,8 @@ function CalendarioContent() {
                         onActualizar={confirmarActualizacionDesdePopup}
                         onCambiarEstado={cambiarEstadoRapido}
                         onEliminar={() => eliminadoReserva(selectionDraft.id_reserva)}
+                        onVerFichaClinica={verFichaClinicaPaciente}
+                        cargandoFichaClinica={abriendoFichaClinica}
                         onBloquear={(motivo) => insertarBloqueoHorario(
                             id_profesional,
                             formatearFechaLocal(selectionDraft.start),

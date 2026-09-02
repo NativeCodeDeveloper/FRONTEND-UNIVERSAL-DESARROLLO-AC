@@ -156,6 +156,12 @@ export default function AgendaCitas() {
             .toUpperCase();
     }
 
+    function esRutDesconocido(rutValor) {
+        return String(rutValor || "")
+            .replace(/[^a-zA-Z0-9]/g, "")
+            .toUpperCase() === "RUTDESCONOCIDO";
+    }
+
     function formatearRutVisible(rutValor) {
         const rutNormalizado = normalizarRut(rutValor);
         return rutNormalizado ? `RUT: ${rutNormalizado}` : "RUT: Sin registro";
@@ -226,6 +232,10 @@ export default function AgendaCitas() {
     }
 
     async function crearPacienteDesdeReserva(reserva) {
+        if (esRutDesconocido(reserva?.rut)) {
+            throw new Error("No se puede generar una ficha con un RUT desconocido.");
+        }
+
         const rutNormalizado = normalizarRut(reserva?.rut);
         const telefonoNormalizado = String(reserva?.telefono || "").trim() || "NO INDICADO";
         const correoNormalizado = String(reserva?.email || "").trim() || null;
@@ -343,6 +353,10 @@ export default function AgendaCitas() {
 
             if (!reserva?.rut) {
                 return toast.error("No se ha podido identificar al paciente de esta reserva");
+            }
+
+            if (esRutDesconocido(reserva.rut)) {
+                return toast.error("No se puede generar una ficha con un RUT desconocido.");
             }
 
             setAbriendoFichaReservaId(reserva.id_reserva);
@@ -751,18 +765,14 @@ export default function AgendaCitas() {
             <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
                 
                 {/* ── Header Principal y Resumen ── */}
-                <div className="mb-6 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4 xl:gap-8">
-                    <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Agenda Clínica</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Panel de Citas
+                <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between xl:gap-8">
+                    <div className="shrink-0">
+                        <h1 className="whitespace-nowrap text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                            Panel de Reservaciones
                         </h1>
-                        <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
-                            Control central de citas, estados de asistencia y flujo de pacientes. Filtra y gestiona la agenda clínica en tiempo real.
-                        </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-col items-stretch gap-2 xl:items-end">
                         <div data-tour="dashboard-kpis" className="flex flex-wrap items-center gap-2 xl:shrink-0 xl:flex-nowrap xl:gap-1">
                         <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
@@ -810,6 +820,18 @@ export default function AgendaCitas() {
                             </div>
                         </div>
                         </div>
+                        <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/calendario")}
+                            className="flex h-9 w-[140px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#6E56CF] px-2 text-[12px] font-medium text-white shadow-sm transition-all hover:bg-[#5b45bc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir al calendario para agendar un paciente"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Agendar Paciente</span>
+                        </button>
                         <a
                             href="https://youtu.be/ga44dJoW62c?si=7lr5NnDPFcJfgzNI"
                             target="_blank"
@@ -844,6 +866,7 @@ export default function AgendaCitas() {
                                 'Presiona "Fichas Clínicas" para ir directo al historial médico del paciente.',
                             ]}
                         />
+                        </div>
                     </div>
                 </div>
 

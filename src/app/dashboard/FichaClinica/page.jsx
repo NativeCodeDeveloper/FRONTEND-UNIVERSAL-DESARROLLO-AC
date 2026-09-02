@@ -8,7 +8,6 @@ import {toast} from "react-hot-toast";
 import * as React from "react"
 import {useRouter} from "next/navigation";
 import {BookOpenIcon} from "@heroicons/react/24/outline";
-import {InfoButton} from "@/Componentes/InfoButton";
 import { formatRut, cleanRut } from "@/lib/designTokens";
 
 
@@ -139,15 +138,32 @@ export default function FichaClinica() {
                             Accede al historial completo de atenciones, documentos y evolución de cada paciente registrado en la plataforma.
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <InfoButton
-                            informacion={'Busca al paciente para gestionar sus fichas de atención. Cada carpeta contiene el registro cronológico de sus consultas y documentos adjuntos.'}
-                            pasos={[
-                                'Busca por nombre o RUT en el buscador de carpeta.',
-                                'O revisa directamente el listado de pacientes registrados.',
-                                'Presiona "Abrir Carpeta" para ver el historial completo del paciente.',
-                            ]}
-                        />
+                    <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <a
+                            href="https://youtu.be/KWLr1mHjhA0?si=tMWgf6nDi-VBcXpu"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial de fichas clínicas"
+                        >
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </span>
+                            <span className="text-[10px] font-bold">Video Tutorial</span>
+                        </a>
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/calendarioGeneral")}
+                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir al calendario para agendar un paciente"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span className="text-[10px] font-bold">Agendar Paciente</span>
+                        </button>
                         <button
                             onClick={() => router.push("/dashboard")}
                             className="h-10 px-5 rounded-2xl bg-[#6E56CF] text-white flex items-center gap-2 shadow-sm hover:bg-[#5b45bc] transition-all"
@@ -155,7 +171,7 @@ export default function FichaClinica() {
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span className="text-[10px] font-bold">Panel de Citas</span>
+                            <span className="text-[10px] font-bold">Reservaciones</span>
                         </button>
                     </div>
                 </div>

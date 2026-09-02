@@ -5,7 +5,7 @@
  * Input especializado para RUT chileno.
  * - Muestra el RUT formateado mientras el usuario escribe (XX.XXX.XXX-X)
  * - El onChange devuelve el valor LIMPIO (sin puntos ni guión) al componente padre
- * - Valida que tenga exactamente 9 caracteres (8 dígitos + dígito verificador)
+ * - Valida que tenga 8 o 9 caracteres (cuerpo de 7 u 8 dígitos + dígito verificador)
  * - El padre guarda el valor limpio → lo envía al backend sin formato
  * - El RutDisplay usa formatRut() para mostrarlo en pantalla
  *
@@ -39,7 +39,7 @@ export function RutInput({
 
     function validate(clean) {
         if (!clean) return "";
-        if (clean.length < 9) return `Faltan ${9 - clean.length} caracter(es) — debe tener 9 en total`;
+        if (clean.length < 8) return `Faltan ${8 - clean.length} caracter(es) — debe tener 8 o 9 en total`;
         return "";
     }
 
@@ -82,7 +82,8 @@ export function RutInput({
     }
 
     const hasError = touched && !!error;
-    const isOk     = touched && !error && cleanRut(display).length === 9;
+    const longitudRut = cleanRut(display).length;
+    const isOk     = touched && !error && (longitudRut === 8 || longitudRut === 9);
 
     const baseClass =
         "h-10 w-full rounded-xl border bg-white px-3 text-[13px] text-slate-800 outline-none transition-all placeholder:text-slate-400 " +

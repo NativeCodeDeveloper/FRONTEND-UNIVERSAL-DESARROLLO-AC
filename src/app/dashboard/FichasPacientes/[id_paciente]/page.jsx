@@ -957,6 +957,20 @@ export default function Paciente() {
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Registros</span>
                             <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{totalFichas} Fichas</span>
                         </div>
+                        <a
+                            href="https://youtu.be/KWLr1mHjhA0?si=FlLU1kSXYOS1RYVF"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial de fichas clínicas"
+                        >
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </span>
+                            <span>Video Tutorial</span>
+                        </a>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => volverAFichas()}

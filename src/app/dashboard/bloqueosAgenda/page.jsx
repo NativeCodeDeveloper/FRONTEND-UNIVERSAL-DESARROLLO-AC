@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { SelectDinamic } from "@/Componentes/SelectDinamic";
 import { InputTextDinamic } from "@/Componentes/InputTextDinamic";
@@ -337,7 +338,31 @@ export default function BloqueosAgendas() {
                             Selecciona uno o varios días del calendario y define el rango horario. Cada día se bloquea de forma independiente para que puedas liberarlos por separado.
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <Link
+                            href="/dashboard/calendario"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#6E56CF] px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-[#5b45bc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir al calendario para agendar un paciente"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Agendar Paciente</span>
+                        </Link>
+                        <a
+                            href="https://www.youtube.com/watch?t=1&v=2wT7jMPcTRM"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial de bloqueo de agenda"
+                        >
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </span>
+                            <span>Video Tutorial</span>
+                        </a>
                         <InfoButton
                             informacion={'Bloquea días u horarios específicos para que no queden disponibles en la agenda pública.'}
                             pasos={[

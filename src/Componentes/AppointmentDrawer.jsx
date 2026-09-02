@@ -16,6 +16,7 @@
  *   - onCambiarEstado: (estado) => Promise<void>
  *   - onEliminar: () => Promise<void>
  *   - onBloquear: (motivo) => Promise<void>
+ *   - onVerFichaClinica: (reserva) => Promise<void>
  *   - listaProfesionales: array
  *   - id_profesional: string
  *   - selectionDraft: { start, end, profesional }
@@ -271,6 +272,76 @@ function FormSection({
   const inputClass =
     "h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-800 outline-none transition-all focus:border-violet-300 focus:ring-2 focus:ring-violet-100";
   const labelClass = "block text-[11px] font-semibold text-slate-500 mb-1";
+  const API = process.env.NEXT_PUBLIC_API_URL;
+  const [pacienteCoincidente, setPacienteCoincidente] = useState(null);
+  const [buscandoPaciente, setBuscandoPaciente] = useState(false);
+  const [errorBusquedaPaciente, setErrorBusquedaPaciente] = useState("");
+  const esRutDesconocido = String(popupForm.rut ?? "")
+    .replace(/\s/g, "")
+    .toUpperCase() === "RUTDESCONOCIDO";
+
+  useEffect(() => {
+    const rutBusqueda = String(popupForm.rut ?? "")
+      .replace(/[^0-9kK]/g, "")
+      .toUpperCase();
+
+    setPacienteCoincidente(null);
+    setErrorBusquedaPaciente("");
+
+    if (esRutDesconocido || (rutBusqueda.length !== 8 && rutBusqueda.length !== 9)) {
+      setBuscandoPaciente(false);
+      return;
+    }
+
+    const controlador = new AbortController();
+    const temporizador = window.setTimeout(async () => {
+      try {
+        setBuscandoPaciente(true);
+        const respuesta = await fetch(`${API}/pacientes/buscarRutEspecifico`, {
+          method: "POST",
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ rut: rutBusqueda }),
+          mode: "cors",
+          signal: controlador.signal,
+        });
+
+        if (!respuesta.ok) {
+          throw new Error("No fue posible consultar el RUT.");
+        }
+
+        const datos = await respuesta.json();
+        const pacientes = Array.isArray(datos) ? datos : datos ? [datos] : [];
+        const coincidenciaExacta = pacientes.find((paciente) =>
+          String(paciente?.rut ?? "")
+            .replace(/[^0-9kK]/g, "")
+            .toUpperCase() === rutBusqueda
+        );
+
+        if (!controlador.signal.aborted) {
+          setPacienteCoincidente(coincidenciaExacta || null);
+          if (coincidenciaExacta) {
+            onPopupFormChange("nombrePaciente", coincidenciaExacta.nombre ?? "");
+            onPopupFormChange("apellidoPaciente", coincidenciaExacta.apellido ?? "");
+            onPopupFormChange("telefono", coincidenciaExacta.telefono ?? "");
+            onPopupFormChange("email", coincidenciaExacta.correo ?? "");
+          }
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setErrorBusquedaPaciente("No fue posible consultar los datos del paciente.");
+        }
+      } finally {
+        if (!controlador.signal.aborted) {
+          setBuscandoPaciente(false);
+        }
+      }
+    }, 350);
+
+    return () => {
+      window.clearTimeout(temporizador);
+      controlador.abort();
+    };
+  }, [API, esRutDesconocido, popupForm.rut]);
 
   return (
     <div className="flex flex-col gap-4 p-5">
@@ -325,6 +396,56 @@ function FormSection({
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-600 mb-2">
             Datos del paciente
           </p>
+          <div>
+            <div className="mb-1 flex items-center justify-between gap-3">
+              <label className="block text-[11px] font-semibold text-slate-500">RUT</label>
+              <label className="inline-flex cursor-pointer items-center gap-2 text-[11px] font-semibold text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={esRutDesconocido}
+                  onChange={(e) => onPopupFormChange("rut", e.target.checked ? "RUT DESCONOCIDO" : "")}
+                  className="h-4 w-4 rounded border-slate-300 text-violet-600 accent-violet-600 focus:ring-2 focus:ring-violet-200"
+                />
+                RUT desconocido
+              </label>
+            </div>
+            {esRutDesconocido ? (
+              <input
+                type="text"
+                value="RUT DESCONOCIDO"
+                disabled
+                className="h-10 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-3 text-[13px] font-semibold text-slate-500 outline-none"
+                aria-label="RUT desconocido"
+              />
+            ) : (
+              <RutInput
+                value={popupForm.rut}
+                onChange={(clean) => onPopupFormChange("rut", clean)}
+              />
+            )}
+            {buscandoPaciente && (
+              <div className="mt-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-[11px] font-medium text-slate-500">
+                <svg className="h-3.5 w-3.5 animate-spin text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Buscando paciente...
+              </div>
+            )}
+            {errorBusquedaPaciente && (
+              <p className="mt-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-[11px] font-medium text-red-600">
+                {errorBusquedaPaciente}
+              </p>
+            )}
+            {pacienteCoincidente && (
+              <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Paciente encontrado
+              </p>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className={labelClass}>Nombre</label>
@@ -344,13 +465,6 @@ function FormSection({
                 placeholder="Apellido"
               />
             </div>
-          </div>
-          <div>
-            <label className={labelClass}>RUT</label>
-            <RutInput
-              value={popupForm.rut}
-              onChange={(clean) => onPopupFormChange("rut", clean)}
-            />
           </div>
           <div>
             <label className={labelClass}>Teléfono</label>
@@ -569,6 +683,8 @@ export function AppointmentDrawer({
   onCambiarEstado,
   onEliminar,
   onBloquear,
+  onVerFichaClinica,
+  cargandoFichaClinica = false,
   listaProfesionales = [],
   // listaPrestaciones: array de servicios del sistema para el dropdown de tipo de consulta.
   // Se obtiene del endpoint GET /serviciosProfesionales/seleccionarTodosServiciosProfesionales
@@ -587,6 +703,9 @@ export function AppointmentDrawer({
 }) {
   const [mounted, setMounted] = useState(false);
   const drawerRef = useRef(null);
+  const { user, isLoaded } = useUser();
+  const dashboardRole = getDashboardRoleFromUser(user);
+  const canSeeFichasClinicas = isLoaded && canAccessFichasClinicas(dashboardRole);
 
   useEffect(() => {
     setMounted(true);
@@ -629,7 +748,7 @@ export function AppointmentDrawer({
         style={{ animation: "slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1)" }}
       >
         {/* Header del drawer */}
-        <div className="flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4 flex-shrink-0">
+        <div className="flex items-start justify-between border-b border-slate-100 bg-white px-5 py-4 flex-shrink-0">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-500">
               Agenda Clínica
@@ -637,11 +756,31 @@ export function AppointmentDrawer({
             <h2 className="text-[16px] font-bold text-slate-800 leading-snug mt-0.5">
               {title}
             </h2>
+            {mode === "edit" && canSeeFichasClinicas && (
+              <button
+                type="button"
+                onClick={() => onVerFichaClinica?.(reserva)}
+                disabled={cargandoFichaClinica}
+                className="mt-3 inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-xl border border-violet-200 bg-violet-50 px-3 text-[11px] font-bold text-violet-700 transition-colors hover:border-violet-300 hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 disabled:cursor-wait disabled:opacity-60"
+              >
+                {cargandoFichaClinica ? (
+                  <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                )}
+                {cargandoFichaClinica ? "Buscando ficha..." : "Ver ficha clínica"}
+              </button>
+            )}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="shrink-0 rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
             aria-label="Cerrar panel"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
