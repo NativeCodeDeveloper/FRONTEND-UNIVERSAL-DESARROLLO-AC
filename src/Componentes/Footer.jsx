@@ -127,14 +127,14 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="lg:col-span-4">
-            <Link href="/" aria-label="Ir al inicio" className="group mb-6 inline-flex items-center">
-              <div className="transition-transform duration-300 group-hover:scale-205">
+            <Link href="/" aria-label="Ir al inicio" className="group mt-4 mb-8 flex items-center justify-center lg:justify-start">
+              <div className="transition-transform duration-300 group-hover:scale-105">
                 <Image
-                  src="/logo.png"
+                  src="/logo-full.png"
                   alt="Agenda Clínica"
-                  width={180}
-                  height={22}
-                  className="h-35 w-auto object-contain"
+                  width={220}
+                  height={55}
+                  className="h-20 w-auto object-contain"
                 />
               </div>
             </Link>

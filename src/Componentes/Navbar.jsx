@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 const navItems = [
@@ -31,26 +30,12 @@ export default function Navbar() {
       {/* Navbar Pill */}
       <div
         className={[
-          "pointer-events-auto flex w-full max-w-6xl items-center justify-between rounded-full border transition-all duration-500",
+          "pointer-events-auto flex items-center justify-between gap-8 rounded-full border transition-all duration-500 lg:gap-14",
           scrolled
             ? "bg-white/70 backdrop-blur-xl border-slate-200/40 shadow-md shadow-slate-200/10 py-2.5 px-4 sm:px-6"
             : "bg-transparent backdrop-blur-sm border-transparent shadow-none py-3.5 px-4 sm:px-6"
         ].join(" ")}
       >
-        {/* Brand / Logo */}
-        <Link href="/" aria-label="Ir al inicio" className="group flex shrink-0 items-center gap-3">
-          <div className="relative shrink-0 transition-transform duration-300 group-hover:scale-105">
-            <Image
-              src="/logo.png"
-              alt="Agenda Clínica"
-              width={160}
-              height={50}
-              priority
-              className="h-14 w-auto object-contain sm:h-16"
-            />
-          </div>
-        </Link>
-
         {/* Desktop Links */}
         <nav aria-label="Menu principal" className="hidden lg:block">
           <ul className="flex items-center gap-8">
@@ -68,7 +53,7 @@ export default function Navbar() {
         </nav>
 
         {/* Action Buttons */}
-        <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-4 lg:w-40">
+        <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-4">
           <Link
             href="/agendaProfesionales"
             aria-label="Agendar hora"

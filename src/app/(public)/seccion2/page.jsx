@@ -90,18 +90,16 @@ export default function Seccion2() {
   };
 
   return (
-    <section id="servicios" className="scroll-mt-24 bg-slate-50 py-20 text-slate-800 sm:py-28 overflow-hidden">
+    <section
+      id="servicios"
+      className="scroll-mt-24 bg-slate-50 bg-cover bg-center md:bg-fixed py-20 text-slate-800 sm:py-28 overflow-hidden"
+      style={{ backgroundImage: "url('/bg-swoosh-azul.jpg')" }}
+    >
       <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
 
         {/* Header */}
         <RevealOnScroll>
           <div className="max-w-3xl mb-16">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="h-px w-10 bg-indigo-600" />
-              <span className="text-sm font-semibold tracking-widest text-indigo-600 uppercase">
-                Servicios
-              </span>
-            </div>
             <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-6">
               Nuestros Servicios
             </h2>
@@ -150,7 +148,7 @@ export default function Seccion2() {
               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-slate-900/80 to-transparent pointer-events-none" />
 
               {/* Top Right Label */}
-              <div className="absolute top-6 right-6 rounded-full bg-indigo-600/90 backdrop-blur-md px-5 py-2 text-sm font-semibold text-white shadow-lg max-w-[80%] text-center truncate">
+              <div className="absolute top-6 right-6 rounded-full bg-slate-900/90 backdrop-blur-md px-5 py-2 text-sm font-semibold text-white shadow-lg max-w-[80%] text-center truncate">
                 {service.name}
               </div>
 

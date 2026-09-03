@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, CalendarCheck, ArrowRight, BookOpen } from "lucide-react";
 import RevealOnScroll from "@/Componentes/RevealOnScroll";
+import ResenasSection from "@/Componentes/ResenasSection";
 
 const CF_BASE = "https://imagedelivery.net/aCBUhLfqUcxA2yhIBn1fNQ";
 const FALLBACK_IMAGE = "/logoagendaclinica.png";
@@ -136,7 +137,7 @@ export default function Seccion3() {
                 {/* ── Left: info panel ──────────────────────── */}
                 <div className="flex flex-col items-center text-center lg:col-span-3 lg:items-start lg:text-left">
                   <div className="flex items-center gap-3 mb-5">
-                    <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center shrink-0">
                       <BookOpen className="h-5 w-5 text-white" />
                     </div>
                     <p className="text-sm text-slate-500 lg:hidden">Contenido del centro</p>
@@ -145,7 +146,7 @@ export default function Seccion3() {
                     Contenido del centro
                   </p>
                   <div className="flex items-center gap-3 mb-1">
-                    <span className="text-xs font-semibold tracking-widest text-indigo-600 uppercase">
+                    <span className="text-xs font-semibold tracking-widest text-slate-500 uppercase">
                       Publicaciones
                     </span>
                   </div>
@@ -204,6 +205,8 @@ export default function Seccion3() {
           </RevealOnScroll>
         </div>
       </section>
+
+      <ResenasSection />
 
       {/* CTA block */}
       <section id="agenda" className="bg-slate-50 py-16 sm:py-24">

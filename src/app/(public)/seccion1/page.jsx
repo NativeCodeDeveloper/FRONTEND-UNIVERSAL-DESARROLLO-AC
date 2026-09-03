@@ -57,12 +57,6 @@ export default function Seccion1() {
 
             {/* Left */}
             <div>
-              <div className="flex items-center gap-4 mb-5">
-                <div className="h-px w-10 bg-indigo-600" />
-                <span className="text-sm font-semibold tracking-widest text-indigo-600 uppercase">
-                  Nosotros
-                </span>
-              </div>
               <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-tight mb-7">
                 {tituloSobreNosotros}
               </h2>
@@ -78,7 +72,7 @@ export default function Seccion1() {
               </p>
               <Link
                 href="/agendaProfesionales"
-                className="group inline-flex items-center gap-2 font-semibold text-slate-900 hover:text-indigo-600 transition-colors w-fit"
+                className="group inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700 hover:scale-[1.02] w-fit"
               >
                 Reservar una hora
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

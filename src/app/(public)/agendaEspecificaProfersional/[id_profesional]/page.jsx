@@ -533,10 +533,7 @@ export default function CalendarioMensualHoras() {
                     <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
                         Agenda · Online
                     </div>
-                    <h1
-                        className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900"
-                        style={{ fontFamily: "var(--font-outfit)" }}
-                    >
+                    <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
                         {nombreProfesional || "Cargando..."}
                     </h1>
                     <p className="max-w-md text-sm leading-6 text-slate-500">

@@ -1,8 +1,19 @@
 import "./globals.css";
 import { AnimatedLayout } from "@/Componentes/AnimatedLayout";
 import AgendaProvider from "@/ContextosGlobales/AgendaContext";
-import { Inter, Outfit, Lora } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Outfit, Lora } from "next/font/google";
 import Script from "next/script";
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,7 +104,7 @@ export default function RootLayout({ children }) {
     return (
         <html
             lang="es"
-            className={`${inter.variable} ${outfit.variable} ${lora.variable}`}
+            className={`${geist.variable} ${geistMono.variable} ${inter.variable} ${outfit.variable} ${lora.variable}`}
         >
         <body className="min-h-screen bg-white">
         <AgendaProvider>

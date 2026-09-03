@@ -148,7 +148,8 @@ export default function Portada() {
   return (
     <section
       id="inicio"
-      className="relative w-full overflow-hidden bg-white min-h-screen flex flex-col items-center justify-center pt-20 pb-10"
+      className="relative w-full overflow-hidden bg-white bg-cover bg-center md:bg-fixed min-h-screen flex flex-col items-center justify-center pt-20 pb-10"
+      style={{ backgroundImage: "url('/bg-swoosh-azul.jpg')" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

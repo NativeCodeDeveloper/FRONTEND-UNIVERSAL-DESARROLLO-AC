@@ -62,10 +62,8 @@ const fragmentShader = `
       float noise = neuro_shape(uv, t, p);
       noise = 1.2 * pow(noise, 3.);
       noise += pow(noise, 10.);
-      noise = max(.0, noise - .38);
-      noise = smoothstep(0.0, 0.75, noise);
-      noise *= 0.78 + 0.22 * (1. - length(vUv - .5));
-      noise = 0.08 + 0.92 * noise;
+      noise = max(.0, noise - .5);
+      noise *= (1. - length(vUv - .5));
 
       float normalizedHue = u_hue / 360.0;
 
