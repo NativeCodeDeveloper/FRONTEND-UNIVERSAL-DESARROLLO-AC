@@ -66,7 +66,7 @@ export default function ResenasSection() {
     <section
       id="testimonios"
       className="scroll-mt-24 bg-slate-50 bg-cover bg-center md:bg-fixed py-20 sm:py-28"
-      style={{ backgroundImage: "url('/bg-swoosh-azul.jpg')" }}
+      style={{ backgroundImage: "url('/bg-swoosh-azul.webp')" }}
     >
       <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
         <RevealOnScroll>

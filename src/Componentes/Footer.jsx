@@ -122,7 +122,7 @@ export default function Footer() {
         </span>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
+      <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 md:px-10 lg:px-16">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-8 border-b border-slate-800 pb-16">
 
           {/* Brand */}
@@ -157,7 +157,7 @@ export default function Footer() {
           </div>
 
           {/* Links grid */}
-          <div className="lg:col-span-8 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:w-fit lg:grid-cols-[200px_220px_360px] lg:gap-10">
+          <div className="lg:col-span-8 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[200px_220px_1fr] lg:gap-10">
 
             {/* Navegación */}
             <div>

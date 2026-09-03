@@ -33,7 +33,7 @@ export default function Navbar() {
           "pointer-events-auto flex items-center justify-between gap-8 rounded-full border transition-all duration-500 lg:gap-14",
           scrolled
             ? "bg-white/70 backdrop-blur-xl border-slate-200/40 shadow-md shadow-slate-200/10 py-2.5 px-4 sm:px-6"
-            : "bg-transparent backdrop-blur-sm border-transparent shadow-none py-3.5 px-4 sm:px-6"
+            : "bg-transparent border-transparent shadow-none py-3.5 px-4 sm:px-6"
         ].join(" ")}
       >
         {/* Desktop Links */}
