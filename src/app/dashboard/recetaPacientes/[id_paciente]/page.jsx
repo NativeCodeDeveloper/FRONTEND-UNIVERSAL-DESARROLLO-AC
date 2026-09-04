@@ -133,6 +133,12 @@ export default function ReecetasPacientes() {
         return String(valor ?? "").trim() || fallback;
     }
 
+    function truncarTextoPDF(valor, maxLargo) {
+        const texto = String(valor ?? "").trim();
+        if (texto.length <= maxLargo) return texto;
+        return `${texto.slice(0, maxLargo - 1).trimEnd()}…`;
+    }
+
     function formatearFechaDocumento(fecha = new Date()) {
         return fecha.toLocaleDateString("es-CL", {
             day: "2-digit",
@@ -178,10 +184,15 @@ export default function ReecetasPacientes() {
         const fechaEmision = new Date();
         const rutPacienteArchivo = sanitizarNombreArchivo(rut_paciente || paciente?.rut || id_paciente || "paciente");
         const nombreProfesionalPDF = normalizarTextoPDF(profesional_responsable);
-        const especialidadProfesionalPDF = normalizarTextoPDF(
+        const especialidadProfesionalCompleta = normalizarTextoPDF(
             profesionalSeleccionado?.descripcionProfesional || profesionalSeleccionado?.especialidad,
             "Profesional tratante"
         );
+        // Truncados a un largo seguro: jsPDF no recorta ni pagina el texto que se
+        // desborda de estas cajas de ancho/alto fijo, así que una descripción muy
+        // larga del profesional superpone el resto de la receta si no se limita aquí.
+        const especialidadProfesionalPDF = truncarTextoPDF(especialidadProfesionalCompleta, 90);
+        const especialidadProfesionalFirmaPDF = truncarTextoPDF(especialidadProfesionalCompleta, 48);
         const rutProfesionalPDF = normalizarTextoPDF(
             rut_profesional_manual || profesionalSeleccionado?.rutProfesional || profesionalSeleccionado?.rut_profesional
         );
@@ -353,7 +364,7 @@ export default function ReecetasPacientes() {
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
             doc.text(nombreProfesionalPDF, rightX, y + 16, {align: "right"});
-            doc.text(especialidadProfesionalPDF, rightX, y + 21, {align: "right"});
+            doc.text(especialidadProfesionalFirmaPDF, rightX, y + 21, {align: "right"});
             doc.text("Firma y timbre profesional", rightX, y + 26, {align: "right"});
             doc.setTextColor(148, 163, 184);
             doc.text(empresaNombre, rightX, y + 31, {align: "right"});

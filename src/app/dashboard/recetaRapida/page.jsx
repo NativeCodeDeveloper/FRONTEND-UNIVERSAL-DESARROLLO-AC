@@ -42,7 +42,13 @@ export default function RecetaRapida() {
 
     const especialidadProfesional = useMemo(() => {
         const profesional = listaProfesionales.find(p => String(p.id_profesional) === String(idProfesional));
-        return profesional?.descripcionProfesional || profesional?.especialidad || "";
+        const texto = (profesional?.descripcionProfesional || profesional?.especialidad || "").trim();
+        // Truncado a un largo seguro: esta caja del PDF tiene alto fijo y jsPDF no
+        // recorta el texto desbordado, así que una descripción muy larga del
+        // profesional superpondría el diagnóstico impreso debajo.
+        const MAX_LARGO_PDF = 130;
+        if (texto.length <= MAX_LARGO_PDF) return texto;
+        return `${texto.slice(0, MAX_LARGO_PDF - 1).trimEnd()}…`;
     }, [listaProfesionales, idProfesional]);
 
     const nombreCompletoPaciente = useMemo(() => {

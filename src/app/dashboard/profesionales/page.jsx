@@ -8,6 +8,8 @@ import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 
+const DESCRIPCION_MAX_LARGO = 500;
+
 export default function Profesionales() {
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [nombreProfesional, setNombreProfesional] = useState('');
@@ -267,10 +269,14 @@ export default function Profesionales() {
                                 <label className="text-sm font-medium text-slate-700">Descripción del profesional</label>
                                 <TextAreaDinamic
                                     value={descripcionProfesional}
-                                    onChange={(e) => setDescripcionProfesional(e.target.value)}
+                                    onChange={(e) => setDescripcionProfesional(e.target.value.slice(0, DESCRIPCION_MAX_LARGO))}
                                     placeholder="Ej: Especialista en ortodoncia con 10 años de experiencia"
+                                    maxLength={DESCRIPCION_MAX_LARGO}
                                     className="w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
                                 />
+                                <p className="text-right text-xs text-slate-400">
+                                    {descripcionProfesional.length}/{DESCRIPCION_MAX_LARGO}
+                                </p>
                             </div>
 
                             {/* Modalidad de atención — PENDIENTE BD —
