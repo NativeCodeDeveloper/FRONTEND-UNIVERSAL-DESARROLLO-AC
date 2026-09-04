@@ -1287,7 +1287,7 @@ export default function Paciente() {
                         <div className="space-y-6">
                             
                             {/* Filtros y firma PDF */}
-                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
+                            <details open className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
