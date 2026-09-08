@@ -3,33 +3,42 @@
 /**
  * PhoneInput.jsx
  * Input especializado para teléfono móvil chileno.
- * - Prefijo "+569" fijo, no editable (siempre presente)
- * - El usuario ingresa solo los 8 dígitos restantes
- * - El onChange devuelve el número COMPLETO: "+569XXXXXXXX"
- * - Valida que los 8 dígitos estén completos
- * - Si el valor que llega del padre ya incluye "+569", lo extrae y muestra solo los 8 dígitos
+ * - Permite escribir el número con o sin prefijo (ej. 12345678, 912345678 o +56912345678)
+ * - Al perder el foco, normaliza los números válidos a "+569XXXXXXXX"
+ * - Valida que queden exactamente 8 dígitos después del 9 móvil
  *
  * Uso:
  *   <PhoneInput
- *     value={telefono}                           // "+56912345678" o "12345678"
- *     onChange={(full) => setTelefono(full)}     // devuelve "+56912345678"
+ *     value={telefono}
+ *     onChange={(full) => setTelefono(full)}     // al salir: "+56912345678"
  *   />
  */
 
 import { useEffect, useState } from "react";
 
-const PREFIX = "+569";
-const DIGITS = 8; // dígitos después del prefijo
+const PREFIJO = "+569";
+const DIGITOS_LOCALES = 8;
 
-function extractDigits(val = "") {
-    const raw = String(val).replace(/\D/g, ""); // solo dígitos
-    // Si empieza con 569, quita ese prefijo
-    if (raw.startsWith("569") && raw.length >= 3) return raw.slice(3, 3 + DIGITS);
-    // Si empieza con 56, quita
-    if (raw.startsWith("56") && raw.length >= 2) return raw.slice(2, 2 + DIGITS);
-    // Si empieza con 9, quita
-    if (raw.startsWith("9") && raw.length >= 1) return raw.slice(1, 1 + DIGITS);
-    return raw.slice(0, DIGITS);
+function extraerDigitosLocales(valor = "") {
+    let digitos = String(valor).replace(/\D/g, "");
+
+    if (digitos.startsWith("569")) {
+        digitos = digitos.slice(3);
+    } else if (digitos.startsWith("56")) {
+        digitos = digitos.slice(2);
+    } else if (digitos.startsWith("9")) {
+        digitos = digitos.slice(1);
+    }
+
+    return digitos;
+}
+
+function normalizarTelefonoChile(valor = "") {
+    const digitosLocales = extraerDigitosLocales(valor);
+
+    if (digitosLocales.length !== DIGITOS_LOCALES) return "";
+
+    return `${PREFIJO}${digitosLocales}`;
 }
 
 export function PhoneInput({
@@ -39,36 +48,42 @@ export function PhoneInput({
     label = "",
     disabled = false,
 }) {
-    const [digits, setDigits]   = useState(extractDigits(value));
+    const [telefonoEscrito, setTelefonoEscrito] = useState(String(value ?? ""));
     const [touched, setTouched] = useState(false);
     const [error,   setError]   = useState("");
 
     // Sincroniza cuando el padre actualiza el valor (carga de BD / reset)
     useEffect(() => {
-        setDigits(extractDigits(value));
+        setTelefonoEscrito(String(value ?? ""));
     }, [value]);
 
-    function validate(d) {
-        if (!d) return "";
-        const clean = d.replace(/\D/g, "");
-        if (clean.length < DIGITS) return `Faltan ${DIGITS - clean.length} dígito(s)`;
-        return "";
-    }
-
     function handleChange(e) {
-        const raw = e.target.value.replace(/\D/g, "").slice(0, DIGITS);
-        setDigits(raw);
-        onChange?.(raw.length > 0 ? `${PREFIX}${raw}` : "");
-        if (touched) setError(validate(raw));
+        setTelefonoEscrito(e.target.value);
+        if (touched) setError("");
     }
 
     function handleBlur() {
         setTouched(true);
-        setError(validate(digits));
+        const telefonoNormalizado = normalizarTelefonoChile(telefonoEscrito);
+
+        if (!telefonoEscrito.trim()) {
+            setError("");
+            onChange?.("");
+            return;
+        }
+
+        if (!telefonoNormalizado) {
+            setError("Ingresa un móvil chileno válido de 8 dígitos");
+            return;
+        }
+
+        setTelefonoEscrito(telefonoNormalizado);
+        setError("");
+        onChange?.(telefonoNormalizado);
     }
 
     const hasError = touched && !!error;
-    const isOk     = touched && !error && digits.replace(/\D/g, "").length === DIGITS;
+    const isOk = touched && !error && Boolean(normalizarTelefonoChile(telefonoEscrito));
 
     return (
         <div className="space-y-1">
@@ -78,20 +93,15 @@ export function PhoneInput({
                 </label>
             )}
             <div className="flex overflow-hidden rounded-xl border border-slate-200 transition-all focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-100 has-[input:focus]">
-                {/* Prefijo fijo */}
-                <div className="flex items-center border-r border-slate-200 bg-slate-100 px-3 text-[13px] font-semibold text-slate-500 select-none flex-shrink-0">
-                    {PREFIX}
-                </div>
-                {/* Campo de 8 dígitos */}
                 <input
                     type="tel"
-                    value={digits}
+                    value={telefonoEscrito}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    placeholder="12345678"
-                    maxLength={DIGITS}
+                    placeholder="+56912345678"
+                    maxLength={20}
                     disabled={disabled}
-                    inputMode="numeric"
+                    inputMode="tel"
                     autoComplete="tel"
                     className={`h-10 flex-1 min-w-0 bg-white px-3 text-[13px] text-slate-800 outline-none placeholder:text-slate-400 ${
                         hasError ? "bg-red-50" : isOk ? "bg-emerald-50/30" : ""
@@ -118,7 +128,7 @@ export function PhoneInput({
             {/* Hint */}
             {!touched && (
                 <p className="text-[11px] text-slate-400">
-                    Ingresa los 8 dígitos de tu número móvil
+                    Puedes ingresar 12345678, 912345678 o +56912345678
                 </p>
             )}
         </div>

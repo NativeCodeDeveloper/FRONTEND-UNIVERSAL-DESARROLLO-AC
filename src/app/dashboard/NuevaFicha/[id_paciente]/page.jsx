@@ -127,6 +127,14 @@ export default function NuevaFicha() {
                 return toast.error('Debe seleccionar una plantilla para la ficha.')
             }
 
+            if (!fechaConsulta) {
+                return toast.error('Debe seleccionar la fecha de la consulta.')
+            }
+
+            if (!observacionesPrecio.trim()) {
+                return toast.error('Debe ingresar el nombre del profesional a cargo.')
+            }
+
             // Validar campos requeridos
             const camposFaltantes = []
             plantillaCompleta.categorias.forEach(cat => {

@@ -1010,7 +1010,7 @@ export default function AgendaCitas() {
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
                                         <TableHead className="w-[120px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pl-8">Horario</TableHead>
                                         <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Identidad Paciente</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Profesional</TableHead>
+                                        <TableHead className="w-[260px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Profesional</TableHead>
                                         <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Motivo</TableHead>
                                         <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Control de Estado</TableHead>
                                         {canSeeFichasClinicas && (
@@ -1043,8 +1043,8 @@ export default function AgendaCitas() {
                                                         <span className="text-[11px] text-slate-400 font-medium mt-0.5">{formatearRutVisible(reserva.rut)}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="py-6">
-                                                    <span className="text-[13px] font-semibold text-slate-600">{obtenerNombreProfesionalReserva(reserva)}</span>
+                                                <TableCell className="w-[260px] py-6">
+                                                    <span className="block max-w-[260px] truncate text-[13px] font-semibold text-slate-600">{obtenerNombreProfesionalReserva(reserva)}</span>
                                                 </TableCell>
                                                 <TableCell className="py-6">
                                                     <div className="flex flex-col max-w-[180px]">
