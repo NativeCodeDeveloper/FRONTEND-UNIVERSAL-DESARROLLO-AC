@@ -41,6 +41,9 @@ import { getStateTokens } from "@/lib/designTokens";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { canAccessFichasClinicas, getDashboardRoleFromUser } from "@/lib/dashboard-access";
+import { Calendar } from "@/components/ui/calendar";
+import { es } from "date-fns/locale";
+import { format } from "date-fns";
 
 const ACCIONES_ESTADO = [
   { valor: "confirmada", etiqueta: "Confirmar" },
@@ -223,6 +226,132 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Repetir cita en más fechas (agendamiento múltiple) ───────────────────────
+// Calendario chico tipo el de bloqueosAgenda (mode="multiple") para elegir días
+// adicionales donde agendar al mismo paciente, a la misma hora. La validación de
+// choques (citas + bloqueos) y el envío real ocurren en calendario/page.jsx —
+// acá solo se recolectan las fechas elegidas.
+function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, formatHora }) {
+  const fechasRepeticion = Array.isArray(popupForm.fechasRepeticion) ? popupForm.fechasRepeticion : [];
+  const [abierto, setAbierto] = useState(false);
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const limite = new Date(hoy);
+  limite.setMonth(limite.getMonth() + 3);
+
+  const diasDeshabilitados = [{ before: hoy }, { after: limite }];
+  if (selectionDraft?.start) diasDeshabilitados.push(selectionDraft.start);
+
+  // Cualquier cambio en las fechas invalida una confirmación previa — obliga a
+  // revisar la lista de nuevo antes de poder agendar (ver botón "Agendar" en el footer).
+  function actualizarFechas(nuevasFechas) {
+    onPopupFormChange("fechasRepeticion", nuevasFechas);
+    onPopupFormChange("confirmacionFechasRepeticion", false);
+  }
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setAbierto((prev) => !prev)}
+        className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left"
+      >
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-600">
+          Repetir cita en más fechas (opcional)
+          {fechasRepeticion.length > 0 && (
+            <span className="ml-2 inline-flex items-center justify-center rounded-full bg-violet-100 text-[#6E56CF] text-[10px] font-bold px-1.5 py-0.5 normal-case tracking-normal">
+              {fechasRepeticion.length}
+            </span>
+          )}
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${abierto ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {abierto && (
+        <div className="px-3 pb-3 space-y-2">
+          <p className="text-[11px] text-slate-400 mb-1">
+            Agenda al mismo paciente en otros días, a la misma hora{selectionDraft?.start && selectionDraft?.end ? ` (${formatHora ? formatHora(selectionDraft.start) : ""}–${formatHora ? formatHora(selectionDraft.end) : ""})` : ""}. Haz clic con cuidado: cada día que selecciones acá crea una reserva real.
+          </p>
+
+          {/* Tamaño natural del calendario (sin escalar) para que las celdas de día
+              sean del mismo tamaño que en bloqueosAgenda y no se preste a un clic
+              en el día equivocado por un objetivo demasiado pequeño. */}
+          <div className="rounded-xl border border-slate-200 bg-white flex justify-center py-1 overflow-x-auto">
+            <Calendar
+              mode="multiple"
+              selected={fechasRepeticion}
+              onSelect={(dias) => actualizarFechas(dias ?? [])}
+              locale={es}
+              disabled={diasDeshabilitados}
+              showOutsideDays={false}
+              className="rounded-xl"
+            />
+          </div>
+
+          {fechasRepeticion.length > 0 && (
+            <>
+              <div className="flex items-center justify-between ml-1">
+                <span className="text-[11px] text-slate-400 font-medium">
+                  {fechasRepeticion.length} fecha(s) adicional(es)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => actualizarFechas([])}
+                  className="text-[10px] font-semibold text-rose-400 hover:text-rose-600 transition-colors"
+                >
+                  Limpiar
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {[...fechasRepeticion].sort((a, b) => a - b).map((dia) => (
+                  <span
+                    key={dia.toISOString()}
+                    className="inline-flex items-center gap-1 bg-violet-100 text-[#6E56CF] text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                  >
+                    {format(dia, "EEE d MMM", { locale: es })}
+                    <button
+                      type="button"
+                      onClick={() => actualizarFechas(fechasRepeticion.filter((d) => d.toISOString() !== dia.toISOString()))}
+                      className="hover:text-rose-500 transition-colors ml-0.5"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+
+              {/* Confirmación obligatoria: el botón "Agendar" del footer queda deshabilitado
+                  hasta que se marque esta casilla — última barrera antes de crear varias
+                  reservas reales de una sola vez. */}
+              <label className="flex items-start gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!popupForm.confirmacionFechasRepeticion}
+                  onChange={(e) => onPopupFormChange("confirmacionFechasRepeticion", e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-violet-600 accent-violet-600 focus:ring-2 focus:ring-violet-200"
+                />
+                <span className="text-[11px] font-semibold text-slate-600 leading-snug">
+                  Revisé la lista de arriba y son las fechas correctas. Se creará 1 reserva el día principal + {fechasRepeticion.length} más. Si alguna fecha ya tiene una cita o un bloqueo, esa fecha no se agenda y se avisa al finalizar.
+                </span>
+              </label>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -530,6 +659,17 @@ function FormSection({
         </div>
       )}
 
+      {/* Repetir cita en más fechas — agenda al mismo paciente, mismo horario y mismo
+          profesional/servicio en días adicionales (ej: todos los martes del mes). */}
+      {mode === "create" && (
+        <RepetirFechasSection
+          popupForm={popupForm}
+          onPopupFormChange={onPopupFormChange}
+          selectionDraft={selectionDraft}
+          formatHora={formatHora}
+        />
+      )}
+
       {/* ── Tipo de consulta + Modalidad ── PENDIENTE BD ──
           Descomentar cuando estén aplicadas las migraciones:
           1. ALTER TABLE reservaciones ADD COLUMN nombre_prestacion VARCHAR(255) NULL;
@@ -694,7 +834,7 @@ export function AppointmentDrawer({
   id_profesional,
   selectionDraft,
   // popupForm ahora incluye: prestacion y modalidad además de los campos base
-  popupForm = { nombrePaciente: "", apellidoPaciente: "", rut: "", telefono: "", email: "", motivoBloqueo: "", prestacion: "", modalidad: "presencial" },
+  popupForm = { nombrePaciente: "", apellidoPaciente: "", rut: "", telefono: "", email: "", motivoBloqueo: "", prestacion: "", modalidad: "presencial", fechasRepeticion: [], confirmacionFechasRepeticion: false },
   onPopupFormChange,
   actualizarHora,
   actualizarFecha,
@@ -840,23 +980,32 @@ export function AppointmentDrawer({
                 >
                   Cancelar
                 </button>
-                {mode === "create" && (
-                  <button
-                    type="button"
-                    data-tour="reserva-guardar"
-                    onClick={() => {
-                      if (popupForm.motivoBloqueo?.trim()) {
-                        onBloquear?.(popupForm.motivoBloqueo);
-                      } else {
-                        onConfirmar?.();
-                      }
-                    }}
-                    className="flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
-                    style={{ backgroundColor: "#6E56CF" }}
-                  >
-                    {popupForm.motivoBloqueo?.trim() ? "Bloquear horario" : "Agendar"}
-                  </button>
-                )}
+                {mode === "create" && (() => {
+                  const fechasRepeticion = Array.isArray(popupForm.fechasRepeticion) ? popupForm.fechasRepeticion : [];
+                  // Si hay fechas de repetición, exige revisar el checkbox de confirmación
+                  // antes de poder agendar — evita crear varias citas reales por un clic
+                  // apurado o un día mal seleccionado en el mini-calendario.
+                  const requiereConfirmarRepeticion = fechasRepeticion.length > 0 && !popupForm.confirmacionFechasRepeticion;
+                  return (
+                    <button
+                      type="button"
+                      data-tour="reserva-guardar"
+                      disabled={requiereConfirmarRepeticion}
+                      onClick={() => {
+                        if (popupForm.motivoBloqueo?.trim()) {
+                          onBloquear?.(popupForm.motivoBloqueo);
+                        } else {
+                          onConfirmar?.();
+                        }
+                      }}
+                      className="flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ backgroundColor: "#6E56CF" }}
+                      title={requiereConfirmarRepeticion ? "Revisa y confirma la lista de fechas adicionales antes de agendar" : undefined}
+                    >
+                      {popupForm.motivoBloqueo?.trim() ? "Bloquear horario" : "Agendar"}
+                    </button>
+                  );
+                })()}
                 {mode === "edit" && (
                   <>
                     <button

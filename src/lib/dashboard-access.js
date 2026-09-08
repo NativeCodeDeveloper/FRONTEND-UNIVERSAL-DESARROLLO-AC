@@ -403,15 +403,6 @@ const DASHBOARD_NAV_SECTIONS = [
     ],
   },
   {
-    id: "finanzas",
-    title: "Finanzas",
-    accordionLabel: "Finanzas",
-    icon: "finance",
-    items: [
-      { label: "Resumen financiero", href: "/dashboard/finanzas", icon: "finance" },
-    ],
-  },
-  {
     id: "agenda",
     title: "Agenda",
     accordionLabel: "Agenda",
@@ -431,6 +422,15 @@ const DASHBOARD_NAV_SECTIONS = [
       { label: "Ver Pacientes", href: "/dashboard/listaPacientes", icon: "users" },
       { label: "Registrar Paciente", href: "/dashboard/GestionPaciente", icon: "users" },
       { label: "Ficha Clinica", href: "/dashboard/FichaClinica", icon: "fileText" },
+    ],
+  },
+  {
+    id: "finanzas",
+    title: "Finanzas",
+    accordionLabel: "Finanzas",
+    icon: "finance",
+    items: [
+      { label: "Resumen financiero", href: "/dashboard/finanzas", icon: "finance" },
     ],
   },
   {

@@ -363,6 +363,8 @@ function CalendarioContent() {
         modalidad: "presencial", // 'presencial' | 'online'
         monto_reserva: "",
         motivo_reserva: "",
+        fechasRepeticion: [], // Date[] — fechas adicionales para agendar al mismo paciente en el mismo horario
+        confirmacionFechasRepeticion: false, // debe marcarse tras revisar la lista antes de poder agendar
     });
 
     // Lista de prestaciones/servicios para el dropdown del drawer
@@ -796,6 +798,8 @@ function CalendarioContent() {
             modalidad: "presencial",
             monto_reserva: "",
             motivo_reserva: "",
+            fechasRepeticion: [],
+            confirmacionFechasRepeticion: false,
         });
     }
 
@@ -829,6 +833,8 @@ function CalendarioContent() {
             modalidad: "presencial", // Modalidad por defecto
             monto_reserva: "",
             motivo_reserva: "",
+            fechasRepeticion: [],
+            confirmacionFechasRepeticion: false,
         });
         setFloatingDraft({
             id: "draft-selection",
@@ -1284,6 +1290,90 @@ function CalendarioContent() {
             return false;
         }
         return false;
+    }
+
+    // POST crudo para una fecha específica del agendamiento múltiple (paciente en varios días).
+    // No valida horario/campos ni muestra toasts: eso ya se hizo una sola vez antes de iterar,
+    // porque el horario y los datos del paciente son iguales en todas las fechas seleccionadas.
+    async function crearReservaEnFecha({ nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado, fecha, horaInicio, horaFinalizacion, id_profesional, nombreProfesional, prestacion, modalidad, monto_reserva, motivo_reserva }) {
+        try {
+            const res = await fetch(`${API}/reservaPacientes/insertarReservaPacienteFicha`, {
+                method: "POST",
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                mode: "cors",
+                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial" })
+            });
+            const respuestaBackend = await res.json().catch(() => ({}));
+            if (respuestaBackend.message === true) return { ok: true };
+            return { ok: false, motivo: "conflicto" };
+        } catch (error) {
+            console.log(error);
+            return { ok: false, motivo: "error" };
+        }
+    }
+
+    // Agenda al mismo paciente en fechas adicionales, mismo horario y mismo profesional/servicio
+    // que la reserva principal ya creada. Cada fecha se valida por separado con la misma lógica
+    // de choques que usa el resto de la agenda (isOverlapping → citas + bloqueos existentes) antes
+    // de intentar el POST; si igual choca en el backend, esa fecha se cuenta como conflicto y se
+    // sigue con las demás. Nunca se sobreescribe ni se duplica una reserva ya existente.
+    async function insertarReservasEnFechasAdicionales(fechasExtra, datosBase) {
+        const fechasValidas = Array.isArray(fechasExtra) ? fechasExtra : [];
+        if (fechasValidas.length === 0) return;
+
+        const {
+            nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado,
+            horaInicioStr, horaFinalizacionStr, id_profesional: idProfesionalEnvio, nombreProfesional,
+            prestacion, modalidad, monto_reserva, motivo_reserva, fechaPrimaria,
+        } = datosBase;
+
+        let exitosos = 0;
+        let conflictos = 0;
+        let errores = 0;
+
+        // Descarta duplicados y el día ya agendado por la reserva principal.
+        const fechasVistas = new Set([fechaPrimaria]);
+        const fechasOrdenadas = fechasValidas
+            .map((dia) => formatearFechaLocal(dia))
+            .filter((fecha) => {
+                if (fechasVistas.has(fecha)) return false;
+                fechasVistas.add(fecha);
+                return true;
+            })
+            .sort();
+
+        const hoyStr = new Date().toISOString().slice(0, 10);
+
+        for (const fecha of fechasOrdenadas) {
+            if (fecha < hoyStr) { errores++; continue; }
+
+            const inicio = new Date(`${fecha}T${horaInicioStr}`);
+            const final = new Date(`${fecha}T${horaFinalizacionStr}`);
+
+            // Misma validación que usa el resto de la agenda: choque con citas o con bloqueos.
+            if (isOverlapping(inicio, final)) { conflictos++; continue; }
+
+            const resultado = await crearReservaEnFecha({
+                nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado,
+                fecha, horaInicio: horaInicioStr, horaFinalizacion: horaFinalizacionStr,
+                id_profesional: idProfesionalEnvio, nombreProfesional,
+                prestacion, modalidad, monto_reserva, motivo_reserva,
+            });
+
+            if (resultado.ok) exitosos++;
+            else if (resultado.motivo === "conflicto") conflictos++;
+            else errores++;
+        }
+
+        if (exitosos > 0) await refrescarCalendario();
+
+        if (exitosos > 0 && conflictos === 0 && errores === 0) {
+            toast.success(`Se agendaron ${exitosos} fecha(s) adicionales correctamente.`);
+        } else if (exitosos > 0) {
+            toast.success(`${exitosos} fecha(s) adicionales agendadas. ${conflictos + errores} no se pudieron agendar (hora ocupada, bloqueada o fecha pasada).`);
+        } else {
+            toast.error(`No se pudo agendar ninguna fecha adicional (${conflictos} ocupada(s)/bloqueada(s), ${errores} con error).`);
+        }
     }
 
     async function ingresarPacienteDesdeAgenda() {
@@ -1880,6 +1970,32 @@ function CalendarioContent() {
             popupForm.motivo_reserva ?? ""
         );
         if (created) {
+            // Defensa adicional: aunque el botón "Agendar" ya queda deshabilitado en el
+            // drawer hasta marcar la casilla de confirmación, no se ejecuta el agendamiento
+            // múltiple si esa confirmación no llegó marcada — nunca debe crear varias
+            // reservas reales sin que el usuario haya revisado la lista de fechas.
+            if (
+                Array.isArray(popupForm.fechasRepeticion) &&
+                popupForm.fechasRepeticion.length > 0 &&
+                popupForm.confirmacionFechasRepeticion
+            ) {
+                await insertarReservasEnFechasAdicionales(popupForm.fechasRepeticion, {
+                    nombrePaciente: popupForm.nombrePaciente,
+                    apellidoPaciente: popupForm.apellidoPaciente,
+                    rutLimpio: normalizarRut(popupForm.rut),
+                    telefono: popupForm.telefono,
+                    correoNormalizado: normalizarCorreoOpcional(popupForm.email),
+                    horaInicioStr: selectionDraft.start.toTimeString().slice(0, 8),
+                    horaFinalizacionStr: selectionDraft.end.toTimeString().slice(0, 8),
+                    id_profesional,
+                    nombreProfesional: obtenerNombreProfesionalParaEnvio(id_profesional),
+                    prestacion: popupForm.prestacion ?? "",
+                    modalidad: popupForm.modalidad ?? "presencial",
+                    monto_reserva: popupForm.monto_reserva ?? "",
+                    motivo_reserva: popupForm.motivo_reserva ?? "",
+                    fechaPrimaria: formatearFechaLocal(selectionDraft.start),
+                });
+            }
             setNombrePaciente(popupForm.nombrePaciente);
             setApellidoPaciente(popupForm.apellidoPaciente);
             setRut(popupForm.rut);
@@ -2111,10 +2227,7 @@ function CalendarioContent() {
                 {/* ── Header premium ── */}
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">
-                            Reservación de pacientes
-                        </p>
-                        <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Calendario
                         </h1>
                         {/* Subtítulo dinámico con rango de semana */}
@@ -2190,12 +2303,12 @@ function CalendarioContent() {
                             type="button"
                             onClick={() => router.push("/dashboard")}
                             className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Ir a reservaciones"
+                            aria-label="Ir a reservas"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>Reservaciones</span>
+                            <span>Reservas</span>
                         </button>
                         <button
                             type="button"

@@ -1,4 +1,4 @@
-# Actualización: Bloqueo de Agenda, Edición de Ficha Clínica, Notificaciones y Calendario Público
+# Actualización: Bloqueo de Agenda, Edición de Ficha Clínica, Notificaciones, Calendario Público y Agendamiento Múltiple
 
 Este documento describe en detalle los cambios implementados en varios módulos del dashboard y del calendario público. Está pensado para que otro desarrollador (o instancia de Claude) entienda exactamente qué se hizo, por qué, y cómo funciona.
 
@@ -347,6 +347,73 @@ Se simuló el algoritmo exacto (extraído literal del archivo) en Node con 12 es
 
 - Esta lógica de "salto por bloqueo" **no** considera reservas ya confirmadas al generar candidatos (solo bloqueos). Las reservas siguen dependiendo exclusivamente de la validación del backend (`validarSlot`) para ser excluidas — funciona hoy porque toda reserva se crea a partir de un candidato de la grilla, pero si en el futuro se detectan huecos perdidos alrededor de reservas parciales (no solo bloqueos), aplicaría el mismo patrón aquí descrito.
 - No se tocó `src/app/dashboard/calendario/page.jsx` (calendario del dashboard) ni `src/app/dashboard/calendarioGeneral/page.jsx` (copia legacy huérfana, ver auditoría previa) — ninguno de los dos tiene este problema porque no arman una grilla de slots fijos por duración.
+
+---
+
+## 5. Agendamiento múltiple — repetir una cita en varias fechas desde el popup de reservas
+
+**Archivos:** `src/Componentes/AppointmentDrawer.jsx` (UI) · `src/app/dashboard/calendario/page.jsx` (lógica de inserción)
+**Fecha:** 2026-09-07 · **Estado:** integrado en `main`, probado manualmente por el usuario tras corregir un bug real de duplicación (ver 5.5).
+
+### 5.1 Qué se pidió
+
+Desde el popup de "Nueva reserva" que se abre en `/dashboard/calendario` al seleccionar un horario, permitir agendar al **mismo paciente, mismo profesional, mismo horario** en **varias fechas adicionales** de una sola vez (ej.: terapia todos los martes por 2 meses), sin crear duplicados ni pisar citas/bloqueos existentes. Explícitamente **no** es una página aparte — vive dentro del mismo drawer de agendamiento (`AppointmentDrawer`, `mode="create"`).
+
+### 5.2 UI: `RepetirFechasSection` (dentro de `AppointmentDrawer.jsx`)
+
+Componente nuevo, usado solo cuando `mode === "create"`. Es un **desplegable** (colapsado por defecto, con contador violeta cuando ya hay fechas elegidas):
+
+- Header tipo botón con flecha que rota 180° al abrir (`useState` local `abierto`).
+- Al expandir: un `Calendar` (`@/components/ui/calendar`, el mismo wrapper de react-day-picker que usa `bloqueosAgenda`) en `mode="multiple"`, a **tamaño natural** (sin transform de escala — ver 5.5 por qué importa), con `showOutsideDays={false}` y los días pasados / el día principal ya agendado deshabilitados (`disabled={[{before: hoy}, {after: limite(+3 meses)}, selectionDraft.start]}`).
+- Chips debajo con cada fecha elegida (`format(dia, "EEE d MMM", {locale: es})`), removibles individualmente, más botón "Limpiar todo".
+- **Checkbox de confirmación obligatoria** (ver 5.4).
+
+Las fechas elegidas se guardan en `popupForm.fechasRepeticion` (`Date[]`), un campo nuevo agregado al estado `popupForm` que ya vive en `calendario/page.jsx` (mismo patrón que `prestacion`, `modalidad`, etc. — se actualiza vía `onPopupFormChange("fechasRepeticion", ...)`).
+
+### 5.3 Lógica de inserción (`calendario/page.jsx`)
+
+No se tocó `insertarNuevaReserva` (la reserva del día principal sigue exactamente igual). Se agregaron dos funciones nuevas, ejecutadas **después** de que la reserva principal se crea con éxito:
+
+- **`crearReservaEnFecha(...)`**: POST crudo a `/reservaPacientes/insertarReservaPacienteFicha` para una fecha puntual — mismo endpoint y mismo shape de body que usa la reserva principal, sin validaciones ni toasts propios (la validación de horario/campos ya se hizo una sola vez, porque es igual en todas las fechas).
+- **`insertarReservasEnFechasAdicionales(fechasExtra, datosBase)`**: itera las fechas (deduplicadas y sin repetir el día principal), y por cada una:
+  1. Descarta fechas pasadas.
+  2. Corre **la misma validación de choques que usa el resto de la agenda** — `isOverlapping()` (revisa `dataAgenda` + `dataBloqueos`, citas y bloqueos) — como pre-chequeo.
+  3. Si pasa, llama a `crearReservaEnFecha`. El backend es la autoridad final: si igual devuelve conflicto, esa fecha se cuenta como no-agendada y se sigue con las demás.
+  4. Al final hace **un solo** `refrescarCalendario()` y muestra un toast resumen (`X agendadas, Y no se pudieron por hora ocupada/bloqueada/pasada`).
+
+Nunca se sobreescribe ni se duplica una hora ya ocupada — cada fecha se valida de forma independiente contra el estado real de la agenda.
+
+### 5.4 Confirmación obligatoria antes de agendar múltiple
+
+El botón **"Agendar"** del footer del drawer queda **deshabilitado** (`disabled`, opacidad reducida) mientras `popupForm.fechasRepeticion.length > 0` y no se haya marcado el checkbox `popupForm.confirmacionFechasRepeticion`. Este campo:
+
+- Se resetea a `false` automáticamente cada vez que la lista de fechas cambia (agregar, quitar, limpiar) — función `actualizarFechas()` dentro de `RepetirFechasSection`.
+- Se revisa **dos veces**: en el `disabled` del botón (UI) y de nuevo dentro de `confirmarAgendamientoDesdePopup` en `calendario/page.jsx` antes de correr el loop de inserción múltiple (defensa en profundidad — nunca debe dispararse el agendamiento múltiple sin la confirmación explícita, aunque algo bypasee la UI).
+
+### 5.5 Bug real encontrado en pruebas y su corrección
+
+Durante las pruebas del usuario, seleccionar fechas en el mini-calendario produjo **citas en un día distinto al elegido** (ej. seleccionó jueves y se agendó también/solo el viernes siguiente). Causa más probable identificada: el mini-calendario se había renderizado con `className="... scale-[0.85] origin-top"` para verse más compacto dentro del drawer angosto (400px) — esto reduce el tamaño real de las celdas de día, dejando columnas vecinas (jueves/viernes) muy juntas y con un blanco de clic pequeño, fácil de errar sin notarlo en un flujo de "clic, clic, clic" repetido por varias semanas.
+
+**Corrección aplicada (no se pudo reproducir en vivo con DevTools — el fix ataca la causa más probable + agrega una barrera independiente de la causa exacta):**
+
+1. Se quitó el `scale-[0.85]` — el calendario vuelve a su tamaño natural, igual que en `bloqueosAgenda` (probado en producción sin este problema).
+2. Se agregó `showOutsideDays={false}` a este calendario específico, para no mostrar días de meses adyacentes (otra fuente de clics ambiguos cerca del borde del mes).
+3. Se agregó el checkbox de confirmación obligatoria descrito en 5.4, como última barrera: obliga a revisar la lista de fechas (con formato "día de semana + fecha", ej. "jue 10 sep") antes de que el botón "Agendar" se habilite.
+
+Verificado visualmente (Chrome headless, vía ruta temporal fuera de dashboard borrada después de la captura) en los tres estados: colapsado, expandido con fechas seleccionadas, botón deshabilitado y habilitado tras marcar el checkbox. El usuario confirmó luego con pruebas manuales reales que funciona correctamente.
+
+Ver también [[cautela-cambios-agenda]] — este fue exactamente el tipo de incidente que esa memoria advierte evitar.
+
+### 5.6 Estilo visual
+
+- Header del desplegable en `text-emerald-600 font-bold` (mismo verde que "Paciente encontrado" en este mismo archivo) para que resalte como sección relevante.
+- Contador de fechas: `bg-violet-100 text-[#6E56CF]` (mismo patrón de chip violeta que el resto del drawer).
+- Checkbox de confirmación: neutro (`border-slate-200 bg-white`, texto `text-slate-600`) con el checkbox en violeta de marca (`accent-violet-600`) — **sin colores tipo "warning" (amber/yellow)**, para no verse como una caja de advertencia genérica de IA; el usuario pidió explícitamente mantener el estilo limpio tipo Apple del resto del dashboard.
+
+### 5.7 Fuera de alcance / pendiente
+
+- No hay límite de fechas por lote (se probó con ~8-9 fechas en 2 meses); no se ha probado con volúmenes mucho mayores.
+- El pre-chequeo `isOverlapping()` usa el estado `dataAgenda`/`dataBloqueos` cargado en el cliente — puede quedar desactualizado entre el POST de la reserva principal y el loop de fechas adicionales si otro usuario agenda al mismo profesional en simultáneo; esto no genera duplicados porque el backend sigue siendo la fuente de verdad final (devuelve conflicto igual), solo podría hacer que el pre-chequeo no detecte algo que el backend sí rechaza — comportamiento seguro, solo potencialmente menos eficiente (un POST de más que termina en conflicto).
 
 ---
 

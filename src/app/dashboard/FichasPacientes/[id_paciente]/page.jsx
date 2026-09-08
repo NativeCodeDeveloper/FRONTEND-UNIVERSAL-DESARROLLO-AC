@@ -18,12 +18,13 @@ import {CheckboxIcon} from "@radix-ui/react-icons";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {InfoButton} from "@/Componentes/InfoButton";
-import { formatRut, cleanRut } from "@/lib/designTokens";
+import { formatRut, cleanRut, getStateTokens } from "@/lib/designTokens";
 import {
     canAccessOdontograma,
     canAccessRecetasEnFicha,
     getDashboardRoleFromUser,
 } from "@/lib/dashboard-access";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 
 function parsearDatosDinamicos(datos) {
@@ -242,6 +243,9 @@ export default function Paciente() {
     const [ultimaAtencion, setUltimaAtencion] = useState(null);
     const pacienteAtencionRef = useRef(null);
     const primeraExpansionRef = useRef(null);
+    const [historialCitas, setHistorialCitas] = useState([]);
+    const [cargandoHistorialCitas, setCargandoHistorialCitas] = useState(false);
+    const pacienteReservasRef = useRef(null);
 
     function toggleFichaExpandida(id_ficha) {
         setFichasExpandidas(prev => {
@@ -292,6 +296,55 @@ export default function Paciente() {
             setUltimaAtencion(atendidas[0]?.fechaInicio || null);
         } catch (error) {
             if (pacienteAtencionRef.current === idPacienteConsultado) setUltimaAtencion(null);
+        }
+    }
+
+    // Historial completo de citas del paciente — Fecha, hora, profesional, motivo,
+    // monto y estado de cada reserva, más el total. No existe un endpoint por
+    // id_paciente ni uno por rut que incluya el nombre del profesional, así que se
+    // usa el mismo listado completo que ya consume el resto del dashboard
+    // (calendario, notificaciones, finanzas) y se filtra acá por rut exacto —
+    // este endpoint sí trae `nombreProfesional` vía JOIN.
+    async function cargarHistorialCitas(rutPaciente, idPacienteConsultado) {
+        if (!rutPaciente) {
+            if (pacienteReservasRef.current === idPacienteConsultado) setHistorialCitas([]);
+            return;
+        }
+        pacienteReservasRef.current = idPacienteConsultado;
+        setCargandoHistorialCitas(true);
+        try {
+            const res = await fetch(`${API}/reservaPacientes/seleccionarReservados`, {
+                method: "GET",
+                headers: { Accept: "application/json" },
+            });
+
+            if (pacienteReservasRef.current !== idPacienteConsultado) return;
+
+            if (!res.ok) {
+                setHistorialCitas([]);
+                return;
+            }
+
+            const data = await res.json();
+            if (!Array.isArray(data)) {
+                setHistorialCitas([]);
+                return;
+            }
+
+            const rutLimpio = cleanRut(rutPaciente);
+            const citasPaciente = data
+                .filter((r) => cleanRut(r.rut || "") === rutLimpio)
+                .sort((a, b) => {
+                    const claveA = `${String(a.fechaInicio || "").slice(0, 10)}T${a.horaInicio || "00:00:00"}`;
+                    const claveB = `${String(b.fechaInicio || "").slice(0, 10)}T${b.horaInicio || "00:00:00"}`;
+                    return new Date(claveB) - new Date(claveA);
+                });
+
+            setHistorialCitas(citasPaciente);
+        } catch (error) {
+            if (pacienteReservasRef.current === idPacienteConsultado) setHistorialCitas([]);
+        } finally {
+            if (pacienteReservasRef.current === idPacienteConsultado) setCargandoHistorialCitas(false);
         }
     }
 
@@ -567,6 +620,7 @@ export default function Paciente() {
         setHabitos(paciente.habitos || "");
         setComentariosAdicionales(paciente.comentariosAdicionales || "");
         cargarUltimaAtencion(paciente.rut, id_paciente);
+        cargarHistorialCitas(paciente.rut, id_paciente);
     }, [detallePaciente]);
 
     function calcularEdad(fechaNacimiento) {
@@ -1286,8 +1340,9 @@ export default function Paciente() {
                         {/* Listado de Fichas */}
                         <div className="space-y-6">
                             
-                            {/* Filtros y firma PDF */}
-                            <details open className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
+                            {/* Filtros y firma PDF — colapsado por defecto, igual que "Información de ingreso",
+                                para no dejar espacio en blanco cuando no se está usando. */}
+                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1351,19 +1406,104 @@ export default function Paciente() {
                                     </div>
                                 </div>
                             </details>
+
+                            {/* Historial de Citas — separado de las Fichas clínicas: reservas/citas
+                                reales del paciente (día, hora, profesional, motivo, monto, estado) más
+                                el total, para que el profesional vea de un vistazo cuántas veces ha
+                                venido este paciente. Colapsado por defecto, mismo patrón que "Filtros"
+                                e "Información de ingreso". */}
+                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
+                                <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 12v3l2 1" />
+                                        </svg>
+                                    </div>
+                                    <div className="relative min-w-0 flex-1">
+                                        <h3 className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-slate-900">Historial de Citas</h3>
+                                        <p className="mt-0.5 text-[12px] text-slate-500">
+                                            {cargandoHistorialCitas
+                                                ? "Cargando..."
+                                                : historialCitas.length === 0
+                                                    ? "Sin citas registradas"
+                                                    : `${historialCitas.length} cita${historialCitas.length === 1 ? "" : "s"} en total`}
+                                        </p>
+                                    </div>
+                                    {!cargandoHistorialCitas && historialCitas.length > 0 && (
+                                        <span className="relative hidden shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 px-3 py-1.5 text-[13px] font-bold text-[#6E56CF] sm:flex">
+                                            {historialCitas.length}
+                                        </span>
+                                    )}
+                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                                        </svg>
+                                    </div>
+                                </summary>
+                                <div className="border-t border-slate-100 p-4">
+                                    {cargandoHistorialCitas ? (
+                                        <p className="py-8 text-center text-[13px] text-slate-400">Cargando historial de citas...</p>
+                                    ) : historialCitas.length === 0 ? (
+                                        <p className="py-8 text-center text-[13px] text-slate-400">Este paciente aún no tiene citas registradas.</p>
+                                    ) : (
+                                        <div className="overflow-x-auto rounded-xl border border-slate-100">
+                                            <Table className="w-full table-fixed">
+                                                <TableHeader>
+                                                    <TableRow className="bg-slate-50/60 hover:bg-slate-50/60">
+                                                        <TableHead className="w-[14%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Fecha</TableHead>
+                                                        <TableHead className="w-[9%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Hora</TableHead>
+                                                        <TableHead className="w-[21%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Profesional</TableHead>
+                                                        <TableHead className="w-[23%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Motivo</TableHead>
+                                                        <TableHead className="w-[13%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Monto</TableHead>
+                                                        <TableHead className="w-[20%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Estado</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {historialCitas.map((cita) => (
+                                                        <TableRow key={cita.id_reserva}>
+                                                            <TableCell className="truncate text-[13px] font-semibold text-slate-800">{formatearFecha(cita.fechaInicio)}</TableCell>
+                                                            <TableCell className="truncate text-[13px] text-slate-600">{String(cita.horaInicio || "").slice(0, 5) || "—"}</TableCell>
+                                                            <TableCell className="truncate text-[13px] text-slate-600" title={cita.nombreProfesional || ""}>
+                                                                {cita.nombreProfesional || "—"}
+                                                            </TableCell>
+                                                            <TableCell className="truncate text-[13px] text-slate-600" title={cita.motivo_reserva || cita.nombre_prestacion || ""}>
+                                                                {cita.motivo_reserva || cita.nombre_prestacion || "—"}
+                                                            </TableCell>
+                                                            <TableCell className="truncate text-[13px] font-semibold text-slate-800">
+                                                                {cita.monto_reserva ? `$${Number(cita.monto_reserva).toLocaleString("es-CL")}` : "—"}
+                                                            </TableCell>
+                                                            <TableCell className="overflow-hidden">
+                                                                <span className="flex w-full items-center justify-start gap-1.5 overflow-hidden rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-700">
+                                                                    <span
+                                                                        className="h-1.5 w-1.5 shrink-0 rounded-full"
+                                                                        style={{ backgroundColor: getStateTokens(cita.estadoReserva).dot }}
+                                                                    />
+                                                                    <span className="truncate">{getStateTokens(cita.estadoReserva).label}</span>
+                                                                </span>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    )}
+                                </div>
+                            </details>
                         </div>
                     </div>
 
                         <div className="xl:col-span-12">
-                            <div className="mb-5 grid grid-cols-1 xl:grid-cols-12 xl:gap-8">
-                                <div data-tour="ficha-registros" className="flex items-center gap-3 xl:col-start-5 xl:col-span-8">
+                            <div className="mb-6 grid grid-cols-[52px_1fr] gap-4 sm:grid-cols-[84px_1fr] sm:gap-6">
+                                <div aria-hidden="true" />
+                                <div data-tour="ficha-registros" className="flex items-center gap-3">
                                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M7 4h7l3 3v13H7V4z" />
                                         </svg>
                                     </span>
-                                    <h2 className="whitespace-nowrap text-[15px] font-bold tracking-[-0.01em] text-slate-700">Registros clínicos</h2>
-                                    <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
+                                    <h2 className="whitespace-nowrap text-[15px] font-bold tracking-[-0.01em] text-slate-900">Registros clínicos</h2>
+                                    <span aria-hidden="true" className="h-px flex-1 bg-slate-200" />
                                 </div>
                             </div>
                             {/* Fichas Propiamente Tales */}
@@ -1379,26 +1519,30 @@ export default function Paciente() {
                                     {fichasAgrupadasPorMes.map((grupo, indiceGrupo) => (
                                     <section
                                         key={grupo.clave}
-                                        className="grid grid-cols-1 gap-3 xl:grid-cols-12 xl:gap-8"
+                                        className="grid grid-cols-[52px_1fr] gap-4 sm:grid-cols-[84px_1fr] sm:gap-6"
                                     >
-                                        <div className="relative z-30 flex items-center gap-2.5 xl:col-span-4 xl:block xl:pt-3 xl:pr-10 xl:text-right">
-                                            <span className="inline-flex items-center whitespace-nowrap rounded-xl border border-violet-100 bg-white/90 px-2.5 py-1 text-[9px] font-bold tracking-[0.04em] text-violet-600 shadow-[0_8px_20px_-16px_rgba(109,40,217,0.55)]">
-                                                {grupo.etiqueta}
-                                            </span>
-                                            <p className="text-[9px] font-medium text-slate-400 xl:mt-1.5">
-                                                {grupo.fichas.length} {grupo.fichas.length === 1 ? "registro" : "registros"}
-                                            </p>
+                                        {/* Riel de línea de tiempo — angosto y monocromo a propósito, para
+                                            dejarle casi todo el ancho a las fichas (antes ocupaba 4 de 12
+                                            columnas solo para una etiqueta de mes). */}
+                                        <div className="relative flex flex-col items-center pt-1">
                                             <span
-                                                aria-hidden="true"
-                                                className={`absolute -right-[17px] top-0 hidden border-l-2 border-dashed border-violet-200 xl:block ${indiceGrupo === fichasAgrupadasPorMes.length - 1 ? "bottom-0" : "-bottom-7"}`}
+                                                className={`relative z-10 h-2.5 w-2.5 shrink-0 rounded-full ring-[3px] ring-white ${indiceGrupo === 0 ? "bg-slate-900 shadow-[0_0_0_1px_rgba(15,23,42,0.15)]" : "bg-slate-300"}`}
                                             />
-                                            <span
-                                                aria-hidden="true"
-                                                className={`absolute -right-[25px] top-5 z-30 hidden h-4 w-4 rounded-full border-4 border-white shadow-[0_0_0_2px_rgba(139,92,246,0.28)] xl:block ${indiceGrupo === 0 ? "bg-[#6E56CF]" : "bg-violet-300"}`}
-                                            />
+                                            {indiceGrupo !== fichasAgrupadasPorMes.length - 1 && (
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="absolute left-1/2 top-4 -bottom-7 w-px -translate-x-1/2 bg-slate-200"
+                                                />
+                                            )}
+                                            <div className="mt-3 text-center">
+                                                <p className="text-[11px] font-bold leading-tight tracking-[-0.01em] text-slate-900">{grupo.etiqueta}</p>
+                                                <p className="mt-0.5 text-[10px] font-medium text-slate-400">
+                                                    {grupo.fichas.length} {grupo.fichas.length === 1 ? "registro" : "registros"}
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <div className="space-y-4 xl:col-span-8">
+                                        <div className="min-w-0 space-y-4">
                                     {grupo.fichas.map((ficha) => {
                                         const expandida = fichasExpandidas.has(ficha.id_ficha);
                                         const esMasReciente = ficha.id_ficha === listaFichasOrdenada[0]?.id_ficha;
@@ -1451,7 +1595,7 @@ export default function Paciente() {
                                                                         <div className="flex items-center gap-3">
                                                                             <span className="h-2 w-2 rounded-full bg-[#6E56CF] shadow-[0_0_0_4px_rgba(110,86,207,0.1)]" />
                                                                             <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6E56CF]">{cat.nombre}</span>
-                                                                            <div className="h-px flex-1 bg-gradient-to-r from-violet-200 via-slate-200 to-transparent"></div>
+                                                                            <div className="h-px flex-1 bg-slate-200"></div>
                                                                         </div>
                                                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                                             {cat.campos.map((campo, idx) => (
