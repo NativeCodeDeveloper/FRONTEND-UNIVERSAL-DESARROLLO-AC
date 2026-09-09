@@ -148,7 +148,8 @@ export default function Portada() {
   return (
     <section
       id="inicio"
-      className="relative w-full overflow-hidden bg-white bg-[url('/wall.jpg')] bg-cover bg-center md:bg-fixed -mt-24 md:-mt-0.5 min-h-screen flex flex-col items-center justify-center pt-[176px] md:pt-20 pb-10"
+      className="relative w-full overflow-hidden bg-white bg-cover bg-center md:bg-fixed -mt-24 md:-mt-0.5 min-h-screen flex flex-col items-center justify-center pt-[176px] md:pt-20 pb-10"
+      style={{ backgroundImage: "url('/bg-swoosh-azul.webp')" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -158,7 +159,7 @@ export default function Portada() {
         <div className="hidden md:flex relative items-center justify-center">
 
           {/* Imagen izquierda */}
-          <div className="w-[470px] h-[470px] rounded-3xl overflow-hidden bg-slate-200 flex-shrink-0">
+          <div className="w-[470px] h-[470px] rounded-3xl overflow-hidden bg-slate-200 flex-shrink-0 shadow-xl shadow-slate-200/50">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide.id}
@@ -182,7 +183,7 @@ export default function Portada() {
           </div>
 
           {/* Card solapada derecha */}
-          <div className="bg-white rounded-3xl border border-indigo-200/60 p-8 ml-[-40px] z-10 max-w-xl flex-1">
+          <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/60 border border-indigo-200/60 p-8 ml-[-40px] z-10 max-w-xl flex-1">
 
             {/* AC badge */}
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5">
@@ -254,7 +255,7 @@ export default function Portada() {
         <div className="md:hidden max-w-sm mx-auto text-center">
 
           {/* Imagen */}
-          <div className="w-full aspect-square rounded-3xl overflow-hidden mb-6 bg-slate-200">
+          <div className="w-full aspect-square rounded-3xl overflow-hidden mb-6 bg-slate-200 shadow-lg shadow-slate-200/50">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide.id + "-mobile-img"}

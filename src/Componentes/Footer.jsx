@@ -113,63 +113,61 @@ export default function Footer() {
   const hasMap = publicContact.mapsUrl && publicContact.mapsUrl.startsWith("https://www.google.com/maps/embed");
 
   return (
-    <footer id="footer" className="relative overflow-hidden bg-[#061a3a] pb-10 pt-20 font-[family-name:var(--font-outfit)] text-slate-300">
-
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-sky-300/70 to-transparent" />
+    <footer id="footer" className="relative overflow-hidden bg-slate-950 text-slate-300 pt-20 pb-10">
 
       {/* Background watermark */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center select-none z-0">
-        <span className="whitespace-nowrap text-[11vw] font-extrabold leading-none tracking-[-0.06em] text-white opacity-[0.035]">
+        <span className="text-[12vw] font-black leading-none text-white whitespace-nowrap opacity-[0.05]">
           AGENDA CLÍNICA
         </span>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
-        <div className="grid gap-12 border-b border-white/10 pb-16 lg:grid-cols-12 lg:gap-10">
+      <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 md:px-10 lg:px-16">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-8 border-b border-slate-800 pb-16">
 
           {/* Brand */}
           <div className="lg:col-span-4">
-            <Link href="/" aria-label="Ir al inicio" className="group mb-7 flex items-center justify-center lg:justify-start">
+            <Link href="/" aria-label="Ir al inicio" className="group mt-4 mb-8 flex items-center justify-center lg:justify-start">
               <div className="transition-transform duration-300 group-hover:scale-105">
                 <Image
                   src="/logo-full.png"
                   alt="Agenda Clínica"
                   width={220}
                   height={55}
-                  className="h-16 w-auto object-contain"
+                  className="h-20 w-auto object-contain"
                 />
               </div>
             </Link>
 
-            <p className="mb-8 max-w-xs text-base leading-7 text-white/65">
+            <p className="text-slate-400 leading-relaxed max-w-xs mb-8 mt-4">
               Agenda tu hora en línea de forma rápida y segura, en cualquier momento del día.
             </p>
 
             {/* Trust badges */}
             <div className="flex flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium text-white/65">
-                <Shield className="h-3.5 w-3.5 text-sky-300" />
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-400">
+                <Shield className="h-3.5 w-3.5 text-indigo-400" />
                 SSL Seguro
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium text-white/65">
-                <Lock className="h-3.5 w-3.5 text-sky-300" />
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-400">
+                <Lock className="h-3.5 w-3.5 text-indigo-400" />
                 Datos Cifrados
               </div>
             </div>
           </div>
 
           {/* Links grid */}
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:col-span-8 lg:grid-cols-[180px_190px_1fr] lg:gap-10">
+          <div className="lg:col-span-8 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[200px_220px_1fr] lg:gap-10">
 
             {/* Navegación */}
             <div>
-              <h4 className="mb-5 text-xs font-bold tracking-[0.18em] text-sky-200 uppercase">Explorar</h4>
-              <ul className="space-y-3">
+              <h4 className="text-white font-semibold mb-5 uppercase tracking-wider text-xs">Explorar</h4>
+              <ul className="space-y-3.5">
                 {navLinks.map((item) => (
                   <li key={item.label}>
                     <a
                       href={item.href}
-                      className="text-sm text-white/60 transition duration-200 hover:text-white"
+                      className="text-slate-400 text-sm transition hover:text-white"
                     >
                       {item.label}
                     </a>
@@ -182,8 +180,8 @@ export default function Footer() {
             <div>
               {socialLinks.length > 0 && (
                 <>
-                  <h4 className="mb-5 text-xs font-bold tracking-[0.18em] text-sky-200 uppercase">Redes sociales</h4>
-                  <div className="space-y-3 text-sm text-white/60">
+                  <h4 className="text-white font-semibold mb-5 uppercase tracking-wider text-xs">Redes sociales</h4>
+                  <div className="space-y-3 text-sm text-slate-400">
                     {socialLinks.map((item) => {
                       const Icon = item.icon;
                       return (
@@ -192,9 +190,9 @@ export default function Footer() {
                           href={item.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group flex items-center gap-3 transition hover:text-white"
+                          className="flex items-center gap-3 transition hover:text-white"
                         >
-                          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-sky-200 transition duration-200 group-hover:border-white/25 group-hover:bg-white group-hover:text-[#061a3a]">
+                          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-slate-400 transition hover:bg-indigo-600 hover:text-white">
                             <Icon className="h-4 w-4" />
                           </span>
                           <span>{item.label}</span>
@@ -206,7 +204,7 @@ export default function Footer() {
               )}
 
               {!hasContactInfo && socialLinks.length === 0 && (
-                <p className="text-sm text-white/45">
+                <p className="text-sm text-slate-500">
                   Configura los datos de empresa desde el dashboard.
                 </p>
               )}
@@ -214,10 +212,10 @@ export default function Footer() {
 
             {/* Contacto */}
             <div>
-              <h4 className="mb-5 text-xs font-bold tracking-[0.18em] text-sky-200 uppercase">Contacto</h4>
-              <div className="space-y-4 text-sm text-white/65">
+              <h4 className="text-white font-semibold mb-5 uppercase tracking-wider text-xs">Contacto</h4>
+              <div className="space-y-3.5 text-sm text-slate-400">
                 <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 shrink-0 text-sky-300" />
+                  <Phone className="h-4 w-4 shrink-0 text-indigo-400" />
                   {publicContact.phone ? (
                     <a
                       href={`tel:${publicContact.phone}`}
@@ -230,7 +228,7 @@ export default function Footer() {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 shrink-0 text-sky-300" />
+                  <Mail className="h-4 w-4 shrink-0 text-indigo-400" />
                   {publicContact.email ? (
                     <a
                       href={publicContact.emailUrl}
@@ -243,7 +241,7 @@ export default function Footer() {
                   )}
                 </div>
                 <div className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" />
+                  <MapPin className="h-4 w-4 shrink-0 text-indigo-400 mt-0.5" />
                   {publicContact.address ? (
                     publicContact.mapsUrl ? (
                       <a
@@ -263,7 +261,7 @@ export default function Footer() {
                 </div>
               </div>
               {hasMap && (
-                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                <div className="mt-5 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
                   <iframe
                     src={publicContact.mapsUrl}
                     width="600"
@@ -283,7 +281,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-8 flex flex-col gap-3 px-1 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between px-1">
           <p>
             © {new Date().getFullYear()} {publicContact.companyName}. Todos los derechos reservados.
           </p>
@@ -293,17 +291,17 @@ export default function Footer() {
               href="https://nativecode.cl"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-white/65 transition hover:text-white"
+              className="font-medium text-slate-400 hover:text-white transition"
             >
               NativeCode
             </a>
-            <span className="text-white/20">·</span>
+            <span className="text-slate-700">·</span>
             Potenciado por{" "}
             <a
               href="https://agendaclinicas.cl"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-white/75 transition hover:text-white"
+              className="font-medium text-slate-300 hover:text-white transition"
             >
               Agenda Clínica
             </a>

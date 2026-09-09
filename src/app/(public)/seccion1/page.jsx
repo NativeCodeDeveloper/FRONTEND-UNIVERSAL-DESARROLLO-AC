@@ -49,49 +49,34 @@ export default function Seccion1() {
   return (
     <section
       id="sobre-nosotros"
-      className="relative scroll-mt-24 overflow-hidden bg-white py-20 font-[family-name:var(--font-outfit)] sm:py-28"
+      className="scroll-mt-24 bg-white py-20 sm:py-28 border-t border-slate-100"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-sky-200 to-transparent" />
-
       <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
         <RevealOnScroll>
-          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 xl:gap-28">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-start">
 
-            <div className="max-w-xl">
-              <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-sky-100 bg-slate-50 px-4 py-2 shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="text-[11px] font-bold tracking-[0.18em] text-slate-600 uppercase">
-                  Conoce nuestro centro
-                </span>
-              </div>
-              <div className="mb-7 h-px w-16 bg-indigo-600" />
-              <h2 className="max-w-lg text-4xl font-extrabold leading-[1.04] tracking-[-0.035em] text-slate-950 sm:text-5xl xl:text-6xl">
+            {/* Left */}
+            <div>
+              <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-tight mb-7">
                 {tituloSobreNosotros}
               </h2>
-              <p className="mt-8 max-w-xl text-base leading-8 text-slate-600 sm:text-lg sm:leading-8">
+              <p className="text-lg text-slate-600 leading-relaxed text-justify">
                 {descripcionPrincipal}
               </p>
             </div>
 
-            <div className="relative rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_24px_65px_-38px_rgba(15,23,42,0.28)] sm:p-10 lg:p-12">
-              <div className="absolute left-0 top-10 h-20 w-1 rounded-r-full bg-linear-to-b from-sky-400 to-indigo-700" />
-              <div className="pl-4 sm:pl-5">
-                <p className="text-base leading-8 text-slate-600 sm:text-lg sm:leading-9">
-                  {descripcionSecundaria}
-                </p>
-                <div className="mt-9 flex flex-wrap items-center gap-5">
-                  <Link
-                    href="/agendaProfesionales"
-                    className="group inline-flex items-center gap-3 rounded-full bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_24px_-12px_rgba(30,58,138,0.75)] transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-0.5"
-                  >
-                    Reservar una hora
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Link>
-                  <span className="text-sm font-medium text-slate-500">
-                    Estamos para orientarte
-                  </span>
-                </div>
-              </div>
+            {/* Right */}
+            <div className="flex flex-col gap-8 lg:pt-16">
+              <p className="text-lg text-slate-600 leading-relaxed text-justify">
+                {descripcionSecundaria}
+              </p>
+              <Link
+                href="/agendaProfesionales"
+                className="group inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700 hover:scale-[1.02] w-fit"
+              >
+                Reservar una hora
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
 
           </div>
