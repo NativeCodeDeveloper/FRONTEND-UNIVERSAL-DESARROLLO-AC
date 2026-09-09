@@ -48,17 +48,24 @@ const PAD_BOTTOM = 28;
 // ilegibles — así nunca se "pierde" un mes por falta de espacio.
 const MIN_POINT_WIDTH = 46;
 const TOOLTIP_MARGIN = 80;
+// El punto más a la derecha (el mes actual) cae justo en el borde de la
+// tarjeta, que tiene `overflow-hidden` — sin margen, el dot/trazo de la curva
+// (o media barra entera, que es más ancha) quedaban recortados contra el
+// borde. `padX` se pasa desde afuera porque en vista de barras depende del
+// ancho real de cada barra (que varía con la cantidad de puntos).
+const PAD_X_CURVE = 10;
 
-function buildScaledPoints(points, width) {
+function buildScaledPoints(points, width, padX = PAD_X_CURVE) {
   if (!points || points.length === 0) return [];
   const values = points.map((p) => p.value);
   const max = Math.max(...values);
   const min = Math.min(...values);
   const range = max - min || 1;
   const n = points.length;
+  const usableWidth = Math.max(width - padX * 2, 1);
 
   return points.map((p, i) => {
-    const x = n > 1 ? (i / (n - 1)) * width : width / 2;
+    const x = n > 1 ? padX + (i / (n - 1)) * usableWidth : width / 2;
     const yRatio = (p.value - min) / range;
     const y = PAD_TOP + (1 - yRatio) * (VB_H - PAD_TOP - PAD_BOTTOM);
     return { value: p.value, date: p.date, x, y };
@@ -116,12 +123,18 @@ export function MetricChart({ series, view = "curve", defaultIndex, valueFormatt
   const contentWidth = Math.max(containerWidth, n * MIN_POINT_WIDTH);
   const isScrollable = containerWidth > 0 && contentWidth > containerWidth + 1;
 
-  const scaled = useMemo(() => buildScaledPoints(points, contentWidth || 1), [points, contentWidth]);
+  // En vista de barras, la barra del extremo (mitad de su ancho) es mucho más
+  // ancha que el dot de la curva — necesita más margen para no recortarse
+  // contra el borde de la tarjeta.
+  const barSlot = n > 0 ? contentWidth / n : 0;
+  const padX = view === "bar" ? Math.max(PAD_X_CURVE, (barSlot * 0.55) / 2 + 2) : PAD_X_CURVE;
+
+  const scaled = useMemo(() => buildScaledPoints(points, contentWidth || 1, padX), [points, contentWidth, padX]);
 
   const otherSeries = view === "curve" ? (series ?? []).slice(1) : [];
   const otherScaled = useMemo(
-    () => otherSeries.map((s) => ({ color: s.color, points: buildScaledPoints(s.data, contentWidth || 1) })),
-    [otherSeries, contentWidth]
+    () => otherSeries.map((s) => ({ color: s.color, points: buildScaledPoints(s.data, contentWidth || 1, padX) })),
+    [otherSeries, contentWidth, padX]
   );
 
   // Por defecto, si el gráfico es scrolleable, arranca mostrando el extremo
@@ -155,7 +168,6 @@ export function MetricChart({ series, view = "curve", defaultIndex, valueFormatt
   }
 
   const gradientId = `mc-grad-${(primary.name || "series").replace(/[^a-zA-Z0-9]/g, "")}`;
-  const barSlot = contentWidth / scaled.length;
 
   return (
     <div

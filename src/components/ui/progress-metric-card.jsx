@@ -4,6 +4,7 @@ import { useId, useMemo, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
 import { ACCENTS, formatCompact, MetricChart, SERIES_COLORS } from "./metric-chart";
 import { PeriodSelect, ViewToggle } from "./metric-controls";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const DEFAULT_PERIODS = [
   { label: "Past 7 days", points: 4 },
@@ -264,17 +265,32 @@ export default function ProgressMetricCard({
         </div>
         {showStats && (
           <div className="flex items-center gap-2.5 text-[12px] text-muted-foreground">
-            <span>
-              <span className="font-medium text-foreground/80">{fmtCompact(stats.peak)}</span> peak
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
+                  <span className="font-medium text-foreground/80">{fmtCompact(stats.peak)}</span> peak
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>El valor más alto registrado en este período.</TooltipContent>
+            </Tooltip>
             <span className="opacity-40">·</span>
-            <span>
-              <span className="font-medium text-foreground/80">{fmtCompact(stats.low)}</span> low
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
+                  <span className="font-medium text-foreground/80">{fmtCompact(stats.low)}</span> low
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>El valor más bajo registrado en este período.</TooltipContent>
+            </Tooltip>
             <span className="opacity-40">·</span>
-            <span>
-              <span className="font-medium text-foreground/80">{fmtCompact(Math.round(stats.avg))}</span> avg
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
+                  <span className="font-medium text-foreground/80">{fmtCompact(Math.round(stats.avg))}</span> avg
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>El promedio de todos los meses de este período.</TooltipContent>
+            </Tooltip>
           </div>
         )}
       </div>

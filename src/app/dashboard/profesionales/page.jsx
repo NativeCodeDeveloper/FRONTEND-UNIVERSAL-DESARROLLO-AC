@@ -252,7 +252,7 @@ export default function Profesionales() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-5">
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5" data-tour="profesional-nombre">
                                 <label className="text-sm font-medium text-slate-700">Nombre del profesional</label>
 
                                 <InputTextDinamic
@@ -265,7 +265,7 @@ export default function Profesionales() {
                                 <p className="text-xs text-slate-400">Solo se permiten letras y espacios.</p>
                             </div>
 
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5" data-tour="profesional-descripcion">
                                 <label className="text-sm font-medium text-slate-700">Descripción del profesional</label>
                                 <TextAreaDinamic
                                     value={descripcionProfesional}
@@ -312,7 +312,7 @@ export default function Profesionales() {
                             — Fin bloque comentado — */}
                         </div>
 
-                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row">
+                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="profesional-guardar">
                             <ButtonDinamic
                                 onClick={() => insertarProfesional(nombreProfesional,descripcionProfesional)}
                                 className="rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0] transition-colors"

@@ -104,7 +104,22 @@ export function TourProvider({ children }) {
                 element: step.selector,
                 advanceOnClick: isInteractive,
                 onHighlighted: (element) => {
-                    if (step.skipIfExpanded && element?.getAttribute("aria-expanded") === "true") {
+                    // OJO: no usar aria-expanded acá — driver.js lo sobrescribe a "true"
+                    // en CUALQUIER elemento que resalta (lo usa para su propio popover,
+                    // sin relación con el estado real del acordeón). Se revisa en cambio
+                    // el maxHeight inline del contenido (el mismo wrapper que anima la
+                    // apertura en NavAccordion), que sí refleja el estado real de React.
+                    const contentWrapper = element?.nextElementSibling;
+                    const isCollapsed = !!contentWrapper && contentWrapper.style.maxHeight === "0px";
+
+                    // Abre el acordeón del sidebar por sí solo en vez de esperar a que
+                    // el usuario adivine que debe hacer clic exactamente ahí — evita que
+                    // quede desincronizado con el estado persistido en sessionStorage
+                    // (que podía dejar la opción sin mostrarse realmente).
+                    if (step.autoExpand && isCollapsed) {
+                        element.click();
+                    }
+                    if (step.skipIfExpanded && contentWrapper && !isCollapsed) {
                         driverRef.current?.moveNext();
                     }
                 },
@@ -154,10 +169,24 @@ export function TourProvider({ children }) {
             stageRadius: 12,
             popoverClass: "ac-tour-popover",
             waitForElement: 8000,
+            // Si el elemento de un paso nunca aparece en el DOM (ej. el usuario
+            // quedó en una ruta distinta, o un elemento condicional no se
+            // renderizó), driver.js salta automáticamente al siguiente paso
+            // válido en esa misma dirección en vez de dejar el tour "colgado".
+            skipMissingElement: true,
             steps,
             onCloseClick: () => instance.destroy(),
-            onDestroyed: () => {
+            onDestroyed: (_element, _step, opts) => {
                 try { localStorage.setItem(COMPLETED_KEY, "1"); } catch {}
+
+                // Solo redirige a Panel de Reservas si el tour terminó de forma
+                // natural (el usuario llegó al último paso y presionó "Finalizar").
+                // Si cierra o sale antes, lo deja donde esté — no lo saca de la
+                // página en la que estaba trabajando.
+                const finishedLastStep = opts?.index === TOUR_STEPS.length - 1;
+                if (finishedLastStep && pathnameRef.current !== "/dashboard") {
+                    router.push("/dashboard");
+                }
             },
         });
 

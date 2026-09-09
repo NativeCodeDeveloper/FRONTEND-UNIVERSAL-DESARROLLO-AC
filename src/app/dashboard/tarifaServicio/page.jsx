@@ -317,7 +317,7 @@ export default function TarifaServicio() {
 
                 {/* Selectores */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm" data-tour="tarifa-select-profesional">
                         <div className="space-y-1 mb-5">
                             <h2 className="text-base font-semibold text-slate-900">Seleccionar Profesional</h2>
                             <p className="text-sm text-slate-500">Seleccione el profesional que imparte el servicio.</p>
@@ -341,7 +341,7 @@ export default function TarifaServicio() {
                         </div>
                     </div>
 
-                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm" data-tour="tarifa-select-servicio">
                         <div className="space-y-1 mb-5">
                             <h2 className="text-base font-semibold text-slate-900">Seleccionar Servicio</h2>
                             <p className="text-sm text-slate-500">Seleccione un servicio para asignar tarifa.</p>
@@ -395,7 +395,7 @@ export default function TarifaServicio() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2" data-tour="tarifa-precio-duracion">
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium text-slate-700">Precio de la consulta</label>
                                 <InputNumberDinamic
@@ -419,7 +419,7 @@ export default function TarifaServicio() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row">
+                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="tarifa-guardar">
                             <ButtonDinamic
                                 onClick={() => insertarTarifaProfesional(profesional_id, servicio_id, precioConsulta, duracionServicio)}
                                 className="rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0] transition-colors"

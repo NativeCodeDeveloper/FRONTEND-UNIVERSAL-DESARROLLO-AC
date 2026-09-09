@@ -237,7 +237,7 @@ export default function ServiciosAgendamiento() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-5">
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5" data-tour="servicio-nombre">
                                 <label className="text-sm font-medium text-slate-700">Nombre del servicio</label>
                                 <InputTextDinamic
                                     value={nombreServicio}
@@ -248,7 +248,7 @@ export default function ServiciosAgendamiento() {
                                 <p className="text-xs text-slate-400">Solo se permiten letras y espacios.</p>
                             </div>
 
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5" data-tour="servicio-descripcion">
                                 <label className="text-sm font-medium text-slate-700">Descripción del servicio</label>
                                 <TextAreaDinamic
                                     value={descripcionServicio}
@@ -259,7 +259,7 @@ export default function ServiciosAgendamiento() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row">
+                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="servicio-guardar">
                             <ButtonDinamic
                                 onClick={() => insertarServicioProfesional(nombreServicio,descripcionServicio)}
                                 className="rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0] transition-colors">
