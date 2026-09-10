@@ -43,7 +43,7 @@ function Field({ label, hint, children }) {
 
 function Input({ icon: Icon, ...props }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-100">
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-slate-400 focus-within:ring-4 focus-within:ring-slate-100">
       {Icon ? <Icon className="h-4 w-4 text-slate-400" /> : null}
       <input
         {...props}
@@ -56,7 +56,7 @@ function Input({ icon: Icon, ...props }) {
 function PasswordInput({ ...props }) {
   const [show, setShow] = useState(false);
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-100">
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-slate-400 focus-within:ring-4 focus-within:ring-slate-100">
       <Lock className="h-4 w-4 shrink-0 text-slate-400" />
       <input
         {...props}
@@ -85,7 +85,7 @@ function RolePermissionDetails({ role }) {
       aria-live="polite"
       className="mt-3 overflow-hidden rounded-[24px] border border-violet-200 bg-white shadow-[0_16px_40px_rgba(110,86,207,0.10)]"
     >
-      <div className="border-b border-violet-100 bg-gradient-to-r from-violet-50 via-white to-cyan-50 px-5 py-4">
+      <div className="border-b border-slate-100 bg-slate-50 px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#6E56CF] text-white shadow-lg shadow-violet-200">
@@ -244,8 +244,7 @@ export default function CreateUserPage() {
 
         {/* ── Header ── */}
         <div className="mb-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración del Sistema</p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
             Crear Usuario
           </h1>
           <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -360,7 +359,7 @@ export default function CreateUserPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || !selectedRoleMeta}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#6E56CF] px-6 text-[13px] font-bold text-white shadow-lg shadow-indigo-100 transition-all hover:bg-[#5b45bc] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-black px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <UserPlus className="h-4 w-4" />
                   {isSubmitting

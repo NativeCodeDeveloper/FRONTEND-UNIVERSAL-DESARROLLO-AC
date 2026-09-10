@@ -124,16 +124,14 @@ export default function ContactoPage() {
         <div className="relative mx-auto grid w-full max-w-7xl gap-8 px-6 md:px-10 lg:grid-cols-[1fr_1.2fr] xl:px-12 xl:gap-14">
 
           {/* Informative Aside Block */}
-          <aside className="rounded-[2.5rem] bg-indigo-600 p-8 shadow-xl md:p-12 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mt-16 -mr-16 h-64 w-64 rounded-full bg-white opacity-[0.03] mix-blend-overlay blur-3xl"></div>
-
-            <p className="text-xs font-bold uppercase tracking-widest text-indigo-300">
+          <aside className="rounded-[2.5rem] bg-slate-900 p-8 shadow-sm md:p-12 text-white relative overflow-hidden">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
               Contáctanos
             </p>
             <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-5xl">
               Inicia tu evaluacion en {publicContact.companyName}.
             </h1>
-            <p className="mt-6 max-w-xl text-indigo-100 text-lg">
+            <p className="mt-6 max-w-xl text-slate-300 text-lg">
               Nuestro equipo clínico está listo para guiarte. Indica tus datos para agendar o realizar consultas.
             </p>
 
@@ -142,10 +140,10 @@ export default function ContactoPage() {
                 const Icon = item.icon;
                 const content = (
                   <>
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/50 backdrop-blur-md border border-indigo-400/50">
+                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 border border-white/10">
                       <Icon className="h-5 w-5 text-white" />
                     </div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-indigo-300">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                       {item.title}
                     </p>
                     <p
@@ -166,7 +164,7 @@ export default function ContactoPage() {
                       href={item.href}
                       target={item.href.startsWith("http") ? "_blank" : undefined}
                       rel={item.href.startsWith("http") ? "noreferrer" : undefined}
-                      className="rounded-2xl border border-indigo-500 bg-indigo-700/30 p-6 transition hover:bg-indigo-700/60"
+                      className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10"
                     >
                       {content}
                     </a>
@@ -176,7 +174,7 @@ export default function ContactoPage() {
                 return (
                   <article
                     key={item.title}
-                    className="rounded-2xl border border-indigo-500 bg-indigo-700/30 p-6"
+                    className="rounded-2xl border border-white/10 bg-white/5 p-6"
                   >
                     {content}
                   </article>
@@ -184,13 +182,13 @@ export default function ContactoPage() {
               })}
             </div>
 
-            <div className="mt-6 rounded-2xl border border-indigo-500 bg-indigo-700/30 p-6">
-              <p className="text-xs font-bold uppercase tracking-widest text-indigo-300">
+            <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
                 Horario de atención
               </p>
               <div className="mt-4 flex items-start gap-4 text-sm font-medium">
-                <Clock3 className="mt-0.5 h-4 w-4 text-indigo-300" />
-                <div className="space-y-2 text-indigo-100">
+                <Clock3 className="mt-0.5 h-4 w-4 text-slate-400" />
+                <div className="space-y-2 text-slate-300">
                   <p>Lunes a Viernes: 9:00 a 19:00</p>
                   <p>Sábado: 10:00 a 14:00</p>
                   <p>Domingo: Cerrado</p>
@@ -201,10 +199,10 @@ export default function ContactoPage() {
 
           {/* Form Block */}
           <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm md:p-12">
-            <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
               Tratamiento asistido
             </p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
               Déjanos tu mensaje.
             </h2>
             <p className="mt-3 text-base text-slate-500">
@@ -227,7 +225,7 @@ export default function ContactoPage() {
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   placeholder="Ej: Camila Perez"
-                  className="h-12 rounded-xl border-slate-200 bg-slate-50 text-slate-900 focus-visible:ring-indigo-600 focus-visible:ring-offset-2"
+                  className="h-12 rounded-xl border-slate-200 bg-slate-50 text-slate-900 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                 />
               </div>
 
@@ -241,7 +239,7 @@ export default function ContactoPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Ej: correo@ejemplo.com"
-                  className="h-12 rounded-xl border-slate-200 bg-slate-50 text-slate-900 focus-visible:ring-indigo-600 focus-visible:ring-offset-2"
+                  className="h-12 rounded-xl border-slate-200 bg-slate-50 text-slate-900 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                 />
               </div>
 
@@ -254,13 +252,13 @@ export default function ContactoPage() {
                   value={mensaje}
                   onChange={(e) => setMensaje(e.target.value)}
                   placeholder="Escribe tu consulta médica..."
-                  className="min-h-[160px] rounded-xl border-slate-200 bg-slate-50 text-slate-900 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 resize-none"
+                  className="min-h-[160px] rounded-xl border-slate-200 bg-slate-50 text-slate-900 focus-visible:ring-slate-900 focus-visible:ring-offset-2 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-indigo-600 px-8 py-4 text-sm font-bold text-white shadow transition hover:bg-slate-900 hover:scale-105"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-slate-900 px-8 py-4 text-sm font-bold text-white transition hover:bg-slate-800 hover:scale-105"
               >
                 Enviar mi solicitud
                 <Send className="h-4 w-4" />

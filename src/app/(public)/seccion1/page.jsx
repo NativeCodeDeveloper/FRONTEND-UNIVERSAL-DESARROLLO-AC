@@ -53,32 +53,34 @@ export default function Seccion1() {
     >
       <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
         <RevealOnScroll>
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-start">
+          <div className="rounded-[2.5rem] border border-slate-100 bg-slate-50 p-6 shadow-sm sm:p-10 lg:p-14">
+            <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-start">
 
-            {/* Left */}
-            <div>
-              <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-tight mb-7">
-                {tituloSobreNosotros}
-              </h2>
-              <p className="text-lg text-slate-600 leading-relaxed text-justify">
-                {descripcionPrincipal}
-              </p>
+              {/* Left */}
+              <div>
+                <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl leading-tight mb-7">
+                  {tituloSobreNosotros}
+                </h2>
+                <p className="text-lg text-slate-600 leading-relaxed text-justify">
+                  {descripcionPrincipal}
+                </p>
+              </div>
+
+              {/* Right */}
+              <div className="flex flex-col gap-8 lg:pt-16">
+                <p className="text-lg text-slate-600 leading-relaxed text-justify">
+                  {descripcionSecundaria}
+                </p>
+                <Link
+                  href="/agendaProfesionales"
+                  className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:scale-[1.02] w-fit"
+                >
+                  Reservar una hora
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+
             </div>
-
-            {/* Right */}
-            <div className="flex flex-col gap-8 lg:pt-16">
-              <p className="text-lg text-slate-600 leading-relaxed text-justify">
-                {descripcionSecundaria}
-              </p>
-              <Link
-                href="/agendaProfesionales"
-                className="group inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700 hover:scale-[1.02] w-fit"
-              >
-                Reservar una hora
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </div>
-
           </div>
         </RevealOnScroll>
       </div>

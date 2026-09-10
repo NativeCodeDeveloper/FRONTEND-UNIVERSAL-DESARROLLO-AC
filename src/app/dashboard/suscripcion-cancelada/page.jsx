@@ -1,11 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Michroma } from "next/font/google";
 import { motion } from "framer-motion";
-import OrbBackground from "@/components/OrbBackground";
-
-const michroma = Michroma({ weight: "400", subsets: ["latin"], display: "swap" });
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -29,8 +25,7 @@ export default function SuscripcionCanceladaPage() {
 
         {/* ── Header ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0} className="mb-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-rose-600">Estado de Cuenta</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
             Suscripción <span className="text-rose-600">Cancelada</span>
           </h1>
           <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -78,7 +73,7 @@ export default function SuscripcionCanceladaPage() {
               <div className="p-4 md:p-8 space-y-4">
                 <div className="relative overflow-hidden rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-500 text-white shadow-sm">
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 9v4" />
                         <path d="M12 17h.01" />

@@ -149,7 +149,7 @@ export default function Portada() {
     <section
       id="inicio"
       className="relative w-full overflow-hidden bg-white bg-cover bg-center md:bg-fixed -mt-24 md:-mt-0.5 min-h-screen flex flex-col items-center justify-center pt-[176px] md:pt-20 pb-10"
-      style={{ backgroundImage: "url('/bg-swoosh-azul.webp')" }}
+      style={{ backgroundImage: "url('/bg-hero-v15.webp')" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -183,7 +183,7 @@ export default function Portada() {
           </div>
 
           {/* Card solapada derecha */}
-          <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/60 border border-indigo-200/60 p-8 ml-[-40px] z-10 max-w-xl flex-1">
+          <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/60 border border-slate-200 p-8 ml-[-40px] z-10 max-w-xl flex-1">
 
             {/* AC badge */}
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5">
@@ -203,7 +203,7 @@ export default function Portada() {
               >
                 <div className="mb-5">
                   {/* Título viene del portadaEdit (tituloPortadaCarrusel) */}
-                  <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 leading-tight mb-2">
+                  <h1 className="text-3xl font-bold tracking-tight text-slate-900 leading-tight mb-2">
                     {currentSlide.titulo || "Tu Centro Médico"}
                   </h1>
                 </div>
@@ -219,13 +219,13 @@ export default function Portada() {
                 <div className="flex flex-wrap items-center gap-3 mb-7">
                   <Link
                     href="/agendaProfesionales"
-                    className="inline-flex items-center rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700 hover:scale-[1.02]"
+                    className="inline-flex items-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:scale-[1.02]"
                   >
                     Agendar hora
                   </Link>
                   <a
                     href="#sobre-nosotros"
-                    className="inline-flex items-center rounded-full border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:border-indigo-300 hover:text-indigo-600"
+                    className="inline-flex items-center rounded-full border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:border-slate-300 hover:text-slate-900"
                   >
                     Sobre nosotros
                   </a>
@@ -240,7 +240,7 @@ export default function Portada() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={label}
-                      className="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center transition-all hover:bg-indigo-600 hover:scale-105"
+                      className="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center transition-all hover:bg-slate-700 hover:scale-105"
                     >
                       <Icon className="h-5 w-5 text-white" />
                     </a>
@@ -295,7 +295,7 @@ export default function Portada() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
               >
-                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 mb-2">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-2">
                   {currentSlide.titulo || "Tu Centro Médico"}
                 </h1>
                 {(currentSlide.descripcion || sobreNosotros) && (
@@ -306,13 +306,13 @@ export default function Portada() {
                 <div className="flex justify-center flex-wrap gap-3 mb-6">
                   <Link
                     href="/agendaProfesionales"
-                    className="inline-flex items-center rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700"
+                    className="inline-flex items-center rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-slate-800"
                   >
                     Agendar hora
                   </Link>
                   <a
                     href="#sobre-nosotros"
-                    className="inline-flex items-center rounded-full border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-700 hover:border-indigo-300 hover:text-indigo-600 transition-all"
+                    className="inline-flex items-center rounded-full border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all"
                   >
                     Sobre nosotros
                   </a>
@@ -325,7 +325,7 @@ export default function Portada() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={label}
-                      className="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center transition-all hover:bg-indigo-600"
+                      className="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center transition-all hover:bg-slate-700"
                     >
                       <Icon className="h-5 w-5 text-white" />
                     </a>

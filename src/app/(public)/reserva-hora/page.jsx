@@ -83,15 +83,9 @@ function ReservaHoraContent() {
     const direccionEmpresa = datosEmpresa.contactoDireccion || "";
 
   return (
-    <section className="relative min-h-screen w-full px-4 pt-28 pb-12 sm:pt-32 sm:pb-16 flex items-center justify-center bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100">
-      {/* Fondos decorativos */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-gradient-to-br from-slate-200/60 via-gray-200/40 to-white blur-3xl" />
-        <div className="absolute -bottom-40 right-[-80px] h-[380px] w-[380px] rounded-full bg-gradient-to-br from-gray-200/50 via-slate-200/40 to-white blur-3xl" />
-      </div>
-
+    <section className="relative min-h-screen w-full px-4 pt-28 pb-12 sm:pt-32 sm:pb-16 flex items-center justify-center bg-slate-50">
       <div className="relative w-full max-w-lg">
-        <div className="rounded-3xl border border-slate-200 bg-white/70 backdrop-blur-xl shadow-[0_20px_60px_-20px_rgba(2,6,23,0.25)]">
+        <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
 
           {/* Header */}
           <div className="flex items-start gap-4 p-7 sm:p-8">
@@ -109,7 +103,7 @@ function ReservaHoraContent() {
             </div>
 
             <div className="flex-1">
-              <span className="inline-flex items-center rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white shadow">
+              <span className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
                 Reserva confirmada
               </span>
 
@@ -128,7 +122,7 @@ function ReservaHoraContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+          <div className="h-px w-full bg-slate-200" />
 
           {/* Body */}
           <div className="p-7 sm:p-8">
@@ -226,7 +220,7 @@ function ReservaHoraContent() {
             <div className="mt-7 flex flex-col items-center gap-3">
               <a
                 href="/agendaProfesionales"
-                className="inline-flex w-full max-w-xs items-center justify-center rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                className="inline-flex w-full max-w-xs items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300"
               >
                 Agendar otra cita
               </a>

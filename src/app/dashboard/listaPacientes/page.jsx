@@ -130,8 +130,7 @@ export default function ListaPacientes() {
                 {/* ── Header Principal ── */}
                 <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Base</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Listado de Pacientes
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -173,7 +172,7 @@ export default function ListaPacientes() {
                                         />
                                         <button
                                             onClick={() => buscarNombreSimilar(nombreBuscado)}
-                                            className="h-12 px-6 rounded-2xl bg-[#6E56CF] text-white text-[13px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
+                                            className="h-12 px-6 rounded-2xl bg-black text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                             Buscar
@@ -192,7 +191,7 @@ export default function ListaPacientes() {
                                         />
                                         <button
                                             onClick={() => buscarRutSimilar(rutBuscado)}
-                                            className="h-12 px-6 rounded-2xl bg-[#6E56CF] text-white text-[13px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
+                                            className="h-12 px-6 rounded-2xl bg-black text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                             Buscar
@@ -240,7 +239,7 @@ export default function ListaPacientes() {
                                                 <TableCell className="text-center py-4">
                                                     <button
                                                         onClick={() => verDetallePaciente(paciente.id_paciente)}
-                                                        className="h-10 w-10 mx-auto rounded-xl bg-violet-50 text-[#6E56CF] hover:bg-[#6E56CF] hover:text-white transition-all flex items-center justify-center shadow-sm"
+                                                        className="h-10 w-10 mx-auto rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center shadow-sm"
                                                     >
                                                         <UserIcon className="w-5 h-5"/>
                                                     </button>

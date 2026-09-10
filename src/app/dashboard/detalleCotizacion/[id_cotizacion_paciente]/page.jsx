@@ -1125,10 +1125,7 @@ export default function DetalleCotizacion() {
                             </button>
                         </div>
                         <div>
-                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">
-                                Presupuesto del paciente
-                            </p>
-                            <h1 className="mt-1 text-3xl font-bold text-slate-900 md:text-4xl">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 Detalle de cotización #{id_cotizacion_paciente}
                             </h1>
                             <p className="mt-2 max-w-2xl text-[13px] text-slate-500">

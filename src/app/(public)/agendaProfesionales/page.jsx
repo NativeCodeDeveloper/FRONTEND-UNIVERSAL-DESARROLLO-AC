@@ -36,12 +36,12 @@ export default function AgendaProfesionales() {
   }, []);
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pt-32 pb-32 text-slate-900 font-sans">
+    <div className="bg-[#f8f9fa] min-h-screen pt-32 pb-32 text-slate-900">
       <div className="mx-auto max-w-7xl px-5 md:px-8 lg:px-10">
 
         {/* Usable Header Block */}
         <div className="max-w-3xl mb-12 lg:mb-16 animate-reveal-up border-b border-slate-200 pb-10">
-          <span className="text-sm font-bold tracking-widest text-indigo-600 uppercase mb-4 block">
+          <span className="text-sm font-bold tracking-widest text-slate-500 uppercase mb-4 block">
             Paso 1: Selección de Especialista
           </span>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6">
@@ -63,10 +63,10 @@ export default function AgendaProfesionales() {
             >
 
               {/* Functional Clean Card */}
-              <div className="w-full bg-white rounded-3xl p-8 flex flex-col justify-between h-full border border-slate-200 hover:border-indigo-600 hover:shadow-lg transition-all duration-300">
+              <div className="w-full bg-white rounded-3xl p-8 flex flex-col justify-between h-full border border-slate-200 hover:border-slate-900 hover:shadow-lg transition-all duration-300">
                 <div>
                   {/* Avatar initial block */}
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-xl font-bold text-indigo-600 mb-6 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-xl font-bold text-slate-900 mb-6 transition-colors group-hover:bg-slate-900 group-hover:text-white">
                     {profesional.nombreProfesional?.charAt(0)}
                   </div>
 
@@ -79,11 +79,11 @@ export default function AgendaProfesionales() {
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[15px] font-bold text-indigo-600 group-hover:text-indigo-800 transition-colors">
+                  <span className="text-[15px] font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
                     Ver Calendario
                   </span>
-                  <div className="rounded-full bg-indigo-50 p-2 group-hover:bg-indigo-100 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <div className="rounded-full bg-slate-100 p-2 group-hover:bg-slate-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-900 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </div>

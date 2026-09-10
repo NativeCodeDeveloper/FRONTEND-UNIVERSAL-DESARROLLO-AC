@@ -139,11 +139,11 @@ export default function Carrito() {
         <div className="mt-20">
             <div className="p-4 sm:p-6">
 
-                    <h1 className="text-blue-800 text-3xl sm:text-4xl font-bold">Cantidad de Sesiones / Promociones</h1>
+                    <h1 className="text-slate-900 text-3xl sm:text-4xl font-bold">Cantidad de Sesiones / Promociones</h1>
 
                 {/* Mensaje cuando no hay productos */}
                 {isMounted && productosDelCarrito.length === 0 && (
-                    <div className="mt-8 bg-white rounded-lg p-6 shadow-sm text-gray-700">
+                    <div className="mt-8 bg-white rounded-xl p-6 shadow-sm text-slate-600">
                         No hay sesiones o paquetes seleccionados.
                     </div>
                 )}
@@ -152,37 +152,37 @@ export default function Carrito() {
                 <div className="hidden md:block">
                     <Table className="w-full mt-8 rounded-xl overflow-hidden shadow-sm bg-white">
                         <TableCaption></TableCaption>
-                        <TableHeader className="bg-gray-100">
-                            <TableRow className="text-gray-700">
+                        <TableHeader className="bg-slate-50">
+                            <TableRow className="text-slate-600">
                                 <TableHead
-                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Producto</TableHead>
+                                    className="px-4 py-3 text-left font-semibold text-sm text-slate-600 border-b">Producto</TableHead>
                                 <TableHead
-                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Referencia</TableHead>
+                                    className="px-4 py-3 text-left font-semibold text-sm text-slate-600 border-b">Referencia</TableHead>
                                 <TableHead
-                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Sesiones </TableHead>
+                                    className="px-4 py-3 text-left font-semibold text-sm text-slate-600 border-b">Sesiones </TableHead>
 
-                                <TableHead className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">Valor
+                                <TableHead className="px-4 py-3 text-left font-semibold text-sm text-slate-600 border-b">Valor
                                     Sesion</TableHead>
                                 <TableHead
-                                    className="px-4 py-3 text-left font-semibold text-sm text-gray-700 border-b">SubTotal</TableHead>
+                                    className="px-4 py-3 text-left font-semibold text-sm text-slate-600 border-b">SubTotal</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isMounted && productosDelCarrito.map((producto) => (
-                                <TableRow key={producto.id_producto} className="hover:bg-gray-50 transition-colors">
+                                <TableRow key={producto.id_producto} className="hover:bg-slate-50 transition-colors">
                                     <TableCell
-                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b font-medium">
-                                        <span className="text-blue-700">{producto.tituloProducto}</span>
+                                        className="px-4 py-4 text-sm text-slate-700 align-middle border-b font-medium">
+                                        <span className="text-slate-900">{producto.tituloProducto}</span>
                                         <span className="mt-3 block"><ShadcnButton
                                             funcion={() => quitarDelCarrito(producto.id_producto)}
                                             nombre={"Eliminar"}/></span>
                                     </TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b"><img
+                                    <TableCell className="px-4 py-4 text-sm text-slate-700 align-middle border-b"><img
                                         src={`https://imagedelivery.net/aCBUhLfqUcxA2yhIBn1fNQ/${producto.imagenProducto}/mini`} alt={"Imagen Producto"} width={100}
                                         height={100} className="object-cover rounded"/></TableCell>
                                     <TableCell
-                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.cantidadVendida}</TableCell>
-                                    <TableCell className="px-4 py-4 text-sm text-gray-800 align-middle border-b">
+                                        className="px-4 py-4 text-sm text-slate-700 align-middle border-b">{producto.cantidadVendida}</TableCell>
+                                    <TableCell className="px-4 py-4 text-sm text-slate-700 align-middle border-b">
 
                                         {/*
                                             <ButtonGroup aria-label="Acciones">
@@ -194,17 +194,17 @@ export default function Carrito() {
 
                                     </TableCell>
                                     <TableCell
-                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b">{producto.valorProducto}</TableCell>
+                                        className="px-4 py-4 text-sm text-slate-700 align-middle border-b">{producto.valorProducto}</TableCell>
                                     <TableCell
-                                        className="px-4 py-4 text-sm text-gray-800 align-middle border-b text-right">{producto.cantidadVendida * producto.valorProducto}</TableCell>
+                                        className="px-4 py-4 text-sm text-slate-700 align-middle border-b text-right">{producto.cantidadVendida * producto.valorProducto}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                         <TableFooter>
-                            <TableRow className="bg-gray-100 w-full font-semibold">
-                                <TableCell className="px-4 py-3 w-full text-left text-gray-700"
+                            <TableRow className="bg-slate-50 w-full font-semibold">
+                                <TableCell className="px-4 py-3 w-full text-left text-slate-600"
                                            colSpan={3}>Total</TableCell>
-                                <TableCell className="px-4 py-3 text-right text-blue-700">$ {isMounted ? totalPago : 0}</TableCell>
+                                <TableCell className="px-4 py-3 text-right text-slate-900">$ {isMounted ? totalPago : 0}</TableCell>
                             </TableRow>
                         </TableFooter>
                     </Table>
@@ -213,17 +213,17 @@ export default function Carrito() {
                 {/* VISTA MÓVIL: tarjetas (sm) */}
                 <div className="md:hidden mt-6 space-y-4">
                     {isMounted && productosDelCarrito.map((producto) => (
-                        <div key={producto.id_producto} className="bg-white rounded-lg shadow p-4 flex items-start gap-4">
+                        <div key={producto.id_producto} className="bg-white rounded-xl shadow-sm p-4 flex items-start gap-4">
                             <img src={`https://imagedelivery.net/aCBUhLfqUcxA2yhIBn1fNQ/${producto.imagenProducto}/mini`} alt={producto.tituloProducto} className="w-20 h-20 object-cover rounded flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-start">
                                     <div className="min-w-0">
-                                        <div className="text-sm font-semibold text-blue-700 truncate">{producto.tituloProducto}</div>
-                                        <div className="text-xs text-gray-500 mt-1">Ref: {producto.id_producto}</div>
+                                        <div className="text-sm font-semibold text-slate-900 truncate">{producto.tituloProducto}</div>
+                                        <div className="text-xs text-slate-400 mt-1">Ref: {producto.id_producto}</div>
                                     </div>
                                     <div className="text-right ml-2 flex-shrink-0">
-                                        <div className="text-sm font-semibold text-gray-800">${producto.valorProducto}</div>
-                                        <div className="text-xs text-gray-500">Subtotal</div>
+                                        <div className="text-sm font-semibold text-slate-700">${producto.valorProducto}</div>
+                                        <div className="text-xs text-slate-400">Subtotal</div>
                                     </div>
                                 </div>
 
@@ -231,7 +231,7 @@ export default function Carrito() {
                                 <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                     <div className="flex items-center gap-2 flex-wrap">
 
-                                        <div className="text-sm text-gray-700">Unidades: <span className="font-medium">{producto.cantidadVendida}</span></div>
+                                        <div className="text-sm text-slate-600">Unidades: <span className="font-medium">{producto.cantidadVendida}</span></div>
                                     </div>
 
                                     <div className="flex items-center gap-2 justify-end flex-shrink-0">
@@ -246,9 +246,9 @@ export default function Carrito() {
                     ))}
 
                     {/* Total y botón pagar en móvil */}
-                    <div className="bg-white p-4 rounded-lg shadow flex items-center justify-between">
-                        <div className="text-lg font-semibold text-gray-700">Total</div>
-                        <div className="text-xl font-bold text-blue-700">$ {isMounted ? totalPago : 0}</div>
+                    <div className="bg-white p-4 rounded-xl shadow-sm flex items-center justify-between">
+                        <div className="text-lg font-semibold text-slate-600">Total</div>
+                        <div className="text-xl font-bold text-slate-900">$ {isMounted ? totalPago : 0}</div>
                     </div>
                 </div>
 
@@ -256,10 +256,7 @@ export default function Carrito() {
                 <div className="mt-6 flex gap-3 ">
                     <Link href="/formularioPago">
                         <button
-                            className="p-2 w-44 rounded-xl font-semibold
-    bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600
-    text-white shadow-md transition-all duration-300
-    hover:scale-105 hover:shadow-xl"
+                            className="p-2 w-44 rounded-xl font-semibold bg-slate-900 text-white transition-colors hover:bg-slate-800"
                         >
                             Ir a Pagar
                         </button>
@@ -267,10 +264,7 @@ export default function Carrito() {
 
                     <Link href="/catalogo">
                         <button
-                            className="p-2 w-44 rounded-xl font-semibold
-    bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600
-    text-white shadow-md transition-all duration-300
-    hover:scale-105 hover:shadow-xl"
+                            className="p-2 w-44 rounded-xl font-semibold bg-white border border-slate-200 text-slate-900 transition-colors hover:bg-slate-50"
                         >
                             Volver a Catalogo
                         </button>

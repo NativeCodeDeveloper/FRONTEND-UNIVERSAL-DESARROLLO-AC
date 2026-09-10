@@ -112,7 +112,7 @@ export default function ImageCropperModal({
                                 type="button"
                                 onClick={handleConfirmar}
                                 disabled={isSaving}
-                                className="h-11 px-6 rounded-2xl bg-[#6E56CF] text-white text-sm font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
+                                className="h-11 px-6 rounded-2xl bg-black text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-sm disabled:opacity-50"
                             >
                                 {isSaving ? "Procesando..." : "Confirmar recorte"}
                             </button>

@@ -268,8 +268,7 @@ export default function SubCategoria(){
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex flex-col gap-2">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administracion</p>
-                        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Gestión de Subcategorías
                         </h1>
                         <p className="text-[13px] text-slate-500">
@@ -317,7 +316,7 @@ export default function SubCategoria(){
                                     <ShadcnButton
                                         nombre={'Ingresar Subcategoria'}
                                         funcion={()=> insertarSubcategoria(descripcionSubcategoria,id)}
-                                        className="w-full rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0]"
+                                        className="w-full rounded-xl bg-black text-white shadow-sm hover:bg-slate-800"
                                     />
                                 </div>
                                 <div className="w-full sm:w-auto">
@@ -334,7 +333,7 @@ export default function SubCategoria(){
                                     <ShadcnButton
                                         nombre={'Actualizar Subcategoria'}
                                         funcion={()=> actualizarSubCategoria(descripcionSubcategoria,id,id_subcategoria)}
-                                        className="w-full rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0]"
+                                        className="w-full rounded-xl bg-black text-white shadow-sm hover:bg-slate-800"
                                     />
                                 )}
                             </div>

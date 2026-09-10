@@ -857,8 +857,7 @@ export default function Finanzas() {
                 {/* ── Header + selector de período ── */}
                 <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Finanzas</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Resumen financiero</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Resumen financiero</h1>
                         <p className="mt-1 text-[13px] text-slate-500">
                             Ingresos generados a partir de tus citas y servicios.
                         </p>

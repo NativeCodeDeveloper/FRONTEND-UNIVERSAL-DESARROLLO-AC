@@ -525,7 +525,7 @@ export default function CalendarioMensualHoras() {
        RENDER
     ══════════════════════════════════════════ */
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 px-4 pt-32 pb-16 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 px-4 pt-32 pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto w-full max-w-3xl">
 
                 {/* ── Header ── */}
@@ -547,12 +547,12 @@ export default function CalendarioMensualHoras() {
                     necesita. Esto determina la duración
                     de los bloques del calendario.
                 ════════════════════════════════════ */}
-                <div className="relative z-10 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-lg shadow-slate-900/5 backdrop-blur supports-[backdrop-filter]:bg-white/70 text-slate-800">
+                <div className="relative z-10 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-slate-800">
                     <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold text-slate-800">Selecciona un servicio</h2>
                         <span className="text-[12px] text-slate-500">Paso 1 de 2</span>
                     </div>
-                    <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent"/>
+                    <div className="mt-3 h-px w-full bg-slate-200"/>
 
                     {cargandoServicios ? (
                         <p className="mt-4 text-center text-sm text-slate-400 py-6">Cargando servicios...</p>
@@ -567,8 +567,8 @@ export default function CalendarioMensualHoras() {
                                 type="button"
                                 onClick={() => setDropdownServicios(v => !v)}
                                 className={
-                                    "w-full flex items-center justify-between rounded-xl border p-3 shadow-sm transition hover:shadow-md hover:shadow-slate-900/5 " +
-                                    (servicioActivo ? "bg-green-50 border-green-300" : "bg-white/90 border-slate-200 hover:border-gray-400")
+                                    "w-full flex items-center justify-between rounded-xl border p-3 shadow-sm transition " +
+                                    (servicioActivo ? "bg-green-50 border-green-300" : "bg-white border-slate-200 hover:border-slate-400")
                                 }
                             >
                                 <div className="text-left">
@@ -653,17 +653,17 @@ export default function CalendarioMensualHoras() {
                     minutos (sin gap entre ellos).
                 ════════════════════════════════════ */}
                 {servicioActivo && (
-                    <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-lg shadow-slate-900/5 backdrop-blur supports-[backdrop-filter]:bg-white/70 text-slate-800">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-slate-800">
                         <div className="flex items-center justify-between">
                             <h2 className="text-sm font-semibold text-slate-800">Agenda mensual</h2>
                             <span className="text-[12px] text-slate-500">Paso 2 de 2 · Selecciona un día</span>
                         </div>
-                        <div className="mt-3 h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent"/>
+                        <div className="mt-3 h-px w-full bg-slate-200"/>
 
                         {/* Navegación mes */}
                         <div className="mt-3 flex items-center justify-between">
                             <button
-                                className="rounded-lg border border-gray-900 bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-md hover:bg-gray-800 active:scale-[0.98]"
+                                className="rounded-lg border border-slate-900 bg-slate-900 px-2.5 py-1 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98]"
                                  onClick={() => {
                                      const nuevaFecha = new Date(mesActual);
                                      nuevaFecha.setMonth(nuevaFecha.getMonth() - 1);
@@ -676,7 +676,7 @@ export default function CalendarioMensualHoras() {
                                 {mesActual.toLocaleString("es-CL", {month: "long", year: "numeric"})}
                             </strong>
                             <button
-                                className="rounded-lg border border-gray-900 bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white shadow-md hover:bg-gray-800 active:scale-[0.98]"
+                                className="rounded-lg border border-slate-900 bg-slate-900 px-2.5 py-1 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 active:scale-[0.98]"
                                  onClick={() => {
                                      const nuevaFecha = new Date(mesActual);
                                      nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
@@ -708,14 +708,14 @@ export default function CalendarioMensualHoras() {
                                         title={bloqueado ? "Día no disponible" : undefined}
                                         onClick={() => { if (!disabled) seleccionarFecha(dia); }}
                                         className={
-                                            "h-10 flex items-center justify-center rounded-md text-sm font-medium transition relative focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1 " +
+                            "h-10 flex items-center justify-center rounded-md text-sm font-medium transition relative focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-1 " +
                                             (pasado || domingo
                                                 ? "cursor-not-allowed border border-slate-200/70 bg-white/60 text-slate-300 opacity-50"
                                                 : bloqueado
                                                     ? "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400"
                                                     : selected
-                                                        ? "border border-gray-900 bg-gray-900 text-white shadow-md"
-                                                        : "border border-slate-200 bg-white/90 text-slate-700 hover:bg-white hover:border-gray-400 hover:shadow-md")
+                                                        ? "border border-slate-900 bg-slate-900 text-white shadow-sm"
+                                                        : "border border-slate-200 bg-white text-slate-700 hover:bg-white hover:border-slate-400 hover:shadow-sm")
                                         }
                                     >
                                         {dia.getDate()}
@@ -765,8 +765,8 @@ export default function CalendarioMensualHoras() {
                                             const sel = horaInicio === s.start;
                                             return (
                                                 <div key={s.start}
-                                                    className={"flex items-center justify-between rounded-xl border p-3 shadow-sm hover:shadow-md hover:shadow-slate-900/5 transition " +
-                                                        (sel ? "bg-green-50 border-green-300" : "bg-white/90 border-slate-200")}>
+                                                    className={"flex items-center justify-between rounded-xl border p-3 shadow-sm transition " +
+                                                        (sel ? "bg-green-50 border-green-300" : "bg-white border-slate-200")}>
                                                     <div>
                                                         {/* Muestra el nombre del servicio en cada slot */}
                                                         <div className="text-sm font-medium text-slate-800">{servicioActivo.nombreServicio}</div>
@@ -775,7 +775,7 @@ export default function CalendarioMensualHoras() {
                                                     <button
                                                         onClick={() => seleccionarHora(s.start)}
                                                         className={"px-3 py-1 rounded-lg font-semibold shadow-sm transition active:scale-[0.98] " +
-                                                            (sel ? "bg-green-600 text-white shadow-md" : "bg-gray-900 text-white hover:bg-gray-800")}
+                                                            (sel ? "bg-green-600 text-white" : "bg-slate-900 text-white hover:bg-slate-800")}
                                                     >
                                                         {sel ? "Seleccionada" : "Seleccionar"}
                                                     </button>

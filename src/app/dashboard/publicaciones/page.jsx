@@ -454,8 +454,7 @@ export default function Publicaciones() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
                     <div className="max-w-3xl">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Gestión de Contenido</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Publicaciones del Carrusel</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Publicaciones del Carrusel</h1>
                         <p className="mt-2 text-[13px] text-slate-500 leading-relaxed">
                             Administra las piezas visuales que aparecen en el portal público. Mantén la imagen de tu clínica actualizada cargando nuevos contenidos y promociones.
                         </p>
@@ -539,7 +538,7 @@ export default function Publicaciones() {
                                         accept="image/*"
                                         multiple={selectedAllowsMultiple}
                                         onChange={handleFileChange}
-                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-[#6E56CF] file:text-white hover:file:bg-[#5b45bc] transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
+                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-black file:text-white hover:file:bg-slate-800 transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
                                         disabled={isUploading}
                                     />
                                 </div>
@@ -548,7 +547,7 @@ export default function Publicaciones() {
                                     <button
                                         type="submit"
                                         disabled={isUploading}
-                                        className="h-12 px-8 bg-[#6E56CF] text-white text-sm font-bold rounded-2xl hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 disabled:opacity-50"
+                                        className="h-12 px-8 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {isUploading ? "Procesando..." : "Actualizar Contenido"}
                                     </button>

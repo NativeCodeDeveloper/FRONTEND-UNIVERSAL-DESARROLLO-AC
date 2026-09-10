@@ -679,8 +679,7 @@ export default function ReecetasPacientes() {
 
                 {/* ── Header ── */}
                 <div className="mb-8">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Documentos Clínicos</p>
-                    <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                    <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                         Receta Médica
                     </h1>
                     <p className="mt-1 text-[13px] text-slate-500">
@@ -692,7 +691,7 @@ export default function ReecetasPacientes() {
                 <div className="mb-6 flex flex-wrap items-center gap-2">
                     <button
                         onClick={volverAFichas}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl bg-[#6E56CF] hover:bg-[#5B47B0] shadow-sm transition-all"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-900 rounded-xl bg-slate-100 hover:bg-slate-200 shadow-sm transition-all"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
@@ -874,14 +873,14 @@ export default function ReecetasPacientes() {
                                 <button
                                     onClick={() => insertarFichasPaciente(nombre_paciente, apellido_paciente, rut_paciente, id_paciente, id_profesional, profesional_responsable, descripcion_receta)}
                                     type="button"
-                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#6E56CF] hover:bg-[#5B47B0] px-4 py-2.5 text-sm font-semibold text-white transition-all"
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-black hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all"
                                 >
                                     Guardar receta
                                 </button>
                                 <button
                                     onClick={generarPDFReceta}
                                     type="button"
-                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-900 bg-slate-900 hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all"
+                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-900 transition-all"
                                 >
                                     Descargar PDF
                                 </button>

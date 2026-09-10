@@ -176,7 +176,7 @@ export default function OdontogramasPaciente() {
     /* ── Loading ── */
     if (cargando) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/30 px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+            <div className="min-h-screen bg-[#FAFAFB] px-4 sm:px-6 lg:px-8 py-6 md:py-10">
                 <ToasterClient/>
                 <div className="max-w-7xl mx-auto">
                     <div className="animate-pulse space-y-6">
@@ -198,14 +198,13 @@ export default function OdontogramasPaciente() {
     const paciente = dataPaciente.length > 0 ? dataPaciente[0] : null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/30 px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        <div className="min-h-screen bg-[#FAFAFB] px-4 sm:px-6 lg:px-8 py-6 md:py-10">
             <ToasterClient/>
             <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* ── Header ── */}
                 <div className="mb-2">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-sky-600 mb-1">Odontologia</p>
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                    <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                         Registros de Odontogramas
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Visualiza, crea y edita los odontogramas del paciente</p>
@@ -214,7 +213,7 @@ export default function OdontogramasPaciente() {
                 {/* ── Tarjeta Paciente + Acciones ── */}
                 <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                         <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Datos del Paciente</h2>
@@ -223,7 +222,7 @@ export default function OdontogramasPaciente() {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
                             {/* Info Paciente */}
                             <div className="flex items-center gap-4">
-                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-500 shadow-lg shadow-sky-500/20">
+                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#6E56CF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                     </svg>
@@ -255,7 +254,7 @@ export default function OdontogramasPaciente() {
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                                 <button
                                     onClick={crearOdontograma}
-                                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 rounded-lg hover:from-sky-700 hover:to-cyan-600 transition-all duration-150 shadow-md hover:shadow-lg"
+                                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-lg hover:bg-slate-800 transition-all duration-150 shadow-sm"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
@@ -292,11 +291,11 @@ export default function OdontogramasPaciente() {
                 <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Odontogramas</h2>
-                            <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-sky-100 text-sky-700">
+                            <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-violet-100 text-[#6E56CF]">
                                 {odontogramas.length}
                             </span>
                         </div>
@@ -322,9 +321,9 @@ export default function OdontogramasPaciente() {
                             {odontogramas.map((item, idx) => (
                                 <div key={item.id_odontograma} className="group">
                                     {/* Header del odontograma */}
-                                    <div className="flex items-center justify-between px-5 py-4 bg-white group-hover:bg-sky-50/30 transition-colors duration-150">
+                                    <div className="flex items-center justify-between px-5 py-4 bg-white group-hover:bg-violet-50/30 transition-colors duration-150">
                                         <div className="flex items-center gap-3">
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 shadow-sm shadow-sky-500/20">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] shadow-sm">
                                                 <span className="text-sm font-bold text-white">{idx + 1}</span>
                                             </div>
                                             <div>

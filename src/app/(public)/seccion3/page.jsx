@@ -158,7 +158,7 @@ export default function Seccion3() {
                   </p>
                   <Link
                     href="/agendaProfesionales"
-                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700 hover:scale-[1.02] w-full max-w-xs justify-center lg:w-auto"
+                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:scale-[1.02] w-full max-w-xs justify-center lg:w-auto"
                   >
                     Agendar hora
                     <ArrowRight className="h-4 w-4" />
@@ -212,19 +212,17 @@ export default function Seccion3() {
       <section id="agenda" className="bg-slate-50 py-16 sm:py-24">
         <div className="mx-auto w-full max-w-5xl px-5 md:px-8">
           <RevealOnScroll>
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-indigo-600 px-6 py-16 text-center shadow-lg sm:px-12">
-              <div className="absolute top-0 right-0 -mt-16 -mr-16 h-64 w-64 rounded-full bg-white opacity-5 mix-blend-overlay blur-3xl" />
-              <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-64 w-64 rounded-full bg-indigo-400 opacity-20 mix-blend-overlay blur-3xl" />
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 px-6 py-16 text-center sm:px-12">
               <div className="relative z-10">
                 <h2 className="mx-auto max-w-2xl text-4xl font-bold tracking-tight text-white mb-6">
                   Tu próxima hora está a un clic
                 </h2>
-                <p className="mx-auto max-w-xl text-lg text-indigo-100 mb-10">
+                <p className="mx-auto max-w-xl text-lg text-slate-300 mb-10">
                   Agenda en línea las 24 horas, sin llamadas ni esperas. Elige el profesional, el día y la hora que mejor se adapte a ti.
                 </p>
                 <Link
                   href="/agendaProfesionales"
-                  className="inline-flex rounded-full bg-white px-8 py-4 font-bold text-indigo-600 transition hover:bg-slate-50 hover:scale-105 shadow-md"
+                  className="inline-flex rounded-full bg-white px-8 py-4 font-bold text-slate-900 transition hover:bg-slate-50 hover:scale-105"
                 >
                   Agendar mi hora
                 </Link>

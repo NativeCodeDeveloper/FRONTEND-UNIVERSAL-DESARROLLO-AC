@@ -458,8 +458,7 @@ export default function RecetaLentesPage() {
                 <div className="mb-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.24em] text-[#6E56CF]">Optometría clínica</p>
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 Receta de lentes
                             </h1>
                         </div>

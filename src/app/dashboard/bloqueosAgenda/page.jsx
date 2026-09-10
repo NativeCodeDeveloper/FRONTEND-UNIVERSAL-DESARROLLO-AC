@@ -332,8 +332,7 @@ export default function BloqueosAgendas() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración de Disponibilidad</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Bloqueo de Agenda</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Bloqueo de Agenda</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Selecciona uno o varios días del calendario y define el rango horario. Cada día se bloquea de forma independiente para que puedas liberarlos por separado.
                         </p>
@@ -341,7 +340,7 @@ export default function BloqueosAgendas() {
                     <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                         <Link
                             href="/dashboard/calendario"
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#6E56CF] px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-[#5b45bc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-black px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -353,7 +352,7 @@ export default function BloqueosAgendas() {
                             href="https://www.youtube.com/watch?t=1&v=2wT7jMPcTRM"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             aria-label="Abrir video tutorial de bloqueo de agenda"
                         >
                             <span className="flex h-4 w-4 shrink-0 items-center justify-center">
@@ -413,13 +412,13 @@ export default function BloqueosAgendas() {
                                     <div data-tour="bloqueo-modo-selector" className="flex rounded-xl border border-slate-200 bg-slate-100/60 p-1 gap-1">
                                         <button
                                             onClick={() => setModoSeleccion("especifico")}
-                                            className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "especifico" ? "bg-white text-[#6E56CF] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                                            className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "especifico" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                         >
                                             Días específicos
                                         </button>
                                         <button
                                             onClick={() => setModoSeleccion("rango")}
-                                            className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "rango" ? "bg-white text-[#6E56CF] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                                            className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "rango" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                         >
                                             Rango de fechas
                                         </button>
@@ -463,8 +462,8 @@ export default function BloqueosAgendas() {
                                                         onClick={() => toggleDiaSemana(dia.value)}
                                                         className={`flex-1 py-2 text-[12px] font-bold rounded-xl transition-all ${
                                                             diasSemanaSeleccionados.includes(dia.value)
-                                                                ? "bg-[#6E56CF] text-white shadow-sm"
-                                                                : "bg-white border border-slate-200 text-slate-500 hover:border-[#6E56CF] hover:text-[#6E56CF]"
+                                                                ? "bg-black text-white shadow-sm"
+                                                                : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-900"
                                                         }`}
                                                     >
                                                         {dia.label}
@@ -475,7 +474,7 @@ export default function BloqueosAgendas() {
 
                                         <button
                                             onClick={generarDiasDesdeRango}
-                                            className="w-full py-2.5 text-[13px] font-bold rounded-xl border-2 border-dashed border-[#6E56CF] text-[#6E56CF] hover:bg-violet-50 transition-all"
+                                            className="w-full py-2.5 text-[13px] font-bold rounded-xl border-2 border-dashed border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all"
                                         >
                                             Generar días →
                                         </button>
@@ -596,7 +595,7 @@ export default function BloqueosAgendas() {
                                         data-tour="bloqueo-guardar"
                                         onClick={insertarBloqueosMultiples}
                                         disabled={cargandoInsercion}
-                                        className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#6E56CF] text-white text-sm font-bold rounded-2xl hover:bg-[#5b45bc] transition-all duration-200 shadow-lg shadow-indigo-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all duration-200 shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
                                         {cargandoInsercion ? (
                                             <>
@@ -625,7 +624,7 @@ export default function BloqueosAgendas() {
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                                    <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
@@ -646,7 +645,7 @@ export default function BloqueosAgendas() {
                                     )}
                                     <button
                                         onClick={verTodosLosBloqueos}
-                                        className="text-[11px] font-bold text-[#6E56CF] uppercase tracking-wider px-3 py-1.5 rounded-lg hover:bg-violet-50 transition-colors"
+                                        className="text-[11px] font-bold text-slate-600 uppercase tracking-wider px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                                     >
                                         Refrescar
                                     </button>
@@ -689,7 +688,7 @@ export default function BloqueosAgendas() {
                                                     <TableCell className="py-3 text-center">
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); abrirModalBloqueo(bloqueo); }}
-                                                            className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-[#6E56CF] hover:bg-violet-50 transition-all active:scale-95"
+                                                            className="inline-flex items-center justify-center h-8 w-8 rounded-xl text-slate-600 hover:bg-slate-100 transition-all active:scale-95"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

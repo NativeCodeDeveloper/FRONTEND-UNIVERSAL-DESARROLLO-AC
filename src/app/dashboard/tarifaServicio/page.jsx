@@ -305,8 +305,7 @@ export default function TarifaServicio() {
                 {/* Header */}
                 <div className="mb-8 rounded-[32px] border border-slate-200 bg-white/90 p-6 shadow-sm">
                     <div className="flex flex-col gap-1">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración</p>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Cobro por Consulta o Servicio
                         </h1>
                         <p className="text-sm text-slate-500">
@@ -331,7 +330,7 @@ export default function TarifaServicio() {
                                     const prof = listaProfesionales.find(p => String(p.id_profesional) === String(id));
                                     setNombreProfesional(prof?.nombreProfesional || '');
                                 }}
-                                className="rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
+                                className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
                                 options={listaProfesionales.map(profesional => ({
                                     value: profesional.id_profesional,
                                     label: profesional.nombreProfesional
@@ -355,7 +354,7 @@ export default function TarifaServicio() {
                                     const serv = listaServiciosProfesionales.find(s => String(s.id_servicioProfesional) === String(id));
                                     setNombreServicio(serv?.nombreServicio || '');
                                 }}
-                                className="rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
+                                className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
                                 options={listaServiciosProfesionales.map(servicio => ({
                                     value: servicio.id_servicioProfesional,
                                     label: servicio.nombreServicio
@@ -402,7 +401,7 @@ export default function TarifaServicio() {
                                     value={precioConsulta}
                                     onChange={(e) => setPrecioConsulta(e.target.value)}
                                     placeholder="Ej: 70000"
-                                    className="w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
+                                    className="w-full rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
                                 />
                                 <p className="text-xs text-slate-400">Solo se permiten valores numéricos.</p>
                             </div>
@@ -413,7 +412,7 @@ export default function TarifaServicio() {
                                     value={duracionServicio}
                                     onChange={(e) => setDuracionServicio(e.target.value)}
                                     placeholder="Ej: 50"
-                                    className="w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
+                                    className="w-full rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
                                 />
                                 <p className="text-xs text-slate-400">Solo se permiten valores numéricos.</p>
                             </div>
@@ -422,21 +421,21 @@ export default function TarifaServicio() {
                         <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="tarifa-guardar">
                             <ButtonDinamic
                                 onClick={() => insertarTarifaProfesional(profesional_id, servicio_id, precioConsulta, duracionServicio)}
-                                className="rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0] transition-colors"
+                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
                             >
                                 Guardar Tarifa
                             </ButtonDinamic>
 
                             <ButtonDinamic
                                 onClick={() =>  actualizarTarifaProfesional(profesional_id,servicio_id,precioConsulta,duracionServicio,id_tarifaProfesional)}
-                                className="rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0] transition-colors"
+                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
                             >
                                 Actualizar Tarifa
                             </ButtonDinamic>
 
                             <ButtonDinamic
                                 onClick={() => eliminarTarifaProfesional(id_tarifaProfesional)}
-                                className="bg-red-600 hover:bg-red-500"
+                                className="bg-rose-600 hover:bg-rose-500"
                             >
                                 Eliminar Tarifa
                             </ButtonDinamic>
@@ -479,7 +478,7 @@ export default function TarifaServicio() {
                                         <TableCell className="text-center">
                                             <ButtonDinamic
                                                 onClick={() =>seleccionarTarifaProfesional(tarifa.id_tarifaProfesional)}
-                                                className="rounded-lg border border-[#DDD6FE] bg-[#F3F0FF] px-3 py-1 text-xs text-[#6E56CF] hover:bg-[#EDE9FE]"
+                                                className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-900 hover:bg-slate-200"
                                             >
                                                 Seleccionar
                                             </ButtonDinamic>

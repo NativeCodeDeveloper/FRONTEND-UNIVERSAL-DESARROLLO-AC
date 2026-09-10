@@ -460,13 +460,10 @@ function formatearFechaHora(fechaISO) {
                             <ArrowLeft className="h-4 w-4"/>
                         </button>
                         <div>
-                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">
-                                Gestión financiera del paciente
-                            </p>
                             {
                                 paciente?.map(paciente => {
                                     return (
-                                        <h1 key={paciente.id_paciente} className="mt-1 text-3xl font-bold text-slate-900 md:text-4xl">
+                                        <h1 key={paciente.id_paciente} className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                             Cotizaciones de {paciente.nombre}
                                         </h1>
                                     )

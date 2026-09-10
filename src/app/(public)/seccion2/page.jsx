@@ -93,14 +93,14 @@ export default function Seccion2() {
     <section
       id="servicios"
       className="scroll-mt-24 bg-slate-50 bg-cover bg-center md:bg-fixed py-20 text-slate-800 sm:py-28 overflow-hidden"
-      style={{ backgroundImage: "url('/bg-swoosh-azul.webp')" }}
+      style={{ backgroundImage: "url('/bg-hero-v15.webp')" }}
     >
       <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10">
 
         {/* Header */}
         <RevealOnScroll>
           <div className="max-w-3xl mb-16">
-            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-6">
+            <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl mb-6">
               Nuestros Servicios
             </h2>
             <p className="text-lg text-slate-600">

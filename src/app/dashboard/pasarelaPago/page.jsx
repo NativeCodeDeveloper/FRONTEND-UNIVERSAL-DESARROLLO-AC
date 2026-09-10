@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import EstadoPersisntence from "../../../Componentes/EstadoPersisntence.jsx"
 
 
-const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100";
+const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100";
 const labelClass = "text-sm font-medium text-slate-700";
 function DatoActual({ icon, etiqueta, valor, ayuda }) {
     return (
@@ -140,10 +140,7 @@ export default function PasarelaPagoPage() {
                     <section className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-sm">
                         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                             <div className="max-w-2xl">
-                                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">
-                                    Configuracion web
-                                </p>
-                                <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                                <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                     Pasarela de pago
                                 </h1>
                                 <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -237,7 +234,7 @@ export default function PasarelaPagoPage() {
                                     <div className="relative">
                                         <KeyRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                         <input
-                                            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100"
+                                            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                                             value={access_token}
                                             onChange={(e) => setaccess_token(e.target.value)}
                                             placeholder="APP_USR-..."

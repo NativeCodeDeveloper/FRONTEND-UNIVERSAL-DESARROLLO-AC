@@ -319,8 +319,7 @@ export default function CarruselPortada() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
                     <div className="max-w-3xl">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración de Portal</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Imágenes de Portada</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Imágenes de Portada</h1>
                         <p className="mt-2 text-[13px] text-slate-500 leading-relaxed">
                             Gestiona las imágenes de gran formato que rotan en la cabecera del sitio. Asegúrate de usar imágenes de alta resolución para mantener la calidad visual.
                         </p>
@@ -401,7 +400,7 @@ export default function CarruselPortada() {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => subirPortadaClick()}
-                                            className="flex-1 h-12 bg-[#6E56CF] text-white text-sm font-bold rounded-2xl hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                                            className="flex-1 h-12 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm flex items-center justify-center gap-2"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -480,7 +479,7 @@ export default function CarruselPortada() {
                                             <div className="mt-6 flex items-center gap-3">
                                                 <button 
                                                     onClick={() => seleccionarPortada(c.id_publicacionesPortada)}
-                                                    className="flex-1 h-10 bg-violet-50 text-[#6E56CF] text-xs font-bold rounded-xl hover:bg-[#6E56CF] hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                    className="flex-1 h-10 bg-slate-100 text-slate-900 text-xs font-bold rounded-xl hover:bg-slate-900 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

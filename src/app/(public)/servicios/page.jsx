@@ -10,7 +10,7 @@ const tratamientos = [
     subtitle: "Regulación Metabólica Dúo",
     description: "Mediante análogos de GLP-1 (Semaglutida/Tirzepatida) regulamos directamente los centros de saciedad anatómicos, controlando el hambre fisiológico y optimizando el vaciado gástrico para una adherencia perfecta al programa.",
     icon: Component,
-    colorClass: "bg-indigo-50 text-indigo-600",
+    colorClass: "bg-slate-100 text-slate-700",
     linkInfo: "/programa"
   },
   {
@@ -26,20 +26,20 @@ const tratamientos = [
     subtitle: "Equilibrio Hormonal",
     description: "Estabilizamos el eje hormonal femenino metabólico. Controlando la sensibilidad cruzada a la insulina abordamos desde adentro la niebla mental, la fatiga y los descontroles de peso asociados al Síndrome de Ovario Poliquístico.",
     icon: Hexagon,
-    colorClass: "bg-indigo-50 text-indigo-600",
+    colorClass: "bg-slate-100 text-slate-700",
     linkInfo: "/programa"
   }
 ];
 
 export default function ServicioPage() {
   return (
-    <main className="bg-[#f8f9fa] text-slate-900 pt-32 pb-32 min-h-screen font-sans">
+    <main className="bg-[#f8f9fa] text-slate-900 pt-32 pb-32 min-h-screen">
 
       {/* Header Section */}
       <section className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10 mb-20 lg:mb-32 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <RevealOnScroll>
           <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-6xl lg:text-[5.5rem] font-medium tracking-tight text-slate-900 leading-[1.05] mb-6">
+            <h1 className="text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight text-slate-900 leading-[1.05] mb-6">
               Nuestros<br />
               Tratamientos
             </h1>
@@ -64,7 +64,7 @@ export default function ServicioPage() {
         {tratamientos.map((tratamiento, index) => {
           const Icon = tratamiento.icon;
           // Apply a staggered offset for middle items
-          const staggerClass = index === 1 ? "lg:mt-[100px]" : index === 2 ? "lg:mt-[50px]" : "";
+          const staggerClass = index === 1 ? "lg:mt-24" : index === 2 ? "lg:mt-12" : "";
 
           return (
             <RevealOnScroll key={index} delayClass={`delay-${index * 100}`}>
@@ -96,7 +96,7 @@ export default function ServicioPage() {
                   {tratamiento.description}
                 </p>
 
-                <div className="flex items-center text-slate-900 font-medium text-sm transition-all group-hover:text-indigo-600 cursor-pointer w-fit border-b border-transparent group-hover:border-indigo-600 pb-1">
+                <div className="flex items-center text-slate-900 font-medium text-sm transition-all cursor-pointer w-fit border-b border-transparent group-hover:border-slate-900 pb-1">
                   Ver detalles
                 </div>
               </article>

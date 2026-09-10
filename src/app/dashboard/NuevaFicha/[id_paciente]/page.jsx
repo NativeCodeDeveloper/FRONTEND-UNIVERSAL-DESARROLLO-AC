@@ -260,8 +260,7 @@ export default function NuevaFicha() {
 
                 {/* ── Header ── */}
                 <div className="mb-8">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Fichas Clínicas</p>
-                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">Nueva Ficha Clínica</h1>
+                    <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Nueva Ficha Clínica</h1>
                     <p className="mt-1 text-[13px] text-slate-500">Complete los campos para registrar la atención del paciente</p>
                 </div>
 

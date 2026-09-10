@@ -387,8 +387,7 @@ export default function EdicionPagina() {
                 {/* ── Header ── */}
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración Web</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Gestión de Contenido
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -423,7 +422,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Cambios
                                     </button>
                                     {mensaje && <p className={`text-[12px] font-medium ${mensaje.startsWith('✅') ? 'text-emerald-700' : 'text-amber-700'}`}>{mensaje}</p>}
@@ -452,7 +451,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Subtítulo
                                     </button>
                                     {mensajeSubTitulo && <p className="text-[12px] font-medium text-slate-600">{mensajeSubTitulo}</p>}
@@ -481,7 +480,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Sobre Nosotros
                                     </button>
                                     {mensajeSobreNosotros && <p className="text-[12px] font-medium text-slate-600">{mensajeSobreNosotros}</p>}
@@ -510,7 +509,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Título Proyecto
                                     </button>
                                     {mensajeProyectos && <p className="text-[12px] font-medium text-slate-600">{mensajeProyectos}</p>}
@@ -539,7 +538,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Título Contacto
                                     </button>
                                     {MensajeContacto && <p className="text-[12px] font-medium text-slate-600">{MensajeContacto}</p>}
@@ -568,7 +567,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Párrafo
                                     </button>
                                     {MensajeTexto1 && <p className="text-[12px] font-medium text-slate-600">{MensajeTexto1}</p>}
@@ -597,7 +596,7 @@ export default function EdicionPagina() {
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
-                                        className="h-10 px-6 rounded-xl bg-[#6E56CF] text-[12px] font-bold text-white hover:bg-[#5b45bc] transition-all disabled:opacity-50">
+                                        className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Párrafo
                                     </button>
                                     {MensajeTexto2 && <p className="text-[12px] font-medium text-slate-600">{MensajeTexto2}</p>}

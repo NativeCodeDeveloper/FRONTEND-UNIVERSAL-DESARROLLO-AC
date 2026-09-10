@@ -43,7 +43,7 @@ export default function Navbar() {
               <li key={item.label}>
                 <Link
                   href={item.href}
-                  className="text-[14px] font-semibold tracking-wide text-slate-700 transition-colors duration-300 hover:text-indigo-600"
+                  className="text-[14px] font-semibold tracking-wide text-slate-700 transition-colors duration-300 hover:text-slate-900"
                 >
                   {item.label}
                 </Link>
@@ -57,7 +57,7 @@ export default function Navbar() {
           <Link
             href="/agendaProfesionales"
             aria-label="Agendar hora"
-            className="hidden rounded-full bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md transition duration-300 hover:bg-indigo-700 hover:scale-105 sm:inline-flex"
+            className="hidden rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition duration-300 hover:bg-slate-800 hover:scale-105 sm:inline-flex"
           >
             Agendar hora
           </Link>
@@ -86,7 +86,7 @@ export default function Navbar() {
               key={item.label}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className="rounded-2xl px-5 py-4 text-[15px] font-bold text-slate-700 transition duration-300 hover:bg-slate-50 hover:text-indigo-600"
+              className="rounded-2xl px-5 py-4 text-[15px] font-bold text-slate-700 transition duration-300 hover:bg-slate-50 hover:text-slate-900"
             >
               {item.label}
             </Link>
@@ -95,7 +95,7 @@ export default function Navbar() {
             <Link
               href="/agendaProfesionales"
               onClick={() => setIsOpen(false)}
-              className="block w-full rounded-2xl bg-indigo-600 px-5 py-4 text-center text-[15px] font-bold text-white shadow transition duration-300 hover:bg-indigo-700"
+              className="block w-full rounded-2xl bg-slate-900 px-5 py-4 text-center text-[15px] font-bold text-white transition duration-300 hover:bg-slate-800"
             >
               Agendar hora
             </Link>

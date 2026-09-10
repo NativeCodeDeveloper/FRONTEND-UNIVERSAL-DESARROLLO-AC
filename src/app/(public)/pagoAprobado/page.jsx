@@ -1,4 +1,4 @@
-import { MoveRight, PhoneCall } from "lucide-react";
+import { CheckCircle2, MoveRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -6,30 +6,34 @@ import Link from "next/link";
 const CORREO = process.env.CORREO_OFICIAL;
 
 const CTA1 = () => (
-    <div className="w-full py-20 lg:py-40">
-        <div className="container mx-auto">
-            <div className="flex flex-col text-center text-sky-700 bg-blue-50 rounded-md p-4 lg:p-14 gap-8 items-center">
-                <div>
-                    <Badge className="bg-sky-100 text-sky-700 border-sky-300">Notificacion</Badge>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <h3 className="text-3xl md:text-5xl tracking-tighter max-w-xl font-regular">
-                        Tu pago ha sido aprobado!
-                    </h3>
-                    <p className="text-lg leading-relaxed tracking-tight text-sky-800 text-muted-foreground max-w-xl">
-                        Tu pedido esta pendiente de confirmación.
+    <div className="w-full bg-emerald-50/40 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        <div className="mx-auto flex max-w-3xl items-center justify-center">
+            <div className="mt-8 w-full overflow-hidden rounded-3xl border border-emerald-100 bg-white shadow-sm lg:mt-14">
+                <div className="h-1.5 w-full bg-emerald-500" />
+                <div className="flex flex-col items-center gap-5 px-6 py-8 text-center sm:px-10 sm:py-10 lg:px-16">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-50/70">
+                        <CheckCircle2 className="h-9 w-9 text-emerald-600" strokeWidth={1.7} aria-hidden="true" />
+                    </div>
+                    <Badge className="border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                        Notificacion
+                    </Badge>
+                    <div className="flex max-w-xl flex-col gap-3">
+                        <h3 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                            Tu pago ha sido aprobado!
+                        </h3>
+                        <p className="text-base leading-7 text-slate-600 sm:text-lg">
+                            Tu pedido esta pendiente de confirmación.
 
-                        En cuanto comencemos a prepararlo te notificaremos inmediatamente a los datos de contacto que nos entregaste. Podrás seguir cada etapa del trayecto y conocer en qué parte del proceso se encuentra tu compra. Si tienes dudas o necesitas asistencia, escríbenos a: <br/>
+                            En cuanto comencemos a prepararlo te notificaremos inmediatamente a los datos de contacto que nos entregaste. Podrás seguir cada etapa del trayecto y conocer en qué parte del proceso se encuentra tu compra. Si tienes dudas o necesitas asistencia, escríbenos a: <br/>
 
-                        {CORREO}
-                    </p>
-                </div>
-                <div className="flex flex-row gap-4">
-<Link href="/">
-    <Button className="gap-4 bg-sky-200 text-sky-800 hover:bg-sky-300">
-        Volver a pagina principal <MoveRight className="w-4 h-4" />
-    </Button>
-</Link>
+                            {CORREO}
+                        </p>
+                    </div>
+                    <Link href="/" className="w-full sm:w-auto">
+                        <Button className="h-12 w-full gap-3 rounded-xl bg-emerald-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 sm:w-auto">
+                            Volver a pagina principal <MoveRight className="h-4 w-4" />
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>

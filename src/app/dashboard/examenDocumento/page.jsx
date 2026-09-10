@@ -355,8 +355,7 @@ export default function ExamenDocumento() {
                 <div className="mb-8">
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Documentación clínica</p>
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 Solicitud de exámenes
                             </h1>
                             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
@@ -458,7 +457,7 @@ export default function ExamenDocumento() {
                                     <button
                                         type="button"
                                         onClick={generarDocumentoPDF}
-                                        className="inline-flex items-center gap-2 rounded-xl bg-[#6E56CF] hover:bg-[#5B47B0] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
+                                        className="inline-flex items-center gap-2 rounded-xl bg-black hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-8m0 8l-3-3m3 3l3-3M4 19h16"/>
@@ -565,7 +564,7 @@ export default function ExamenDocumento() {
                                                         className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 ${
                                                             yaAgregado
                                                                 ? "cursor-not-allowed border border-emerald-200 bg-emerald-50 text-emerald-700"
-                                                                : "bg-[#6E56CF] hover:bg-[#5B47B0] text-white shadow-md hover:from-violet-700 hover:to-indigo-700"
+                                                                : "bg-black hover:bg-slate-800 text-white shadow-sm"
                                                         }`}
                                                     >
                                                         {yaAgregado ? "Agregado" : "Agregar al documento"}

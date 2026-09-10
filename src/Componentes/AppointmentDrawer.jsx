@@ -476,7 +476,7 @@ function FormSection({
     <div className="flex flex-col gap-4 p-5">
       {/* Rango de fecha/hora */}
       {selectionDraft && (
-        <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
+        <div data-tour="reserva-horario" className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 mb-2">
             Horario
           </p>
@@ -521,7 +521,7 @@ function FormSection({
 
       {/* Datos del paciente */}
       {mode !== "bloqueo" && (
-        <div className="rounded-xl border border-violet-100 bg-violet-50/50 p-3 space-y-2">
+        <div data-tour="reserva-paciente" className="rounded-xl border border-violet-100 bg-violet-50/50 p-3 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-600 mb-2">
             Datos del paciente
           </p>
@@ -617,7 +617,7 @@ function FormSection({
 
       {/* Selector de tarifa / servicio del profesional */}
       {mode !== "bloqueo" && listaTarifasProfesional.length > 0 && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 space-y-2">
+        <div data-tour="reserva-servicio" className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 space-y-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-1">
             Servicio
           </p>
@@ -998,8 +998,7 @@ export function AppointmentDrawer({
                           onConfirmar?.();
                         }
                       }}
-                      className="flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ backgroundColor: "#6E56CF" }}
+                      className="flex-1 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                       title={requiereConfirmarRepeticion ? "Revisa y confirma la lista de fechas adicionales antes de agendar" : undefined}
                     >
                       {popupForm.motivoBloqueo?.trim() ? "Bloquear horario" : "Agendar"}
@@ -1011,15 +1010,14 @@ export function AppointmentDrawer({
                     <button
                       type="button"
                       onClick={onEliminar}
-                      className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100 transition-colors"
+                      className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 hover:bg-rose-100 transition-colors"
                     >
                       Eliminar
                     </button>
                     <button
                       type="button"
                       onClick={onActualizar}
-                      className="flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors"
-                      style={{ backgroundColor: "#6E56CF" }}
+                      className="flex-1 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800"
                     >
                       Actualizar
                     </button>

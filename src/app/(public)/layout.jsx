@@ -9,8 +9,8 @@ export default function PublicLayout({ children }) {
   return (
     <CarritoProvider>
       <ObjetoPagarProvider>
-        <link rel="preload" as="image" href="/bg-swoosh-azul.webp" fetchPriority="high" />
-        <div className="relative min-h-screen bg-slate-50 text-slate-900 font-sans">
+        <link rel="preload" as="image" href="/bg-hero-v15.webp" fetchPriority="high" />
+        <div className="relative min-h-screen bg-slate-50 text-slate-900 font-system-apple">
           {/* Fondo base */}
           <div className="pointer-events-none fixed inset-0 z-0" />
           <ToasterClient />

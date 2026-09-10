@@ -1,10 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { TOUR_STEPS } from "@/lib/tourSteps";
+import { canAccessDashboardPath, getDashboardRoleFromUser } from "@/lib/dashboard-access";
 
 const COMPLETED_KEY = "ac_tour_completado";
 
@@ -13,7 +15,15 @@ const TOUR_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 2
   <path stroke-linecap="round" stroke-linejoin="round" d="M15 9l-2 5-4 1 2-5 4-1z" />
 </svg>`;
 
-const TOUR_GROUPS = [...new Set(TOUR_STEPS.map((step) => step.grupo))];
+// Pasos sin "route" (ej. resaltar un ítem del sidebar) ya se saltan solos si
+// el elemento no existe en el DOM — el sidebar filtra sus secciones por rol.
+// Pero un paso CON route fuerza router.push aunque el rol no tenga acceso a
+// esa página (el middleware lo redirige a otra parte), dejando al usuario
+// varado ahí mientras el tour espera 8s por un selector que nunca va a
+// aparecer. Por eso se filtran acá antes de construir los steps del driver.
+function getStepsForRole(role) {
+    return TOUR_STEPS.filter((step) => !step.route || canAccessDashboardPath(role, step.route));
+}
 
 function waitForRoute(pathnameRef, target, callback) {
     if (!target || pathnameRef.current === target) {
@@ -65,9 +75,9 @@ function waitForStableElement(selector, callback, frames = 6) {
     requestAnimationFrame(tick);
 }
 
-function buildTourMeta(step) {
-    const currentGroupIndex = TOUR_GROUPS.indexOf(step.grupo);
-    const dots = TOUR_GROUPS
+function buildTourMeta(step, groups) {
+    const currentGroupIndex = groups.indexOf(step.grupo);
+    const dots = groups
         .map((_, index) => {
             const state = index < currentGroupIndex ? "done" : index === currentGroupIndex ? "active" : "pending";
             return `<span class="ac-dot ac-dot--${state}"></span>`;
@@ -82,8 +92,12 @@ const TourContext = createContext(null);
 export function TourProvider({ children }) {
     const pathname = usePathname();
     const router = useRouter();
+    const { user } = useUser();
     const driverRef = useRef(null);
     const pathnameRef = useRef(pathname);
+    const role = getDashboardRoleFromUser(user);
+    const tourSteps = useMemo(() => getStepsForRole(role), [role]);
+    const tourGroups = useMemo(() => [...new Set(tourSteps.map((step) => step.grupo))], [tourSteps]);
 
     useEffect(() => {
         pathnameRef.current = pathname;
@@ -95,9 +109,9 @@ export function TourProvider({ children }) {
     }, []);
 
     const buildDriver = useCallback(() => {
-        const steps = TOUR_STEPS.map((step, index) => {
+        const steps = tourSteps.map((step, index) => {
             const isFirst = index === 0;
-            const isLast = index === TOUR_STEPS.length - 1;
+            const isLast = index === tourSteps.length - 1;
             const isInteractive = step.interactive === true;
 
             return {
@@ -127,14 +141,14 @@ export function TourProvider({ children }) {
                     side: step.side || "right",
                     align: step.align || "start",
                     title: `<span class="ac-tour-icon-badge">${TOUR_ICON_SVG}</span><span class="ac-tour-title-text">${step.title}</span>`,
-                    description: `${buildTourMeta(step)}<p class="ac-tour-text">${step.description}</p>`,
+                    description: `${buildTourMeta(step, tourGroups)}<p class="ac-tour-text">${step.description}</p>`,
                     showButtons: isInteractive
                         ? ["close"]
                         : (isFirst || step.noPrevious) ? ["next", "close"] : ["next", "previous", "close"],
                     nextBtnText: isLast ? "Finalizar" : "Siguiente",
                     prevBtnText: "Atrás",
                     onNextClick: () => {
-                        const next = TOUR_STEPS[index + 1];
+                        const next = tourSteps[index + 1];
 
                         if (next?.route && next.route !== pathnameRef.current) {
                             router.push(next.route);
@@ -146,7 +160,7 @@ export function TourProvider({ children }) {
                         driverRef.current?.moveNext();
                     },
                     onPrevClick: () => {
-                        const prev = TOUR_STEPS[index - 1];
+                        const prev = tourSteps[index - 1];
                         if (prev?.route && prev.route !== pathnameRef.current) {
                             router.push(prev.route);
                             waitForRoute(pathnameRef, prev.route, () => {
@@ -183,7 +197,7 @@ export function TourProvider({ children }) {
                 // natural (el usuario llegó al último paso y presionó "Finalizar").
                 // Si cierra o sale antes, lo deja donde esté — no lo saca de la
                 // página en la que estaba trabajando.
-                const finishedLastStep = opts?.index === TOUR_STEPS.length - 1;
+                const finishedLastStep = opts?.index === tourSteps.length - 1;
                 if (finishedLastStep && pathnameRef.current !== "/dashboard") {
                     router.push("/dashboard");
                 }
@@ -192,11 +206,11 @@ export function TourProvider({ children }) {
 
         driverRef.current = instance;
         return instance;
-    }, [router]);
+    }, [router, tourSteps, tourGroups]);
 
     const start = useCallback(() => {
         const instance = buildDriver();
-        const firstStep = TOUR_STEPS[0];
+        const firstStep = tourSteps[0];
         if (firstStep?.route && firstStep.route !== pathnameRef.current) {
             router.push(firstStep.route);
             waitForRoute(pathnameRef, firstStep.route, () => {
@@ -205,7 +219,7 @@ export function TourProvider({ children }) {
             return;
         }
         instance.drive(0);
-    }, [buildDriver, router]);
+    }, [buildDriver, router, tourSteps]);
 
     const skip = useCallback(() => {
         driverRef.current?.destroy();

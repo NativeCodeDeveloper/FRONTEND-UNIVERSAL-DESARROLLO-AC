@@ -1015,7 +1015,7 @@ export default function Paciente() {
                             href="https://youtu.be/KWLr1mHjhA0?si=FlLU1kSXYOS1RYVF"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             aria-label="Abrir video tutorial de fichas clínicas"
                         >
                             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]">
@@ -1135,42 +1135,42 @@ export default function Paciente() {
                         
                         {/* Acciones Rápidas */}
                         <div data-tour="ficha-acciones-rapidas" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Ficha</span>
                             </button>
-                            <button onClick={agendarPaciente} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                            <button onClick={agendarPaciente} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Agendar</span>
                             </button>
                             {canSeeOdontograma && (
-                                <button onClick={verOdontogramas} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                <button onClick={verOdontogramas} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
                                     </span>
                                     <span className="text-[13px] font-semibold text-slate-800">Odontograma</span>
                                 </button>
                             )}
                             {canSeeRecetaMedica && (
-                                <button onClick={() => irAReceta(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                                <button onClick={() => irAReceta(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
                                     </span>
                                     <span className="text-[13px] font-semibold text-slate-800">Recetas</span>
                                 </button>
                             )}
-                            <button type="button" onClick={irACotizaciones} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                            <button type="button" onClick={irACotizaciones} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Cotizaciones</span>
                             </button>
-                            <button onClick={irADocumentos} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#151A2D] text-white transition-colors duration-200 group-hover:bg-[#6E56CF]">
+                            <button onClick={irADocumentos} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Documentos</span>
@@ -1180,7 +1180,7 @@ export default function Paciente() {
                         {pacienteActual && (
                             <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
@@ -1197,13 +1197,13 @@ export default function Paciente() {
                                         }}
                                         aria-label="Editar información de ingreso"
                                         title="Editar información de ingreso"
-                                        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                                        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487a2.1 2.1 0 113 2.97L8.33 18.99l-4.33 1.36 1.36-4.33L16.862 4.487z" />
                                         </svg>
                                     </button>
-                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
+                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-slate-300 group-open:bg-slate-100 group-open:text-slate-900">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                                         </svg>
@@ -1233,8 +1233,8 @@ export default function Paciente() {
                         {/* Formulario de Edición (Cerrable) */}
                         {mostrarFormulario && (
                             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm sm:p-6" onClick={() => setMostrarFormulario(false)}>
-                                <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" onClick={(e) => e.stopPropagation()} className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-white/80 bg-white shadow-2xl shadow-slate-950/25 animate-in fade-in zoom-in-95 duration-200">
-                                <div className="flex shrink-0 items-center justify-between border-b border-violet-100 bg-gradient-to-r from-violet-50 via-white to-white px-5 py-3 sm:px-6">
+                                <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" onClick={(e) => e.stopPropagation()} className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/60 px-5 py-3 sm:px-6">
                                     <div>
                                         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6E56CF]">Paciente</p>
                                         <h3 className="mt-0.5 text-sm font-bold text-slate-900">Editar Información de Ingreso</h3>
@@ -1331,7 +1331,7 @@ export default function Paciente() {
                                 </div>
                                 <div className="flex shrink-0 items-center justify-end gap-2.5 border-t border-slate-200 bg-slate-50/95 px-4 py-2.5 sm:px-5">
                                     <button onClick={() => setMostrarFormulario(false)} className="h-9 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-500 transition-colors hover:bg-slate-50">Cancelar</button>
-                                    <button onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente)} className="h-9 rounded-lg bg-[#6E56CF] px-5 text-xs font-bold text-white shadow-md shadow-violet-200 transition-colors hover:bg-[#5b45bc]">Guardar Cambios</button>
+                                    <button onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente)} className="h-9 rounded-lg bg-black px-5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-slate-800">Guardar Cambios</button>
                                 </div>
                             </div>
                             </div>
@@ -1344,7 +1344,7 @@ export default function Paciente() {
                                 para no dejar espacio en blanco cuando no se está usando. */}
                             <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18l-7 8v6l-4 2v-8L3 4z" />
                                         </svg>
@@ -1352,7 +1352,7 @@ export default function Paciente() {
                                     <div className="relative min-w-0 flex-1">
                                         <h3 className="text-[14px] font-semibold leading-tight tracking-[-0.01em] text-slate-900">Filtros</h3>
                                     </div>
-                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
+                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-slate-300 group-open:bg-slate-100 group-open:text-slate-900">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                                         </svg>
@@ -1414,7 +1414,7 @@ export default function Paciente() {
                                 e "Información de ingreso". */}
                             <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-[#151A2D] text-white shadow-[0_12px_24px_-14px_rgba(15,23,42,0.8)] transition-colors duration-300 group-open:border-[#6E56CF] group-open:bg-[#6E56CF]">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 12v3l2 1" />
@@ -1435,7 +1435,7 @@ export default function Paciente() {
                                             {historialCitas.length}
                                         </span>
                                     )}
-                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-violet-200 group-open:bg-violet-50 group-open:text-[#6E56CF]">
+                                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-slate-300 group-open:bg-slate-100 group-open:text-slate-900">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
                                         </svg>
@@ -1575,11 +1575,11 @@ export default function Paciente() {
                                                     </div>
                                                 </div>
                                                 <div className="relative z-10 flex flex-wrap items-center gap-2 xl:justify-end">
-                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-800 bg-[#151A2D] px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6E56CF] hover:bg-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">
+                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-800 bg-black px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-700 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
                                                         {expandida ? "Ocultar" : "Ver detalle"}
                                                     </button>
-                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-10 rounded-xl border border-violet-200 bg-violet-50 px-4 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">PDF</button>
-                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[11px] font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2">Editar</button>
+                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-10 rounded-xl border border-slate-200 bg-slate-100 px-4 text-[11px] font-bold text-slate-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">PDF</button>
+                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[11px] font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">Editar</button>
                                                 </div>
                                             </div>
                                             {expandida && (

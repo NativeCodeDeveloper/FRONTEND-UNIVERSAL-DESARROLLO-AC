@@ -197,25 +197,49 @@ export const TOUR_STEPS = [
   },
 
   // ── Calendario y Reservas ────────────────────────────────────────────────
+  // Los 3 pasos marcados con interactive:true exigen el clic real del usuario
+  // sobre el elemento (no el botón "Siguiente" del popover) — así el tour
+  // nunca avanza sin que el formulario realmente se haya abierto, llenado o
+  // guardado. driver.js llama al mismo onNextClick de cada paso al detectar
+  // ese clic, así que la navegación de ruta entre pasos sigue funcionando igual.
   {
     id: "calendario-nueva-reserva",
     grupo: "Calendario y Reservas",
     route: "/dashboard/calendario",
     selector: "#btn-nueva-reserva",
     title: "Calendario y Reservas",
-    description: "Haz clic en el botón morado \"Nueva reserva\" resaltado a la derecha. Cuando se abra el formulario, presiona \"Siguiente\" para continuar.",
+    description: "Haz clic en el botón morado \"Nueva reserva\" resaltado a la derecha para abrir el formulario.",
     side: "left",
     align: "start",
+    interactive: true,
   },
   {
-    id: "calendario-formulario",
+    id: "calendario-horario",
     grupo: "Calendario y Reservas",
     route: "/dashboard/calendario",
-    selector: '[data-tour="reserva-drawer"]',
+    selector: '[data-tour="reserva-horario"]',
     title: "Calendario y Reservas",
-    description: "Completa la fecha y el horario. En los datos del paciente, usa tu propio nombre, RUT, correo y celular — así vas a recibir de verdad las notificaciones y ver cómo funcionan. Baja con scroll hasta \"Servicio\" y elige un tipo de atención: es obligatorio para poder guardar.",
+    description: "Elige la fecha y define el horario de inicio y término de la cita.",
     side: "left",
     noPrevious: true,
+  },
+  {
+    id: "calendario-paciente",
+    grupo: "Calendario y Reservas",
+    route: "/dashboard/calendario",
+    selector: '[data-tour="reserva-paciente"]',
+    title: "Calendario y Reservas",
+    description: "Datos del paciente. Para esta prueba, usa tu propio nombre, RUT, correo y celular — así vas a recibir de verdad las notificaciones y ver cómo funcionan.",
+    side: "left",
+  },
+  {
+    id: "calendario-servicio",
+    grupo: "Calendario y Reservas",
+    route: "/dashboard/calendario",
+    selector: '[data-tour="reserva-servicio"]',
+    title: "Calendario y Reservas",
+    description: "Elige un tipo de atención: <strong>es obligatorio</strong> para poder guardar la reserva.",
+    side: "left",
   },
   {
     id: "calendario-guardar",
@@ -223,8 +247,9 @@ export const TOUR_STEPS = [
     route: "/dashboard/calendario",
     selector: '[data-tour="reserva-guardar"]',
     title: "Calendario y Reservas",
-    description: "Presiona \"Agendar\" para guardar. Si falta algún dato obligatorio o el horario ya está ocupado, el sistema te avisa antes de confirmar.",
+    description: "Haz clic en \"Agendar\" para guardar de verdad. Si falta algún dato obligatorio o el horario ya está ocupado, el sistema te avisa antes de confirmar.",
     side: "top",
+    interactive: true,
   },
 
   // ── De la reserva a la ficha clínica ─────────────────────────────────────
@@ -263,7 +288,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-modo-selector"]',
     title: "Bloqueos",
-    description: "Elige \"Días específicos\" para marcar días sueltos en el calendario (por ejemplo, solo los miércoles), o \"Rango de fechas\" para bloquear un período completo indicando los días de la semana.",
+    description: "Este tramo es solo explicativo — no hace falta que crees un bloqueo real ahora, luego lo haces tú con calma. Elige \"Días específicos\" para marcar días sueltos en el calendario (por ejemplo, solo los miércoles), o \"Rango de fechas\" para bloquear un período completo indicando los días de la semana.",
     side: "right",
   },
   {
@@ -299,7 +324,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-guardar"]',
     title: "Bloqueos",
-    description: "Guarda el bloqueo. Cada día queda bloqueado de forma independiente y se puede eliminar por separado más tarde desde la tabla de la derecha; el calendario de arriba no se marca visualmente, así que no te preocupes si se ve igual.",
+    description: "Este botón guarda el bloqueo. Cada día queda bloqueado de forma independiente y se puede eliminar por separado más tarde desde la tabla de la derecha; el calendario de arriba no se marca visualmente, así que no te preocupes si se ve igual. <div class=\"ac-tour-callout\"><span>Hasta aquí llega la parte explicativa — cuando quieras, créalo tú mismo con tranquilidad para tus bloqueos reales.</span></div>",
     side: "top",
   },
 

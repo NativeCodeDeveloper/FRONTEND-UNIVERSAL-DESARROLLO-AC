@@ -74,8 +74,7 @@ export default function Testimonios() {
         {/* ── Header ── */}
         <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Contenido web</p>
-            <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
               Testimonios
             </h1>
             <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -99,7 +98,7 @@ export default function Testimonios() {
               onClick={() => setFiltroRating(0)}
               className={`h-8 px-3 rounded-full text-[11px] font-bold transition-all ${
                 filtroRating === 0
-                  ? "bg-[#6E56CF] text-white"
+                  ? "bg-black text-white"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
             >
@@ -111,7 +110,7 @@ export default function Testimonios() {
                 onClick={() => setFiltroRating(n)}
                 className={`h-8 px-3 rounded-full text-[11px] font-bold flex items-center gap-1 transition-all ${
                   filtroRating === n
-                    ? "bg-[#6E56CF] text-white"
+                    ? "bg-black text-white"
                     : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
               >

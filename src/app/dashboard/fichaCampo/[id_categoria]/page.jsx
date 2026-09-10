@@ -279,8 +279,7 @@ export default function FichaCampo() {
 
                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
                         <div>
-                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Campos</p>
-                            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 {nombreCategoria || "Categor\u00eda"}
                             </h1>
                             <p className="mt-1 text-[13px] text-slate-500 max-w-lg">
@@ -291,7 +290,7 @@ export default function FichaCampo() {
                         <button
                             type="button"
                             onClick={abrirModalNuevoCampo}
-                            className="group inline-flex items-center gap-2.5 px-5 py-2.5 text-sm font-semibold text-white bg-[#6E56CF] rounded-xl hover:bg-[#5B47B0] active:scale-[0.98] transition-all duration-150 shadow-sm self-start sm:self-auto"
+                            className="group inline-flex items-center gap-2.5 px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all duration-150 shadow-sm self-start sm:self-auto"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="size-4 transition-transform duration-200 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
@@ -511,7 +510,7 @@ export default function FichaCampo() {
                             <button
                                 type="button"
                                 onClick={() => insertarCampo(id_categoria,nuevoCampoNombre,nuevoCampoRequerido,nuevoCampoOrden)}
-                                className="px-5 py-2 text-sm font-semibold text-white bg-[#6E56CF] rounded-xl hover:bg-[#5B47B0] active:scale-[0.97] transition-all duration-150 shadow-sm"
+                                className="px-5 py-2 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 active:scale-[0.97] transition-all duration-150 shadow-sm"
                             >
                                 Crear Campo
                             </button>
@@ -588,7 +587,7 @@ export default function FichaCampo() {
                             <button
                                 type="button"
                                 onClick={()=>editarCampo(id_campo,editCampoNombre,editCampoRequerido,editCampoOrden)}
-                                className="px-5 py-2 text-sm font-semibold text-white bg-[#6E56CF] rounded-xl hover:bg-[#5B47B0] active:scale-[0.97] transition-all duration-150 shadow-sm"
+                                className="px-5 py-2 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 active:scale-[0.97] transition-all duration-150 shadow-sm"
                             >
                                 Guardar Cambios
                             </button>

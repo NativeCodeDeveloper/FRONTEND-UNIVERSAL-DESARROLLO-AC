@@ -238,8 +238,7 @@ export default function GestionPaciente() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Clínica</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Gestión de Pacientes</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Gestión de Pacientes</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Registra y administra la base de datos de tus pacientes. La creación de un perfil es el primer paso para generar fichas clínicas y planes de tratamiento personalizados.
                         </p>
@@ -351,7 +350,7 @@ export default function GestionPaciente() {
                                 <div className="mt-10 flex justify-end">
                                     <button
                                         onClick={() => insertarPaciente(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, observacion1, apoderado, apoderadoRut, medicamentosUsados, habitos, comentariosAdicionales)}
-                                        className="h-12 px-8 bg-[#6E56CF] text-white text-sm font-bold rounded-2xl hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex items-center gap-2"
+                                        className="h-12 px-8 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -416,7 +415,7 @@ export default function GestionPaciente() {
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => verDetallePaciente(p.id_paciente)}
-                                                    className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-400 group-hover:bg-[#6E56CF] group-hover:text-white transition-all shadow-sm"
+                                                    className="h-8 w-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-sm"
                                                     title="Ver Ficha"
                                                 >
                                                     <UserIcon className="h-4 w-4" />

@@ -257,7 +257,7 @@ return (
                             {/* PRECIO */}
                             <div className="flex items-baseline gap-3">
                                 <span className="text-sm uppercase tracking-wider text-slate-500">Valor</span>
-               <label className="text-2xl md:text-3xl font-bold text-purple-600">
+               <label className="text-2xl md:text-3xl font-bold text-slate-900">
                    {new Intl.NumberFormat('es-CL', {
                        style: 'currency',
                        currency: 'CLP',
@@ -334,9 +334,6 @@ return (
                                     </SelectContent>
                                 </Select>
                             </div>
-
-
-
 
 
 

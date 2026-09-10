@@ -171,8 +171,7 @@ export default function DatosEmpresa() {
                 {/* Header */}
                 <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-sm">
                     <div className="flex flex-col gap-1">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Configuración</p>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Datos de la Página Web</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Datos de la Página Web</h1>
                         <p className="text-sm text-slate-500">
                             Configura el nombre, contacto, redes sociales y textos que se muestran en toda la página pública.
                         </p>
@@ -372,7 +371,7 @@ export default function DatosEmpresa() {
                 <div className="flex justify-end pb-4">
                     <ButtonDinamic
                         onClick={guardarDatosEmpresa}
-                        className="rounded-xl bg-[#6E56CF] text-white shadow-sm hover:bg-[#5B47B0] transition-colors"
+                        className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
                     >
                         {cargando ? "Guardando..." : "Guardar todos los datos"}
                     </ButtonDinamic>

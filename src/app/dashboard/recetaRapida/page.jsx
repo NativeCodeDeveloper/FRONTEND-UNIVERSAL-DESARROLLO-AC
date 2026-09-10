@@ -284,8 +284,7 @@ export default function RecetaRapida() {
                 <div className="mb-8 rounded-[32px] border border-slate-200/80 bg-white/90 p-5 shadow-sm">
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Documento médico</p>
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 Receta rápida
                             </h1>
                         </div>

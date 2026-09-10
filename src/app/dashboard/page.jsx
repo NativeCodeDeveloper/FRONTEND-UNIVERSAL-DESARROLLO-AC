@@ -8,6 +8,7 @@ import {useUser} from "@clerk/nextjs";
 import {Calendar28} from "@/Componentes/shadcnCalendarSelector";
 import {InfoButton} from "@/Componentes/InfoButton";
 import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
+import {getStateTokens} from "@/lib/designTokens";
 
 import {
     Table,
@@ -525,27 +526,11 @@ export default function AgendaCitas() {
     }
 
     function obtenerPaletaEstadoReserva(estadoReserva = "") {
+        // Fuente de verdad: designTokens.js (misma paleta que usan calendario/AppointmentDrawer),
+        // en vez de mantener estos valores duplicados a mano.
         const estadoNormalizado = normalizarEstadoReserva(estadoReserva);
-
-        if (estadoNormalizado === "reservada" || estadoNormalizado === "reservado") {
-            return { backgroundColor: "rgba(110, 86, 207, 0.10)", color: "#4c1d95", accentColor: "#6E56CF", borderColor: "rgba(110, 86, 207, 0.30)" };
-        }
-        if (estadoNormalizado === "confirmada" || estadoNormalizado === "confirmado") {
-            return { backgroundColor: "rgba(16, 185, 129, 0.12)", color: "#065f46", accentColor: "#10B981", borderColor: "rgba(16, 185, 129, 0.30)" };
-        }
-        if (estadoNormalizado === "asiste") {
-            return { backgroundColor: "rgba(14, 165, 233, 0.12)", color: "#0c4a6e", accentColor: "#0EA5E9", borderColor: "rgba(14, 165, 233, 0.30)" };
-        }
-        if (estadoNormalizado === "no asiste" || estadoNormalizado === "no asistio" || estadoNormalizado === "no asistste") {
-            return { backgroundColor: "rgba(249, 115, 22, 0.12)", color: "#9a3412", accentColor: "#F97316", borderColor: "rgba(249, 115, 22, 0.30)" };
-        }
-        if (estadoNormalizado === "finalizado") {
-            return { backgroundColor: "rgba(15, 118, 110, 0.12)", color: "#134e4a", accentColor: "#0F766E", borderColor: "rgba(15, 118, 110, 0.30)" };
-        }
-        if (estadoNormalizado === "anulada" || estadoNormalizado === "anulado") {
-            return { backgroundColor: "rgba(239, 68, 68, 0.12)", color: "#991b1b", accentColor: "#EF4444", borderColor: "rgba(239, 68, 68, 0.30)" };
-        }
-        return { backgroundColor: "rgba(245, 158, 11, 0.12)", color: "#92400e", accentColor: "#F59E0B", borderColor: "rgba(245, 158, 11, 0.35)" };
+        const token = getStateTokens(estadoNormalizado);
+        return { backgroundColor: token.bg, color: token.text, accentColor: token.accent, borderColor: token.border };
     }
 
     function obtenerEstiloBadgeEstado(estadoReserva = "") {
@@ -732,7 +717,7 @@ export default function AgendaCitas() {
             <button
                 onClick={() => verFichaClinicaPaciente(data)}
                 disabled={abriendoFichaReservaId === data.id_reserva}
-                className="h-10 w-10 mx-auto rounded-xl bg-white border border-slate-200 text-[#6E56CF] hover:border-[#6E56CF] hover:bg-violet-50 transition-all flex items-center justify-center shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-10 w-10 mx-auto rounded-xl bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100 transition-all flex items-center justify-center shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
                 title="Ver Ficha Clínica"
             >
                 {abriendoFichaReservaId === data.id_reserva ? (
@@ -824,7 +809,7 @@ export default function AgendaCitas() {
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/calendario")}
-                            className="flex h-9 w-[140px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#6E56CF] px-2 text-[12px] font-medium text-white shadow-sm transition-all hover:bg-[#5b45bc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="flex h-9 w-[140px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-black px-2 text-[12px] font-medium text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -836,7 +821,7 @@ export default function AgendaCitas() {
                             href="https://youtu.be/ga44dJoW62c?si=7lr5NnDPFcJfgzNI"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             aria-label="Abrir video tutorial del panel de citas"
                         >
                             <span className="flex h-4 w-4 shrink-0 items-center justify-center">
@@ -849,7 +834,7 @@ export default function AgendaCitas() {
                         {canSeeFichasClinicas && (
                             <button
                                 onClick={() => router.push("/dashboard/FichaClinica")}
-                                className="flex h-9 items-center gap-1.5 rounded-lg bg-[#6E56CF] px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-[#5b45bc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                className="flex h-9 items-center gap-1.5 rounded-lg bg-black px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -926,7 +911,7 @@ export default function AgendaCitas() {
                                 <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4 pt-6 border-t border-slate-100">
                                     <Calendar28 nombre="Desde" value={fechaInicio} onChange={(v) => setfechaInicio(v)} />
                                     <Calendar28 nombre="Hasta" value={fechaFinalizacion} onChange={(v) => setfechaFinalizacion(v)} />
-                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-9 w-full bg-[#6E56CF] text-white text-[13px] font-bold rounded-xl hover:bg-[#5b45bc] shadow-sm transition-all">Filtrar por Período</button>
+                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-9 w-full bg-black text-white text-[13px] font-bold rounded-xl hover:bg-slate-800 shadow-sm transition-all">Filtrar por Período</button>
                                     <button onClick={() => { limpiarFiltrosPersistidos(); listarTablaCitas(); }} className="h-9 w-full border border-slate-200 text-slate-500 text-[13px] font-bold rounded-xl hover:bg-slate-50 transition-all">Limpiar Filtros</button>
                                 </div>
                             </div>

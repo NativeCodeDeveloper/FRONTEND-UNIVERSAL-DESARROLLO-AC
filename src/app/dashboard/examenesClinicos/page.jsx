@@ -165,8 +165,7 @@ export default function SolicitudExamenes() {
 
                 {/* Header premium */}
                 <div className="mb-8">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF] mb-1">Configuración</p>
-                    <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
+                    <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                         Exámenes Clínicos
                     </h1>
                     <p className="mt-1 text-[13px] text-slate-500 max-w-2xl">
@@ -230,7 +229,7 @@ export default function SolicitudExamenes() {
                             <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t border-slate-100">
                                 <button
                                     onClick={insertarExamen}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#6E56CF] rounded-xl hover:bg-[#5B47B0] transition-all duration-150 shadow-sm"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 transition-all duration-150 shadow-sm"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

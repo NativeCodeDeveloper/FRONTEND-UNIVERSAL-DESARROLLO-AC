@@ -33,7 +33,7 @@ const STEPS = [
 
 export default function ComoFuncionaPage() {
     return (
-        <div className="bg-slate-50 min-h-screen pt-20 pb-24 md:pt-32 md:pb-32 lg:pt-40 lg:pb-40 font-sans text-slate-900">
+        <div className="bg-slate-50 min-h-screen pt-20 pb-24 md:pt-32 md:pb-32 lg:pt-40 lg:pb-40 text-slate-900">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
@@ -43,7 +43,7 @@ export default function ComoFuncionaPage() {
                             ¿Cómo funciona el tratamiento?
                         </h2>
                         <p className="text-lg md:text-xl text-slate-600 font-light max-w-2xl mx-auto">
-                            Un enfoque médico que ataca la <span className="text-indigo-600 font-semibold">causa real de tu peso</span>
+                            Un enfoque médico que ataca la <span className="text-slate-900 font-semibold">causa real de tu peso</span>
                         </p>
                     </div>
                 </RevealOnScroll>
@@ -56,7 +56,7 @@ export default function ComoFuncionaPage() {
                             {STEPS.map((step, index) => (
                                 <div key={index} className="flex flex-col items-center flex-1 relative z-10">
                                     {/* Step Circle */}
-                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 text-white font-bold text-lg z-10 relative shadow-md">
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-900 text-white font-bold text-lg z-10 relative">
                                         {step.step}
                                     </div>
                                 </div>
@@ -72,16 +72,16 @@ export default function ComoFuncionaPage() {
                                         key={index}
                                         delayClass={`delay-${index * 75}`}
                                     >
-                                        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all duration-300 h-full">
+                                        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 h-full">
                                             {/* Mobile Step Number */}
                                             <div className="lg:hidden mb-4">
-                                                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold text-sm">
+                                                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 text-slate-900 font-bold text-sm">
                                                     {step.step}
                                                 </span>
                                             </div>
 
                                             {/* Icon */}
-                                            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 mb-6">
+                                            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-100 text-slate-700 mb-6">
                                                 <StepIcon strokeWidth={1.5} className="h-7 w-7" />
                                             </div>
 
@@ -105,7 +105,7 @@ export default function ComoFuncionaPage() {
                 {/* Results Text */}
                 <RevealOnScroll className="text-center mb-12 md:mb-16">
                     <p className="text-lg md:text-2xl font-semibold text-slate-700">
-                        <span className="text-indigo-600">baja entre un 8–10% de tu exceso de peso en 3 meses.</span> 
+                        <span className="text-slate-900">baja entre un 8–10% de tu exceso de peso en 3 meses.</span>
                     </p>
                 </RevealOnScroll>
 
@@ -114,7 +114,7 @@ export default function ComoFuncionaPage() {
                     <div className="text-center">
                         <Link
                             href="/agendaProfesionales"
-                            className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-10 py-4 md:px-12 md:py-4 text-base md:text-lg font-semibold text-white transition-all hover:bg-indigo-700 shadow-lg hover:shadow-xl"
+                            className="inline-flex items-center justify-center rounded-full bg-slate-900 px-10 py-4 md:px-12 md:py-4 text-base md:text-lg font-semibold text-white transition-colors hover:bg-slate-800"
                         >
                             Agenda tu evaluación médica →
                         </Link>

@@ -105,8 +105,7 @@ export default function PedidosCompra() {
                 {/* ── Header ── */}
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Panel de Administrador</p>
-                        <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Compras en Línea
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -148,7 +147,7 @@ export default function PedidosCompra() {
                                             placeholder="Busca por similitud en nombres (solo nombre, sin apellido)"
                                         />
                                         <button onClick={() => filtrarSimilitudNombre(comprador)}
-                                            className="h-10 px-5 rounded-xl bg-[#6E56CF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all flex-shrink-0 flex items-center gap-2">
+                                            className="h-10 px-5 rounded-xl bg-black text-white text-[12px] font-bold hover:bg-slate-800 transition-all flex-shrink-0 flex items-center gap-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                             Buscar
                                         </button>

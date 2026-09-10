@@ -449,10 +449,10 @@ export default function FormularioReservaProfesional() {
        RENDER
     ══════════════════════════════════════════ */
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 px-4 pt-28 pb-12 sm:pt-32 sm:pb-16 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 px-4 pt-28 pb-12 sm:pt-32 sm:pb-16 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl">
                 <header className="mb-10 text-center">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-4 py-1.5 text-xs font-medium tracking-wide text-slate-500 shadow-sm ring-1 ring-white">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium tracking-wide text-slate-500 shadow-sm">
                         Reserva Online
                     </div>
                     <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
@@ -461,25 +461,24 @@ export default function FormularioReservaProfesional() {
                     <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
                         {descripcionProfesional}
                     </p>
-                    <div className="mx-auto mt-4 h-px w-20 bg-gradient-to-r from-transparent via-violet-400/50 to-transparent"/>
                 </header>
 
                 <form
-                    className="flex flex-col gap-8 rounded-2xl border border-slate-200/80 border-t-2 border-t-violet-400/70 bg-white/95 p-6 shadow-xl shadow-slate-900/5 ring-1 ring-white/80 sm:p-8"
+                    className="flex flex-col gap-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
                     onSubmit={e => e.preventDefault()}
                 >
                     <div>
-                        <h2 className="border-l-2 border-violet-400 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Servicio</h2>
-                        <div className="mt-1 h-px w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"/>
+                        <h2 className="border-l-2 border-slate-300 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Servicio</h2>
+                        <div className="mt-1 h-px w-full bg-slate-100"/>
 
                         {servicio ? (
-                            <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-violet-200 bg-gradient-to-r from-violet-50/80 to-white px-4 py-3 shadow-sm transition-colors hover:border-violet-300">
+                            <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm transition-colors hover:border-slate-300">
                                 <div>
                                     <p className="text-sm font-semibold text-slate-800">{servicio.nombre}</p>
                                     <p className="text-xs text-slate-500">{servicio.duracion_min} min de atención</p>
                                 </div>
                                 {Number(servicio.precio) > 0 && (
-                                    <span className="shrink-0 rounded-full border border-violet-200 bg-white/80 px-3 py-1 text-sm font-bold text-violet-700 shadow-sm">
+                                    <span className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1 text-sm font-bold text-slate-900 shadow-sm">
                                         {formatoCLP.format(servicio.precio)}
                                     </span>
                                 )}
@@ -500,15 +499,15 @@ export default function FormularioReservaProfesional() {
                                         value: i,
                                         label: `${t.nombreServicio}${Number(t.precio) > 0 ? ` — ${formatoCLP.format(t.precio)}` : ""}`,
                                     }))}
-                                    className={tarifaIndexFallback !== "" ? "h-11 rounded-lg border-violet-400 bg-violet-50/50 font-medium text-slate-900 shadow-sm" : "h-11 rounded-lg border-slate-200 bg-slate-50/40 shadow-sm"}
+                                    className={tarifaIndexFallback !== "" ? "h-11 rounded-lg border-slate-400 bg-slate-50 font-medium text-slate-900 shadow-sm" : "h-11 rounded-lg border-slate-200 bg-slate-50/40 shadow-sm"}
                                 />
                             </div>
                         )}
                     </div>
 
                     <div>
-                        <h2 className="border-l-2 border-violet-400 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Datos personales</h2>
-                        <div className="mt-1 h-px w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"/>
+                        <h2 className="border-l-2 border-slate-300 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Datos personales</h2>
+                        <div className="mt-1 h-px w-full bg-slate-100"/>
                         <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Nombre</label>
@@ -535,11 +534,11 @@ export default function FormularioReservaProfesional() {
 
                     {(fechaInicio || horaInicio || totalPago || servicioNombre) && (
                         <div>
-                            <h2 className="border-l-2 border-violet-400 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Resumen de tu cita</h2>
-                            <div className="mt-1 h-px w-full bg-gradient-to-r from-slate-200 via-slate-100 to-transparent"/>
-                            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
+                            <h2 className="border-l-2 border-slate-300 pl-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Resumen de tu cita</h2>
+                            <div className="mt-1 h-px w-full bg-slate-100"/>
+                            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                                 {servicioNombre && (
-                                    <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-4 sm:px-5">
+                                    <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-5">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
                                             <Stethoscope aria-hidden="true" className="size-5" strokeWidth={1.8}/>
                                         </div>
@@ -576,14 +575,14 @@ export default function FormularioReservaProfesional() {
                                 </div>
 
                                 {Number(totalPago) > 0 && (
-                                    <div className="flex items-center justify-between gap-4 border-t border-violet-100 bg-violet-50/70 px-4 py-4 sm:px-5">
+                                    <div className="flex items-center justify-between gap-4 border-t border-slate-200 bg-slate-50 px-4 py-4 sm:px-5">
                                         <div className="flex min-w-0 items-center gap-3">
-                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 ring-1 ring-inset ring-violet-200">
+                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
                                                 <Banknote aria-hidden="true" className="size-5" strokeWidth={1.8}/>
                                             </div>
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-violet-700">Valor consulta</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Valor consulta</p>
                                         </div>
-                                        <p className="shrink-0 text-lg font-bold tracking-tight tabular-nums text-violet-700 sm:text-xl">{formatoCLP.format(totalPago)}</p>
+                                        <p className="shrink-0 text-lg font-bold tracking-tight tabular-nums text-slate-900 sm:text-xl">{formatoCLP.format(totalPago)}</p>
                                     </div>
                                 )}
                             </div>

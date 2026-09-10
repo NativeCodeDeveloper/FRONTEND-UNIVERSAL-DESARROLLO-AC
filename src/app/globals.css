@@ -655,6 +655,23 @@ html {
   border-color: #ffffff;
 }
 
+/* Pila de fuente de sistema de Apple (San Francisco). SF Pro no se puede
+   distribuir como webfont con licencia libre — esta es la forma estándar de
+   mostrar la San Francisco real en macOS/iOS/Safari (-apple-system,
+   BlinkMacSystemFont la resuelven al SF del sistema); en otras plataformas
+   cae a la fuente de sistema equivalente (Segoe UI en Windows, Roboto en
+   Android/Chrome OS). Se aplica solo al layout público, no al dashboard. */
+/* El selector * es necesario: globals.css define font-family directo en
+   h1-h6 (var(--font-display), que resuelve a Geist primero) y en body
+   (var(--font-body)) — esas reglas de elemento ganan por sobre la herencia
+   normal de esta clase en un ancestro, así que hay que igualar su alcance
+   apuntando también a los descendientes (títulos incluidos). */
+.font-system-apple,
+.font-system-apple * {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
 .driver-active-element {
   border-radius: 12px;
 }

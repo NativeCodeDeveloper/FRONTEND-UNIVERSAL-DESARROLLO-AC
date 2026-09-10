@@ -307,8 +307,7 @@ export default function EdicionFichaClinica() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Modificar registro</p>
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Edición de Ficha Clínica</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Edición de Ficha Clínica</h1>
                     </div>
                     <div className="flex items-center gap-2">
                         {dataFicha.map((ficha) => (
@@ -547,7 +546,7 @@ export default function EdicionFichaClinica() {
                     ))}
                     <button
                         onClick={() => actualizarFicha()}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-[#6E56CF] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#5b45bc] shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]">
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-black px-6 py-2.5 text-sm font-bold text-white hover:bg-slate-800 shadow-sm transition-all active:scale-[0.98]">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>

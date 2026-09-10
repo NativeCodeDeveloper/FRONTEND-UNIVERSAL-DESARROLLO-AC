@@ -267,12 +267,12 @@ export default function EspecificacionProductos(){
                 {/* Header */}
                 <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Gestión de Especificaciones de Producto
                         </h1>
                         <p className="text-sm text-slate-600">
                             Sub-Subcategoría principal:
-                            <span className="ml-2 font-semibold text-blue-700">{nombreSubSubCategoriaPadre}</span>
+                            <span className="ml-2 font-semibold text-slate-700">{nombreSubSubCategoriaPadre}</span>
                         </p>
                     </div>
                 </div>
@@ -284,11 +284,11 @@ export default function EspecificacionProductos(){
                             <div className="space-y-1">
                                 <h2 className="text-base font-semibold text-slate-900">
                                     Ingreso y edición
-                                    <span className="ml-2 text-blue-700">(Especificación)</span>
+                                    <span className="ml-2 text-slate-700">(Especificación)</span>
                                 </h2>
                                 <p className="text-sm text-slate-600">
                                     Especificación seleccionada:
-                                    <span className="ml-2 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-100">
+                                    <span className="ml-2 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-200">
                                         {idEspecificacionSeleccionada}
                                     </span>
                                 </p>
@@ -297,7 +297,7 @@ export default function EspecificacionProductos(){
 
                         <div className="grid grid-cols-1 gap-3">
                             <label className="text-sm font-medium text-slate-700">Nombre de la especificación</label>
-                            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100">
+                            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-200">
                                 <ShadcnInput
                                     value={descripcionEspecificacion}
                                     onChange={(e)=> setDescripcionEspecificacion(e.target.value)}
@@ -347,7 +347,7 @@ export default function EspecificacionProductos(){
                         <h3 className="text-base font-semibold text-slate-900">Especificaciones de Producto</h3>
                         <p className="text-sm text-slate-600">
                             Lista asociada a
-                            <span className="ml-2 font-semibold text-blue-700">{nombreSubSubCategoriaPadre}</span>
+                            <span className="ml-2 font-semibold text-slate-700">{nombreSubSubCategoriaPadre}</span>
                         </p>
                     </div>
 
@@ -355,7 +355,7 @@ export default function EspecificacionProductos(){
                         <Table>
                             <TableCaption className="caption-bottom bg-slate-50 py-3 text-sm text-slate-600">
                                 Lista de Especificaciones asociadas a sub-subcategoría
-                                <span className='ml-2 font-bold text-blue-700'>{nombreSubSubCategoriaPadre}</span>
+                                <span className='ml-2 font-bold text-slate-700'>{nombreSubSubCategoriaPadre}</span>
                             </TableCaption>
                             <TableHeader>
                                 <TableRow className="bg-slate-50">

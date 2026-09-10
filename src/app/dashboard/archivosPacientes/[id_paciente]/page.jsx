@@ -364,8 +364,7 @@ export default function ArchivosPaciente() {
                 {/* ── Header Principal ── */}
                 <div className="mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Gestión Documental</p>
-                        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Documentos del Paciente
                         </h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
@@ -435,7 +434,7 @@ export default function ArchivosPaciente() {
                         <button
                             onClick={abrirSelectorArchivo}
                             disabled={subiendo}
-                            className="h-10 px-5 rounded-xl bg-[#6E56CF] text-white text-[13px] font-bold hover:bg-[#5B45B0] transition-all shadow-lg shadow-indigo-100 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-10 px-5 rounded-xl bg-slate-900 text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {subiendo ? (
                                 <>
