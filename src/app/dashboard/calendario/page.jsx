@@ -1261,7 +1261,7 @@ function CalendarioContent() {
                     mode: "cors",
                     // NOTA: nombre_prestacion y modalidad se envían pero el backend
                     // debe tener la migración de BD aplicada para persistirlos.
-                    body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial" })
+                    body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", origen: "dashboard" })
                 });
                 const respuestaBackend = await res.json();
                 if (!res.ok && respuestaBackend.message === "conflicto") {
@@ -1301,7 +1301,7 @@ function CalendarioContent() {
                 method: "POST",
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
                 mode: "cors",
-                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial" })
+                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", origen: "dashboard" })
             });
             const respuestaBackend = await res.json().catch(() => ({}));
             if (respuestaBackend.message === true) return { ok: true };

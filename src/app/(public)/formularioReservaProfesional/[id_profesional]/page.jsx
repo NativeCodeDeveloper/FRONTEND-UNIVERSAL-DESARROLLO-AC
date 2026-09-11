@@ -208,6 +208,7 @@ export default function FormularioReservaProfesional() {
                     motivo_reserva:    motivoReserva,
                     estadoReserva:     "reservada",
                     id_profesional,
+                    origen:            "web",
                 }),
             });
 
