@@ -70,11 +70,9 @@ export const metadata = {
   alternates: {
     canonical: metadataBase.href,
   },
-  icons: {
-    icon: "/logofavcom.png",
-    shortcut: "/logofavcom.png",
-    apple: "/apple-touch-icon.png",
-  },
+  // Favicon/apple-touch-icon: se resuelven solos por convención de archivo
+  // (src/app/icon.png, src/app/apple-icon.png, src/app/favicon.ico) — Next.js
+  // genera los <link> correctos automáticamente, no hace falta declararlos acá.
   openGraph: {
     title: "Agenda Clínica | Sistema de Agendamiento Médico Online",
     description:
