@@ -376,7 +376,7 @@ export default function SidebarNav() {
           })}
       </nav>
 
-      <div className="shrink-0 flex items-center justify-between border-t border-slate-100 px-4 py-3">
+      <div className="shrink-0 flex items-center justify-between border-t border-slate-100 px-4 py-2">
         <span className="text-[11px] font-medium text-slate-400">Notificaciones</span>
         <NotificationBell />
       </div>

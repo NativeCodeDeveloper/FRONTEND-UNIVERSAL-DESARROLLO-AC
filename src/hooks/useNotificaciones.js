@@ -9,6 +9,13 @@ import { suscribirsePush } from '@/lib/pushSubscription';
 
 const API = () => process.env.NEXT_PUBLIC_API_URL;
 
+// El backend ya filtra por fecha_evento, pero esto evita esperar al próximo
+// poll (cada 30s) para que una notificación desaparezca justo al pasar su hora.
+function noHaExpirado(n) {
+    if (!n.fecha_evento) return true;
+    return new Date(n.fecha_evento).getTime() >= Date.now();
+}
+
 export function useNotificaciones() {
     const [notifs,  setNotifs]  = useState([]);
     const [permiso, setPermiso] = useState('default');
@@ -23,7 +30,7 @@ export function useNotificaciones() {
             });
             if (!res.ok) return;
             const data = await res.json();
-            setNotifs(Array.isArray(data) ? data : []);
+            setNotifs(Array.isArray(data) ? data.filter(noHaExpirado) : []);
         } catch {}
     }, []);
 
@@ -32,6 +39,15 @@ export function useNotificaciones() {
         intervalRef.current = setInterval(fetchNotifs, 30_000);
         return () => clearInterval(intervalRef.current);
     }, [fetchNotifs]);
+
+    // Barrido local cada 30s para descartar notificaciones cuya hora ya pasó,
+    // sin esperar al próximo fetch al backend.
+    useEffect(() => {
+        const t = setInterval(() => {
+            setNotifs((current) => current.filter(noHaExpirado));
+        }, 30_000);
+        return () => clearInterval(t);
+    }, []);
 
     useEffect(() => {
         if (typeof Notification === 'undefined') return;

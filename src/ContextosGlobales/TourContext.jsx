@@ -25,6 +25,15 @@ function getStepsForRole(role) {
     return TOUR_STEPS.filter((step) => !step.route || canAccessDashboardPath(role, step.route));
 }
 
+// requestAnimationFrame NO es seguro acá: Chrome (y otros navegadores) suspenden
+// casi por completo los rAF quedan en pestañas/ventanas sin foco. Si el
+// profesional cambia de pestaña un momento durante el tour (algo común, por
+// ejemplo para copiar un dato), un polling basado en rAF puede quedar
+// congelado indefinidamente hasta que vuelva a esa pestaña. setTimeout no
+// tiene ese problema — Chrome lo limita a ~1 tick/seg en pestañas de fondo,
+// pero SIEMPRE sigue corriendo.
+const POLL_MS = 50;
+
 function waitForRoute(pathnameRef, target, callback) {
     if (!target || pathnameRef.current === target) {
         callback();
@@ -32,20 +41,20 @@ function waitForRoute(pathnameRef, target, callback) {
     }
     let attempts = 0;
     const tick = () => {
-        if (pathnameRef.current === target || attempts > 200) {
+        if (pathnameRef.current === target || attempts > 100) {
             callback();
             return;
         }
         attempts += 1;
-        requestAnimationFrame(tick);
+        setTimeout(tick, POLL_MS);
     };
-    requestAnimationFrame(tick);
+    setTimeout(tick, POLL_MS);
 }
 
 // Espera a que el elemento objetivo exista Y deje de moverse (layout estable)
 // antes de continuar — evita resaltar un elemento que todavía está siendo
 // reposicionado por datos que cargan de forma asíncrona (ej. profesionales).
-function waitForStableElement(selector, callback, frames = 6) {
+function waitForStableElement(selector, callback, checks = 4) {
     if (!selector) {
         callback();
         return;
@@ -65,14 +74,14 @@ function waitForStableElement(selector, callback, frames = 6) {
             lastKey = key;
         }
 
-        if ((key && stableCount >= frames) || attempts > 300) {
+        if ((key && stableCount >= checks) || attempts > 150) {
             callback();
             return;
         }
         attempts += 1;
-        requestAnimationFrame(tick);
+        setTimeout(tick, POLL_MS);
     };
-    requestAnimationFrame(tick);
+    setTimeout(tick, POLL_MS);
 }
 
 function buildTourMeta(step, groups) {
@@ -132,6 +141,13 @@ export function TourProvider({ children }) {
                     // (que podía dejar la opción sin mostrarse realmente).
                     if (step.autoExpand && isCollapsed) {
                         element.click();
+                        // El acordeón anima su expansión en 200ms (NavAccordion usa
+                        // transition-[max-height,opacity] duration-200). driver.js NO
+                        // vuelve a medir el recuadro/popover cuando el layout cambia por
+                        // esto — solo lo hace en window resize — así que el recuadro puede
+                        // quedar desactualizado si algo se movió. Se fuerza un refresh
+                        // manual una vez terminada la animación para que quede bien anclado.
+                        window.setTimeout(() => driverRef.current?.refresh(), 260);
                     }
                     if (step.skipIfExpanded && contentWrapper && !isCollapsed) {
                         driverRef.current?.moveNext();
