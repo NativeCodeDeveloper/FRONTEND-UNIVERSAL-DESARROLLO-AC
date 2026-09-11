@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useAppointmentNotifications } from "@/hooks/useAppointmentNotifications"
+import { suscribirsePush, esIOS, esPWAInstalada } from "@/lib/pushSubscription"
 
 const DISMISS_KEY = "notif_banner_dismissed_until"
 const DISMISS_DAYS = 7
@@ -47,7 +48,15 @@ export default function NotificationProvider() {
         const resultado = await Notification.requestPermission()
         setPermiso(resultado)
         setBannerVisible(false)
+        if (resultado === "granted") {
+            // Suscripción push real (VAPID) — funciona aunque la app esté cerrada.
+            // En iOS solo si la PWA está instalada; en ese caso soportaPush() da
+            // false adentro y esto no hace nada (silencioso, no rompe el flujo).
+            suscribirsePush()
+        }
     }
+
+    const mostrarNotaIOS = esIOS() && !esPWAInstalada()
 
     function descartarBanner() {
         guardarDescarte()
@@ -74,8 +83,13 @@ export default function NotificationProvider() {
                     <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-bold text-slate-800 leading-tight">Notificaciones de citas</p>
                         <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                            Recibe un aviso 30 min antes de cada cita del día.
+                            Recibe un aviso cuando tengas una cita próxima, incluso con la app cerrada.
                         </p>
+                        {mostrarNotaIOS && (
+                            <p className="text-[10px] text-amber-600 mt-1.5 leading-relaxed">
+                                En iPhone/iPad: agrega esta app a tu pantalla de inicio para recibir avisos aunque no la tengas abierta.
+                            </p>
+                        )}
                     </div>
 
                     {/* Cerrar */}

@@ -1,28 +1,13 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { obtenerCitasProximas } from '@/lib/citasProximas';
+import { suscribirsePush } from '@/lib/pushSubscription';
 
-// Frontend-only: no depende de un backend de notificaciones (aún no existe /notificaciones/*).
-// Reusa /reservaPacientes/seleccionarReservados, que ya funciona, para armar el panel.
+// Feed real: consume /notificaciones/* del backend (poblado por el cron de
+// recordatorios 12h/6h/1h). Antes esto se calculaba 100% en el cliente sobre
+// /reservaPacientes/seleccionarReservados — ya no hace falta, el backend ahora
+// tiene su propio feed persistente + push real.
 
 const API = () => process.env.NEXT_PUBLIC_API_URL;
-const ANTICIPACION_MIN = 30;
-const DESCARTADAS_KEY = 'notif_descartadas';
-
-function getDescartadas() {
-    try {
-        const raw = sessionStorage.getItem(DESCARTADAS_KEY);
-        return new Set(JSON.parse(raw) || []);
-    } catch {
-        return new Set();
-    }
-}
-
-function saveDescartadas(set) {
-    try {
-        sessionStorage.setItem(DESCARTADAS_KEY, JSON.stringify([...set]));
-    } catch {}
-}
 
 export function useNotificaciones() {
     const [notifs,  setNotifs]  = useState([]);
@@ -31,19 +16,14 @@ export function useNotificaciones() {
 
     const fetchNotifs = useCallback(async () => {
         try {
-            const res = await fetch(`${API()}/reservaPacientes/seleccionarReservados`, {
+            const res = await fetch(`${API()}/notificaciones/pendientes`, {
                 method: 'GET',
                 headers: { Accept: 'application/json' },
                 mode: 'cors',
             });
             if (!res.ok) return;
-            const reservas = await res.json();
-
-            const descartadas = getDescartadas();
-            const citas = obtenerCitasProximas(reservas, ANTICIPACION_MIN)
-                .filter(n => !descartadas.has(n.id));
-
-            setNotifs(citas);
+            const data = await res.json();
+            setNotifs(Array.isArray(data) ? data : []);
         } catch {}
     }, []);
 
@@ -62,21 +42,28 @@ export function useNotificaciones() {
         if (typeof Notification === 'undefined') return;
         const result = await Notification.requestPermission();
         setPermiso(result);
+        if (result === 'granted') {
+            suscribirsePush();
+        }
     }, []);
 
     const marcarLeida = useCallback((id) => {
-        const descartadas = getDescartadas();
-        descartadas.add(id);
-        saveDescartadas(descartadas);
         setNotifs(n => n.filter(x => x.id !== id));
+        fetch(`${API()}/notificaciones/${id}/leer`, {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            mode: 'cors',
+        }).catch(() => {});
     }, []);
 
     const marcarTodasLeidas = useCallback(() => {
         setNotifs(current => {
             if (current.length === 0) return current;
-            const descartadas = getDescartadas();
-            current.forEach(n => descartadas.add(n.id));
-            saveDescartadas(descartadas);
+            fetch(`${API()}/notificaciones/leer-todas`, {
+                method: 'POST',
+                headers: { Accept: 'application/json' },
+                mode: 'cors',
+            }).catch(() => {});
             return [];
         });
     }, []);

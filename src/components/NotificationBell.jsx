@@ -31,9 +31,9 @@ export default function NotificationBell() {
     const { notifs, permiso, pedirPermiso, marcarLeida, marcarTodasLeidas } = useNotificaciones();
 
     function irACitaDeNotificacion(notif) {
-        if (notif.tipo !== 'recordatorio') return;
+        if (notif.tipo !== 'recordatorio' || !notif.id_reserva) return;
         setOpen(false);
-        router.push(`/dashboard/calendario?id_reserva=${notif.id}`);
+        router.push(`/dashboard/calendario?id_reserva=${notif.id_reserva}`);
     }
 
     const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 640;
