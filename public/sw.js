@@ -101,7 +101,7 @@ self.addEventListener('push', (event) => {
     event.waitUntil(
         self.registration.showNotification(data.titulo || 'Agenda Clínica', {
             body:    data.body  || '',
-            icon:    data.icon  || '/logo.png',
+            icon:    data.icon  || '/icon-192.png',
             badge:   '/icon-192.png',
             data:    { url: data.url || '/dashboard' },
             vibrate: [200, 100, 200],
