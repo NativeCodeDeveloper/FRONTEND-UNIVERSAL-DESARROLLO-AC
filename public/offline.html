@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="color-scheme" content="light" />
   <title>Sin conexión — Agenda Clínica</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #060607;
-      --bg-2: #0b0c0e;
-      --line: rgba(255, 255, 255, 0.07);
-      --line-strong: rgba(255, 255, 255, 0.14);
-      --ink: #f2f3f5;
-      --ink-dim: #9a9ea6;
-      --ink-faint: #5b5f66;
-      --accent: #eef2ff;
-      --accent-glow: rgba(148, 178, 255, 0.16);
-      --pulse: #d7dee8;
+      --bg: #f3f4f6;
+      --bg-2: #ffffff;
+      --line: rgba(0, 0, 0, 0.08);
+      --line-strong: rgba(0, 0, 0, 0.16);
+      --ink: #16181c;
+      --ink-dim: #52565c;
+      --ink-faint: #8b8f96;
+      --accent: #16181c;
+      --accent-glow: rgba(0, 0, 0, 0.08);
+      --pulse: #16181c;
     }
 
     html, body { height: 100%; }
@@ -36,25 +36,24 @@
       overflow-y: auto;
     }
 
-    /* fondo: grilla técnica + halo frío centrado */
+    /* fondo: imagen hexagonal con difuminado leve */
     body::before {
       content: "";
       position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(var(--line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line) 1px, transparent 1px);
-      background-size: 42px 42px;
-      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 0%, transparent 75%);
-      mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 0%, transparent 75%);
+      inset: -30px;
+      background-color: var(--bg);
+      background-image: url('/bg-hero-v17.webp');
+      background-size: cover;
+      background-position: center;
+      filter: blur(6px);
       pointer-events: none;
+      z-index: -2;
     }
     body::after {
       content: "";
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 50% 38%, var(--accent-glow), transparent 55%),
-                  linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      background: radial-gradient(circle at 50% 38%, var(--accent-glow), transparent 55%);
       pointer-events: none;
       z-index: -1;
     }
@@ -199,8 +198,8 @@
     button#retry {
       margin-top: 34px;
       padding: 13px 30px;
-      background: var(--ink);
-      color: #0a0a0b;
+      background: #000000;
+      color: #ffffff;
       border: none;
       border-radius: 10px;
       font-size: 13.5px;
@@ -211,10 +210,10 @@
       align-items: center;
       gap: 9px;
       transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
     }
     button#retry svg { width: 15px; height: 15px; }
-    button#retry:hover { background: #ffffff; box-shadow: 0 0 24px rgba(255,255,255,0.18); }
+    button#retry:hover { background: #1a1a1a; box-shadow: 0 0 24px rgba(0,0,0,0.28); }
     button#retry:active { transform: scale(0.97); }
 
     .elapsed {
