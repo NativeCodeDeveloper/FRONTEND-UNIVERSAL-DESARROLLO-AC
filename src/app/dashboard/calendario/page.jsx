@@ -337,6 +337,12 @@ function CalendarioContent() {
     const [dataBloqueos, setDataBloqueos] = useState([]);
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [id_profesional, setId_profesional] = useState("");
+    const agendaAsignadaDisponible = Boolean(
+        idProfesionalAgendaAsignada && listaProfesionales.some(
+            (profesional) => normalizarIdProfesional(profesional.id_profesional) === idProfesionalAgendaAsignada
+        )
+    );
+    const idProfesionalAgendaActiva = agendaAsignadaDisponible ? idProfesionalAgendaAsignada : "";
     const [backgroundCalendarEvents, setBackgroundCalendarEvents] = useState([]);
     const [mostrarListaBloqueos, setMostrarListaBloqueos] = useState(true);
     const [mostrarFormularioAgenda, setMostrarFormularioAgenda] = useState(false);
@@ -465,13 +471,10 @@ function CalendarioContent() {
                         (profesional) => normalizarIdProfesional(profesional.id_profesional) === idProfesionalAgendaAsignada
                     );
 
-                    if (idProfesionalAgendaAsignada && !agendaAsignadaExiste) {
-                        setId_profesional("");
-                        return toast.error("La agenda asignada a este usuario ya no está disponible.");
-                    }
-
                     setId_profesional(
-                        idProfesionalAgendaAsignada || normalizarIdProfesional(respustaBackend[0].id_profesional)
+                        agendaAsignadaExiste
+                            ? idProfesionalAgendaAsignada
+                            : normalizarIdProfesional(respustaBackend[0].id_profesional)
                     );
                 } else {
                     return toast.error('No hay profesionales o servicios ingresados en el sistema');
@@ -1909,8 +1912,8 @@ function CalendarioContent() {
             if (!reserva) return toast.error("Sin Data");
 
             if (
-                idProfesionalAgendaAsignada &&
-                normalizarIdProfesional(reserva.id_profesional) !== idProfesionalAgendaAsignada
+                idProfesionalAgendaActiva &&
+                normalizarIdProfesional(reserva.id_profesional) !== idProfesionalAgendaActiva
             ) {
                 return toast.error("No tienes acceso a esta agenda.");
             }
@@ -1925,7 +1928,7 @@ function CalendarioContent() {
             setfechaFinalizacion((reserva.fechaFinalizacion ?? "").slice(0, 10));
             setHoraFinalizacion(reserva.horaFinalizacion ?? "");
             setEstadoReserva(reserva.estadoReserva ?? "");
-            setId_profesional(idProfesionalAgendaAsignada || normalizarIdProfesional(reserva.id_profesional));
+            setId_profesional(idProfesionalAgendaActiva || normalizarIdProfesional(reserva.id_profesional));
             setMontoReserva(reserva.monto_reserva ?? "");
             setMotivoReserva(reserva.motivo_reserva ?? "");
         } catch (error) {
@@ -2295,9 +2298,9 @@ function CalendarioContent() {
                         </p>
                     </div>
                     <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-                        {idProfesionalAgendaAsignada ? (
+                        {idProfesionalAgendaActiva ? (
                             <div className="flex h-10 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-4 text-[13px] font-semibold text-violet-900 shadow-sm sm:w-[280px] sm:flex-none">
-                                {obtenerNombreProfesionalSeleccionado(idProfesionalAgendaAsignada)}
+                                {obtenerNombreProfesionalSeleccionado(idProfesionalAgendaActiva)}
                             </div>
                         ) : (
                             <div className="relative w-full sm:w-[280px] sm:flex-none">

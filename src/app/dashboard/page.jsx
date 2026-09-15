@@ -43,6 +43,7 @@ export default function AgendaCitas() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
     const {user, isLoaded} = useUser();
+    const idProfesionalAgendaAsignada = String(user?.publicMetadata?.idProfesionalAgenda || "");
     const dashboardRole = getDashboardRoleFromUser(user);
     const canSeeFichasClinicas = isLoaded && canAccessFichasClinicas(dashboardRole);
     const canSeeReservationAmounts = isLoaded && dashboardRole !== "operador-clinico";
@@ -55,6 +56,12 @@ export default function AgendaCitas() {
     const [estadoReserva, setestadoReserva] = useState("");
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [id_profesional, setId_profesional] = useState("");
+    const agendaAsignadaDisponible = Boolean(
+        idProfesionalAgendaAsignada && listaProfesionales.some(
+            (profesional) => String(profesional.id_profesional) === idProfesionalAgendaAsignada
+        )
+    );
+    const idProfesionalAgendaActiva = agendaAsignadaDisponible ? idProfesionalAgendaAsignada : "";
     const [actualizandoReservaId, setActualizandoReservaId] = useState(null);
     const [abriendoFichaReservaId, setAbriendoFichaReservaId] = useState(null);
     const [eliminandoReservaId, setEliminandoReservaId] = useState(null);
@@ -65,6 +72,8 @@ export default function AgendaCitas() {
 
     useEffect(() => {
         if (typeof window === "undefined") return;
+
+        if (!isLoaded) return;
 
         const profesionalGuardado = window.localStorage.getItem(STORAGE_KEYS.profesional);
         const fechaInicioGuardada = window.localStorage.getItem(STORAGE_KEYS.fechaInicio);
@@ -86,7 +95,7 @@ export default function AgendaCitas() {
         if (estadoGuardado) {
             setestadoReserva(estadoGuardado);
         }
-    }, []);
+    }, [isLoaded, idProfesionalAgendaAsignada]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -305,7 +314,8 @@ export default function AgendaCitas() {
             const esEstadoCorrecto = Number(reserva?.estadoPeticion) === 1;
             if (!esEstadoCorrecto) return false;
 
-            const coincideProfesional = !id_profesional || String(reserva?.id_profesional) === String(id_profesional);
+            const profesionalFiltrado = idProfesionalAgendaActiva || id_profesional;
+            const coincideProfesional = !profesionalFiltrado || String(reserva?.id_profesional) === String(profesionalFiltrado);
             const coincideEstado = !estadoReserva || normalizarEstadoReserva(reserva?.estadoReserva) === normalizarEstadoReserva(estadoReserva);
             const coincideFecha = coincideConRangoFechas(reserva);
 
@@ -314,7 +324,7 @@ export default function AgendaCitas() {
     }
 
     function limpiarFiltrosPersistidos() {
-        setId_profesional("");
+        setId_profesional(idProfesionalAgendaActiva || "");
         setestadoReserva("");
         setfechaInicio(null);
         setfechaFinalizacion(null);
@@ -334,6 +344,12 @@ export default function AgendaCitas() {
                 const respustaBackend = await res.json();
                 if(respustaBackend){
                     setListaProfesionales(respustaBackend);
+                    const agendaAsignadaExiste = respustaBackend.some(
+                        (profesional) => String(profesional.id_profesional) === idProfesionalAgendaAsignada
+                    );
+                    if (idProfesionalAgendaAsignada) {
+                        setId_profesional(agendaAsignadaExiste ? idProfesionalAgendaAsignada : "");
+                    }
                 } else {
                     return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
                 }
@@ -344,8 +360,9 @@ export default function AgendaCitas() {
     }
 
     useEffect(() => {
+        if (!isLoaded) return;
         seleccionarTodosProfesionalesAgendaLista();
-    }, []);
+    }, [isLoaded, idProfesionalAgendaAsignada]);
 
     async function verFichaClinicaPaciente(reserva) {
         try {
@@ -436,7 +453,7 @@ export default function AgendaCitas() {
             } else {
                 const respuestaBackend = await res.json();
                 // Filtrar solo estadoPeticion === 1
-                const filtradas = respuestaBackend.filter(r => Number(r?.estadoPeticion) === 1);
+                const filtradas = aplicarFiltrosCombinados(respuestaBackend);
                 if (filtradas.length > 0) {
                     setdataLista(filtradas);
                     return toast.success("Similitud de RUT encontrada")
@@ -467,7 +484,7 @@ export default function AgendaCitas() {
             } else {
                 const respuestaBackend = await res.json();
                 // Filtrar solo estadoPeticion === 1
-                const filtradas = respuestaBackend.filter(r => Number(r?.estadoPeticion) === 1);
+                const filtradas = aplicarFiltrosCombinados(respuestaBackend);
                 if (filtradas.length > 0) {
                     setdataLista(filtradas);
                     return toast.success("Similitud de nombre encontrada")
@@ -492,7 +509,7 @@ export default function AgendaCitas() {
             const respuestaBackend = await res.json();
             if (respuestaBackend) {
                 setDataListaBase(respuestaBackend);
-                setdataLista(respuestaBackend);
+                setdataLista(aplicarFiltrosCombinados(respuestaBackend));
             }
         } catch (err) {
             console.log(err);
@@ -501,8 +518,9 @@ export default function AgendaCitas() {
     }
 
     useEffect(() => {
+        if (!isLoaded) return;
         listarTablaCitas();
-    }, []);
+    }, [isLoaded, idProfesionalAgendaAsignada]);
 
     useEffect(() => {
         if (!Array.isArray(dataListaBase) || dataListaBase.length === 0) {
@@ -510,7 +528,7 @@ export default function AgendaCitas() {
             return;
         }
         setdataLista(aplicarFiltrosCombinados(dataListaBase));
-    }, [dataListaBase, id_profesional, fechaInicio, fechaFinalizacion, estadoReserva]);
+    }, [dataListaBase, id_profesional, idProfesionalAgendaActiva, fechaInicio, fechaFinalizacion, estadoReserva]);
 
     function normalizarEstadoReserva(estado = "") {
         const base = String(estado)
@@ -880,13 +898,19 @@ export default function AgendaCitas() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
-                                        <Select value={String(id_profesional || "null")} onValueChange={(v) => setId_profesional(v)}>
-                                            <SelectTrigger className="h-9 w-full rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Seleccionar profesional..." /></SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="null">Todos los profesionales</SelectItem>
-                                                {listaProfesionales.map((p) => (<SelectItem key={p.id_profesional} value={String(p.id_profesional)}>{p.nombreProfesional}</SelectItem>))}
-                                            </SelectContent>
-                                        </Select>
+                                        {idProfesionalAgendaActiva ? (
+                                            <div className="flex h-9 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-3 text-[12px] font-semibold text-violet-900">
+                                                {listaProfesionales.find((profesional) => String(profesional.id_profesional) === idProfesionalAgendaActiva)?.nombreProfesional || "Agenda asignada"}
+                                            </div>
+                                        ) : (
+                                            <Select value={String(id_profesional || "null")} onValueChange={(v) => setId_profesional(v === "null" ? "" : v)}>
+                                                <SelectTrigger className="h-9 w-full rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Seleccionar profesional..." /></SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="null">Todos los profesionales</SelectItem>
+                                                    {listaProfesionales.map((p) => (<SelectItem key={p.id_profesional} value={String(p.id_profesional)}>{p.nombreProfesional}</SelectItem>))}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Estado Reserva</label>
