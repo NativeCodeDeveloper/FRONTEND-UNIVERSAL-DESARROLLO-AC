@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -54,6 +55,10 @@ export default function Calendario() {
 function CalendarioContent() {
 
     const API = process.env.NEXT_PUBLIC_API_URL;
+    const { user, isLoaded: usuarioCargado } = useUser();
+    const idProfesionalAgendaAsignada = normalizarIdProfesional(
+        user?.publicMetadata?.idProfesionalAgenda
+    );
     const popupRef = useRef(null);
     const popupDragStateRef = useRef({ dragging: false, offsetX: 0, offsetY: 0 });
     const selectionGuardRef = useRef({ missingProfessional: false, overlap: false, past: false, outOfHours: false });
@@ -456,7 +461,18 @@ function CalendarioContent() {
 
                 if (respustaBackend && respustaBackend.length > 0) {
                     setListaProfesionales(respustaBackend);
-                    setId_profesional(normalizarIdProfesional(respustaBackend[0].id_profesional));
+                    const agendaAsignadaExiste = respustaBackend.some(
+                        (profesional) => normalizarIdProfesional(profesional.id_profesional) === idProfesionalAgendaAsignada
+                    );
+
+                    if (idProfesionalAgendaAsignada && !agendaAsignadaExiste) {
+                        setId_profesional("");
+                        return toast.error("La agenda asignada a este usuario ya no está disponible.");
+                    }
+
+                    setId_profesional(
+                        idProfesionalAgendaAsignada || normalizarIdProfesional(respustaBackend[0].id_profesional)
+                    );
                 } else {
                     return toast.error('No hay profesionales o servicios ingresados en el sistema');
                 }
@@ -467,9 +483,10 @@ function CalendarioContent() {
     }
 
     useEffect(() => {
+        if (!usuarioCargado) return;
         seleccionarTodosProfesionalesCalendario();
         cargarListaPrestaciones(); // Carga servicios para el dropdown de tipo de consulta
-    }, []);
+    }, [usuarioCargado, idProfesionalAgendaAsignada]);
 
     useEffect(() => {
         cargarTarifasPorProfesional(id_profesional);
@@ -1891,6 +1908,13 @@ function CalendarioContent() {
             let reserva = Array.isArray(data) ? data[0] : data;
             if (!reserva) return toast.error("Sin Data");
 
+            if (
+                idProfesionalAgendaAsignada &&
+                normalizarIdProfesional(reserva.id_profesional) !== idProfesionalAgendaAsignada
+            ) {
+                return toast.error("No tienes acceso a esta agenda.");
+            }
+
             setNombrePaciente(reserva.nombrePaciente ?? "");
             setApellidoPaciente(reserva.apellidoPaciente ?? "");
             setRut(reserva.rut ?? "");
@@ -1901,7 +1925,7 @@ function CalendarioContent() {
             setfechaFinalizacion((reserva.fechaFinalizacion ?? "").slice(0, 10));
             setHoraFinalizacion(reserva.horaFinalizacion ?? "");
             setEstadoReserva(reserva.estadoReserva ?? "");
-            setId_profesional(normalizarIdProfesional(reserva.id_profesional));
+            setId_profesional(idProfesionalAgendaAsignada || normalizarIdProfesional(reserva.id_profesional));
             setMontoReserva(reserva.monto_reserva ?? "");
             setMotivoReserva(reserva.motivo_reserva ?? "");
         } catch (error) {
@@ -2271,19 +2295,24 @@ function CalendarioContent() {
                         </p>
                     </div>
                     <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-                        {/* Selector de profesional */}
-                        <div className="relative w-full sm:w-[280px] sm:flex-none">
-                            <SelectDinamic
-                                value={id_profesional}
-                                onChange={(e) => setId_profesional(e.target.value)}
-                                options={listaProfesionales.map((p) => ({
-                                    value: normalizarIdProfesional(p.id_profesional),
-                                    label: p.nombreProfesional,
-                                }))}
-                                placeholder="Seleccionar Agenda"
-                                className="h-10 rounded-xl border-slate-200 bg-white pl-4 pr-8 text-[13px] font-semibold text-slate-800 shadow-sm focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-                            />
-                        </div>
+                        {idProfesionalAgendaAsignada ? (
+                            <div className="flex h-10 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-4 text-[13px] font-semibold text-violet-900 shadow-sm sm:w-[280px] sm:flex-none">
+                                {obtenerNombreProfesionalSeleccionado(idProfesionalAgendaAsignada)}
+                            </div>
+                        ) : (
+                            <div className="relative w-full sm:w-[280px] sm:flex-none">
+                                <SelectDinamic
+                                    value={id_profesional}
+                                    onChange={(e) => setId_profesional(e.target.value)}
+                                    options={listaProfesionales.map((p) => ({
+                                        value: normalizarIdProfesional(p.id_profesional),
+                                        label: p.nombreProfesional,
+                                    }))}
+                                    placeholder="Seleccionar Agenda"
+                                    className="h-10 rounded-xl border-slate-200 bg-white pl-4 pr-8 text-[13px] font-semibold text-slate-800 shadow-sm focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                />
+                            </div>
+                        )}
                         {/* CTA Nueva reserva */}
                         <button
                             type="button"

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle2,
   ChevronDown,
   CircleMinus,
   Eye,
   EyeOff,
+  KeyRound,
   Lock,
-  Mail,
+  RefreshCw,
+  Trash2,
   UserPlus,
   UsersRound,
 } from "lucide-react";
@@ -18,7 +20,10 @@ import {
 } from "@/lib/dashboard-access";
 
 const initialForm = {
-  email: "",
+  nombre: "",
+  apellido: "",
+  nombreUsuario: "",
+  idProfesionalAgenda: "",
   password: "",
   confirmPassword: "",
   role: "",
@@ -28,6 +33,27 @@ const ROLE_OPTIONS = getAssignableDashboardRoles();
 const ROLE_OPTIONS_BY_VALUE = new Map(
   ROLE_OPTIONS.map((option) => [option.value, option])
 );
+
+async function leerRespuesta(response) {
+  const rawResponse = await response.text();
+
+  try {
+    return rawResponse ? JSON.parse(rawResponse) : null;
+  } catch {
+    return { error: rawResponse };
+  }
+}
+
+function formatearFecha(fecha) {
+  if (!fecha) {
+    return "Sin registro";
+  }
+
+  return new Intl.DateTimeFormat("es-CL", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(fecha));
+}
 
 function Field({ label, hint, children }) {
   return (
@@ -160,12 +186,68 @@ function RolePermissionDetails({ role }) {
 }
 
 export default function CreateUserPage() {
+  const API = process.env.NEXT_PUBLIC_API_URL;
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [createdUser, setCreatedUser] = useState(null);
+  const [usuarios, setUsuarios] = useState([]);
+  const [cargandoUsuarios, setCargandoUsuarios] = useState(true);
+  const [errorUsuarios, setErrorUsuarios] = useState("");
+  const [contrasenasNuevas, setContrasenasNuevas] = useState({});
+  const [accionEnCurso, setAccionEnCurso] = useState("");
+  const [mensajeUsuarios, setMensajeUsuarios] = useState("");
+  const [listaProfesionales, setListaProfesionales] = useState([]);
+  const [errorProfesionales, setErrorProfesionales] = useState("");
 
   const selectedRoleMeta = ROLE_OPTIONS_BY_VALUE.get(form.role) || null;
+
+  const cargarUsuarios = useCallback(async () => {
+    setCargandoUsuarios(true);
+    setErrorUsuarios("");
+
+    try {
+      const response = await fetch("/api/dashboard/users", { cache: "no-store" });
+      const data = await leerRespuesta(response);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudieron cargar los usuarios.");
+      }
+
+      setUsuarios(Array.isArray(data?.users) ? data.users : []);
+    } catch (loadError) {
+      setErrorUsuarios(loadError.message || "No se pudieron cargar los usuarios.");
+    } finally {
+      setCargandoUsuarios(false);
+    }
+  }, []);
+
+  const cargarProfesionales = useCallback(async () => {
+    if (!API) {
+      setErrorProfesionales("No se configuró la conexión para cargar las agendas.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API}/profesionales/seleccionarTodosProfesionales`, {
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudieron cargar las agendas profesionales.");
+      }
+
+      const profesionales = await response.json();
+      setListaProfesionales(Array.isArray(profesionales) ? profesionales : []);
+    } catch (loadError) {
+      setErrorProfesionales(loadError.message || "No se pudieron cargar las agendas profesionales.");
+    }
+  }, [API]);
+
+  useEffect(() => {
+    cargarUsuarios();
+    cargarProfesionales();
+  }, [cargarProfesionales, cargarUsuarios]);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -176,13 +258,18 @@ export default function CreateUserPage() {
     setError("");
     setCreatedUser(null);
 
-    if (!form.email.trim()) {
-      setError("Completa el correo.");
+    if (!form.nombre.trim()) {
+      setError("Completa el nombre.");
       return;
     }
 
-    if (form.password.length < 8) {
-      setError("La contrasena debe tener al menos 8 caracteres.");
+    if (!form.nombreUsuario.trim()) {
+      setError("Completa el nombre de usuario.");
+      return;
+    }
+
+    if (!form.password) {
+      setError("Completa la contrasena.");
       return;
     }
 
@@ -205,36 +292,97 @@ export default function CreateUserPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: form.email,
+          nombre: form.nombre,
+          apellido: form.apellido,
+          nombreUsuario: form.nombreUsuario,
+          idProfesionalAgenda: form.idProfesionalAgenda,
           password: form.password,
           role: form.role,
         }),
       });
 
-      const rawResponse = await response.text();
-      let data = null;
-
-      try {
-        data = rawResponse ? JSON.parse(rawResponse) : null;
-      } catch {
-        data = null;
-      }
+      const data = await leerRespuesta(response);
 
       if (!response.ok) {
         throw new Error(
           data?.error ||
           data?.message ||
-          rawResponse ||
           `No se pudo crear el usuario. HTTP ${response.status}`
         );
       }
 
       setCreatedUser(data?.user || null);
       setForm({ ...initialForm, role: form.role });
+      await cargarUsuarios();
     } catch (submitError) {
       setError(submitError.message || "No se pudo crear el usuario.");
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function actualizarContrasena(usuarioId) {
+    const password = contrasenasNuevas[usuarioId] || "";
+
+    if (!password) {
+      setErrorUsuarios("Ingresa la nueva contrasena.");
+      return;
+    }
+
+    setAccionEnCurso(`password-${usuarioId}`);
+    setErrorUsuarios("");
+    setMensajeUsuarios("");
+
+    try {
+      const response = await fetch(`/api/dashboard/users/${usuarioId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await leerRespuesta(response);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudo actualizar la contrasena.");
+      }
+
+      setContrasenasNuevas((current) => ({ ...current, [usuarioId]: "" }));
+      setMensajeUsuarios("Contrasena actualizada correctamente.");
+    } catch (updateError) {
+      setErrorUsuarios(updateError.message || "No se pudo actualizar la contrasena.");
+    } finally {
+      setAccionEnCurso("");
+    }
+  }
+
+  async function eliminarUsuario(usuario) {
+    const confirmarEliminacion = window.confirm(
+      `Eliminar permanentemente a ${usuario.nombreUsuario || usuario.nombre || "este usuario"} de Clerk?`
+    );
+
+    if (!confirmarEliminacion) {
+      return;
+    }
+
+    setAccionEnCurso(`delete-${usuario.id}`);
+    setErrorUsuarios("");
+    setMensajeUsuarios("");
+
+    try {
+      const response = await fetch(`/api/dashboard/users/${usuario.id}`, {
+        method: "DELETE",
+      });
+      const data = await leerRespuesta(response);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudo eliminar el usuario.");
+      }
+
+      setUsuarios((current) => current.filter((item) => item.id !== usuario.id));
+      setMensajeUsuarios("Usuario eliminado correctamente.");
+    } catch (deleteError) {
+      setErrorUsuarios(deleteError.message || "No se pudo eliminar el usuario.");
+    } finally {
+      setAccionEnCurso("");
     }
   }
 
@@ -248,7 +396,7 @@ export default function CreateUserPage() {
             Crear Usuario
           </h1>
           <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
-            Crea un usuario en Clerk con correo y contraseña, y asígnale un perfil. El rol queda guardado en <code className="mx-0.5 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-700">publicMetadata.role</code> para que el middleware y el menú respeten sus permisos.
+            Crea un usuario en Clerk con nombre de usuario, contraseña y perfil. Puedes vincularlo a una agenda para que al ingresar vea solamente sus reservas.
           </p>
         </div>
 
@@ -267,18 +415,51 @@ export default function CreateUserPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6">
-              <Field label="Correo electronico" hint="Se usara como email principal del usuario">
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field label="Nombre" hint="Se mostrará en la lista de usuarios">
+                  <Input
+                    value={form.nombre}
+                    onChange={(event) => updateField("nombre", event.target.value)}
+                    placeholder="Ej.: María"
+                  />
+                </Field>
+                <Field label="Apellido" hint="Opcional">
+                  <Input
+                    value={form.apellido}
+                    onChange={(event) => updateField("apellido", event.target.value)}
+                    placeholder="Ej.: González"
+                  />
+                </Field>
+              </div>
+
+              <Field label="Nombre de usuario" hint="Será el identificador para iniciar sesión">
                 <Input
-                  icon={Mail}
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => updateField("email", event.target.value)}
-                  placeholder="usuario@dominio.cl"
+                  value={form.nombreUsuario}
+                  onChange={(event) => updateField("nombreUsuario", event.target.value)}
+                  placeholder="Ej.: maria.gonzalez"
                 />
               </Field>
 
+              <Field label="Agenda asignada" hint="El usuario verá solamente esta agenda al entrar a Calendario">
+                <select
+                  value={form.idProfesionalAgenda}
+                  onChange={(event) => updateField("idProfesionalAgenda", event.target.value)}
+                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-[14px] text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100"
+                >
+                  <option value="">Sin agenda asignada</option>
+                  {listaProfesionales.map((profesional) => (
+                    <option key={profesional.id_profesional} value={String(profesional.id_profesional)}>
+                      {profesional.nombreProfesional}
+                    </option>
+                  ))}
+                </select>
+                {errorProfesionales ? (
+                  <p className="text-[11px] text-rose-600">{errorProfesionales}</p>
+                ) : null}
+              </Field>
+
               <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Contrasena" hint="Minimo 8 caracteres">
+                <Field label="Contrasena" hint="Usa una contraseña que el usuario pueda recordar">
                   <PasswordInput
                     value={form.password}
                     onChange={(event) => updateField("password", event.target.value)}
@@ -349,7 +530,7 @@ export default function CreateUserPage() {
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-[13px] text-emerald-800">
                   <p className="font-semibold">Usuario creado correctamente.</p>
                   <p className="mt-1">
-                    {createdUser.email} fue creado con el perfil{" "}
+                    @{createdUser.nombreUsuario || createdUser.nombre} fue creado con el perfil{" "}
                     <span className="font-semibold">{getDashboardRoleLabel(createdUser.role)}</span>.
                   </p>
                 </div>
@@ -415,7 +596,7 @@ export default function CreateUserPage() {
               <div className="p-6 space-y-3">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <p className="text-[13px] font-bold text-slate-900">1. Clerk crea el usuario</p>
-                  <p className="mt-1 text-[12px] leading-5 text-slate-500">Se registra correo y contrasena usando el Backend SDK.</p>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-500">Se registran nombre de usuario y contraseña usando el Backend SDK.</p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
                   <p className="text-[13px] font-bold text-slate-900">2. Se asigna el perfil</p>
@@ -432,6 +613,130 @@ export default function CreateUserPage() {
             </div>
           </aside>
         </div>
+
+        <section className="mt-8 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-slate-100 bg-slate-50/30 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-8 md:py-5">
+            <div>
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                Usuarios creados en Clerk
+              </h2>
+              <p className="mt-1 text-[12px] text-slate-500">
+                Gestiona el acceso, asigna una nueva contrasena o elimina usuarios que ya no deben acceder.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={cargarUsuarios}
+              disabled={cargandoUsuarios}
+              className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 text-[12px] font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 md:self-auto"
+            >
+              <RefreshCw className={`h-4 w-4 ${cargandoUsuarios ? "animate-spin" : ""}`} />
+              Actualizar lista
+            </button>
+          </div>
+
+          <div className="p-4 md:p-8">
+            {errorUsuarios ? (
+              <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
+                {errorUsuarios}
+              </div>
+            ) : null}
+
+            {mensajeUsuarios ? (
+              <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-800">
+                {mensajeUsuarios}
+              </div>
+            ) : null}
+
+            {cargandoUsuarios ? (
+              <div className="flex min-h-40 items-center justify-center gap-3 text-[13px] font-medium text-slate-500">
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                Cargando usuarios de Clerk...
+              </div>
+            ) : usuarios.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-10 text-center">
+                <UsersRound className="mx-auto h-7 w-7 text-slate-300" />
+                <p className="mt-3 text-[13px] font-semibold text-slate-700">No hay usuarios para mostrar.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[1000px] border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/70">
+                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Usuario</th>
+                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Perfil</th>
+                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Creado</th>
+                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Último acceso</th>
+                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Nueva contrasena</th>
+                      <th className="px-4 py-3 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {usuarios.map((usuario) => {
+                      const actualizandoContrasena = accionEnCurso === `password-${usuario.id}`;
+                      const eliminandoUsuario = accionEnCurso === `delete-${usuario.id}`;
+
+                      return (
+                        <tr key={usuario.id} className="align-top transition-colors hover:bg-slate-50/60">
+                          <td className="px-4 py-4">
+                            <p className="max-w-56 break-words text-[13px] font-bold text-slate-800">
+                              {usuario.nombre || "Sin nombre registrado"}
+                            </p>
+                            <p className="mt-1 max-w-56 break-all text-[11px] font-medium text-violet-700">
+                              {usuario.nombreUsuario ? `@${usuario.nombreUsuario}` : "Sin nombre de usuario"}
+                            </p>
+                            <p className="mt-1 font-mono text-[10px] text-slate-400">{usuario.id}</p>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="inline-flex rounded-full border border-violet-200 bg-violet-50 px-2.5 py-1 text-[10px] font-bold text-[#6E56CF]">
+                              {getDashboardRoleLabel(usuario.role) || usuario.role || "Sin perfil"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-[12px] leading-5 text-slate-600">{formatearFecha(usuario.createdAt)}</td>
+                          <td className="px-4 py-4 text-[12px] leading-5 text-slate-600">{formatearFecha(usuario.lastSignInAt)}</td>
+                          <td className="px-4 py-4">
+                            <input
+                              type="password"
+                              value={contrasenasNuevas[usuario.id] || ""}
+                              onChange={(event) => setContrasenasNuevas((current) => ({
+                                ...current,
+                                [usuario.id]: event.target.value,
+                              }))}
+                              placeholder="Nueva contraseña"
+                              className="h-10 w-48 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100"
+                            />
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => actualizarContrasena(usuario.id)}
+                                disabled={Boolean(accionEnCurso)}
+                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-white px-3 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                <KeyRound className="h-3.5 w-3.5" />
+                                {actualizandoContrasena ? "Guardando..." : "Cambiar"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => eliminarUsuario(usuario)}
+                                disabled={Boolean(accionEnCurso)}
+                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-3 text-[11px] font-bold text-rose-600 shadow-sm transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                {eliminandoUsuario ? "Eliminando..." : "Eliminar"}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
