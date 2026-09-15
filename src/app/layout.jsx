@@ -104,6 +104,15 @@ export default function RootLayout({ children }) {
             lang="es"
             className={`${geist.variable} ${geistMono.variable} ${inter.variable} ${outfit.variable} ${lora.variable}`}
         >
+      <head>
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            src="//unpkg.com/react-grab/dist/index.global.js"
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
+      </head>
         <body className="min-h-screen bg-white">
         <AgendaProvider>
             <AnimatedLayout>

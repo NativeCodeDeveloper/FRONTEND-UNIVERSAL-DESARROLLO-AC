@@ -332,6 +332,23 @@ export default function PresupuestoTratamiento() {
                         Presupuesto de Tratamiento
                     </h1>
                     <p className="mt-1 text-[13px] text-slate-500">Selecciona servicios para armar el presupuesto del paciente.</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                        <a
+                            href="/dashboard/ingresoProductos"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                        >
+                            Ir a prestaciones
+                        </a>
+                        <a
+                            href="https://youtu.be/RUGGZeSXmFk?si=NiBqgM_ZN2Jnh2t_"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial de presupuesto de tratamiento"
+                        >
+                            Video tutorial
+                        </a>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

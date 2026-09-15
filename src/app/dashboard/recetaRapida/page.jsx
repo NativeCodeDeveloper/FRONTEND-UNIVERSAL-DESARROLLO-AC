@@ -283,10 +283,19 @@ export default function RecetaRapida() {
             <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 md:py-10">
                 <div className="mb-8 rounded-[32px] border border-slate-200/80 bg-white/90 p-5 shadow-sm">
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                        <div>
+                        <div className="flex flex-wrap items-center gap-3">
                             <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 Receta rápida
                             </h1>
+                            <a
+                                href="https://youtu.be/eZhpFPow0MA?si=EwgGXBk17EqX9_qu"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                aria-label="Abrir video tutorial de receta rápida"
+                            >
+                                Video tutorial
+                            </a>
                         </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">

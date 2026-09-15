@@ -7,7 +7,6 @@ import ShadcnInput from "@/Componentes/shadcnInput2";
 import {toast} from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {UserIcon} from "@heroicons/react/24/outline";
-import {InfoButton} from "@/Componentes/InfoButton";
 import { formatRut, cleanRut } from "@/lib/designTokens";
 
 export default function ListaPacientes() {
@@ -138,17 +137,30 @@ export default function ListaPacientes() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="h-14 px-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
-                            <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{listaPacientes.length} Registros</span>
-                        </div>
-                        <InfoButton
-                            informacion={'Busca pacientes registrados y agéndalos rápidamente desde este listado.'}
-                            pasos={[
-                                'Filtra por nombre o RUT para localizar el perfil que buscas.',
-                                'Presiona "Agendar" para pre-cargar sus datos directamente en el calendario clínico.',
-                            ]}
-                        />
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard")}
+                            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir a reservas"
+                        >
+                            Reservas
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/calendario")}
+                            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir al calendario"
+                        >
+                            Calendario
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/FichaClinica")}
+                            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir a fichas clínicas"
+                        >
+                            Fichas clínicas
+                        </button>
                     </div>
                 </div>
 

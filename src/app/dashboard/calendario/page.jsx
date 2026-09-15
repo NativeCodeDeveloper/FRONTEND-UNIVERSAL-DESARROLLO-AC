@@ -2329,6 +2329,14 @@ function CalendarioContent() {
                         </button>
                         <button
                             type="button"
+                            onClick={() => router.push("/dashboard/listaPacientes")}
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Ir a lista de pacientes"
+                        >
+                            <span>Pacientes</span>
+                        </button>
+                        <button
+                            type="button"
                             onClick={() => router.push("/dashboard/FichaClinica")}
                             className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
                             aria-label="Ir a fichas clínicas"

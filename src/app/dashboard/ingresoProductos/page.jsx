@@ -424,10 +424,21 @@ useEffect(() => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-center shadow-sm">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total</p>
-                            <p className="text-lg font-bold text-slate-900">{productos.length}</p>
-                        </div>
+                        <a
+                            href="/dashboard/presupuestoTratamiento"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                        >
+                            Ir a presupuestos
+                        </a>
+                        <a
+                            href="https://youtu.be/RUGGZeSXmFk?si=NiBqgM_ZN2Jnh2t_"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            aria-label="Abrir video tutorial de prestaciones y servicios"
+                        >
+                            Video tutorial
+                        </a>
                         <InfoButton
                             informacion={'Registra los servicios, prestaciones y productos disponibles para generar presupuestos de tratamiento.'}
                             pasos={[
