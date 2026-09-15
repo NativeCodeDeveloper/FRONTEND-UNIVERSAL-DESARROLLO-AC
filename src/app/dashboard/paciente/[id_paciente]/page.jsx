@@ -1,5 +1,6 @@
 "use client"
 import {useParams, useSearchParams} from "next/navigation";
+import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
 import {useState, useEffect, useRef} from "react";
 import {toast} from "react-hot-toast";
 import {useUser} from "@clerk/nextjs";
@@ -66,9 +67,25 @@ export default function Paciente(){
     const [comentariosAdicionales, setComentariosAdicionales] = useState("");
 
     function volverAingreso(){
-        router.push("/dashboard/GestionPaciente");
+        router.push("/dashboard/listaPacientes");
     }
 
+
+    // Reformatea a dd-mm-aaaa SIN recalcular la fecha: parte del resultado de
+    // formatearFecha, que ya resuelve la zona horaria igual que el resto de la app.
+    // Leer el ISO directamente corria el dia (mostraba 07 en vez de 06).
+    function fechaLegible(valor) {
+        const base = formatearFecha(valor);
+
+        if (!base) return "---";
+
+        const partes = String(base).split("-");
+
+        if (partes.length !== 3) return base;
+
+        const [anio, mes, dia] = partes;
+        return `${dia.padStart(2, "0")}-${mes.padStart(2, "0")}-${anio}`;
+    }
 
     function convertirFecha(isoString) {
         if (!isoString) return null;
@@ -81,18 +98,7 @@ export default function Paciente(){
     //FUNCION PARA LA ACTUALIZACION DE DATOS DEL PACIENTE
     async function actualizarDatosPacientes(nombre,apellido,rut,nacimiento,sexo, prevision,telefono,correo,direccion,pais,observacion1,apoderado,apoderado_rut,medicamentosUsados,habitos,comentariosAdicionales,id_paciente ) {
 
-        let prevision_id = 0;
-
-        if (prevision.includes("FONASA")) {
-            prevision_id = 1;
-        } else if (prevision.includes("ISAPRE")) {
-            prevision_id = 2;
-        } else if (prevision.includes("CONVENIO")) {
-            prevision_id = 3;
-        } else if (prevision.includes("SIN PREVISION")) {
-            prevision_id = 4;
-        }
-
+        const prevision_id = previsionIdDesdeNombre(prevision) ?? 0;
         try {
             if (!nombre || !apellido || !rut || !nacimiento || !sexo || !prevision_id || !telefono || !correo || !direccion || !pais || !id_paciente) {
                 return toast.error("Debe llenar todos los campos para proceder con la actualziacion")
@@ -203,7 +209,7 @@ export default function Paciente(){
             setRut(paciente.rut);
             setNacimiento(paciente.nacimiento);
             setSexo(paciente.sexo);
-            setPrevision(previsionDeterminacion(paciente.prevision_id));
+            setPrevision(previsionDesdeId(paciente.prevision_id));
             setTelefono(paciente.telefono);
             setCorreo(paciente.correo);
             setDireccion(paciente.direccion);
@@ -221,13 +227,6 @@ export default function Paciente(){
 
 
 
-    function previsionDeterminacion(id_prevision){
-        if(id_prevision === 1) return "FONASA";
-        if(id_prevision === 2) return "ISAPRE";
-        if(id_prevision === 3) return "CONVENIO";
-        if(id_prevision === 4) return "SIN PREVISION";
-        return "SIN DEFINIR";
-    }
 
 
 
@@ -251,7 +250,7 @@ export default function Paciente(){
                 const resultadoBackend = await res.json();
                 if(resultadoBackend.message === true){
                     toast.success("Se ha eliminado correctamente el paciente de la base de datos");
-                    router.push("/dashboard/GestionPaciente");
+                    router.push("/dashboard/listaPacientes");
                     return;
                 }else{
                     return toast.error("No se ha podido elimnar al paciente de la base de datos, el mensaje que llega se contepla como false")
@@ -270,16 +269,14 @@ export default function Paciente(){
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
 
-                {/* ── Header ── */}
-                <div className="mb-8">
-                    <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                        {paciente ? `${paciente.nombre} ${paciente.apellido}` : "Ficha de Paciente"}
-                    </h1>
-                    <p className="mt-1 text-[13px] text-slate-500">Datos clínicos y de contacto del paciente</p>
-                </div>
-
-                {/* ── Acciones ── */}
-                <div className="mb-6 flex flex-wrap items-center gap-2">
+                {/* ── Header: titulo y acciones en una sola linea ── */}
+                <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:flex-nowrap lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                            {paciente ? `${paciente.nombre} ${paciente.apellido}` : "Ficha de Paciente"}
+                        </h1>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:justify-end">
                     {canSeeFichasClinicas && (
                         <button
                             onClick={volverAFichas}
@@ -335,6 +332,7 @@ export default function Paciente(){
                             nota={'Si eliminas un paciente, no podrás acceder a sus fichas clínicas asociadas.'}
                         />
                     )}
+                    </div>
                 </div>
 
                 {/* ── Estado vacío ── */}
@@ -350,44 +348,38 @@ export default function Paciente(){
 
                         {/* ── Tarjeta de identidad ── */}
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-5 px-6 py-6 border-b border-slate-100">
-                                {/* Avatar */}
-                                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE] text-xl font-bold text-[#6E56CF]">
-                                    {paciente.nombre?.charAt(0)}{paciente.apellido?.charAt(0)}
-                                </div>
-                                {/* Nombre y datos clave */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                                        <span className="inline-flex items-center rounded-lg bg-[#F3F0FF] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#6E56CF] uppercase tracking-wide">
-                                            {previsionDeterminacion(paciente.prevision_id)}
-                                        </span>
-                                        <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
-                                            ID #{paciente.id_paciente}
-                                        </span>
-                                    </div>
-                                    <h2 className="text-xl font-bold text-slate-900 truncate">
+                            {/* Identidad a la izquierda; prevision e ID a la derecha. */}
+                            <div className="flex flex-wrap items-start justify-between gap-3 px-6 py-5 border-b border-slate-100">
+                                <div className="min-w-0">
+                                    <h2 className="text-lg font-bold text-slate-900 truncate">
                                         {paciente.nombre} {paciente.apellido}
                                     </h2>
-                                    <p className="mt-0.5 text-[13px] text-slate-500 font-mono">
+                                    <p className="mt-1 text-[13px] text-slate-500">
                                         RUT {formatRut(paciente.rut) || "---"}
                                     </p>
                                 </div>
+                                <div className="flex shrink-0 items-center gap-2">
+                                    <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600 uppercase tracking-wide">
+                                        {previsionDesdeId(paciente.prevision_id)}
+                                    </span>
+                                    <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
+                                        ID #{paciente.id_paciente}
+                                    </span>
+                                </div>
                             </div>
 
-                            {/* Datos rápidos en fila */}
-                            <div className="grid grid-cols-2 gap-px bg-slate-100 md:grid-cols-4">
+                            {/* Datos como lista: etiqueta a la izquierda, valor a la derecha. */}
+                            <dl className="divide-y divide-slate-100">
                                 {[
-                                    { label: "Fecha de nacimiento", value: formatearFecha(paciente.nacimiento) ?? "---" },
-                                    { label: "Sexo",                value: paciente.sexo ?? "---" },
-                                    { label: "Teléfono",            value: paciente.telefono ?? "---" },
-                                    { label: "País",                value: paciente.pais ?? "---" },
+                                    { label: "Fecha de nacimiento", value: fechaLegible(paciente.nacimiento) },
+                                    { label: "Sexo",                value: paciente.sexo || "---" },
                                 ].map(({ label, value }) => (
-                                    <div key={label} className="bg-white px-5 py-4">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
-                                        <p className="text-[13px] font-semibold text-slate-800">{value}</p>
+                                    <div key={label} className="flex items-baseline justify-between gap-4 px-6 py-3.5">
+                                        <dt className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</dt>
+                                        <dd className="text-[13px] font-semibold text-slate-800 text-right break-words">{value}</dd>
                                     </div>
                                 ))}
-                            </div>
+                            </dl>
                         </div>
 
                         {/* ── Contacto + Apoderado ── */}
@@ -405,18 +397,16 @@ export default function Paciente(){
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-100">
                                     {[
+                                        { label: "Teléfono",           value: paciente.telefono },
                                         { label: "Correo electrónico", value: paciente.correo },
                                         { label: "Dirección",          value: paciente.direccion },
+                                        { label: "País",               value: paciente.pais },
                                     ].map(({ label, value }) => (
-                                        <div key={label} className="bg-white px-5 py-4">
+                                        <div key={label} className="bg-white px-6 py-4">
                                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
                                             <p className="text-[13px] font-medium text-slate-800 break-words">{value || "---"}</p>
                                         </div>
                                     ))}
-                                    <div className="bg-white px-5 py-4 md:col-span-2">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">Observación</p>
-                                        <p className="text-[13px] font-medium text-slate-800 leading-relaxed break-words">{paciente.observacion1 || "---"}</p>
-                                    </div>
                                 </div>
                             </div>
 
@@ -435,12 +425,27 @@ export default function Paciente(){
                                         { label: "Nombre",        value: paciente.apoderado },
                                         { label: "RUT apoderado", value: paciente.apoderado_rut },
                                     ].map(({ label, value }) => (
-                                        <div key={label} className="bg-white px-5 py-4">
+                                        <div key={label} className="bg-white px-6 py-4">
                                             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
                                             <p className="text-[13px] font-medium text-slate-800 break-words">{value || "---"}</p>
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* ── Observación (texto largo, ancho completo) ── */}
+                        <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                            <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
+                                <div className="h-8 w-8 rounded-xl bg-slate-100 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <h3 className="text-sm font-semibold text-slate-800">Observación</h3>
+                            </div>
+                            <div className="px-6 py-5">
+                                <p className="text-[13px] font-medium text-slate-800 leading-relaxed break-words">{paciente.observacion1 || "---"}</p>
                             </div>
                         </div>
 
@@ -524,7 +529,7 @@ export default function Paciente(){
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Previsión</label>
                                         <div className="[&_button]:w-full [&_button]:justify-between [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:text-sm [&_button]:text-slate-700 [&_button]:shadow-none">
-                                            <ShadcnSelect nombreDefault="Seleccione Previsión" value1="FONASA" value2="ISAPRE" value3="CONVENIO" value4="SIN PREVISION" onChange={(v) => setPrevision(v)}/>
+                                            <ShadcnSelect nombreDefault="Seleccione Previsión" opciones={NOMBRES_PREVISION} value={prevision} onChange={(v) => setPrevision(v)}/>
                                         </div>
                                     </div>
                                     <div>

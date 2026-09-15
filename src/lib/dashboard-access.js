@@ -125,7 +125,7 @@ const routeMatchersByRole = {
     // /^\/dashboard\/calendarioGeneral$/,
     /^\/dashboard\/bloqueosAgenda$/,
     /^\/dashboard\/AgendaDetalle\/[^/]+$/,
-    /^\/dashboard\/GestionPaciente$/,
+    /^\/dashboard\/listaPacientes$/,
     /^\/dashboard\/paciente\/[^/]+$/,
   ],
   secretaria: [
@@ -135,7 +135,7 @@ const routeMatchersByRole = {
     // /^\/dashboard\/calendarioGeneral$/,
     /^\/dashboard\/bloqueosAgenda$/,
     /^\/dashboard\/AgendaDetalle\/[^/]+$/,
-    /^\/dashboard\/GestionPaciente$/,
+    /^\/dashboard\/listaPacientes$/,
     /^\/dashboard\/paciente\/[^/]+$/,
   ],
   cancelado: [
@@ -419,8 +419,7 @@ const DASHBOARD_NAV_SECTIONS = [
     accordionLabel: "Pacientes y Fichas",
     icon: "users",
     items: [
-      { label: "Ver Pacientes", href: "/dashboard/listaPacientes", icon: "users" },
-      { label: "Registrar Paciente", href: "/dashboard/GestionPaciente", icon: "users" },
+      { label: "Listado de Pacientes", href: "/dashboard/listaPacientes", icon: "users" },
       { label: "Ficha Clinica", href: "/dashboard/FichaClinica", icon: "fileText" },
     ],
   },

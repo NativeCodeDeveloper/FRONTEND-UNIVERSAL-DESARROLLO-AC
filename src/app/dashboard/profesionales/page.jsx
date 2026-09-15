@@ -1,62 +1,119 @@
 'use client'
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { InputTextDinamic } from "@/Componentes/InputTextDinamic";
-import { InputNumberDinamic } from "@/Componentes/InputNumberDinamic";
-import { TextAreaDinamic } from "@/Componentes/TextAreaDinamic";
-import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
+
+import React, { useEffect, useMemo, useState } from 'react';
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
+import ProfesionalModal from "@/Componentes/ProfesionalModal";
+import { formatRut } from "@/lib/designTokens";
 
-const DESCRIPCION_MAX_LARGO = 500;
+// Paleta de acento por tarjeta: se elige de forma estable a partir del nombre,
+// asi un mismo profesional conserva siempre su color.
+const ACENTOS = [
+    "bg-slate-900 text-white",
+    "bg-[#EDE9FE] text-[#6E56CF]",
+    "bg-teal-50 text-teal-700",
+    "bg-amber-50 text-amber-700",
+    "bg-sky-50 text-sky-700",
+    "bg-rose-50 text-rose-700",
+];
+
+function acentoDe(nombre = "") {
+    let suma = 0;
+    for (const caracter of String(nombre)) suma += caracter.codePointAt(0);
+    return ACENTOS[suma % ACENTOS.length];
+}
+
+function inicialesDe(nombre = "") {
+    const palabras = String(nombre)
+        .replace(/\b(dr|dra|don|sr|sra)\.?\b/gi, "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (palabras.length === 0) return "–";
+
+    return (palabras[0][0] + (palabras[1]?.[0] ?? "")).toUpperCase();
+}
+
+function FilaDato({ icono, children }) {
+    return (
+        <div className="flex items-center gap-2.5 text-[13px] text-slate-600">
+            <span className="shrink-0 text-slate-400">{icono}</span>
+            <span className="min-w-0 truncate">{children || "—"}</span>
+        </div>
+    );
+}
 
 export default function Profesionales() {
-    const [listaProfesionales, setListaProfesionales] = useState([]);
-    const [nombreProfesional, setNombreProfesional] = useState('');
-    const [descripcionProfesional, setDescripcionProfesional] = useState('');
-    const [id_profesional, setIdProfesional] = useState("");
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // MODALIDAD DE ATENCIÓN — requiere migración de BD:
-    //   ALTER TABLE profesionales
-    //     ADD COLUMN modalidad_atencion VARCHAR(20) NOT NULL DEFAULT 'ambas'
-    //     COMMENT 'presencial | online | ambas';
-    //
-    // Actualizar endpoint POST /profesionales/insertarProfesional:
-    //   Aceptar { nombreProfesional, descripcionProfesional, modalidad_atencion }
-    //
-    // Actualizar endpoint POST /profesionales/actualizarProfesional:
-    //   Aceptar { nombreProfesional, descripcionProfesional, modalidad_atencion, id_profesional }
-    //
-    // Retornar modalidad_atencion en GET seleccionarTodosProfesionales y POST seleccionarProfesional
-    // ══════════════════════════════════════════════════════════════════════════
-    const [modalidadAtencion, setModalidadAtencion] = useState('ambas'); // 'presencial' | 'online' | 'ambas'
     const API = process.env.NEXT_PUBLIC_API_URL;
 
+    const [listaProfesionales, setListaProfesionales] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [busqueda, setBusqueda] = useState("");
+    const [modalAbierto, setModalAbierto] = useState(false);
+    const [enEdicion, setEnEdicion] = useState(null);
+    // Confirmacion en la propia tarjeta: evita un dialogo nativo bloqueante.
+    const [confirmandoId, setConfirmandoId] = useState(null);
+    const [eliminandoId, setEliminandoId] = useState(null);
 
     async function seleccionarTodosProfesionales() {
         try {
             const res = await fetch(`${API}/profesionales/seleccionarTodosProfesionales`, {
                 method: 'GET',
-                headers: {Accept: 'application/json'},
+                headers: { Accept: 'application/json' },
                 mode: 'cors'
-            })
+            });
 
             if (!res.ok) {
                 return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
-                
-            }else{
-                const respustaBackend = await res.json();
-
-                if(respustaBackend){
-                    setListaProfesionales(respustaBackend);
-
-                }else{
-                    return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
-                }
             }
-        }catch (error) {
+
+            const respuestaBackend = await res.json();
+
+            if (!respuestaBackend) {
+                return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
+            }
+
+            setListaProfesionales(Array.isArray(respuestaBackend) ? respuestaBackend : []);
+        } catch (error) {
             return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
+        } finally {
+            setCargando(false);
+        }
+    }
+
+    async function eliminarProfesional(id_profesional) {
+        if (!id_profesional) {
+            return toast.error('Por favor seleccione un profesional para continuar con la eliminacion.');
+        }
+
+        setEliminandoId(id_profesional);
+
+        try {
+            const res = await fetch(`${API}/profesionales/eliminarProfesional`, {
+                method: 'POST',
+                headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_profesional }),
+                mode: 'cors'
+            });
+
+            if (!res.ok) {
+                return toast.error('Error al eliminar el profesional, por favor intente nuevamente.');
+            }
+
+            const respuestaBackend = await res.json();
+
+            if (respuestaBackend?.message !== true) {
+                return toast.error('Error al eliminar el profesional, por favor intente nuevamente.');
+            }
+
+            toast.success('Profesional eliminado correctamente.');
+            setConfirmandoId(null);
+            await seleccionarTodosProfesionales();
+        } catch (error) {
+            return toast.error('Error al eliminar el profesional, por favor intente nuevamente.');
+        } finally {
+            setEliminandoId(null);
         }
     }
 
@@ -64,450 +121,226 @@ export default function Profesionales() {
         seleccionarTodosProfesionales();
     }, []);
 
+    const profesionalesFiltrados = useMemo(() => {
+        const termino = busqueda.trim().toLowerCase();
 
-    async function seleccionarProfesional(id_profesional) {
-        try {
+        const ordenados = [...listaProfesionales].sort((a, b) =>
+            String(a.nombreProfesional ?? "").localeCompare(String(b.nombreProfesional ?? ""))
+        );
 
-            if(!id_profesional){
-                return toast.error('Por favor seleccione un profesional para continuar con la edición.');
-            }
+        if (!termino) return ordenados;
 
-            const res = await fetch(`${API}/profesionales/seleccionarProfesional`, {
-                method: 'POST',
-                headers: {Accept: 'application/json',
-                    'Content-Type': 'application/json'},
-                body: JSON.stringify({id_profesional}),
-                mode: 'cors'
-            })
+        return ordenados.filter((profesional) =>
+            [
+                profesional.nombreProfesional,
+                profesional.descripcionProfesional,
+                profesional.correoContacto,
+                profesional.numeroTelefono,
+                profesional.rutProfesional,
+            ]
+                .filter(Boolean)
+                .some((campo) => String(campo).toLowerCase().includes(termino))
+        );
+    }, [listaProfesionales, busqueda]);
 
-            if (!res.ok) {
-                return toast.error('Error al seleccionar el profesional, por favor intente nuevamente.');
-
-            }else{
-                const respustaBackend = await res.json();
-
-                if(Array.isArray(respustaBackend) && respustaBackend.length > 0){
-                    setCorreoContacto(respustaBackend[0].correoContacto || "")
-                    setNumeroTelefono(respustaBackend[0].numeroTelefono || "")
-                    setRutProfesional(respustaBackend[0].rutProfesional || "")
-                    setNombreProfesional(respustaBackend[0].nombreProfesional || "");
-                    setDescripcionProfesional(respustaBackend[0].descripcionProfesional || "");
-                    setModalidadAtencion(respustaBackend[0].modalidad_atencion ?? 'ambas');
-                    setIdProfesional(respustaBackend[0].id_profesional);
-                    return toast.success('Profesional seleccionado correctamente.');
-                }else{
-                    return toast.error('Error al seleccionar el profesional, por favor intente nuevamente.');
-                }
-            }
-        }catch (error) {
-            return toast.error('Error al seleccionar el profesional, por favor intente nuevamente.');
-        }
+    function abrirNuevo() {
+        setEnEdicion(null);
+        setModalAbierto(true);
     }
 
-
-
-    async function eliminarProfesional(id_profesional) {
-        try {
-            if(!id_profesional){
-                return toast.error('Por favor seleccione un profesional para continuar con la eliminacion.');
-            }
-            const res = await fetch(`${API}/profesionales/eliminarProfesional`, {
-                method: 'POST',
-                headers: {Accept: 'application/json',
-                    'Content-Type': 'application/json'},
-                body: JSON.stringify({id_profesional}),
-                mode: 'cors'
-            })
-
-            if (!res.ok) {
-                return toast.error('Error al eliminar el profesional, por favor intente nuevamente.');
-
-            }else{
-                const respustaBackend = await res.json();
-
-                if(respustaBackend.message === true){
-                    setNombreProfesional("");
-                    setDescripcionProfesional("");
-                    setIdProfesional("");
-                    await seleccionarTodosProfesionales();
-                    return toast.success('Profesional eliminado correctamente.');
-                }else{
-                    return toast.error('Error al eliminar el profesional, por favor intente nuevamente.');
-                }
-            }
-        }catch (error) {
-            return toast.error('Error al eliminar el profesional, por favor intente nuevamente.');
-        }
+    function abrirEdicion(profesional) {
+        setEnEdicion(profesional);
+        setModalAbierto(true);
     }
-
-
-
-    const [correoContacto, setCorreoContacto] = useState("");
-    const [numeroTelefono, setNumeroTelefono] = useState("");
-    const [rutProfesional, setRutProfesional] = useState("");
-
-    async function insertarProfesional(
-        nombreProfesional,
-        descripcionProfesional,
-        correoContacto,
-        numeroTelefono,
-        rutProfesional
-    ) {
-        try {
-
-            if(!nombreProfesional){
-                return toast.error('Por favor complete el nombre del profesional.');
-            }
-            if(!descripcionProfesional ){
-                return toast.error('Por favor complete la descripcion del profesional.');
-            }
-            if( !correoContacto){
-                return toast.error('Por favor complete el correo del profesional.');
-            }
-            if( !numeroTelefono){
-                return toast.error('Por favor complete el numero de telefono del profesional.');
-            }
-            if( !rutProfesional){
-                return toast.error('Por favor complete el RUT del profesional.');
-            }
-
-            const res = await fetch(`${API}/profesionales/insertarProfesional`, {
-                method: 'POST',
-                headers: {Accept: 'application/json',
-                    'Content-Type': 'application/json'},
-
-                body: JSON.stringify({
-                    nombreProfesional,
-                    descripcionProfesional,
-                    correoContacto,
-                    numeroTelefono,
-                    rutProfesional
-                })
-
-            })
-
-                if (!res.ok) {
-                    return toast.error('Error al insertar el profesional, por favor intente nuevamente.');
-                }else{
-                    const respustaBackend = await res.json();
-
-                    if(respustaBackend.message === true){
-                        setNombreProfesional('');
-                        setDescripcionProfesional('');
-                        setCorreoContacto('');
-                        setNumeroTelefono('');
-                        setRutProfesional('');
-                        await seleccionarTodosProfesionales();
-                        return toast.success('Profesional insertado correctamente.');
-                    }else{
-                        return toast.error('Error al insertar el profesional, por favor intente nuevamente.');
-                    }
-                }
-        }catch (error) {
-            return toast.error('Error al insertar el profesional, por favor intente nuevamente.');
-        }
-    }
-
-
-
-
-
-    async function actualizarProfesional(
-        nombreProfesional,
-        descripcionProfesional,
-        correoContacto,
-        numeroTelefono,
-        rutProfesional,
-        id_profesional
-    ) {
-        try {
-
-            if(!nombreProfesional){
-                return toast.error('Debe indicar el nombre para poder actualizar el profesional');
-            }
-            if(!descripcionProfesional){
-                return toast.error('Debe indicar la descripción para poder actualizar el profesional');
-            }
-            if(!correoContacto){
-                return toast.error('Debe indicar el correo para poder actualizar el profesional');
-            }
-            if(!numeroTelefono){
-                return toast.error('Debe indicar el número de teléfono para poder actualizar el profesional');
-            }
-            if(!rutProfesional){
-                return toast.error('Debe indicar el RUT para poder actualizar el profesional');
-            }
-
-            const res = await fetch(`${API}/profesionales/actualizarProfesional`, {
-
-                method: 'POST',
-
-                headers: {Accept: 'application/json',
-                    'Content-Type': 'application/json'},
-
-                body: JSON.stringify({
-                    nombreProfesional,
-                    descripcionProfesional,
-                    correoContacto,
-                    numeroTelefono,
-                    rutProfesional,
-                    id_profesional })
-            })
-
-            if (!res.ok) {
-                return toast.error('Error al actualizar el profesional, por favor intente nuevamente.');
-            }else{
-                const respustaBackend = await res.json();
-
-                if(respustaBackend.message === true){
-                    setNombreProfesional('');
-                    setCorreoContacto(``);
-                    setNumeroTelefono(``);
-                    setDescripcionProfesional('');
-                    setIdProfesional("");
-                    await seleccionarTodosProfesionales();
-                    return toast.success('Profesional actualizado correctamente.');
-
-                }else{
-                    return toast.error('Error al actualizar el profesional, por favor intente nuevamente.');
-                }
-            }
-        }catch (error) {
-            return toast.error('Error al actualizar el profesional, por favor intente nuevamente.');
-        }
-    }
-
-
 
     return (
         <div className="min-h-screen bg-[#FAFAFB]">
             <ToasterClient />
 
-            <div className="mx-auto w-full max-w-6xl px-6 py-10">
+            <div className="mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10">
 
-                {/* Header */}
-                <div className="mb-8 rounded-[32px] border border-slate-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
-                    <div className="flex flex-col gap-1">
+                {/* ── Encabezado ── */}
+                <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:flex-nowrap lg:items-end lg:justify-between">
+                    <div className="min-w-0">
                         <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Profesionales
                         </h1>
-                        <p className="text-sm text-slate-500">
-                            Gestión de profesionales registrados en la plataforma
+                        <p className="mt-1 text-[13px] text-slate-500">
+                            {cargando
+                                ? "Cargando equipo profesional..."
+                                : `${listaProfesionales.length} ${listaProfesionales.length === 1 ? "profesional registrado" : "profesionales registrados"}`}
                         </p>
                     </div>
+                    <button
+                        onClick={abrirNuevo}
+                        className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl bg-black px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Nuevo Profesional
+                    </button>
                 </div>
 
-                {/* Form */}
-                <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
-                    <div className="flex flex-col gap-6">
+                {/* ── Buscador ── */}
+                <div className="relative mb-6 max-w-md">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+                    <input
+                        type="search"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                        placeholder="Buscar por nombre, especialidad, correo o RUT..."
+                        aria-label="Buscar profesional"
+                        className="h-11 w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-4 text-[13px] text-slate-800 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-slate-900"
+                    />
+                </div>
 
-                        <div className="space-y-1">
-                            <h2 className="text-base font-semibold text-slate-900">
-                                Ingreso y edición
-                                <span className="ml-2 text-slate-400">(Profesional)</span>
-                            </h2>
-                            <p className="text-sm text-slate-500">
-                                Complete los campos para registrar o actualizar un profesional.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-5">
-                            <div className="space-y-1.5" data-tour="profesional-nombre">
-                                <label className="text-sm font-medium text-slate-700">Nombre del profesional</label>
-
-                                <InputTextDinamic
-                                    value={nombreProfesional}
-                                    onChange={(e) => setNombreProfesional(e.target.value)}
-                                    placeholder="Ej: Dr. Juan Pérez"
-                                    className="w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
-                                />
-
-                                <p className="text-xs text-slate-400">Solo se permiten letras y espacios.</p>
-                            </div>
-
-                            <div className="space-y-1.5" data-tour="profesional-descripcion">
-                                <label className="text-sm font-medium text-slate-700">Descripción del profesional</label>
-                                <TextAreaDinamic
-                                    value={descripcionProfesional}
-                                    onChange={(e) => setDescripcionProfesional(e.target.value.slice(0, DESCRIPCION_MAX_LARGO))}
-                                    placeholder="Ej: Especialista en ortodoncia con 10 años de experiencia"
-                                    maxLength={DESCRIPCION_MAX_LARGO}
-                                    className="w-full rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-indigo-100"
-                                />
-
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                                <div className="space-y-1.5">
-                                    <label htmlFor="correo" className="text-sm font-medium text-slate-700">Correo electrónico</label>
-                                    <input
-                                        value={correoContacto}
-                                        onChange={(e) => setCorreoContacto(e.target.value)}
-                                        id="correo"
-                                        name="correo"
-                                        type="email"
-                                        autoComplete="email"
-                                        placeholder="ejemplo@clinica.cl"
-                                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                                    />
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label htmlFor="numeroTelefono" className="text-sm font-medium text-slate-700">Número de teléfono</label>
-                                    <input
-                                        value={numeroTelefono}
-                                        onChange={(e) => setNumeroTelefono(e.target.value)}
-                                        id="numeroTelefono"
-                                        name="numeroTelefono"
-                                        type="tel"
-                                        autoComplete="tel"
-                                        placeholder="Ej: +56 9 1234 5678"
-                                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                                    />
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label htmlFor="rutProfesional" className="text-sm font-medium text-slate-700">RUT profesional</label>
-                                    <input
-                                        id="rutProfesional"
-                                        name="rutProfesional"
-                                        type="text"
-                                        placeholder="Ej: 12.345.678-9"
-                                        value={rutProfesional}
-                                        onChange={(e) => setRutProfesional(e.target.value)}
-                                        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                                    />
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="profesional-guardar">
-                            <ButtonDinamic
-                                onClick={() => insertarProfesional(
-                                    nombreProfesional,
-                                    descripcionProfesional,
-                                    correoContacto,
-                                    numeroTelefono,
-                                    rutProfesional
-                                )}
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
-                            >
-                                Guardar Profesional
-                            </ButtonDinamic>
-
-                            <ButtonDinamic
-                                onClick={() => actualizarProfesional(
-                                    nombreProfesional,
-                                    descripcionProfesional,
-                                    correoContacto,
-                                    numeroTelefono,
-                                    rutProfesional,
-                                    id_profesional
-                                )}
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
-                            >
-                                Actualizar Profesional
-                            </ButtonDinamic>
-
-                        </div>
+                {/* ── Tarjetas ── */}
+                {cargando ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        {[0, 1, 2].map((i) => (
+                            <div key={i} className="h-[232px] animate-pulse rounded-[24px] border border-slate-200 bg-white" />
+                        ))}
                     </div>
-                </div>
-
-                {/* Tabla de profesionales registrados */}
-                <details className="group mt-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_45px_-32px_rgba(15,23,42,0.35)] transition-all duration-300">
-                    <summary className="flex cursor-pointer list-none flex-col gap-4 border-b border-slate-100 bg-slate-50/40 px-6 py-5 transition-colors duration-300 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between [&::-webkit-details-marker]:hidden">
-                        <div>
-                            <h2 className="text-base font-semibold tracking-tight text-slate-900">Profesionales registrados</h2>
-                            <p className="mt-0.5 text-sm text-slate-500">Administre el equipo profesional disponible en la plataforma.</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm">
-                                <span className="text-xs font-semibold text-slate-600">
-                                    {listaProfesionales.length} {listaProfesionales.length === 1 ? 'profesional registrado' : 'profesionales registrados'}
-                                </span>
-                            </div>
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 group-open:rotate-180 group-open:border-slate-300 group-open:bg-slate-100 group-open:text-slate-900">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                ) : profesionalesFiltrados.length === 0 ? (
+                    <div className="rounded-[24px] border border-dashed border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
+                        <p className="text-[13px] font-medium text-slate-500">
+                            {busqueda
+                                ? "Ningún profesional coincide con la búsqueda."
+                                : "Aún no hay profesionales registrados."}
+                        </p>
+                        {!busqueda && (
+                            <button
+                                onClick={abrirNuevo}
+                                className="mt-4 inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-5 text-[12px] font-bold text-slate-600 transition-all hover:bg-slate-50"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
-                            </div>
-                        </div>
-                    </summary>
+                                Registrar el primero
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                        {profesionalesFiltrados.map((profesional) => {
+                            const confirmando = confirmandoId === profesional.id_profesional;
+                            const eliminando = eliminandoId === profesional.id_profesional;
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[760px] border-collapse text-left">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/70">
-                                    <th scope="col" className="w-[30%] px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Profesional</th>
-                                    <th scope="col" className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Correo</th>
-                                    <th scope="col" className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Teléfono</th>
-                                    <th scope="col" className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">RUT</th>
-                                    <th scope="col" className="w-[250px] px-6 py-3.5 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {listaProfesionales.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} className="px-6 py-14 text-center">
-                                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-300">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2a5 5 0 00-10 0v2m0 0H2v-2a3 3 0 015.356-1.857M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            return (
+                                <article
+                                    key={profesional.id_profesional}
+                                    className="flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md"
+                                >
+                                    <div className="flex items-start gap-3 px-5 pt-5">
+                                        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold ${acentoDe(profesional.nombreProfesional)}`}>
+                                            {inicialesDe(profesional.nombreProfesional)}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h2 className="truncate text-[15px] font-bold text-slate-900">
+                                                {profesional.nombreProfesional}
+                                            </h2>
+                                            <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-slate-500">
+                                                {profesional.descripcionProfesional || "Sin especialidad registrada"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 space-y-2 px-5">
+                                        <FilaDato
+                                            icono={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                                 </svg>
-                                            </div>
-                                            <p className="mt-3 text-sm font-medium text-slate-500">No hay profesionales registrados.</p>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    [...listaProfesionales].sort((a, b) => a.nombreProfesional.localeCompare(b.nombreProfesional)).map((profesional) => (
-                                        <tr key={profesional.id_profesional} className="group transition-colors hover:bg-slate-50/60">
-                                            <td className="px-6 py-4">
-                                                <div className="min-w-0">
-                                                    <p className="truncate text-sm font-bold text-slate-800">{profesional.nombreProfesional}</p>
-                                                    <p className="mt-0.5 text-[11px] font-medium text-slate-400">{profesional.descripcionProfesional}</p>
+                                            }
+                                        >
+                                            {profesional.correoContacto}
+                                        </FilaDato>
+                                        <FilaDato
+                                            icono={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.49a1 1 0 01-.5 1.21l-2.26 1.13a11 11 0 005.52 5.52l1.13-2.26a1 1 0 011.21-.5l4.49 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
+                                                </svg>
+                                            }
+                                        >
+                                            {profesional.numeroTelefono}
+                                        </FilaDato>
+                                        <FilaDato
+                                            icono={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0h4" />
+                                                </svg>
+                                            }
+                                        >
+                                            {formatRut(profesional.rutProfesional) || profesional.rutProfesional}
+                                        </FilaDato>
+                                    </div>
 
+                                    <div className="mt-auto px-5 pb-5 pt-4">
+                                        <div className="border-t border-slate-100 pt-4">
+                                            {confirmando ? (
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <span className="text-[12px] font-medium text-slate-500">¿Eliminar?</span>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => setConfirmandoId(null)}
+                                                            disabled={eliminando}
+                                                            className="h-10 rounded-xl px-4 text-[12px] font-semibold text-slate-500 transition-colors hover:bg-slate-100 disabled:opacity-50"
+                                                        >
+                                                            Cancelar
+                                                        </button>
+                                                        <button
+                                                            onClick={() => eliminarProfesional(profesional.id_profesional)}
+                                                            disabled={eliminando}
+                                                            className="h-10 rounded-xl bg-red-600 px-4 text-[12px] font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+                                                        >
+                                                            {eliminando ? "Eliminando..." : "Sí, eliminar"}
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </td>
-                                            <td className="max-w-md px-6 py-4 text-sm leading-6 text-slate-500">{profesional.correoContacto}</td>
-                                            <td className="max-w-md px-6 py-4 text-sm leading-6 text-slate-500">{profesional.numeroTelefono}</td>
-                                            <td className="max-w-md px-6 py-4 text-sm leading-6 text-slate-500">{profesional.rutProfesional}</td>
-
-
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center justify-end gap-2">
+                                            ) : (
+                                                <div className="flex items-center justify-between gap-2">
                                                     <button
-                                                        type="button"
-                                                        onClick={() => seleccionarProfesional(profesional.id_profesional)}
-                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-white px-3.5 text-xs font-bold text-[#6E56CF] shadow-sm transition-all hover:border-violet-300 hover:bg-[#F3F0FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                                        onClick={() => abrirEdicion(profesional)}
+                                                        className="inline-flex h-10 items-center gap-2 rounded-xl px-4 text-[12px] font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
                                                         aria-label={`Editar ${profesional.nombreProfesional}`}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 13H9v-2.828l6.586-6.586z" />
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                         </svg>
                                                         Editar
                                                     </button>
                                                     <button
-                                                        type="button"
-                                                        onClick={() => eliminarProfesional(profesional.id_profesional)}
-                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-3.5 text-xs font-bold text-rose-600 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+                                                        onClick={() => setConfirmandoId(profesional.id_profesional)}
+                                                        className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-100 bg-red-50 px-4 text-[12px] font-bold text-red-600 transition-colors hover:bg-red-100"
                                                         aria-label={`Eliminar ${profesional.nombreProfesional}`}
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
                                                         Eliminar
                                                     </button>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                            )}
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })}
                     </div>
-                </details>
-
+                )}
             </div>
+
+            <ProfesionalModal
+                abierto={modalAbierto}
+                profesional={enEdicion}
+                onCerrar={() => { setModalAbierto(false); setEnEdicion(null); }}
+                onGuardado={seleccionarTodosProfesionales}
+            />
         </div>
     );
 }

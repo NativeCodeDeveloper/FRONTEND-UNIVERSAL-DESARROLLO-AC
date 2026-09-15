@@ -1,6 +1,7 @@
 
 'use client'
 import {useEffect, useState} from "react";
+import { previsionDesdeId } from "@/lib/previsiones";
 import {useParams, useRouter} from "next/navigation";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
@@ -114,11 +115,6 @@ export default function ReecetasPacientes() {
         return edad;
     }
 
-    function previsionDeterminacion(id_prevision) {
-        if (id_prevision === 1) return "NO APLICA";
-        if (id_prevision === 2) return "ISAPRE";
-        return "SIN DEFINIR";
-    }
 
     function volverAFichas() {
         router.push(`/dashboard/FichasPacientes/${id_paciente}`);
@@ -278,7 +274,7 @@ export default function ReecetasPacientes() {
             doc.text(doc.splitTextToSize(especialidadProfesionalPDF, 58), margin + 130, y + 36, {lineHeightFactor: 1.3});
             doc.text(normalizarTextoPDF(formatearFecha(paciente?.nacimiento)), margin + 4, y + 49);
             doc.text(`${calcularEdad(paciente?.nacimiento)} años`, margin + 74, y + 49);
-            doc.text(normalizarTextoPDF(previsionDeterminacion(paciente?.prevision_id)), margin + 130, y + 49);
+            doc.text(normalizarTextoPDF(previsionDesdeId(paciente?.prevision_id)), margin + 130, y + 49);
 
             if (diagnosticoPDF) {
                 doc.setFont("helvetica", "bold");
@@ -731,7 +727,7 @@ export default function ReecetasPacientes() {
                                 </div>
                                 <div className="ml-auto flex flex-wrap gap-2">
                                     <span className="inline-flex items-center rounded-lg bg-[#F3F0FF] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#6E56CF] uppercase tracking-wide">
-                                        {previsionDeterminacion(paciente.prevision_id)}
+                                        {previsionDesdeId(paciente.prevision_id)}
                                     </span>
                                     <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
                                         {calcularEdad(paciente.nacimiento)} años

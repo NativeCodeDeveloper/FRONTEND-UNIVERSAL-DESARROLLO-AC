@@ -2,6 +2,7 @@
 import {useParams} from "next/navigation";
 import {useState, useEffect, useRef, useMemo} from "react";
 import { useUser } from "@clerk/nextjs";
+import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -471,17 +472,7 @@ export default function Paciente() {
         const direccionNormalizada = String(direccion || "").trim();
         const paisNormalizado = String(pais || "").trim();
 
-        if (prevision.includes("FONASA")) {
-            prevision_id = 1;
-        } else if (prevision.includes("ISAPRE")) {
-            prevision_id = 2;
-        } else if (prevision.includes("CONVENIO")) {
-            prevision_id = 3;
-        } else if (prevision.includes("SIN PREVISION")) {
-            prevision_id = 4;
-        } else {
-            prevision_id = 0;
-        }
+        prevision_id = previsionIdDesdeNombre(prevision) ?? 0;
 
         try {
             if (
@@ -609,7 +600,7 @@ export default function Paciente() {
         setRut(paciente.rut || "");
         setNacimiento(paciente.nacimiento || "");
         setSexo(paciente.sexo || "");
-        setPrevision(previsionDeterminacion(paciente.prevision_id));
+        setPrevision(previsionDesdeId(paciente.prevision_id));
         setTelefono(paciente.telefono || "");
         setCorreo(paciente.correo || "");
         setDireccion(paciente.direccion || "");
@@ -640,13 +631,6 @@ export default function Paciente() {
         return edad;
     }
 
-    function previsionDeterminacion(id_prevision) {
-        if (id_prevision === 1) return "FONASA";
-        if (id_prevision === 2) return "ISAPRE";
-        if (id_prevision === 3) return "CONVENIO";
-        if (id_prevision === 4) return "SIN PREVISION";
-        return "SIN DEFINIR";
-    }
 
     const pacienteActual = detallePaciente[0];
     const totalFichas = listaFichas.length;
@@ -806,7 +790,7 @@ export default function Paciente() {
             escribirDato("TIPO / PLANTILLA", tituloFicha, margin + 130, y + 32, 58);
             escribirDato("NACIMIENTO", formatearFecha(pacienteActual.nacimiento), margin + 4, y + 46, 50);
             escribirDato("EDAD", calcularEdad(pacienteActual.nacimiento) === "-" ? "-" : `${calcularEdad(pacienteActual.nacimiento)} años`, margin + 74, y + 46, 35);
-            escribirDato("PREVISIÓN", previsionDeterminacion(pacienteActual.prevision_id), margin + 130, y + 46, 45);
+            escribirDato("PREVISIÓN", previsionDesdeId(pacienteActual.prevision_id), margin + 130, y + 46, 45);
 
             y += 64;
 
@@ -1066,7 +1050,7 @@ export default function Paciente() {
                                         </div>
                                         <div className="space-y-1">
                                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Previsión</span>
-                                            <p className="text-[12px] font-semibold text-slate-700">{previsionDeterminacion(pacienteActual.prevision_id)}</p>
+                                            <p className="text-[12px] font-semibold text-slate-700">{previsionDesdeId(pacienteActual.prevision_id)}</p>
                                         </div>
                                         <div className="space-y-1">
                                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sexo</span>
@@ -1270,7 +1254,8 @@ export default function Paciente() {
                                             <div className="w-full [&_button]:h-9 [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm">
                                                 <ShadcnSelect
                                                     nombreDefault={prevision || "Seleccionar..."}
-                                                    value1={"FONASA"} value2={"ISAPRE"} value3={"CONVENIO"} value4={"SIN PREVISION"}
+                                                    opciones={NOMBRES_PREVISION}
+                                                    value={prevision}
                                                     onChange={(v) => setPrevision(v)}
                                                 />
                                             </div>

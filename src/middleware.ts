@@ -2,11 +2,19 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { canAccessDashboardPath, getDashboardRoleFromClaims } from "@/lib/dashboard-access";
 
+// TEMPORAL (dev): en true se salta el sign-in y el control de roles, entrando
+// directo al dashboard. Volver a false antes de commitear / desplegar.
+const BYPASS_DASHBOARD_AUTH = true;
+
 const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isDashboardApiRoute = createRouteMatcher(["/api/dashboard(.*)"]);
 const SUBSCRIPTION_CANCELLED_PATH = "/dashboard/suscripcion-cancelada";
 
 export default clerkMiddleware(async (auth, req) => {
+  if (BYPASS_DASHBOARD_AUTH) {
+    return NextResponse.next();
+  }
+
   if (!isDashboardRoute(req) && !isDashboardApiRoute(req)) {
     return NextResponse.next();
   }

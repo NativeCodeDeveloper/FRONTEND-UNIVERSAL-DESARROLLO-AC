@@ -12,7 +12,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function ShadcnDatePicker({label = "Fecha", value, onChange}) {
+export default function ShadcnDatePicker({label = "Fecha", value, onChange, className = "w-48", placeholder = "Select date"}) {
     const [open, setOpen] = React.useState(false)
     const initialDate = value ? new Date(value) : undefined
     const [date, setDate] = React.useState(initialDate)
@@ -24,17 +24,22 @@ export default function ShadcnDatePicker({label = "Fecha", value, onChange}) {
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="date" className="px-1">
-                {label}
-            </Label>
+            {/* Con label="" el campo se integra bajo la etiqueta del formulario que lo contiene. */}
+            {label ? (
+                <Label htmlFor="date" className="px-1">
+                    {label}
+                </Label>
+            ) : null}
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
                         id="date"
-                        className="w-48 justify-between font-normal"
+                        className={`justify-between font-normal ${className}`}
                     >
-                        {date ? formatDate(date) : "Select date"}
+                        <span className={date ? "" : "text-slate-400"}>
+                            {date ? formatDate(date) : placeholder}
+                        </span>
                         <ChevronDownIcon/>
                     </Button>
                 </PopoverTrigger>

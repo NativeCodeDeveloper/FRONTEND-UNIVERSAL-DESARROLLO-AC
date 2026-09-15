@@ -17,24 +17,32 @@ export function ShadcnSelect({
                                  value3,
                                  value4,
                                  value5,
+                                 opciones,
+                                 value,
+                                 className = "w-[180px]",
                                  onChange,
                              }) {
+    // `opciones` permite listas de cualquier largo; value1..value5 se mantiene para
+    // los formularios que ya lo usaban.
+    const items = Array.isArray(opciones) && opciones.length > 0
+        ? opciones
+        : [value1, value2, value3, value4, value5].filter(Boolean);
+
     return (
         <Select
             // shadcn usa onValueChange, NO onChange
             onValueChange={onChange}
+            {...(value === undefined ? {} : { value })}
         >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className={className}>
                 <SelectValue placeholder={nombreDefault} />
             </SelectTrigger>
 
             <SelectContent>
                 <SelectGroup>
-                    {value1 && <SelectItem value={value1}>{value1}</SelectItem>}
-                    {value2 && <SelectItem value={value2}>{value2}</SelectItem>}
-                    {value3 && <SelectItem value={value3}>{value3}</SelectItem>}
-                    {value4 && <SelectItem value={value4}>{value4}</SelectItem>}
-                    {value5 && <SelectItem value={value5}>{value5}</SelectItem>}
+                    {items.map((item) => (
+                        <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
                 </SelectGroup>
             </SelectContent>
         </Select>

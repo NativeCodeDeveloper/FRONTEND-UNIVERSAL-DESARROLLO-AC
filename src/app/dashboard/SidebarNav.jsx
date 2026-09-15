@@ -75,13 +75,29 @@ const ICONS = {
   ),
 };
 
+// Una ruta esta activa solo si coincide exacto o es una subruta real. Comparar
+// con startsWith pelado hacia que "/dashboard" (Panel de Reservas) matcheara
+// toda ruta del dashboard y "/dashboard/receta" matcheara "/dashboard/recetaRapida".
+function isPathActive(pathname, href) {
+  if (!pathname || !href || href.startsWith("http")) {
+    return false;
+  }
+
+  // "/dashboard" es la ruta indice: solo activa en coincidencia exacta.
+  if (href === "/dashboard") {
+    return pathname === href;
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 function getActiveAccordion(pathname, sections) {
   for (const section of sections) {
     if (!section.accordionLabel) {
       continue;
     }
 
-    if (section.items.some((item) => pathname.startsWith(item.href))) {
+    if (section.items.some((item) => isPathActive(pathname, item.href))) {
       return section.id;
     }
   }
@@ -103,7 +119,7 @@ function SectionLabel({ label }) {
 function NavItem({ href, icon, label }) {
   const pathname = usePathname();
   const isExternal = href.startsWith("http");
-  const isActive = !isExternal && (pathname === href || (href !== "/dashboard" && pathname.startsWith(href)));
+  const isActive = isPathActive(pathname, href);
 
   return (
     <Link
@@ -148,7 +164,7 @@ function SubNavItem({ href, label, action }) {
   }
 
   const isExternal = href.startsWith("http");
-  const isActive = !isExternal && pathname.startsWith(href);
+  const isActive = isPathActive(pathname, href);
 
   return (
     <Link

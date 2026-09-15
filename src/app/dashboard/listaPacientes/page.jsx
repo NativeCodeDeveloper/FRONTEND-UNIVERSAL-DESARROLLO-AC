@@ -7,13 +7,16 @@ import ShadcnInput from "@/Componentes/shadcnInput2";
 import {toast} from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {UserIcon} from "@heroicons/react/24/outline";
+import {InfoButton} from "@/Componentes/InfoButton";
 import { formatRut, cleanRut } from "@/lib/designTokens";
+import NuevoPacienteModal from "@/Componentes/NuevoPacienteModal";
 
 export default function ListaPacientes() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const [listaPacientes, setListaPacientes] = useState([]);
     const [nombreBuscado, setNombreBuscado] = useState("");
     const [rutBuscado, setRutBuscado] = useState("");
+    const [modalAbierto, setModalAbierto] = useState(false);
 
     const router = useRouter();
 
@@ -127,8 +130,8 @@ export default function ListaPacientes() {
             <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
                 
                 {/* ── Header Principal ── */}
-                <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                    <div>
+                <div className="mb-10 flex flex-col gap-6 xl:flex-row xl:flex-nowrap xl:items-end xl:justify-between">
+                    <div className="min-w-0">
                         <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Listado de Pacientes
                         </h1>
@@ -136,31 +139,59 @@ export default function ListaPacientes() {
                             Busca y gestiona la base de datos de pacientes. Envía registros directamente al calendario de agendamiento para optimizar el flujo de atención.
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={() => router.push("/dashboard")}
-                            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Ir a reservas"
-                        >
-                            Reservas
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => router.push("/dashboard/calendario")}
-                            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Ir al calendario"
-                        >
-                            Calendario
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => router.push("/dashboard/FichaClinica")}
-                            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Ir a fichas clínicas"
-                        >
-                            Fichas clínicas
-                        </button>
+                    {/* Navegacion rapida (aporte del colega) + accion primaria de registro.
+                        El contador y la ayuda quedan debajo, compactos y alineados al
+                        borde derecho del bloque. */}
+                    <div className="flex w-full flex-col gap-2 xl:w-auto xl:shrink-0">
+                        <div className="flex flex-wrap items-center gap-2 md:justify-end xl:flex-nowrap">
+                            <button
+                                type="button"
+                                onClick={() => router.push("/dashboard")}
+                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                aria-label="Ir a reservas"
+                            >
+                                Reservas
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => router.push("/dashboard/calendario")}
+                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                aria-label="Ir al calendario"
+                            >
+                                Calendario
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => router.push("/dashboard/FichaClinica")}
+                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                aria-label="Ir a fichas clínicas"
+                            >
+                                Fichas clínicas
+                            </button>
+                            <button
+                                onClick={() => setModalAbierto(true)}
+                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-5 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Registrar Paciente
+                            </button>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 md:justify-end [&_button]:h-9 [&_button]:rounded-xl [&_button]:px-3 [&_button]:text-[12px]">
+                            <div className="flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
+                                <span className="text-[10px] font-bold uppercase leading-none tracking-widest text-slate-400">Total</span>
+                                <span className="text-[12px] font-bold leading-none text-slate-900">{listaPacientes.length}</span>
+                            </div>
+                            <InfoButton
+                                informacion={'Busca, registra y agenda pacientes desde un solo listado.'}
+                                pasos={[
+                                    'Filtra por nombre o RUT para localizar el perfil que buscas.',
+                                    'Presiona "Registrar Paciente" para incorporar a alguien que aún no está en la base.',
+                                    'Presiona "Agendar" para pre-cargar sus datos directamente en el calendario clínico.',
+                                ]}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -242,7 +273,16 @@ export default function ListaPacientes() {
                                     {listaPacientes.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={5} className="py-20 text-center">
-                                                <p className="text-[13px] text-slate-400 font-medium italic">No se han encontrado pacientes con los criterios de búsqueda.</p>
+                                                <p className="text-[13px] text-slate-400 font-medium">No se han encontrado pacientes con los criterios de búsqueda.</p>
+                                                <button
+                                                    onClick={() => setModalAbierto(true)}
+                                                    className="mt-4 h-10 px-5 rounded-xl border border-slate-200 text-slate-600 text-[12px] font-bold hover:bg-slate-50 transition-all inline-flex items-center gap-2"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Registrar nuevo paciente
+                                                </button>
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -294,6 +334,12 @@ export default function ListaPacientes() {
                     </div>
                 </div>
             </div>
+
+            <NuevoPacienteModal
+                abierto={modalAbierto}
+                onCerrar={() => setModalAbierto(false)}
+                onCreado={listarPacientes}
+            />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect, useState} from "react";
+import { previsionDesdeId } from "@/lib/previsiones";
 import {useParams, useRouter} from "next/navigation";
 import {
     ArrowLeft,
@@ -47,13 +48,6 @@ function calcularEdadPaciente(fechaNacimiento) {
     return edad;
 }
 
-function previsionDeterminacionPaciente(id_prevision) {
-    if (id_prevision === 1) return "FONASA";
-    if (id_prevision === 2) return "ISAPRE";
-    if (id_prevision === 3) return "CONVENIO";
-    if (id_prevision === 4) return "SIN PREVISION";
-    return "SIN DEFINIR";
-}
 
 function estadosLetra_interpretacion(estado_backend){
     switch (estado_backend) {
@@ -518,7 +512,7 @@ function formatearFechaHora(fechaISO) {
                                     </div>
                                     <div className="space-y-0.5">
                                         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Previsión</span>
-                                        <p className="text-[12px] font-semibold text-slate-700">{previsionDeterminacionPaciente(elemento.prevision_id)}</p>
+                                        <p className="text-[12px] font-semibold text-slate-700">{previsionDesdeId(elemento.prevision_id)}</p>
                                     </div>
                                     <div className="space-y-0.5">
                                         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Sexo</span>
