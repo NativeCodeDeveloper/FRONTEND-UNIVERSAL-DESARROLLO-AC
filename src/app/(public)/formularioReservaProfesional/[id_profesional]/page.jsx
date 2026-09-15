@@ -18,6 +18,11 @@ const formatoCLP = new Intl.NumberFormat("es-CL", {
     minimumFractionDigits: 0, maximumFractionDigits: 0,
 });
 
+function normalizarFechaCalendario(fecha) {
+    const coincidencia = String(fecha ?? "").trim().match(/^(\d{4}-\d{2}-\d{2})/);
+    return coincidencia ? coincidencia[1] : "";
+}
+
 /* ─────────────────────────────────────────────
    COMPONENTE
 ───────────────────────────────────────────── */
@@ -86,10 +91,13 @@ export default function FormularioReservaProfesional() {
         const horaInicioQuery = searchParams.get("horaInicio");
         const horaFinQuery = searchParams.get("horaFin");
 
-        if (!fechaInicio && fechaInicioQuery) setFechaInicio(fechaInicioQuery);
-        if (!fechaFinalizacion && fechaFinalizacionQuery) setFechaFinalizacion(fechaFinalizacionQuery);
-        if (!horaInicio && horaInicioQuery) setHoraInicio(horaInicioQuery);
-        if (!horaFin && horaFinQuery) setHoraFin(horaFinQuery);
+        const fechaInicioSeleccionada = normalizarFechaCalendario(fechaInicioQuery);
+        const fechaFinalizacionSeleccionada = normalizarFechaCalendario(fechaFinalizacionQuery);
+
+        if (fechaInicioSeleccionada && fechaInicioSeleccionada !== fechaInicio) setFechaInicio(fechaInicioSeleccionada);
+        if (fechaFinalizacionSeleccionada && fechaFinalizacionSeleccionada !== fechaFinalizacion) setFechaFinalizacion(fechaFinalizacionSeleccionada);
+        if (horaInicioQuery && horaInicioQuery !== horaInicio) setHoraInicio(horaInicioQuery);
+        if (horaFinQuery && horaFinQuery !== horaFin) setHoraFin(horaFinQuery);
     }, [
         searchParams,
         fechaInicio,
@@ -171,11 +179,13 @@ export default function FormularioReservaProfesional() {
     async function agendarSinPago() {
         const motivoReserva = (servicio?.nombre || servicioNombre || "").trim();
         const montoReserva = String(servicio?.precio ?? totalPago ?? "").trim();
+        const fechaInicioReserva = normalizarFechaCalendario(fechaInicio);
+        const fechaFinalizacionReserva = normalizarFechaCalendario(fechaFinalizacion);
 
         if(procesando) return;
 
         /* ── Validaciones de guard ── */
-        if (!fechaInicio || !horaInicio || !horaFin) {
+        if (!fechaInicioReserva || !fechaFinalizacionReserva || !horaInicio || !horaFin) {
             toast.error("Debes seleccionar fecha y hora antes de completar el formulario. Vuelve al calendario.");
             return;
         }
@@ -200,9 +210,9 @@ export default function FormularioReservaProfesional() {
                     rut:               rut.trim(),
                     telefono:          telefono.trim(),
                     email:             email.trim(),
-                    fechaInicio,
+                    fechaInicio:        fechaInicioReserva,
                     horaInicio,
-                    fechaFinalizacion,
+                    fechaFinalizacion:  fechaFinalizacionReserva,
                     horaFinalizacion:  horaFin,
                     monto_reserva:     montoReserva,
                     motivo_reserva:    motivoReserva,
@@ -270,6 +280,9 @@ export default function FormularioReservaProfesional() {
      try {
          if(procesando) return;
 
+         const fechaInicioReserva = normalizarFechaCalendario(fechaInicio);
+         const fechaFinalizacionReserva = normalizarFechaCalendario(fechaFinalizacion);
+
          if(
              !tituloProducto ||
              !precio ||
@@ -278,9 +291,9 @@ export default function FormularioReservaProfesional() {
              !rut ||
              !telefono ||
              !email ||
-             !fechaInicio ||
+             !fechaInicioReserva ||
              !horaInicio ||
-             !fechaFinalizacion ||
+             !fechaFinalizacionReserva ||
              !horaFinalizacion ||
              !estadoReserva ||
              !totalPago ||
@@ -300,9 +313,9 @@ export default function FormularioReservaProfesional() {
                  rut,
                  telefono,
                  email,
-                 fechaInicio,
+                 fechaInicio: fechaInicioReserva,
                  horaInicio,
-                 fechaFinalizacion,
+                 fechaFinalizacion: fechaFinalizacionReserva,
                  horaFinalizacion,
                  estadoReserva ,
                  totalPago,
