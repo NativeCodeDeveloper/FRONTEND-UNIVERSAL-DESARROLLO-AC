@@ -49,19 +49,47 @@ export async function PATCH(req, { params }) {
     try {
       body = await req.json();
     } catch {
-      return responseError("No se pudo leer la nueva contrasena.");
+      return responseError("No se pudo leer la actualización del usuario.");
     }
 
     const password = String(body?.password || "");
+    const actualizaAgenda = Object.prototype.hasOwnProperty.call(body || {}, "idProfesionalAgenda");
+    const idProfesionalAgenda = String(body?.idProfesionalAgenda || "").trim();
 
-    if (!password) {
-      return responseError("Debes ingresar una contrasena.");
+    if (!password && !actualizaAgenda) {
+      return responseError("Debes indicar una contraseña o una agenda para actualizar.");
+    }
+
+    if (actualizaAgenda && idProfesionalAgenda && !/^\d+$/.test(idProfesionalAgenda)) {
+      return responseError("La agenda seleccionada no es válida.");
     }
 
     const client = await clerkClient();
-    await client.users.updateUser(targetUserId, { password });
+    const datosActualizados = {};
 
-    return NextResponse.json({ success: true });
+    if (password) {
+      datosActualizados.password = password;
+    }
+
+    if (actualizaAgenda) {
+      const targetUser = await client.users.getUser(targetUserId);
+      const publicMetadata = { ...(targetUser.publicMetadata || {}) };
+
+      if (idProfesionalAgenda) {
+        publicMetadata.idProfesionalAgenda = idProfesionalAgenda;
+      } else {
+        delete publicMetadata.idProfesionalAgenda;
+      }
+
+      datosActualizados.publicMetadata = publicMetadata;
+    }
+
+    const user = await client.users.updateUser(targetUserId, datosActualizados);
+
+    return NextResponse.json({
+      success: true,
+      idProfesionalAgenda: String(user.publicMetadata?.idProfesionalAgenda || ""),
+    });
   } catch (error) {
     console.error("PATCH /api/dashboard/users/[userId] failed", error);
 

@@ -4,7 +4,7 @@ import { canAccessDashboardPath, getDashboardRoleFromClaims } from "@/lib/dashbo
 
 // TEMPORAL (dev): en true se salta el sign-in y el control de roles, entrando
 // directo al dashboard. Volver a false antes de commitear / desplegar.
-const BYPASS_DASHBOARD_AUTH = true;
+const BYPASS_DASHBOARD_AUTH = false;
 
 const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"]);
 const isDashboardApiRoute = createRouteMatcher(["/api/dashboard(.*)"]);

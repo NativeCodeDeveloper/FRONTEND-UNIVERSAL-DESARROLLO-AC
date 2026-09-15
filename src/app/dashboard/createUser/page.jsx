@@ -195,6 +195,7 @@ export default function CreateUserPage() {
   const [cargandoUsuarios, setCargandoUsuarios] = useState(true);
   const [errorUsuarios, setErrorUsuarios] = useState("");
   const [contrasenasNuevas, setContrasenasNuevas] = useState({});
+  const [agendasProfesionales, setAgendasProfesionales] = useState({});
   const [accionEnCurso, setAccionEnCurso] = useState("");
   const [mensajeUsuarios, setMensajeUsuarios] = useState("");
   const [listaProfesionales, setListaProfesionales] = useState([]);
@@ -214,7 +215,14 @@ export default function CreateUserPage() {
         throw new Error(data?.error || "No se pudieron cargar los usuarios.");
       }
 
-      setUsuarios(Array.isArray(data?.users) ? data.users : []);
+      const usuariosCargados = Array.isArray(data?.users) ? data.users : [];
+      setUsuarios(usuariosCargados);
+      setAgendasProfesionales(
+        usuariosCargados.reduce((agendas, usuario) => ({
+          ...agendas,
+          [usuario.id]: String(usuario.idProfesionalAgenda || ""),
+        }), {})
+      );
     } catch (loadError) {
       setErrorUsuarios(loadError.message || "No se pudieron cargar los usuarios.");
     } finally {
@@ -349,6 +357,38 @@ export default function CreateUserPage() {
       setMensajeUsuarios("Contrasena actualizada correctamente.");
     } catch (updateError) {
       setErrorUsuarios(updateError.message || "No se pudo actualizar la contrasena.");
+    } finally {
+      setAccionEnCurso("");
+    }
+  }
+
+  async function actualizarAgendaProfesional(usuarioId) {
+    const idProfesionalAgenda = String(agendasProfesionales[usuarioId] || "");
+
+    setAccionEnCurso(`agenda-${usuarioId}`);
+    setErrorUsuarios("");
+    setMensajeUsuarios("");
+
+    try {
+      const response = await fetch(`/api/dashboard/users/${usuarioId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idProfesionalAgenda }),
+      });
+      const data = await leerRespuesta(response);
+
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudo actualizar la agenda asignada.");
+      }
+
+      setUsuarios((current) => current.map((usuario) => (
+        usuario.id === usuarioId
+          ? { ...usuario, idProfesionalAgenda }
+          : usuario
+      )));
+      setMensajeUsuarios(idProfesionalAgenda ? "Agenda asignada correctamente." : "La agenda asignada fue eliminada.");
+    } catch (updateError) {
+      setErrorUsuarios(updateError.message || "No se pudo actualizar la agenda asignada.");
     } finally {
       setAccionEnCurso("");
     }
@@ -660,13 +700,12 @@ export default function CreateUserPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[1000px] border-collapse text-left">
+                <table className="w-full min-w-[900px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/70">
                       <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Usuario</th>
                       <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Perfil</th>
-                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Creado</th>
-                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Último acceso</th>
+                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Agenda asignada</th>
                       <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Nueva contrasena</th>
                       <th className="px-4 py-3 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Acciones</th>
                     </tr>
@@ -674,6 +713,7 @@ export default function CreateUserPage() {
                   <tbody className="divide-y divide-slate-100">
                     {usuarios.map((usuario) => {
                       const actualizandoContrasena = accionEnCurso === `password-${usuario.id}`;
+                      const actualizandoAgenda = accionEnCurso === `agenda-${usuario.id}`;
                       const eliminandoUsuario = accionEnCurso === `delete-${usuario.id}`;
 
                       return (
@@ -692,8 +732,34 @@ export default function CreateUserPage() {
                               {getDashboardRoleLabel(usuario.role) || usuario.role || "Sin perfil"}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-[12px] leading-5 text-slate-600">{formatearFecha(usuario.createdAt)}</td>
-                          <td className="px-4 py-4 text-[12px] leading-5 text-slate-600">{formatearFecha(usuario.lastSignInAt)}</td>
+                          <td className="px-4 py-4">
+                            <div className="flex min-w-[240px] items-center gap-2">
+                              <select
+                                value={agendasProfesionales[usuario.id] ?? String(usuario.idProfesionalAgenda || "")}
+                                onChange={(event) => setAgendasProfesionales((current) => ({
+                                  ...current,
+                                  [usuario.id]: event.target.value,
+                                }))}
+                                disabled={Boolean(accionEnCurso)}
+                                className="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-800 outline-none transition-colors focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-50"
+                              >
+                                <option value="">Sin agenda asignada</option>
+                                {listaProfesionales.map((profesional) => (
+                                  <option key={profesional.id_profesional} value={String(profesional.id_profesional)}>
+                                    {profesional.nombreProfesional}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => actualizarAgendaProfesional(usuario.id)}
+                                disabled={Boolean(accionEnCurso)}
+                                className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-white px-3 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {actualizandoAgenda ? "Guardando..." : "Guardar"}
+                              </button>
+                            </div>
+                          </td>
                           <td className="px-4 py-4">
                             <input
                               type="password"

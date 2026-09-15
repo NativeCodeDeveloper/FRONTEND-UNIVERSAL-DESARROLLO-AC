@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { SelectDinamic } from "@/Componentes/SelectDinamic";
@@ -23,8 +24,16 @@ import {
 
 export default function BloqueosAgendas() {
     const API = process.env.NEXT_PUBLIC_API_URL;
+    const { user, isLoaded: usuarioCargado } = useUser();
+    const idProfesionalAgendaAsignada = String(user?.publicMetadata?.idProfesionalAgenda || "").trim();
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [id_profesional, setId_profesional] = useState("");
+    const agendaAsignadaDisponible = Boolean(
+        idProfesionalAgendaAsignada && listaProfesionales.some(
+            (profesional) => String(profesional.id_profesional) === idProfesionalAgendaAsignada
+        )
+    );
+    const idProfesionalAgendaActiva = agendaAsignadaDisponible ? idProfesionalAgendaAsignada : "";
     const [diasSeleccionados, setDiasSeleccionados] = useState([]);
     const [horaInicio, setHoraInicio] = useState("");
     const [horaFinalizacion, setHoraFinalizacion] = useState("");
@@ -129,7 +138,10 @@ export default function BloqueosAgendas() {
         }
     }
 
-    useEffect(() => { buscarProfesionales(); }, []);
+    useEffect(() => {
+        if (!usuarioCargado) return;
+        buscarProfesionales();
+    }, [usuarioCargado, idProfesionalAgendaAsignada]);
 
     async function verTodosLosBloqueos() {
         try {
@@ -148,7 +160,7 @@ export default function BloqueosAgendas() {
 
     // Recarga la lista respetando el filtro de profesional activo
     async function recargarBloqueos(profId) {
-        const idActual = profId !== undefined ? profId : id_profesional;
+        const idActual = idProfesionalAgendaActiva || (profId !== undefined ? profId : id_profesional);
         if (idActual) {
             await filtrarPorProfesional(idActual);
         } else {
@@ -156,15 +168,33 @@ export default function BloqueosAgendas() {
         }
     }
 
-    useEffect(() => { verTodosLosBloqueos(); }, []);
-
     useEffect(() => {
-        if (id_profesional) {
-            filtrarPorProfesional(id_profesional);
+        if (!usuarioCargado) return;
+        if (idProfesionalAgendaAsignada && listaProfesionales.length === 0) return;
+
+        const idProfesionalVisible = idProfesionalAgendaActiva || id_profesional;
+        if (idProfesionalVisible) {
+            filtrarPorProfesional(idProfesionalVisible);
         } else {
             verTodosLosBloqueos();
         }
-    }, [id_profesional]);
+    }, [usuarioCargado, idProfesionalAgendaAsignada, idProfesionalAgendaActiva, id_profesional, listaProfesionales.length]);
+
+    useEffect(() => {
+        if (idProfesionalAgendaActiva && id_profesional !== idProfesionalAgendaActiva) {
+            setId_profesional(idProfesionalAgendaActiva);
+            return;
+        }
+
+        if (
+            idProfesionalAgendaAsignada &&
+            listaProfesionales.length > 0 &&
+            !idProfesionalAgendaActiva &&
+            id_profesional
+        ) {
+            setId_profesional("");
+        }
+    }, [idProfesionalAgendaAsignada, idProfesionalAgendaActiva, id_profesional, listaProfesionales.length]);
 
     async function filtrarPorProfesional(id) {
         try {
@@ -242,14 +272,14 @@ export default function BloqueosAgendas() {
         }
 
         setCargandoInsercion(false);
-        await verTodosLosBloqueos();
+        await recargarBloqueos(idProfesionalAgendaActiva || id_profesional);
 
         // Limpiar formulario
         setDiasSeleccionados([]);
         setHoraInicio("");
         setHoraFinalizacion("");
         setMotivo("");
-        setId_profesional("");
+        setId_profesional(idProfesionalAgendaActiva || "");
 
         // Mostrar resultado
         if (exitosos > 0 && conflictoReserva === 0 && conflictoBloqueo === 0) {
@@ -389,15 +419,21 @@ export default function BloqueosAgendas() {
                                 {/* Profesional */}
                                 <div className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Profesional</label>
-                                    <SelectDinamic
-                                        value={id_profesional}
-                                        onChange={(e) => setId_profesional(e.target.value)}
-                                        options={listaProfesionales.map(p => ({
-                                            value: p.id_profesional,
-                                            label: p.nombreProfesional
-                                        }))}
-                                        placeholder="Selecciona un profesional"
-                                    />
+                                    {idProfesionalAgendaActiva ? (
+                                        <div className="flex h-10 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-3 text-[13px] font-semibold text-violet-900">
+                                            {listaProfesionales.find((profesional) => String(profesional.id_profesional) === idProfesionalAgendaActiva)?.nombreProfesional || "Agenda asignada"}
+                                        </div>
+                                    ) : (
+                                        <SelectDinamic
+                                            value={id_profesional}
+                                            onChange={(e) => setId_profesional(e.target.value)}
+                                            options={listaProfesionales.map(p => ({
+                                                value: p.id_profesional,
+                                                label: p.nombreProfesional
+                                            }))}
+                                            placeholder="Selecciona un profesional"
+                                        />
+                                    )}
                                 </div>
 
                                 {/* Selector de modo */}

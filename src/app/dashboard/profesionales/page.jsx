@@ -121,7 +121,6 @@ export default function Profesionales() {
             const respuestaBackend = await res.json();
             limpiarEstados();
             setData(respuestaBackend);
-            return toast.success("Profesionales cargados correctamente");
 
         } catch (e) {
             return toast.error(`Error en el servidor contacte a soporte de nativeCode`);
