@@ -25,6 +25,7 @@ import {
     getDashboardRoleFromUser,
 } from "@/lib/dashboard-access";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 
 
 function parsearDatosDinamicos(datos) {
@@ -1011,20 +1012,13 @@ export default function Paciente() {
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Registros</span>
                             <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{totalFichas} Fichas</span>
                         </div>
-                        <a
-                            href="https://youtu.be/KWLr1mHjhA0?si=FlLU1kSXYOS1RYVF"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="KWLr1mHjhA0"
+                            titulo="Ficha del paciente"
+                            ariaLabel="Abrir video tutorial de fichas clínicas"
                             className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial de fichas clínicas"
-                        >
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                            </span>
-                            <span>Video Tutorial</span>
-                        </a>
+                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]"
+                        />
                         <div className="flex gap-2">
                             <button
                                 onClick={() => volverAFichas()}
@@ -1524,22 +1518,33 @@ export default function Paciente() {
                                         {/* Riel de línea de tiempo — angosto y monocromo a propósito, para
                                             dejarle casi todo el ancho a las fichas (antes ocupaba 4 de 12
                                             columnas solo para una etiqueta de mes). */}
-                                        <div className="relative flex flex-col items-center pt-1">
+                                        {/* Orden vertical del riel: punto → etiqueta del mes → línea.
+                                            La línea va DESPUÉS de la etiqueta como item de flex (no
+                                            absolute): antes se dibujaba absolute de top-4 a -bottom-7
+                                            cruzando toda la columna y, al ser un elemento posicionado
+                                            sobre un hermano estático, se pintaba ENCIMA del texto del
+                                            mes. Siendo un item más del flujo es imposible que lo pise,
+                                            sin importar cuántos grupos haya ni cuánto ocupe la etiqueta
+                                            (meses largos que envuelven en dos líneas incluidos).
+                                            flex-1 la estira hasta el fondo de la fila y -mb-7 cubre el
+                                            space-y-7 que separa los grupos, para empalmar con el punto
+                                            del grupo siguiente. */}
+                                        <div className="flex flex-col items-center pt-1">
                                             <span
-                                                className={`relative z-10 h-2.5 w-2.5 shrink-0 rounded-full ring-[3px] ring-white ${indiceGrupo === 0 ? "bg-slate-900 shadow-[0_0_0_1px_rgba(15,23,42,0.15)]" : "bg-slate-300"}`}
+                                                className={`h-2.5 w-2.5 shrink-0 rounded-full ring-[3px] ring-white ${indiceGrupo === 0 ? "bg-slate-900 shadow-[0_0_0_1px_rgba(15,23,42,0.15)]" : "bg-slate-300"}`}
                                             />
-                                            {indiceGrupo !== fichasAgrupadasPorMes.length - 1 && (
-                                                <span
-                                                    aria-hidden="true"
-                                                    className="absolute left-1/2 top-4 -bottom-7 w-px -translate-x-1/2 bg-slate-200"
-                                                />
-                                            )}
                                             <div className="mt-3 text-center">
                                                 <p className="text-[11px] font-bold leading-tight tracking-[-0.01em] text-slate-900">{grupo.etiqueta}</p>
                                                 <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                                                     {grupo.fichas.length} {grupo.fichas.length === 1 ? "registro" : "registros"}
                                                 </p>
                                             </div>
+                                            {indiceGrupo !== fichasAgrupadasPorMes.length - 1 && (
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="mt-3 -mb-7 w-px flex-1 bg-slate-200"
+                                                />
+                                            )}
                                         </div>
 
                                         <div className="min-w-0 space-y-4">

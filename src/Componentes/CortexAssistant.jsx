@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Minus, Send, X } from "lucide-react";
+import { useTour } from "@/ContextosGlobales/TourContext";
 
 const InteractiveNebulaOrb = dynamic(
   () => import("@/components/ui/InteractiveNebulaOrb").then((module) => module.InteractiveNebulaOrb),
@@ -21,6 +22,7 @@ const THINKING_LABELS = [
 ];
 
 export default function CortexAssistant() {
+  const { isRunning: tourActivo } = useTour();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [mockConversation, setMockConversation] = useState([]);
@@ -87,6 +89,11 @@ export default function CortexAssistant() {
     setMessage("");
     setIsEvolving(true);
   };
+
+  // Igual que el banner de notificaciones: z-[80] queda por debajo del overlay
+  // del tour (z-10000), así que durante el tutorial el orbe se vería como una
+  // mancha apagada en la esquina. Se oculta y vuelve al terminar.
+  if (tourActivo) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[80]">

@@ -3,6 +3,7 @@ import {useState, useEffect} from "react";
 import {toast} from "react-hot-toast";
 import ToasterClient from "@/Componentes/ToasterClient";
 import Image from "next/image";
+import { cfImageUrl } from "@/lib/cloudflare";
 
 export default function GestionStock() {
     const API = process.env.NEXT_PUBLIC_API_URL;
@@ -11,15 +12,16 @@ export default function GestionStock() {
     const [nuevoStock, setNuevoStock] = useState({});
     const [productoSimilar, setProductoSimilar] = useState("");
 
-    const CLOUDFLARE_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_HASH;
     const VARIANT_CARD = 'card';
     const VARIANT_FULL='full';
     const VARIANT_MINI = 'mini';
 
 
+    // Antes interpolaba NEXT_PUBLIC_CLOUDFLARE_HASH, que no está definida:
+    // producía URLs "imagedelivery.net/undefined/..." y ninguna miniatura
+    // cargaba.
     function cfToSrc(imageId) {
-        if (!imageId) return "";
-        return `https://imagedelivery.net/${CLOUDFLARE_HASH}/${imageId}/${VARIANT_MINI}`;
+        return cfImageUrl(imageId, VARIANT_MINI);
     }
 
     async function buscarProductoSimilar(productoSimilar){

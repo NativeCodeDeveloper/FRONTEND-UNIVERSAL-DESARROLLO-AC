@@ -22,6 +22,7 @@ import {
 
 import * as React from "react"
 import * as XLSX from "xlsx";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import {
     Select,
     SelectContent,
@@ -817,20 +818,12 @@ export default function AgendaCitas() {
                             </svg>
                             <span>Agendar Paciente</span>
                         </button>
-                        <a
-                            href="https://youtu.be/ga44dJoW62c?si=7lr5NnDPFcJfgzNI"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="ga44dJoW62c"
+                            titulo="Panel de reservas"
+                            ariaLabel="Abrir video tutorial del panel de citas"
                             className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial del panel de citas"
-                        >
-                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                            </span>
-                            <span>Video Tutorial</span>
-                        </a>
+                        />
                         {canSeeFichasClinicas && (
                             <button
                                 onClick={() => router.push("/dashboard/FichaClinica")}

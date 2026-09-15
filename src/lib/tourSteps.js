@@ -26,6 +26,14 @@
  *                        acordeones abiertos que persiste en sessionStorage.
  * selector: null      -> paso sin elemento anclado (mensaje centrado, usado
  *                        solo para el cierre del tour).
+ * optional: true     -> el paso pertenece a una rama que puede no existir en
+ *                        esta corrida (ej. ficha nueva vs. ficha existente).
+ *                        El tour compite entre los pasos opcionales
+ *                        consecutivos y entra solo al primero cuyo ancla esté
+ *                        realmente en el DOM; si ninguno aplica, cae al primer
+ *                        paso NO opcional que los sigue (el punto donde las
+ *                        ramas se vuelven a juntar). Sin esta bandera, cada
+ *                        rama que no aplica costaría el timeout completo.
  */
 
 export const TOUR_STEPS = [
@@ -208,7 +216,9 @@ export const TOUR_STEPS = [
     route: "/dashboard/calendario",
     selector: "#btn-nueva-reserva",
     title: "Calendario y Reservas",
-    description: "Haz clic en el botón morado \"Nueva reserva\" resaltado a la derecha para abrir el formulario.",
+    // Se nombra el botón por su texto, no por su color: el resaltado del tour ya
+    // lo señala y "morado" no le sirve a quien no distingue ese color.
+    description: "Haz clic en el botón <strong>\"Nueva reserva\"</strong> que está resaltado para abrir el formulario de la cita.",
     side: "left",
     align: "start",
     interactive: true,
@@ -247,21 +257,69 @@ export const TOUR_STEPS = [
     route: "/dashboard/calendario",
     selector: '[data-tour="reserva-guardar"]',
     title: "Calendario y Reservas",
-    description: "Haz clic en \"Agendar\" para guardar de verdad. Si falta algún dato obligatorio o el horario ya está ocupado, el sistema te avisa antes de confirmar.",
+    description: "Haz clic en <strong>\"Agendar\"</strong> para guardar de verdad. <div class=\"ac-tour-callout\"><span>Si falta un dato obligatorio o el horario ya está ocupado, el sistema te avisa con un mensaje en pantalla y la cita <strong>no</strong> se guarda. Si eso pasa, corrige lo que falte y vuelve a presionar \"Agendar\" antes de continuar.</span></div>",
     side: "top",
     interactive: true,
   },
 
   // ── De la reserva a la ficha clínica ─────────────────────────────────────
+  // Este tramo se bifurca según si el paciente ya tenía ficha o no:
+  //   sin ficha → /dashboard/NuevaFicha/{id}     (rama A, la del cliente nuevo)
+  //   con ficha → /dashboard/FichasPacientes/{id} (rama B)
+  // Por eso los pasos de ambas ramas van marcados `optional: true`: el tour
+  // compite entre ellos y entra solo a la rama que realmente se renderizó.
   {
     id: "panel-ver-ficha",
     grupo: "Pacientes y Fichas",
     route: "/dashboard",
     selector: '[data-tour="dashboard-tabla-citas"]',
     title: "Pacientes y Fichas",
-    description: "Tu reserva de prueba ya aparece aquí (la vas a reconocer por tu propio nombre). Búscala y presiona el ícono de ojo: si el paciente todavía no tiene ficha, el sistema te va a preguntar si quieres crearla con esos datos.",
+    description: "Tu reserva de prueba ya aparece aquí — la vas a reconocer por tu propio nombre. Búscala y <strong>haz clic en el ícono de ojo</strong> de esa fila para abrir su ficha. <div class=\"ac-tour-callout\"><span>Si el paciente todavía no tiene ficha, el navegador te va a mostrar una ventana preguntando si quieres crearla: presiona <strong>Aceptar</strong> y el tour sigue solo.</span></div>",
     side: "top",
+    // Interactivo a propósito: antes tenía botón "Siguiente", y quien lo
+    // presionaba se quedaba en /dashboard mientras el tour buscaba anclas que
+    // solo existen en la ficha — se saltaba el tramo completo sin avisar.
+    interactive: true,
+    // Viene después de "calendario-guardar", que es interactivo: al guardar, el
+    // drawer de la reserva se cierra, así que "Atrás" apuntaría a un formulario
+    // que ya no existe.
+    noPrevious: true,
   },
+
+  // ── Rama A: el paciente todavía no tenía ficha ───────────────────────────
+  {
+    id: "nueva-ficha-plantilla",
+    grupo: "Pacientes y Fichas",
+    route: null,
+    selector: '[data-tour="nueva-ficha-plantilla"]',
+    title: "Pacientes y Fichas",
+    description: "El paciente quedó creado con los datos de la reserva y esta es su primera ficha clínica. Empieza eligiendo la <strong>plantilla</strong>: define qué campos vas a registrar en la atención. Puedes crear tus propias plantillas después, en Plantillas y Exámenes.",
+    side: "bottom",
+    noPrevious: true,
+    optional: true,
+  },
+  {
+    id: "nueva-ficha-fecha",
+    grupo: "Pacientes y Fichas",
+    route: null,
+    selector: '[data-tour="nueva-ficha-fecha"]',
+    title: "Pacientes y Fichas",
+    description: "La <strong>fecha de consulta es obligatoria</strong> — es la que ordena el historial del paciente. Al lado puedes anotar qué profesional realizó la atención.",
+    side: "bottom",
+    optional: true,
+  },
+  {
+    id: "nueva-ficha-guardar",
+    grupo: "Pacientes y Fichas",
+    route: null,
+    selector: '[data-tour="nueva-ficha-guardar"]',
+    title: "Pacientes y Fichas",
+    description: "Al elegir la plantilla aparecen sus campos más abajo; los complétas y presionas <strong>\"Guardar Ficha Clínica\"</strong>. Cada atención que registres se va acumulando en el historial del paciente.",
+    side: "top",
+    optional: true,
+  },
+
+  // ── Rama B: el paciente ya tenía ficha ───────────────────────────────────
   {
     id: "fichas-detalle-acciones",
     grupo: "Pacientes y Fichas",
@@ -270,6 +328,8 @@ export const TOUR_STEPS = [
     title: "Pacientes y Fichas",
     description: "Esta es la ficha del paciente. Desde aquí creas una nueva ficha clínica (el registro de una atención), agendas otra cita, o abres Odontograma, Receta y Documentos según tus permisos.",
     side: "bottom",
+    noPrevious: true,
+    optional: true,
   },
   {
     id: "fichas-registros",
@@ -279,6 +339,7 @@ export const TOUR_STEPS = [
     title: "Pacientes y Fichas",
     description: "Todo el historial clínico del paciente queda ordenado cronológicamente aquí, agrupado por mes.",
     side: "top",
+    optional: true,
   },
 
   // ── Bloqueos ─────────────────────────────────────────────────────────────

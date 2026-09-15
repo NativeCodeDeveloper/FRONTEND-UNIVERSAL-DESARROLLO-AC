@@ -4,6 +4,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {toast, Toaster} from "react-hot-toast";
 import {InfoButton} from "@/Componentes/InfoButton";
 import ImageCropperModal from "@/Componentes/ImageCropperModal";
+import { cfImageUrl } from "@/lib/cloudflare";
 
 const PUBLICACIONES_CROP_ASPECT = 1; // Tarjetas cuadradas en /seccion3
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
@@ -41,7 +42,6 @@ export default function Publicaciones() {
     const [cropInsertImageSrc, setCropInsertImageSrc] = useState(null);
 
     const API = process.env.NEXT_PUBLIC_API_URL;
-    const CLOUDFLARE_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_HASH;
     const selectedPublication = listaPublicaciones.find((publicacion) => String(publicacion.id_publicaciones) === String(id_publicaciones));
     const selectedAllowsMultiple = Number(id_publicaciones) === 10;
 
@@ -420,11 +420,11 @@ export default function Publicaciones() {
         }
     }
 
+    // Delega en el helper compartido: acá el hash venía de una variable de
+    // entorno inexistente, así que este guard devolvía "" siempre y TODAS las
+    // miniaturas caían al placeholder gris.
     function cfToSrc(imageId, variant = VARIANT_CARD) {
-        if (!imageId) return "";
-        if (imageId.startsWith("http")) return imageId;
-        if (!CLOUDFLARE_HASH) return "";
-        return `https://imagedelivery.net/${CLOUDFLARE_HASH}/${imageId}/${variant}`;
+        return cfImageUrl(imageId, variant);
     }
 
     return (
@@ -480,6 +480,69 @@ export default function Publicaciones() {
                     {/* ── Columna Izquierda: Formularios (7 slots) ── */}
                     <div className="lg:col-span-7 space-y-8">
                         
+                        {/* Form: Insertar */}
+                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden transition-all hover:shadow-md">
+                            <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </div>
+                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">Crear Nueva Publicación</h2>
+                            </div>
+
+                            <form onSubmit={handleInsertSubmit} className="p-8 space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Descripción del Banner</label>
+                                            <input
+                                                type="text"
+                                                value={newDescripcion}
+                                                onChange={(e) => setNewDescripcion(e.target.value)}
+                                                className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+                                                placeholder="Ej: Especialistas en Ortodoncia..."
+                                                disabled={isInserting}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Imagen Principal</label>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleNewFileChange}
+                                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-slate-900 file:text-white hover:file:bg-slate-800 transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
+                                                disabled={isInserting}
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="aspect-square rounded-3xl border border-slate-100 bg-slate-50 overflow-hidden relative">
+                                        {newPreview ? (
+                                            <img src={newPreview} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Vista Previa</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 flex justify-end">
+                                    <button
+                                        type="submit"
+                                        disabled={isInserting}
+                                        className="h-12 px-8 bg-slate-900 text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isInserting ? "Insertando..." : "Confirmar Creación"}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                         {/* Form: Actualizar */}
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden transition-all hover:shadow-md">
                             <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
@@ -550,69 +613,6 @@ export default function Publicaciones() {
                                         className="h-12 px-8 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {isUploading ? "Procesando..." : "Actualizar Contenido"}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Form: Insertar */}
-                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden transition-all hover:shadow-md">
-                            <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-900 shadow-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </div>
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">Crear Nueva Publicación</h2>
-                            </div>
-
-                            <form onSubmit={handleInsertSubmit} className="p-8 space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Descripción del Banner</label>
-                                            <input
-                                                type="text"
-                                                value={newDescripcion}
-                                                onChange={(e) => setNewDescripcion(e.target.value)}
-                                                className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
-                                                placeholder="Ej: Especialistas en Ortodoncia..."
-                                                disabled={isInserting}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Imagen Principal</label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleNewFileChange}
-                                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-slate-900 file:text-white hover:file:bg-slate-800 transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
-                                                disabled={isInserting}
-                                            />
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="aspect-square rounded-3xl border border-slate-100 bg-slate-50 overflow-hidden relative">
-                                        {newPreview ? (
-                                            <img src={newPreview} alt="Preview" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-2">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                <span className="text-[10px] font-bold uppercase tracking-widest">Vista Previa</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={isInserting}
-                                        className="h-12 px-8 bg-slate-900 text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        {isInserting ? "Insertando..." : "Confirmar Creación"}
                                     </button>
                                 </div>
                             </form>

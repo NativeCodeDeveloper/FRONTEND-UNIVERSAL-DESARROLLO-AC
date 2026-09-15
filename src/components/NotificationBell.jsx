@@ -189,13 +189,19 @@ export default function NotificationBell() {
 
     return (
         <>
+            {/* Círculo completo en vez de rounded-2xl: junto al texto del pie
+                lee como un control de iOS. El estado abierto usa un anillo
+                interior (inset) en lugar de un borde real, así el botón no
+                cambia de tamaño al abrirse y no empuja el layout. */}
             <button ref={btnRef} onClick={toggle} title="Notificaciones"
-                className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl transition-all duration-150 ${
-                    open ? 'bg-[#EDE9FE] text-[#6E56CF]' : 'bg-slate-100/80 text-slate-400 hover:bg-[#F3F0FF] hover:text-[#6E56CF]'
+                className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+                    open
+                        ? 'bg-[#EDE9FE] text-[#6E56CF] shadow-[inset_0_0_0_1px_rgba(110,86,207,0.28)]'
+                        : 'bg-slate-100 text-slate-400 hover:bg-[#F3F0FF] hover:text-[#6E56CF] hover:shadow-[0_4px_10px_-4px_rgba(15,23,42,0.25)] active:scale-[0.94]'
                 }`}>
                 <Bell size={15} strokeWidth={1.8} />
                 {notifs.length > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-[#6E56CF] rounded-full flex items-center justify-center text-[8px] font-bold text-white leading-none ring-2 ring-white">
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 bg-[#6E56CF] rounded-full flex items-center justify-center text-[9px] font-bold text-white leading-none ring-2 ring-white shadow-[0_2px_6px_-1px_rgba(110,86,207,0.55)]">
                         {notifs.length > 9 ? '9+' : notifs.length}
                     </span>
                 )}

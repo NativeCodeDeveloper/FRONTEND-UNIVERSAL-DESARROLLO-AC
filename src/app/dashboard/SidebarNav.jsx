@@ -376,9 +376,18 @@ export default function SidebarNav() {
           })}
       </nav>
 
-      <div className="shrink-0 flex items-center justify-between border-t border-slate-100 px-4 py-2">
-        <span className="text-[11px] font-medium text-slate-400">Notificaciones</span>
-        <NotificationBell />
+      {/* Pie de notificaciones — tarjeta flotante.
+          Antes era una franja plana con una línea dura a todo el ancho. Ahora
+          es una tarjeta despegada de los bordes, con esquinas muy redondeadas,
+          borde hairline y sombra en dos capas: una de contacto (1px, casi
+          opaca) y otra difusa y muy abierta. Esa combinación es la que da la
+          sensación de profundidad suave sin que se vea una sombra "dibujada".
+          Sin degradados, acorde al resto del panel. */}
+      <div className="shrink-0 px-3 pb-3 pt-1.5">
+        <div className="flex items-center justify-between gap-2 rounded-[18px] border border-slate-200/70 bg-white px-3 py-2 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.28)] transition-shadow duration-200 hover:shadow-[0_1px_2px_rgba(15,23,42,0.05),0_14px_30px_-16px_rgba(15,23,42,0.34)]">
+          <span className="text-[11px] font-semibold tracking-[-0.01em] text-slate-500">Notificaciones</span>
+          <NotificationBell />
+        </div>
       </div>
     </>
   );

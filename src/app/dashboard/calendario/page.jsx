@@ -19,6 +19,7 @@ import { AppointmentDrawer } from "@/Componentes/AppointmentDrawer";
 import { AppointmentCard } from "@/Componentes/AppointmentCard";
 import { StatusFilterChips } from "@/Componentes/StatusFilterChips";
 import { getStateTokens } from "@/lib/designTokens";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 
 dayjs.locale("es");
 const localizer = dayjsLocalizer(dayjs);
@@ -74,6 +75,18 @@ function CalendarioContent() {
             .rbc-header + .rbc-header,
             .rbc-time-header-content + .rbc-time-header-content {
                 border-color: #F1F5F9 !important;
+            }
+            /* ── Fila "todo el día": se oculta ──
+               react-big-calendar siempre reserva esta fila en las vistas de
+               semana y día, y acá quedaba ocupando 58px vacíos que empujaban la
+               grilla horaria muy abajo (la cabecera medía 90px: 32 de los días
+               + 58 de esta fila). En esta agenda NINGÚN evento puede ser de día
+               completo — los tres puntos donde se construyen eventos fijan
+               allDay: false, y los bloqueos multi-día se expanden a segmentos
+               por día justamente para caer en la grilla horaria — así que la
+               fila es espacio muerto estructural, no un caso a futuro. */
+            .rbc-allday-cell {
+                display: none !important;
             }
             .rbc-time-view .rbc-time-gutter .rbc-label {
                 font-size: 11px !important;
@@ -2212,8 +2225,12 @@ function CalendarioContent() {
         );
     };
 
+    // whitespace-nowrap es lo que importa acá: el ancho de esta columna lo fija
+    // la etiqueta horaria ("8:00"), y en pantallas angostas "GMT-3" se partía en
+    // dos líneas ("GMT-" / "3"), estirando la cabecera. A 9px y sin quiebre
+    // entra siempre en una sola línea.
     const CustomTimeGutterHeader = () => (
-        <div className="flex items-center justify-center h-full text-[10px] text-slate-400 font-semibold tracking-wide bg-white border-b border-slate-100">
+        <div className="flex items-center justify-center h-full whitespace-nowrap text-[9px] text-slate-400 font-semibold tracking-wide bg-white border-b border-slate-100">
             GMT-3
         </div>
     );
@@ -2321,20 +2338,12 @@ function CalendarioContent() {
                             </svg>
                             <span>Ver Fichas</span>
                         </button>
-                        <a
-                            href="https://youtu.be/ga44dJoW62c?si=EgpcoP0G2QetqFJy"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="ga44dJoW62c"
+                            titulo="Calendario y reservas"
+                            ariaLabel="Abrir video tutorial del calendario de reservas"
                             className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial del calendario de reservas"
-                        >
-                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                            </span>
-                            <span>Video Tutorial</span>
-                        </a>
+                        />
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/bloqueosAgenda")}

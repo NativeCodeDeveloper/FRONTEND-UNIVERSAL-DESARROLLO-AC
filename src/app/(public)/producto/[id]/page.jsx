@@ -5,6 +5,7 @@ import {useCarritoGlobal} from "@/ContextosGlobales/CarritoContext";
 import {toast} from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import CarruselProducto from "@/Componentes/CarruselProducto";
+import { cfImageUrl } from "@/lib/cloudflare";
 import {
     Select,
     SelectContent,
@@ -86,7 +87,6 @@ export default function ProductoDetalle() {
 
     // CONSTANTE API QUE APUNTA AL SERVIDOR BACKEND PARA CONECTAR CON LOS ENDPOINDS EN VIEWS
     const API = process.env.NEXT_PUBLIC_API_URL;
-    const CLOUDFLARE_HASH = process.env.NEXT_PUBLIC_CLOUDFLARE_HASH;
     const VARIANT = 'full'
 
 
@@ -221,10 +221,10 @@ return (
                 <div className="flex items-start justify-center bg-slate-50/60 backdrop-blur rounded-2xl border border-slate-200 p-3 relative w-full max-w-2xl mx-auto overflow-hidden">
                     <div className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto pt-2">
                         <CarruselProducto
-                            imagen1={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${dataProductoSeleccionado.imagenProducto}/${VARIANT}`}
-                            imagen2={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${dataProductoSeleccionado.imagenProductoSegunda}/${VARIANT}`}
-                            imagen3={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${dataProductoSeleccionado.imagenProductoTercera}/${VARIANT}`}
-                            imagen4={`https://imagedelivery.net/${CLOUDFLARE_HASH}/${dataProductoSeleccionado.imagenProductoCuarta}/${VARIANT}`}
+                            imagen1={cfImageUrl(dataProductoSeleccionado.imagenProducto, VARIANT)}
+                            imagen2={cfImageUrl(dataProductoSeleccionado.imagenProductoSegunda, VARIANT)}
+                            imagen3={cfImageUrl(dataProductoSeleccionado.imagenProductoTercera, VARIANT)}
+                            imagen4={cfImageUrl(dataProductoSeleccionado.imagenProductoCuarta, VARIANT)}
 
                         />
 

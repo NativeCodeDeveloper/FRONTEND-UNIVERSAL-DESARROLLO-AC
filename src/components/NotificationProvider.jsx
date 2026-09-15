@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useAppointmentNotifications } from "@/hooks/useAppointmentNotifications"
 import { suscribirsePush, esIOS, esPWAInstalada } from "@/lib/pushSubscription"
+import { useTour } from "@/ContextosGlobales/TourContext"
 
 const DISMISS_KEY = "notif_banner_dismissed_until"
 const DISMISS_DAYS = 7
@@ -31,6 +32,7 @@ export default function NotificationProvider() {
     // "denied"  → bloqueado → no hacer nada
     const [permiso, setPermiso] = useState("idle")
     const [bannerVisible, setBannerVisible] = useState(false)
+    const { isRunning: tourActivo } = useTour()
 
     useEffect(() => {
         if (typeof Notification === "undefined") return
@@ -66,7 +68,12 @@ export default function NotificationProvider() {
     // Hook de polling — activo solo cuando el permiso está concedido
     useAppointmentNotifications(permiso === "granted")
 
-    if (!bannerVisible || permiso !== "default") return null
+    // Mientras el tutorial guiado corre, el banner se oculta: vive en z-50 y el
+    // overlay de driver.js está en z-10000, así que aparecería como una mancha
+    // gris ilegible abajo al centro, compitiendo con el paso resaltado. No se
+    // marca como descartado — `bannerVisible` sigue en true y el banner vuelve
+    // solo en cuanto el usuario cierra o termina el tour.
+    if (!bannerVisible || permiso !== "default" || tourActivo) return null
 
     return (
         <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4 animate-in slide-in-from-bottom-4 fade-in duration-300">

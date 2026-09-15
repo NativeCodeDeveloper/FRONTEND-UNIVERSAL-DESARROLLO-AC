@@ -364,7 +364,7 @@ export default function NuevaFicha() {
 
                     <div className="flex flex-col gap-3 p-3.5 sm:p-4">
                         {/* Selector de plantilla */}
-                        <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+                        <div data-tour="nueva-ficha-plantilla" className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
                             <label className="mb-1 block text-[9px] font-bold uppercase tracking-[0.14em] text-slate-500">
                                 Plantilla de ficha <span className="text-red-400 normal-case">*</span>
                             </label>
@@ -381,7 +381,7 @@ export default function NuevaFicha() {
                         </div>
 
                         {/* Fecha + Profesional */}
-                        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                        <div data-tour="nueva-ficha-fecha" className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                             <div className="relative overflow-hidden rounded-xl border-2 border-violet-200 bg-white p-3 shadow-[0_10px_24px_-20px_rgba(109,40,217,0.7)]">
                                 <div className="relative flex items-start justify-between gap-2">
                                     <div>
@@ -462,6 +462,7 @@ export default function NuevaFicha() {
                             </button>
                         </Link>
                         <button
+                            data-tour="nueva-ficha-guardar"
                             onClick={() => insertarFicha()}
                             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-black hover:bg-slate-800 rounded-xl transition-all shadow-sm"
                         >

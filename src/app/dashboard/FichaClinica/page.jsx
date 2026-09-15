@@ -9,6 +9,7 @@ import * as React from "react"
 import {useRouter} from "next/navigation";
 import {BookOpenIcon} from "@heroicons/react/24/outline";
 import { formatRut, cleanRut } from "@/lib/designTokens";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 
 
 export default function FichaClinica() {
@@ -138,20 +139,13 @@ export default function FichaClinica() {
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                        <a
-                            href="https://youtu.be/KWLr1mHjhA0?si=tMWgf6nDi-VBcXpu"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="KWLr1mHjhA0"
+                            titulo="Fichas clínicas"
+                            ariaLabel="Abrir video tutorial de fichas clínicas"
                             className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial de fichas clínicas"
-                        >
-                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                            </span>
-                            <span className="text-[10px] font-bold">Video Tutorial</span>
-                        </a>
+                            claseEtiqueta="text-[10px] font-bold"
+                        />
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/calendario")}

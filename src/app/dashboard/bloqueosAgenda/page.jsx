@@ -10,6 +10,7 @@ import { es } from "date-fns/locale";
 import { format, eachDayOfInterval } from "date-fns";
 import ToasterClient from "@/Componentes/ToasterClient";
 import { InfoButton } from "@/Componentes/InfoButton";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import {
     Table,
     TableBody,
@@ -348,20 +349,13 @@ export default function BloqueosAgendas() {
                             </svg>
                             <span>Agendar Paciente</span>
                         </Link>
-                        <a
-                            href="https://www.youtube.com/watch?t=1&v=2wT7jMPcTRM"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="2wT7jMPcTRM"
+                            inicio={1}
+                            titulo="Bloqueos de agenda"
+                            ariaLabel="Abrir video tutorial de bloqueo de agenda"
                             className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial de bloqueo de agenda"
-                        >
-                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="ml-px h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                    <path d="M8 5v14l11-7z" />
-                                </svg>
-                            </span>
-                            <span>Video Tutorial</span>
-                        </a>
+                        />
                         <InfoButton
                             informacion={'Bloquea días u horarios específicos para que no queden disponibles en la agenda pública.'}
                             pasos={[

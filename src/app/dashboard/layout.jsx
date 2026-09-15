@@ -47,8 +47,12 @@ export default function DashboardLayout({ children }) {
 
                     </div>
                 </div>
+
+                {/* Dentro de TourProvider a propósito: el banner de permisos
+                    necesita saber si el tour está corriendo para no aparecer
+                    sepultado bajo el overlay del tutorial (z-50 vs z-10000). */}
+                <NotificationProvider />
             </TourProvider>
-            <NotificationProvider />
         </ClerkProvider>
     );
 }
