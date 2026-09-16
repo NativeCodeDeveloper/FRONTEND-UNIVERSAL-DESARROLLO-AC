@@ -2,6 +2,7 @@
 'use client'
 import {useEffect, useState} from "react";
 import { previsionDesdeId } from "@/lib/previsiones";
+import { profesionalPorId, rutDeProfesional } from "@/lib/profesional";
 import {useParams, useRouter} from "next/navigation";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
@@ -360,10 +361,11 @@ export default function ReecetasPacientes() {
             doc.setFontSize(9);
             doc.setTextColor(71, 85, 105);
             doc.text(nombreProfesionalPDF, rightX, y + 16, {align: "right"});
-            doc.text(especialidadProfesionalFirmaPDF, rightX, y + 21, {align: "right"});
-            doc.text("Firma y timbre profesional", rightX, y + 26, {align: "right"});
+            doc.text(rutProfesionalPDF ? `RUT: ${rutProfesionalPDF}` : "-", rightX, y + 21, {align: "right"});
+            doc.text(especialidadProfesionalFirmaPDF, rightX, y + 26, {align: "right"});
+            doc.text("Firma y timbre profesional", rightX, y + 31, {align: "right"});
             doc.setTextColor(148, 163, 184);
-            doc.text(empresaNombre, rightX, y + 31, {align: "right"});
+            doc.text(empresaNombre, rightX, y + 36, {align: "right"});
 
             dibujarPie();
 
@@ -403,7 +405,12 @@ export default function ReecetasPacientes() {
                     id_paciente,
                     id_profesional,
                     profesional_responsable,
-                    descripcion_receta
+                    descripcion_receta,
+                    // La columna fecha_receta existe pero llegaba null: nadie la
+                    // enviaba y el backend no la genera. Se manda desde aqui en
+                    // formato DATETIME local (no UTC) para que el listado no
+                    // muestre la fecha corrida respecto a la emision real.
+                    fecha_receta: fechaHoraParaBackend()
                 }),
                 mode: "cors",
             })
@@ -548,16 +555,20 @@ export default function ReecetasPacientes() {
         }
     }
 
-    function formatearFechaHora(fechaIso) {
-        if (!fechaIso) return "-";
+    // "YYYY-MM-DD HH:mm:ss" en hora local, que es lo que espera un DATETIME de MySQL.
+    // Un ISO con Z guardaria la hora UTC y en Chile la receta apareceria emitida
+    // varias horas despues.
+    function fechaHoraParaBackend(fecha = new Date()) {
+        const dosDigitos = (n) => String(n).padStart(2, "0");
 
-        const fecha = new Date(fechaIso);
-
-        const dia = String(fecha.getDate()).padStart(2, "0");
-        const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+        const dia = dosDigitos(fecha.getDate());
+        const mes = dosDigitos(fecha.getMonth() + 1);
         const anio = fecha.getFullYear();
+        const hora = dosDigitos(fecha.getHours());
+        const minuto = dosDigitos(fecha.getMinutes());
+        const segundo = dosDigitos(fecha.getSeconds());
 
-        return `${dia}/${mes}/${anio}`;
+        return `${anio}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
     }
 
     async function limpiarFormulario() {
@@ -775,9 +786,10 @@ export default function ReecetasPacientes() {
                                                     value={uiOnlyProfesionalSeleccionado}
                                                     onValueChange={(value) => {
                                                         setUiOnlyProfesionalSeleccionado(value);
-                                                        const prof = listaProfesionales.find(p => String(p.id_profesional) === value);
+                                                        const prof = profesionalPorId(listaProfesionales, value);
                                                         setId_profesional(Number(value));
                                                         setProfesional_responsable(prof?.nombreProfesional || "");
+                                                        setRut_profesional_manual(rutDeProfesional(prof));
                                                     }}
                                                 >
                                                     <SelectTrigger className="h-10 w-full rounded-xl border-slate-200 bg-white text-sm text-slate-900 shadow-none">
@@ -928,7 +940,6 @@ export default function ReecetasPacientes() {
                                 <Table className="min-w-[700px]">
                                     <TableHeader>
                                         <TableRow className="bg-slate-50 border-b border-slate-100 hover:bg-slate-50">
-                                            <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Fecha</TableHead>
                                             <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Paciente</TableHead>
                                             <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Profesional</TableHead>
                                             <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Descripción</TableHead>
@@ -938,13 +949,12 @@ export default function ReecetasPacientes() {
                                     <TableBody>
                                         {listaRecetasPaciente.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={5} className="py-12 text-center text-sm text-slate-400">
+                                                <TableCell colSpan={4} className="py-12 text-center text-sm text-slate-400">
                                                     No hay recetas registradas para este paciente.
                                                 </TableCell>
                                             </TableRow>
                                         ) : listaRecetasPaciente.map((receta) => (
                                             <TableRow key={receta.id_receta} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                                                <TableCell className="px-6 py-4 text-[13px] font-medium text-slate-600">{formatearFechaHora(receta.fecha_receta)}</TableCell>
                                                 <TableCell className="px-6 py-4 text-[13px] font-semibold text-slate-900">{receta.nombre_paciente} {receta.apellido_paciente}</TableCell>
                                                 <TableCell className="px-6 py-4 text-[13px] text-slate-600">{receta.profesional_responsable}</TableCell>
                                                 <TableCell className="max-w-[380px] px-6 py-4 text-[13px] leading-5 text-slate-600 whitespace-normal">{receta.descripcion_receta}</TableCell>

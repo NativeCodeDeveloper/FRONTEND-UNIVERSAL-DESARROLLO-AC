@@ -24,9 +24,16 @@ export function ShadcnSelect({
                              }) {
     // `opciones` permite listas de cualquier largo; value1..value5 se mantiene para
     // los formularios que ya lo usaban.
-    const items = Array.isArray(opciones) && opciones.length > 0
+    // `opciones` acepta strings ("FONASA") o pares {value, label} para cuando el
+    // valor guardado difiere de lo que se muestra (ej. id de profesional / nombre).
+    const items = (Array.isArray(opciones) && opciones.length > 0
         ? opciones
-        : [value1, value2, value3, value4, value5].filter(Boolean);
+        : [value1, value2, value3, value4, value5].filter(Boolean)
+    ).map((item) =>
+        item && typeof item === "object"
+            ? { value: String(item.value), label: item.label ?? String(item.value) }
+            : { value: String(item), label: String(item) }
+    );
 
     return (
         <Select
@@ -41,7 +48,7 @@ export function ShadcnSelect({
             <SelectContent>
                 <SelectGroup>
                     {items.map((item) => (
-                        <SelectItem key={item} value={item}>{item}</SelectItem>
+                        <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
                     ))}
                 </SelectGroup>
             </SelectContent>

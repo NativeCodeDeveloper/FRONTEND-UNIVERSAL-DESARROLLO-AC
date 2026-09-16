@@ -44,7 +44,10 @@ export function useAppointmentNotifications(enabled) {
 
                 mostrarNotificacionNavegador("Cita próxima — AgendaClínica", {
                     body: `En ~${ANTICIPACION_MIN} min · ${cita.descripcion}`,
-                    icon: "/logo.png",
+                    // Mismo icono y badge que la notificacion push, para que ambas se vean
+                    // igual. /logo.png media 1536x1024 y no servia como icono.
+                    icon: "/icon-192.png",
+                    badge: "/badge-96.png",
                     tag: cita.id,         // evita duplicados a nivel del OS
                     renotify: false,
                 })

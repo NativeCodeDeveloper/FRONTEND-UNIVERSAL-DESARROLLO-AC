@@ -1,6 +1,8 @@
 "use client";
 
 import {useEffect, useMemo, useRef, useState} from "react";
+import { useProfesionales } from "@/hooks/useProfesionales";
+import { profesionalPorNombre, rutDeProfesional } from "@/lib/profesional";
 import {useParams, useRouter} from "next/navigation";
 import {jsPDF} from "jspdf";
 import {autoTable} from "jspdf-autotable";
@@ -120,6 +122,8 @@ export default function DetalleCotizacion() {
     const [fechaEmisionPDF, setFechaEmisionPDF] = useState(obtenerFechaLocalActual);
     const [enviandoCotizacionCorreo, setEnviandoCotizacionCorreo] = useState(false);
     const [envioCotizacionCorreoConfirmado, setEnvioCotizacionCorreoConfirmado] = useState(false);
+    // Permite recuperar el RUT del profesional para el pie de firma del PDF.
+    const listaProfesionales = useProfesionales();
     const [observacionesDetalle, setObservacionesDetalle] = useState("");
     const envioCotizacionCorreoEnCursoRef = useRef(false);
 
@@ -1063,7 +1067,8 @@ export default function DetalleCotizacion() {
         documento.text("• Para consultas comuníquese con la clínica antes de iniciar cualquier tratamiento.", margen, finalY + 10);
 
         finalY += 24;
-        if (finalY + 14 > altoPagina - 22) {
+        // El pie de firma puede ocupar hasta finalY + 17 (nombre, RUT y centro).
+        if (finalY + 22 > altoPagina - 22) {
             documento.addPage();
             dibujarEncabezado();
             finalY = 48;
@@ -1078,7 +1083,18 @@ export default function DetalleCotizacion() {
         documento.setTextColor(...MID);
         documento.text("Firma y Timbre Profesional", margen + sigW / 2, finalY + 5, {align: "center"});
         documento.setFontSize(6);
-        documento.text(nombreEmpresa, margen + sigW / 2, finalY + 9, {align: "center"});
+        if (profesionalTexto && profesionalTexto !== "-") {
+            documento.text(profesionalTexto, margen + sigW / 2, finalY + 9, {align: "center"});
+            // El RUT solo se imprime si el nombre calza con un profesional registrado,
+            // para no atribuir un RUT al profesional equivocado.
+            const rutFirma = rutDeProfesional(profesionalPorNombre(listaProfesionales, profesionalTexto));
+            if (rutFirma) {
+                documento.text(`RUT: ${rutFirma}`, margen + sigW / 2, finalY + 13, {align: "center"});
+            }
+            documento.text(nombreEmpresa, margen + sigW / 2, finalY + (rutFirma ? 17 : 13), {align: "center"});
+        } else {
+            documento.text(nombreEmpresa, margen + sigW / 2, finalY + 9, {align: "center"});
+        }
 
         documento.setFontSize(7);
         documento.line(rightX - sigW, finalY, rightX, finalY);

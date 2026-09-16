@@ -1,6 +1,7 @@
 'use client'
 
 import React, {useEffect, useMemo, useRef, useState} from "react";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import toast from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -8,6 +9,7 @@ import ToasterClient from "@/Componentes/ToasterClient";
 import ShadcnInput from "@/Componentes/shadcnInput2";
 import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
 import {useProfesionales} from "@/hooks/useProfesionales";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
 import {buscarPacientePorRut} from "@/lib/buscarPaciente";
 import {
     Select,
@@ -329,7 +331,12 @@ export default function ExamenDocumento() {
 
         doc.setFontSize(6.5);
         doc.setTextColor(120, 120, 120);
-        doc.text(`${nombreProfesional.trim() || "-"} · ${empresaNombre}`, contentLeft, firmaY + 10);
+        const rutEmisor = rutProfesional.trim();
+        doc.text(
+            `${nombreProfesional.trim() || "-"}${rutEmisor ? ` · RUT ${rutEmisor}` : ""} · ${empresaNombre}`,
+            contentLeft,
+            firmaY + 10
+        );
 
         doc.setDrawColor(190, 190, 190);
         doc.line(contentLeft, footerY - 5, contentRight, footerY - 5);
@@ -361,15 +368,13 @@ export default function ExamenDocumento() {
                             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
                                 Completa los antecedentes clínicos básicos y arma una orden de exámenes con un formato sobrio, legible y adecuado para entrega hospitalaria.
                             </p>
-                            <a
-                                href="https://youtu.be/w7lKsLYkDmU?si=6jU-G3bM5omCS5AE"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <BotonVideoTutorial
+                                videoId="w7lKsLYkDmU"
+                                titulo="Solicitud de exámenes"
+                                etiqueta="Video tutorial"
+                                ariaLabel="Abrir video tutorial de solicitud de exámenes"
                                 className="mt-4 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                                aria-label="Abrir video tutorial de solicitud de exámenes"
-                            >
-                                Video tutorial
-                            </a>
+                            />
                         </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
@@ -425,8 +430,9 @@ export default function ExamenDocumento() {
                                         value={idProfesional}
                                         onValueChange={(value) => {
                                             setIdProfesional(value);
-                                            const prof = listaProfesionales.find(p => String(p.id_profesional) === value);
+                                            const prof = profesionalPorId(listaProfesionales, value);
                                             setNombreProfesional(prof?.nombreProfesional || "");
+                                            setRutProfesional(rutDeProfesional(prof));
                                         }}
                                     >
                                         <SelectTrigger className="h-10 w-full rounded-md border-slate-200 bg-white text-sm text-slate-900 shadow-none">
@@ -447,9 +453,22 @@ export default function ExamenDocumento() {
                                     <ShadcnInput
                                         value={rutProfesional}
                                         placeholder="Ej: 12.345.678-9"
-                                        onChange={(e) => setRutProfesional(e.target.value)}
+                                        onChange={(e) => {
+                                            const valor = e.target.value;
+                                            setRutProfesional(valor);
+                                            const prof = profesionalPorRut(listaProfesionales, valor);
+                                            if (prof) {
+                                                setIdProfesional(String(prof.id_profesional));
+                                                setNombreProfesional(prof.nombreProfesional || "");
+                                            }
+                                        }}
                                         className="w-full"
                                     />
+                                    {profesionalPorRut(listaProfesionales, rutProfesional) ? (
+                                        <p className="mt-1 text-[11px] font-medium text-emerald-600">
+                                            Profesional registrado · datos completados automáticamente
+                                        </p>
+                                    ) : null}
                                 </div>
 
                                 <div>

@@ -1,5 +1,6 @@
 'use client'
 import React, {useState, useEffect, useMemo} from "react";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import {
     Table,
     TableBody,
@@ -18,6 +19,7 @@ import {SelectDinamic} from "@/Componentes/SelectDinamic";
 import {InputTextDinamic} from "@/Componentes/InputTextDinamic";
 import { useEmpresaNombre } from "@/hooks/useEmpresaNombre";
 import { useProfesionales } from "@/hooks/useProfesionales";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
 
 
 
@@ -339,15 +341,13 @@ export default function PresupuestoTratamiento() {
                         >
                             Ir a prestaciones
                         </a>
-                        <a
-                            href="https://youtu.be/RUGGZeSXmFk?si=NiBqgM_ZN2Jnh2t_"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="RUGGZeSXmFk"
+                            titulo="Presupuesto de tratamiento"
+                            etiqueta="Video tutorial"
+                            ariaLabel="Abrir video tutorial de presupuesto de tratamiento"
                             className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial de presupuesto de tratamiento"
-                        >
-                            Video tutorial
-                        </a>
+                        />
                     </div>
                 </div>
 
@@ -456,7 +456,13 @@ export default function PresupuestoTratamiento() {
                                         <label className="block text-sm font-medium text-slate-700 mb-1.5">Profesional</label>
                                         <SelectDinamic
                                             value={nombreProfesional}
-                                            onChange={(e) => setNombreProfesional(e.target.value)}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setNombreProfesional(value);
+                                                setRutProfesionalManual(
+                                                    rutDeProfesional(profesionalPorId(listaProfesionales, value))
+                                                );
+                                            }}
                                             className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-100"
                                             options={listaProfesionales.map(profesional => ({
                                                 value: profesional.id_profesional,
@@ -469,10 +475,20 @@ export default function PresupuestoTratamiento() {
                                         <label className="block text-sm font-medium text-slate-700 mb-1.5">RUT profesional</label>
                                         <InputTextDinamic
                                             value={rutProfesionalManual}
-                                            onChange={(e) => setRutProfesionalManual(e.target.value)}
+                                            onChange={(e) => {
+                                                const valor = e.target.value;
+                                                setRutProfesionalManual(valor);
+                                                const prof = profesionalPorRut(listaProfesionales, valor);
+                                                if (prof) setNombreProfesional(prof.id_profesional);
+                                            }}
                                             placeholder="Ej: 12.345.678-9"
                                             className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-100"
                                         />
+                                        {profesionalPorRut(listaProfesionales, rutProfesionalManual) ? (
+                                            <p className="mt-1 text-[11px] font-medium text-emerald-600">
+                                                Profesional registrado · datos completados automáticamente
+                                            </p>
+                                        ) : null}
                                     </div>
                                 </div>
 

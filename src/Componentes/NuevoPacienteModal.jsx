@@ -270,7 +270,7 @@ export default function NuevoPacienteModal({ abierto, onCerrar, onCreado }) {
     "h-11 rounded-xl border-slate-200 placeholder:text-slate-400 focus:border-slate-900";
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
+    <div data-tour-modal className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
       <div
         onClick={cerrar}
         className={`absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity duration-300 ${

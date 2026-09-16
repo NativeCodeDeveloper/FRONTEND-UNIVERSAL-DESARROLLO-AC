@@ -9,9 +9,14 @@ export default function manifest() {
         theme_color: '#6E56CF',
         orientation: 'portrait-primary',
         lang: 'es',
+        // `any` y `maskable` van en entradas separadas: declarar ambos propositos en
+        // el mismo archivo deja que el sistema elija, y en Android el recorte
+        // circular del icono maskable puede comerse los bordes del logo.
         icons: [
-            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
     };
 }

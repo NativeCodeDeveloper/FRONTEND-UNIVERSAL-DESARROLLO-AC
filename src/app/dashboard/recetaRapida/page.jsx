@@ -1,6 +1,7 @@
 'use client'
 
 import {useMemo, useRef, useState} from "react";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import jsPDF from "jspdf";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
@@ -8,6 +9,7 @@ import ShadcnInput from "@/Componentes/shadcnInput2";
 import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
 import {useProfesionales} from "@/hooks/useProfesionales";
 import {buscarPacientePorRut} from "@/lib/buscarPaciente";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
 import {
     Select,
     SelectContent,
@@ -239,7 +241,9 @@ export default function RecetaRapida() {
             const altoCaja = Math.max(88, alturaTexto + 18);
             doc.roundedRect(margin - 2, inicioCaja, rightX - margin + 4, altoCaja, 1.5, 1.5);
 
-            const firmaY = Math.min(pageH - 46, inicioCaja + altoCaja + 34);
+            // pageH - 51: el bloque de firma crecio 5mm al sumar el RUT; este tope
+            // conserva la misma separacion con el pie de pagina que habia antes.
+            const firmaY = Math.min(pageH - 51, inicioCaja + altoCaja + 34);
 
             doc.setDrawColor(148, 163, 184);
             doc.setLineWidth(0.35);
@@ -250,10 +254,12 @@ export default function RecetaRapida() {
             doc.setTextColor(71, 85, 105);
             doc.text(nombreProfesional, rightX, firmaY + 6, {align: "right"});
             doc.setFontSize(8);
-            doc.text(especialidadProfesional || "-", rightX, firmaY + 11, {align: "right"});
-            doc.text("Firma y timbre profesional", rightX, firmaY + 16, {align: "right"});
+            const rutFirma = (rutProfesional || "").trim();
+            doc.text(rutFirma ? `RUT: ${rutFirma}` : "-", rightX, firmaY + 11, {align: "right"});
+            doc.text(especialidadProfesional || "-", rightX, firmaY + 16, {align: "right"});
+            doc.text("Firma y timbre profesional", rightX, firmaY + 21, {align: "right"});
             doc.setTextColor(148, 163, 184);
-            doc.text(empresaNombre, rightX, firmaY + 21, {align: "right"});
+            doc.text(empresaNombre, rightX, firmaY + 26, {align: "right"});
 
             const footerY = pageH - 14;
             doc.setDrawColor(226, 232, 240);
@@ -287,15 +293,13 @@ export default function RecetaRapida() {
                             <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                                 Receta rápida
                             </h1>
-                            <a
-                                href="https://youtu.be/eZhpFPow0MA?si=EwgGXBk17EqX9_qu"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <BotonVideoTutorial
+                                videoId="eZhpFPow0MA"
+                                titulo="Receta rápida"
+                                etiqueta="Video tutorial"
+                                ariaLabel="Abrir video tutorial de receta rápida"
                                 className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                                aria-label="Abrir video tutorial de receta rápida"
-                            >
-                                Video tutorial
-                            </a>
+                            />
                         </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
@@ -371,8 +375,9 @@ export default function RecetaRapida() {
                                         value={idProfesional}
                                         onValueChange={(value) => {
                                             setIdProfesional(value);
-                                            const prof = listaProfesionales.find(p => String(p.id_profesional) === value);
+                                            const prof = profesionalPorId(listaProfesionales, value);
                                             setNombreProfesional(prof?.nombreProfesional || "");
+                                            setRutProfesional(rutDeProfesional(prof));
                                         }}
                                     >
                                         <SelectTrigger className="h-10 w-full rounded-md border-slate-200 bg-white text-sm text-slate-900 shadow-none">
@@ -393,9 +398,22 @@ export default function RecetaRapida() {
                                     <ShadcnInput
                                         value={rutProfesional}
                                         placeholder="Ej: 12.345.678-9"
-                                        onChange={(e) => setRutProfesional(e.target.value)}
+                                        onChange={(e) => {
+                                            const valor = e.target.value;
+                                            setRutProfesional(valor);
+                                            const prof = profesionalPorRut(listaProfesionales, valor);
+                                            if (prof) {
+                                                setIdProfesional(String(prof.id_profesional));
+                                                setNombreProfesional(prof.nombreProfesional || "");
+                                            }
+                                        }}
                                         className="w-full"
                                     />
+                                    {profesionalPorRut(listaProfesionales, rutProfesional) ? (
+                                        <p className="mt-1 text-[11px] font-medium text-emerald-600">
+                                            Profesional registrado · datos completados automáticamente
+                                        </p>
+                                    ) : null}
                                 </div>
 
                                 <div>

@@ -1,5 +1,6 @@
 'use client'
 import {useState, useEffect} from 'react'
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import {useParams, useRouter} from "next/navigation";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
@@ -261,15 +262,13 @@ export default function OdontogramasPaciente() {
                                     </svg>
                                     Nuevo Odontograma
                                 </button>
-                                <a
-                                    href="https://youtu.be/L_J7Pf9qh4c?si=izAQeZ2G6b15HAMy"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <BotonVideoTutorial
+                                    videoId="L_J7Pf9qh4c"
+                                    titulo="Odontograma"
+                                    etiqueta="Video tutorial"
+                                    ariaLabel="Abrir video tutorial del odontograma"
                                     className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-150"
-                                    aria-label="Abrir video tutorial del odontograma"
-                                >
-                                    Video tutorial
-                                </a>
+                                />
                                 <button
                                     onClick={() => irCarpetaClinica(id_paciente)}
                                     className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all duration-150"

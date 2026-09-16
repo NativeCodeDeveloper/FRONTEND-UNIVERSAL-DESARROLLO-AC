@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import {
     Table,
     TableBody,
@@ -430,15 +431,13 @@ useEffect(() => {
                         >
                             Ir a presupuestos
                         </a>
-                        <a
-                            href="https://youtu.be/RUGGZeSXmFk?si=NiBqgM_ZN2Jnh2t_"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <BotonVideoTutorial
+                            videoId="RUGGZeSXmFk"
+                            titulo="Prestaciones y servicios"
+                            etiqueta="Video tutorial"
+                            ariaLabel="Abrir video tutorial de prestaciones y servicios"
                             className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                            aria-label="Abrir video tutorial de prestaciones y servicios"
-                        >
-                            Video tutorial
-                        </a>
+                        />
                         <InfoButton
                             informacion={'Registra los servicios, prestaciones y productos disponibles para generar presupuestos de tratamiento.'}
                             pasos={[

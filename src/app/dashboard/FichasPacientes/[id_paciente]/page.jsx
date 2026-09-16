@@ -3,6 +3,8 @@ import {useParams} from "next/navigation";
 import {useState, useEffect, useRef, useMemo} from "react";
 import { useUser } from "@clerk/nextjs";
 import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
+import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
+import { claveFechaCivil, formatearFechaCivil } from "@/lib/fechas";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -154,8 +156,11 @@ export default function Paciente() {
     const [mostrarFormulario, setMostrarFormulario] = useState(false);
     const formularioEdicionRef = useRef(null);
 
+    const [modalFichaAbierto, setModalFichaAbierto] = useState(false);
+
+    // La ficha se rellena en un modal, sin salir de la carpeta del paciente.
     function nuevaFichaClinica() {
-        router.push(`/dashboard/NuevaFicha/${id_paciente}`);
+        setModalFichaAbierto(true);
     }
 
     function editarPaciente() {
@@ -636,7 +641,16 @@ export default function Paciente() {
     const totalFichas = listaFichas.length;
 
     const listaFichasOrdenada = useMemo(() => {
-        return [...listaFichas].sort((a, b) => new Date(b.fechaConsulta) - new Date(a.fechaConsulta));
+        return [...listaFichas].sort((a, b) => {
+            // Se comparan como texto "AAAA-MM-DD" para no pasar por Date, que
+            // desplaza el dia segun la zona horaria.
+            const fechaA = claveFechaCivil(a.fechaConsulta);
+            const fechaB = claveFechaCivil(b.fechaConsulta);
+
+            if (fechaA !== fechaB) return fechaB.localeCompare(fechaA);
+
+            return Number(b.id_ficha) - Number(a.id_ficha);
+        });
     }, [listaFichas]);
 
     const fichasAgrupadasPorMes = useMemo(() => {
@@ -1556,7 +1570,7 @@ export default function Paciente() {
                                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                                 </svg>
-                                                                {formatearFecha(ficha.fechaConsulta)}
+                                                                {formatearFechaCivil(ficha.fechaConsulta)}
                                                             </p>
                                                             <span className="inline-flex h-6 items-center rounded-lg border border-violet-100 bg-violet-50/80 px-2 text-[9px] font-bold text-[#6E56CF]">
                                                                 N° Registro {ficha.id_ficha}
@@ -1616,6 +1630,14 @@ export default function Paciente() {
                         </div>
                 </div>
             </div>
+
+            <FichaClinicaModal
+                abierto={modalFichaAbierto}
+                paciente={pacienteActual}
+                id_paciente={id_paciente}
+                onCerrar={() => setModalFichaAbierto(false)}
+                onGuardada={() => listarFichasClinicasPaciente(id_paciente)}
+            />
         </div>
     )
 }

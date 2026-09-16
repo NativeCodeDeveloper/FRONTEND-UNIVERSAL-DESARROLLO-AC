@@ -8,6 +8,7 @@ import ShadcnInput from "@/Componentes/shadcnInput2";
 import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
 import {useProfesionales} from "@/hooks/useProfesionales";
 import {buscarPacientePorRut} from "@/lib/buscarPaciente";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
 import {
     Select,
     SelectContent,
@@ -393,7 +394,9 @@ export default function RecetaLentesPage() {
             const observacionesLineas = doc.splitTextToSize(observaciones, contentW - 20);
             doc.text(observacionesLineas, margin + 6, y + 7, {lineHeightFactor: 1.5});
 
-            const signatureY = pageH - 26;
+            // pageH - 32: el bloque de firma sumo la linea del RUT; sin subirlo, esa
+            // linea caia por debajo del pie de pagina (pageH - 16).
+            const signatureY = pageH - 32;
             doc.setDrawColor(180, 187, 200);
             doc.line(pageW - margin - 54, signatureY, pageW - margin - 6, signatureY);
             doc.setFont("helvetica", "normal");
@@ -402,6 +405,11 @@ export default function RecetaLentesPage() {
             doc.text("Firma y timbre del profesional", pageW - margin - 30, signatureY + 5, {align: "center"});
             doc.setTextColor(...text);
             doc.text(valorVisual(formulario.nombreProfesional, ""), pageW - margin - 30, signatureY + 9, {align: "center"});
+            const rutFirmaLentes = formulario.rutProfesional.trim();
+            if (rutFirmaLentes) {
+                doc.setTextColor(...muted);
+                doc.text(`RUT: ${rutFirmaLentes}`, pageW - margin - 30, signatureY + 13, {align: "center"});
+            }
 
             doc.setDrawColor(...line);
             doc.line(margin + 6, pageH - 16, pageW - margin - 6, pageH - 16);
@@ -516,9 +524,13 @@ export default function RecetaLentesPage() {
                                         <Select
                                             value={formulario.idProfesional}
                                             onValueChange={(value) => {
-                                                updateField("idProfesional", value);
-                                                const prof = listaProfesionales.find(p => String(p.id_profesional) === value);
-                                                updateField("nombreProfesional", prof?.nombreProfesional || "");
+                                                const prof = profesionalPorId(listaProfesionales, value);
+                                                setFormulario((prev) => ({
+                                                    ...prev,
+                                                    idProfesional: value,
+                                                    nombreProfesional: prof?.nombreProfesional || "",
+                                                    rutProfesional: rutDeProfesional(prof),
+                                                }));
                                             }}
                                         >
                                             <SelectTrigger className="h-10 w-full rounded-md border-slate-200 bg-white text-sm text-slate-900 shadow-none">
@@ -536,7 +548,20 @@ export default function RecetaLentesPage() {
                                     <InputField
                                         label="RUT profesional"
                                         value={formulario.rutProfesional}
-                                        onChange={(e) => updateField("rutProfesional", e.target.value)}
+                                        onChange={(e) => {
+                                            const valor = e.target.value;
+                                            const prof = profesionalPorRut(listaProfesionales, valor);
+                                            setFormulario((prev) => ({
+                                                ...prev,
+                                                rutProfesional: valor,
+                                                ...(prof
+                                                    ? {
+                                                          idProfesional: String(prof.id_profesional),
+                                                          nombreProfesional: prof.nombreProfesional || "",
+                                                      }
+                                                    : {}),
+                                            }));
+                                        }}
                                         placeholder="Ej: 17.517.094-4"
                                         className="md:col-span-2"
                                     />

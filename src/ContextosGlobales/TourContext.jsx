@@ -275,6 +275,33 @@ export function TourProvider({ children }) {
                     if (step.skipIfExpanded && contentWrapper && !isCollapsed) {
                         driverRef.current?.moveNext();
                     }
+
+                    // autoAbrir: pasos cuyo contenido vive dentro de un modal. El tour
+                    // abre el modal por su cuenta en vez de confiar en que el usuario
+                    // adivine que debe pulsar el boton; sin esto, los pasos siguientes
+                    // anclan a campos que todavia no estan en el DOM y se pierden en el
+                    // timeout. Se comprueba que no haya ya un modal abierto para no
+                    // cerrarlo al volver atras sobre el mismo paso.
+                    // Si el paso apunta a algo que NO esta dentro de un modal pero
+                    // quedo uno abierto de un paso anterior, se cierra: un modal
+                    // abierto bloquea el scroll del fondo y atrapa el foco, y dejaria
+                    // el resto del tour inutilizable.
+                    const modalAbierto = document.querySelector("[data-tour-modal]");
+                    if (modalAbierto && !modalAbierto.contains(element)) {
+                        const cerrar = modalAbierto.querySelector('[aria-label="Cerrar"]');
+                        if (cerrar) {
+                            cerrar.click();
+                            window.setTimeout(() => driverRef.current?.refresh(), 340);
+                        }
+                    }
+
+                    if (step.autoAbrir && !document.querySelector('[role="dialog"]')) {
+                        element.click();
+                        // El panel entra con una animacion de 300ms; driver.js no vuelve
+                        // a medir solo, asi que se refresca al terminar para que el
+                        // recuadro quede bien puesto sobre el campo.
+                        window.setTimeout(() => driverRef.current?.refresh(), 340);
+                    }
                 },
                 popover: {
                     side: step.side || "right",
@@ -356,6 +383,7 @@ export function TourProvider({ children }) {
                 detachWatchersRef.current?.();
                 detachWatchersRef.current = null;
                 setIsRunning(false);
+                document.documentElement.style.scrollBehavior = scrollPrevioRef.current || "";
                 try { localStorage.setItem(COMPLETED_KEY, "1"); } catch {}
 
                 // Solo redirige a Panel de Reservas si el tour terminó de forma
@@ -373,11 +401,16 @@ export function TourProvider({ children }) {
         return instance;
     }, [router, tourSteps, tourGroups]);
 
+    // Guarda el valor original para devolverlo al terminar el tour.
+    const scrollPrevioRef = useRef(null);
+
     const start = useCallback(() => {
         const instance = buildDriver();
         const firstStep = tourSteps[0];
 
         setIsRunning(true);
+        scrollPrevioRef.current = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = "auto";
         lastHighlightedRef.current = null;
         detachWatchersRef.current?.();
         detachWatchersRef.current = attachLayoutWatchers(() => driverRef.current);

@@ -58,6 +58,18 @@ export const TOUR_STEPS = [
     side: "right",
   },
   {
+    id: "profesional-nuevo",
+    grupo: "Configuración inicial",
+    route: "/dashboard/profesionales",
+    selector: '[data-tour="profesional-nuevo"]',
+    title: "Paso 1: Crea un profesional",
+    description: "Cada profesional que registres aparece aquí como una tarjeta, con su agenda propia. Presiona <strong>\"Registrar Profesional\"</strong> — te abrimos el formulario y seguimos juntos.",
+    side: "bottom",
+    // El formulario vive en un modal: el tour lo abre solo para que los pasos
+    // siguientes encuentren los campos en pantalla.
+    autoAbrir: true,
+  },
+  {
     id: "profesional-nombre",
     grupo: "Configuración inicial",
     route: "/dashboard/profesionales",
@@ -67,12 +79,39 @@ export const TOUR_STEPS = [
     side: "bottom",
   },
   {
+    id: "profesional-correo",
+    grupo: "Configuración inicial",
+    route: "/dashboard/profesionales",
+    selector: '[data-tour="profesional-correo"]',
+    title: "Paso 1: Crea un profesional",
+    description: "El <strong>correo del profesional</strong>. Es obligatorio y sirve para contactarlo y para identificarlo dentro de la plataforma.",
+    side: "bottom",
+  },
+  {
+    id: "profesional-telefono",
+    grupo: "Configuración inicial",
+    route: "/dashboard/profesionales",
+    selector: '[data-tour="profesional-telefono"]',
+    title: "Paso 1: Crea un profesional",
+    description: "El <strong>teléfono</strong>, también obligatorio. Puedes escribirlo como 12345678 o +56912345678: el campo lo ordena solo y te avisa si quedó incompleto.",
+    side: "bottom",
+  },
+  {
+    id: "profesional-rut",
+    grupo: "Configuración inicial",
+    route: "/dashboard/profesionales",
+    selector: '[data-tour="profesional-rut"]',
+    title: "Paso 1: Crea un profesional",
+    description: "El <strong>RUT del profesional</strong>. Escríbelo sin puntos ni guión, que se formatea solo. <strong>Es importante:</strong> este RUT viaja después al pie de firma de cada receta, orden de examen y presupuesto que emita, sin que nadie tenga que volver a escribirlo.",
+    side: "bottom",
+  },
+  {
     id: "profesional-descripcion",
     grupo: "Configuración inicial",
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-descripcion"]',
     title: "Paso 1: Crea un profesional",
-    description: "Aquí va una descripción breve del profesional — por ejemplo su especialidad. <strong>Que sea corta, de una o dos líneas</strong>: esta descripción se muestra tal cual en tu página web, así que mientras más simple y clara, mejor se ve para tus pacientes.",
+    description: "Aquí va la especialidad del profesional. <strong>Que sea corta, de una o dos líneas</strong>: se muestra tal cual en tu página web, así que mientras más simple y clara, mejor se ve para tus pacientes. El correo, el teléfono y el RUT también son obligatorios — el RUT se usa después para firmar recetas y documentos.",
     side: "bottom",
   },
   {
@@ -81,8 +120,20 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-guardar"]',
     title: "Paso 1: Crea un profesional",
-    description: "Presiona <strong>\"Guardar Profesional\"</strong> para crearlo. En cuanto lo guardes, este profesional ya tiene su propia agenda lista — solo falta darle un servicio para que pueda recibir reservas. Repite este paso por cada profesional que atienda en tu clínica.",
+    description: "Presiona <strong>\"Registrar Profesional\"</strong> para crearlo. En cuanto lo guardes aparece como tarjeta en la lista, con su agenda lista — solo falta darle un servicio para que pueda recibir reservas. Repite este paso por cada profesional de tu clínica.",
     side: "top",
+  },
+  {
+    id: "profesional-lista",
+    grupo: "Configuración inicial",
+    route: "/dashboard/profesionales",
+    selector: '[data-tour="profesional-lista"]',
+    title: "Paso 1: Crea un profesional",
+    description: "Así queda cada profesional: una tarjeta con su correo, teléfono y RUT a la vista. Desde aquí lo <strong>editas</strong> o lo <strong>eliminas</strong> cuando lo necesites, y el buscador de arriba te sirve cuando ya tengas varios.",
+    side: "top",
+    // Opcional: si todavia no hay ningun profesional creado, esta lista no existe
+    // en pantalla y el tour sigue de largo sin quedarse esperando.
+    optional: true,
   },
   {
     id: "config-servicios",
@@ -272,7 +323,10 @@ export const TOUR_STEPS = [
     id: "panel-ver-ficha",
     grupo: "Pacientes y Fichas",
     route: "/dashboard",
-    selector: '[data-tour="dashboard-tabla-citas"]',
+    // Se ancla al encabezado y no a la tarjeta completa: con cientos de citas ese
+    // contenedor mide miles de pixeles y driver.js no puede recuadrarlo, dejando el
+    // popover tirado en una esquina.
+    selector: '[data-tour="dashboard-citas-header"]',
     title: "Pacientes y Fichas",
     description: "Tu reserva de prueba ya aparece aquí — la vas a reconocer por tu propio nombre. Búscala y <strong>haz clic en el ícono de ojo</strong> de esa fila para abrir su ficha. <div class=\"ac-tour-callout\"><span>Si el paciente todavía no tiene ficha, el navegador te va a mostrar una ventana preguntando si quieres crearla: presiona <strong>Aceptar</strong> y el tour sigue solo.</span></div>",
     side: "top",
@@ -304,7 +358,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="nueva-ficha-fecha"]',
     title: "Pacientes y Fichas",
-    description: "La <strong>fecha de consulta es obligatoria</strong> — es la que ordena el historial del paciente. Al lado puedes anotar qué profesional realizó la atención.",
+    description: "La <strong>fecha de consulta es obligatoria</strong> — es la que ordena el historial del paciente. A la derecha eliges al <strong>profesional</strong> de una lista: su RUT se completa solo, sin que tengas que escribirlo.",
     side: "bottom",
     optional: true,
   },
@@ -326,7 +380,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="ficha-acciones-rapidas"]',
     title: "Pacientes y Fichas",
-    description: "Esta es la ficha del paciente. Desde aquí creas una nueva ficha clínica (el registro de una atención), agendas otra cita, o abres Odontograma, Receta y Documentos según tus permisos.",
+    description: "Esta es la carpeta del paciente. Con <strong>\"Ficha\"</strong> registras una nueva atención en una ventana, sin salir de aquí ni perder lo que estás viendo. También agendas otra cita, o abres Odontograma, Receta y Documentos según tus permisos.",
     side: "bottom",
     noPrevious: true,
     optional: true,

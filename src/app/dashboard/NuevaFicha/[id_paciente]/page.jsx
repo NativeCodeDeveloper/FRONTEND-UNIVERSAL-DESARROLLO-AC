@@ -11,6 +11,9 @@ import {ShadcnInput} from "@/Componentes/shadcnInput";
 import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {useRouter} from "next/navigation";
 import { formatRut } from "@/lib/designTokens";
+import { useProfesionales } from "@/hooks/useProfesionales";
+import { etiquetaProfesionalConRut, profesionalPorId } from "@/lib/profesional";
+import { ShadcnSelect } from "@/Componentes/shadcnSelect";
 import {
     Accordion,
     AccordionContent,
@@ -65,6 +68,10 @@ export default function NuevaFicha() {
     // Campos base
     const [fechaConsulta, setFechaConsulta] = useState("");
     const [observacionesPrecio, setObservacionesPrecio] = useState("");
+    // El profesional a cargo se guarda como texto en `observaciones`: el selector
+    // arma esa cadena con nombre y RUT para no tipearla en cada ficha.
+    const listaProfesionales = useProfesionales();
+    const [idProfesionalFicha, setIdProfesionalFicha] = useState("");
 
     // Plantilla dinámica
     const [plantillas, setPlantillas] = useState([])
@@ -399,14 +406,31 @@ export default function NuevaFicha() {
                                 </div>
                             </div>
                             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3">
-                                <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Profesional a cargo</label>
-                                <p className="mb-2 mt-0.5 text-[9px] text-slate-400">Indica quién realizó la atención.</p>
-                                <ShadcnInput
-                                    value={observacionesPrecio}
-                                    placeholder="Ej: Dra. Andrea Morán"
-                                    onChange={(e) => setObservacionesPrecio(e.target.value)}
-                                    className="h-9 rounded-lg border-slate-200 bg-white text-[12px]"
-                                />
+                                <label className="block text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Asignar Profesional <span className="text-rose-500">*</span></label>
+                                <p className="mb-2 mt-0.5 text-[9px] text-slate-400">Selecciona al profesional: su RUT se completa solo.</p>
+                                <div className="[&_[data-slot=select-trigger]]:h-9 [&_[data-slot=select-trigger]]:w-full [&_[data-slot=select-trigger]]:rounded-lg [&_[data-slot=select-trigger]]:bg-white [&_[data-slot=select-trigger]]:text-[12px]">
+                                    <ShadcnSelect
+                                        nombreDefault="Seleccionar profesional..."
+                                        className="h-9 w-full rounded-lg border-slate-200 bg-white text-[12px]"
+                                        value={idProfesionalFicha}
+                                        opciones={listaProfesionales.map((p) => ({
+                                            value: String(p.id_profesional),
+                                            label: p.nombreProfesional,
+                                        }))}
+                                        onChange={(value) => {
+                                            setIdProfesionalFicha(value);
+                                            setObservacionesPrecio(
+                                                etiquetaProfesionalConRut(profesionalPorId(listaProfesionales, value))
+                                            );
+                                        }}
+                                    />
+                                </div>
+                                {/* El RUT se muestra como confirmacion, no como campo a rellenar. */}
+                                {observacionesPrecio ? (
+                                    <p className="mt-2 text-[11px] font-medium text-slate-600">{observacionesPrecio}</p>
+                                ) : (
+                                    <p className="mt-2 text-[11px] text-slate-400">El RUT se completa automáticamente.</p>
+                                )}
                             </div>
                         </div>
                     </div>

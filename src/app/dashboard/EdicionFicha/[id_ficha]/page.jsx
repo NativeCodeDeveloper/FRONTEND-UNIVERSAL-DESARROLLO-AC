@@ -1,6 +1,9 @@
 "use client"
 
 import {Textarea} from "@/components/ui/textarea";
+import { useProfesionales } from "@/hooks/useProfesionales";
+import { etiquetaProfesionalConRut, profesionalPorId } from "@/lib/profesional";
+import { ShadcnSelect } from "@/Componentes/shadcnSelect";
 import {useState, useEffect} from "react";
 import {useParams} from "next/navigation";
 import ToasterClient from "@/Componentes/ToasterClient";
@@ -74,6 +77,10 @@ export default function EdicionFichaClinica() {
     const [tipoAtencion, settipoAtencion] = useState("");
     const [anotacionConsulta, setanotacionConsulta] = useState("");
     const [observaciones, setObservaciones] = useState("");
+    // Mismo criterio que en NuevaFicha: el profesional viaja como texto dentro de
+    // `observaciones`, y el selector arma esa cadena con nombre y RUT.
+    const listaProfesionales = useProfesionales();
+    const [idProfesionalFicha, setIdProfesionalFicha] = useState("");
     const [diagnostico, setDiagnostico] = useState("");
     const [indicaciones, setIndicaciones] = useState("");
     const [fechaConsulta, setFechaConsulta] = useState("");
@@ -430,21 +437,51 @@ export default function EdicionFichaClinica() {
 
                         {/* Fecha + Profesional */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {/* Izquierda: fecha (obligatoria). Derecha: profesional asignado. */}
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Fecha de Consulta</label>
-                                <ShadcnDatePicker
-                                    label=""
-                                    value={fechaConsulta}
-                                    onChange={(fecha) => setFechaConsulta(fecha)}
-                                />
+                                <label className="ml-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                    Fecha de Consulta <span className="text-red-500">*</span>
+                                </label>
+                                <div className="[&_[data-slot=button]]:h-10 [&_[data-slot=button]]:w-full [&_[data-slot=button]]:rounded-xl [&_[data-slot=button]]:border-slate-200">
+                                    <ShadcnDatePicker
+                                        label=""
+                                        placeholder="Seleccione fecha"
+                                        className="h-10 w-full rounded-xl border-slate-200"
+                                        value={fechaConsulta}
+                                        onChange={(fecha) => setFechaConsulta(fecha)}
+                                    />
+                                </div>
+                                <p className="ml-1 text-[11px] text-slate-400">Campo obligatorio.</p>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Profesional</label>
-                                <ShadcnInput
-                                    value={observaciones}
-                                    placeholder="Ej: Dra. Andrea Moran"
-                                    onChange={e => setObservaciones(e.target.value)}
+                                <label className="ml-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                    Asignar Profesional <span className="text-red-500">*</span>
+                                </label>
+                                <ShadcnSelect
+                                    nombreDefault="Seleccionar profesional..."
+                                    className="h-10 w-full rounded-xl border-slate-200 bg-white text-sm"
+                                    value={idProfesionalFicha}
+                                    opciones={listaProfesionales.map((p) => ({
+                                        value: String(p.id_profesional),
+                                        label: p.nombreProfesional,
+                                    }))}
+                                    onChange={(value) => {
+                                        setIdProfesionalFicha(value);
+                                        setObservaciones(
+                                            etiquetaProfesionalConRut(profesionalPorId(listaProfesionales, value))
+                                        );
+                                    }}
                                 />
+                                {/* El RUT se muestra como confirmacion, no como campo a rellenar. */}
+                                {observaciones ? (
+                                    <p className="ml-1 text-[11px] font-medium text-slate-500">
+                                        {observaciones}
+                                    </p>
+                                ) : (
+                                    <p className="ml-1 text-[11px] text-slate-400">
+                                        El RUT se completa automáticamente.
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>

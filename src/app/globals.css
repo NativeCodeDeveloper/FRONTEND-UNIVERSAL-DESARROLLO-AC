@@ -476,6 +476,22 @@ html {
 }
 
 /* ── Tutorial guiado (driver.js) ─────────────────────────────────────────── */
+
+/* Los modales viven en z-50, muy por debajo de la capa oscura que driver.js pone
+   sobre la pagina. Cuando un paso del tour apunta a un campo que esta dentro de un
+   modal, ese campo quedaba tapado por la capa. Con el tour activo el modal sube por
+   encima de la capa, pero siempre por debajo del popover (z-index 1000000000), para
+   que las instrucciones sigan visibles sobre el formulario. */
+/* driver.js mide la posicion del recuadro apenas desplaza la pagina; con scroll
+   suave todavia se esta moviendo y el popover queda mal puesto. */
+html:has(body.driver-active) {
+    scroll-behavior: auto !important;
+}
+
+body.driver-active [data-tour-modal] {
+    z-index: 999999990;
+}
+
 @keyframes ac-tour-pop-in {
   from { opacity: 0; transform: scale(0.97) translateY(2px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }

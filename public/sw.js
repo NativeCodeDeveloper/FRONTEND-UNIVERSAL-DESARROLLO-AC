@@ -2,12 +2,13 @@
 // CRÍTICO: Este SW NUNCA cachea datos de pacientes, fichas clínicas ni reservas.
 // Solo se cachea el shell de la app y assets estáticos.
 
-const CACHE_NAME = 'ac-shell-v3';
+const CACHE_NAME = 'ac-shell-v4';
 
 const SHELL_ASSETS = [
     '/',
     '/icon-192.png',
     '/icon-512.png',
+    '/badge-96.png',
     '/apple-touch-icon.png',
     '/logo.png',
     '/logofavcom.png',
@@ -102,7 +103,9 @@ self.addEventListener('push', (event) => {
         self.registration.showNotification(data.titulo || 'Agenda Clínica', {
             body:    data.body  || '',
             icon:    data.icon  || '/icon-192.png',
-            badge:   '/icon-192.png',
+            // Android pinta el badge en monocromo usando solo el canal alfa: con el
+            // icono a color (cuadrado opaco) salia un cuadro gris en la barra de estado.
+            badge:   '/badge-96.png',
             data:    { url: data.url || '/dashboard' },
             vibrate: [200, 100, 200],
         })

@@ -784,9 +784,11 @@ export default function AgendaCitas() {
                         </h1>
                     </div>
 
-                    <div className="flex flex-col items-stretch gap-2 xl:items-end">
-                        <div data-tour="dashboard-kpis" className="flex flex-wrap items-center gap-2 xl:shrink-0 xl:flex-nowrap xl:gap-1">
-                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                    <div className="flex w-full flex-col gap-2 xl:w-auto xl:shrink-0">
+                        {/* Metricas en columnas iguales: antes cada tarjeta tomaba el
+                            ancho de su contenido y la fila quedaba despareja. */}
+                        <div data-tour="dashboard-kpis" className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
+                        <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
@@ -795,8 +797,8 @@ export default function AgendaCitas() {
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{dataLista.length}</span>
                             </div>
                         </div>
-                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#F3F0FF] text-[#6E56CF]">
+                        <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-900 text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div className="flex flex-col justify-center">
@@ -804,7 +806,7 @@ export default function AgendaCitas() {
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.confirmadas}</span>
                             </div>
                         </div>
-                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                        <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg>
                             </div>
@@ -813,7 +815,7 @@ export default function AgendaCitas() {
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.asiste}</span>
                             </div>
                         </div>
-                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                        <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-rose-50 text-rose-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636L5.636 18.364M5.636 5.636l12.728 12.728"/></svg>
                             </div>
@@ -822,7 +824,7 @@ export default function AgendaCitas() {
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.anuladas}</span>
                             </div>
                         </div>
-                        <div className="h-11 px-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm">
+                        <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14 9V5a3 3 0 00-3-3l-1 9V21h9.28a2 2 0 001.97-1.66l1.38-9A2 2 0 0020.66 8H14z" /><path strokeLinecap="round" strokeLinejoin="round" d="M7 11H4a2 2 0 00-2 2v6a2 2 0 002 2h3" /></svg>
                             </div>
@@ -832,11 +834,11 @@ export default function AgendaCitas() {
                             </div>
                         </div>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+                        <div className="flex flex-wrap items-stretch gap-2 [&>*]:h-11 [&>*]:flex-1 [&>*]:min-w-[140px] [&_button]:h-11 [&_button]:w-full">
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/calendario")}
-                            className="flex h-9 w-[140px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-black px-2 text-[12px] font-medium text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            className="flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-black px-4 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -848,12 +850,12 @@ export default function AgendaCitas() {
                             videoId="ga44dJoW62c"
                             titulo="Panel de reservas"
                             ariaLabel="Abrir video tutorial del panel de citas"
-                            className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            className="flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                         />
                         {canSeeFichasClinicas && (
                             <button
                                 onClick={() => router.push("/dashboard/FichaClinica")}
-                                className="flex h-9 items-center gap-1.5 rounded-lg bg-black px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                                className="flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -945,7 +947,7 @@ export default function AgendaCitas() {
 
                     {/* Tabla de Resultados */}
                     <div data-tour="dashboard-tabla-citas" className="overflow-visible rounded-[32px] border border-slate-200 bg-white shadow-sm">
-                        <div className="flex items-center justify-between rounded-t-[32px] border-b border-slate-100 bg-slate-50/30 px-4 py-4 md:px-8 md:py-5">
+                        <div data-tour="dashboard-citas-header" className="flex items-center justify-between rounded-t-[32px] border-b border-slate-100 bg-slate-50/30 px-4 py-4 md:px-8 md:py-5">
                             <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Citas Agendadas</h2>
                             <div className="flex items-center gap-3">
                                 <span className="text-[11px] font-bold text-slate-400">{dataLista.length} {dataLista.length === 1 ? "cita" : "citas"}</span>
