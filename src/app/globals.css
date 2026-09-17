@@ -498,6 +498,7 @@ body.driver-active [data-tour-modal] {
 }
 
 .driver-popover.ac-tour-popover {
+  --ac-tour-aviso-icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5'/%3E%3Cpath d='M12 16.5h.01'/%3E%3C/svg%3E");
   font-family: var(--font-geist), var(--font-inter), system-ui, sans-serif;
   border-radius: 18px;
   border: 1px solid #e2e8f0;
@@ -524,6 +525,59 @@ body.driver-active [data-tour-modal] {
 
 .ac-tour-popover .ac-tour-callout strong {
   font-weight: 800;
+}
+
+/* Aviso de "este paso todavía no se completó". Va oculto dentro de la
+   descripción del paso y se enciende con .ac-tour-alerta en el popover (ver
+   TourContext): driver.js rehace el popover en cada refresh y un nodo inyectado
+   a mano no sobreviviría al primer scroll.
+   Tratamiento oscuro a propósito: el callout informativo de arriba es violeta
+   claro, y si el aviso usara el mismo tono se leería como "más información" en
+   vez de "falta algo". Negro sólido, sin gradiente ni decoración. */
+.ac-tour-popover .ac-tour-aviso {
+  display: none;
+}
+
+/* Con el aviso encendido, el callout informativo se retira: dice casi lo mismo
+   ("si falta un dato, corrige y vuelve a presionar"), y repetirlo alarga el
+   popover y diluye el mensaje que sí importa en ese momento. */
+.ac-tour-popover.ac-tour-alerta .ac-tour-callout {
+  display: none;
+}
+
+.ac-tour-popover.ac-tour-alerta .ac-tour-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  animation: ac-tour-aviso-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ac-tour-popover.ac-tour-alerta .ac-tour-aviso::before {
+  content: "";
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  background-color: #ffffff;
+  -webkit-mask: var(--ac-tour-aviso-icono) center / contain no-repeat;
+  mask: var(--ac-tour-aviso-icono) center / contain no-repeat;
+}
+
+.ac-tour-popover .ac-tour-aviso strong {
+  font-weight: 800;
+}
+
+@keyframes ac-tour-aviso-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .ac-tour-popover .driver-popover-title {
@@ -655,11 +709,20 @@ body.driver-active [data-tour-modal] {
   box-shadow: 0 8px 16px -8px rgba(110, 86, 207, 0.55);
 }
 
-.ac-tour-popover .driver-popover-prev-btn,
-.ac-tour-popover .driver-popover-prev-btn:hover {
+/* En los pasos interactivos "Atrás" es el único botón de navegación: es la vía
+   para volver a los campos y corregir cuando la acción no se pudo completar. Con
+   el gris claro anterior se perdía contra el fondo blanco del popover justo
+   cuando más falta hace verlo. */
+/* Se apunta con `.driver-popover-footer button.driver-popover-prev-btn` a
+   propósito: la regla común de más arriba (`.ac-tour-popover
+   .driver-popover-footer button`) fija `border: 1px solid transparent` y, por
+   especificidad, le ganaba a un selector más corto — por eso "Atrás" se veía
+   sin borde, flotando como texto suelto sobre el blanco del popover. */
+.ac-tour-popover .driver-popover-footer button.driver-popover-prev-btn,
+.ac-tour-popover .driver-popover-footer button.driver-popover-prev-btn:hover {
   background: #ffffff;
-  color: #475569;
-  border-color: #e2e8f0;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
 }
 
 .ac-tour-popover .driver-popover-close-btn {

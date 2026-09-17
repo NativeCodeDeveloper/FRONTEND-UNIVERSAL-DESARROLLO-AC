@@ -34,6 +34,12 @@
  *                          { tipo: "sale-de-ruta", ruta }    debe haber navegado
  *                        Si no se cumple, el paso se queda donde está y el
  *                        usuario puede corregir y volver a intentarlo.
+ * aviso: "texto"    -> qué mostrar dentro del popover si la condición de
+ *                        `esperar` no se cumple a los ~2,5s del clic. Sirve para
+ *                        que el usuario sepa POR QUÉ el tour no avanzó en vez de
+ *                        creer que se congeló. Los pasos interactivos conservan
+ *                        el botón "Atrás", así que desde el aviso puede volver a
+ *                        los campos anteriores y corregir.
  * optional: true     -> el paso pertenece a una rama que puede no existir en
  *                        esta corrida (ej. ficha nueva vs. ficha existente).
  *                        El tour compite entre los pasos opcionales
@@ -284,6 +290,7 @@ export const TOUR_STEPS = [
     // Avanza cuando el panel de la reserva está realmente en pantalla; si no se
     // abrió, los pasos siguientes anclarían a campos que no existen.
     esperar: { tipo: "aparece", selector: '[data-tour="reserva-drawer"]' },
+    aviso: "El formulario de la cita todavía no se abrió, y el tutorial no puede seguir sin él. Vuelve a hacer clic en el botón <strong>\"Nueva reserva\"</strong> resaltado.",
   },
   {
     id: "calendario-horario",
@@ -328,6 +335,7 @@ export const TOUR_STEPS = [
     // reserva creada y no "el panel se cerró", porque "Cancelar" también lo
     // cierra y eso no es haber agendado.
     esperar: { tipo: "reserva-creada" },
+    aviso: "La cita <strong>todavía no se guardó</strong>, así que el tutorial se queda aquí. Mira el mensaje que salió en pantalla: suele faltar un dato obligatorio o el horario ya está ocupado. Usa <strong>\"Atrás\"</strong> para volver a los campos, corrige y presiona <strong>\"Agendar\"</strong> de nuevo.",
   },
 
   // ── De la reserva a la ficha clínica ─────────────────────────────────────
@@ -364,6 +372,7 @@ export const TOUR_STEPS = [
     // Y solo avanza cuando la ficha se abrió de verdad. Si el usuario cancela la
     // ventana del navegador, sigue en el Panel y el tour lo espera acá.
     esperar: { tipo: "sale-de-ruta", ruta: "/dashboard" },
+    aviso: "La ficha todavía no se abrió. Haz clic en el <strong>ícono de ojo</strong> resaltado; si el navegador te muestra una ventana preguntando si quieres crear la ficha, presiona <strong>Aceptar</strong>.",
     // Viene después de "calendario-guardar", que es interactivo: al guardar, el
     // drawer de la reserva se cierra, así que "Atrás" apuntaría a un formulario
     // que ya no existe.

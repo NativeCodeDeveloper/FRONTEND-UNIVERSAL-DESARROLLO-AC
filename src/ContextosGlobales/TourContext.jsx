@@ -125,8 +125,15 @@ function waitForStableElement(selector, callback, checks = 4) {
 // usuario puede reintentar — que es exactamente lo que el propio popover le
 // está pidiendo.
 const GATE_INTENTOS = 300; // 15s a 50ms por tick
+// Cuando la acción sí funciona, la condición se cumple casi de inmediato (abrir
+// un panel, un POST corto). Si a los ~2,5s todavía no pasó nada, es que algo
+// falló —falta un dato obligatorio, la hora está ocupada, se canceló el diálogo—
+// y el usuario merece que se lo digan en vez de quedarse mirando un tour que no
+// reacciona. Se avisa pero se sigue esperando: si igual se cumple después, el
+// tour avanza normal.
+const GATE_AVISO_INTENTOS = 50;
 
-function esperarCondicionDelPaso(step, pathnameRef, alCumplirse) {
+function esperarCondicionDelPaso(step, pathnameRef, alCumplirse, alDemorarse) {
     const gate = step?.esperar;
     if (!gate) {
         alCumplirse();
@@ -152,12 +159,17 @@ function esperarCondicionDelPaso(step, pathnameRef, alCumplirse) {
     }
 
     let attempts = 0;
+    let avisado = false;
     const tick = () => {
         if (cumplida()) {
             alCumplirse();
             return;
         }
         attempts += 1;
+        if (!avisado && attempts >= (gate.avisoIntentos ?? GATE_AVISO_INTENTOS)) {
+            avisado = true;
+            alDemorarse?.();
+        }
         // Se agota el plazo: no se avanza. El paso sigue vivo y el usuario puede
         // corregir y volver a intentarlo.
         if (attempts > (gate.intentos ?? GATE_INTENTOS)) return;
@@ -249,6 +261,25 @@ function attachLayoutWatchers(getDriver) {
     };
 }
 
+// El aviso viaja SIEMPRE dentro de la descripción del paso, oculto por CSS, y
+// se muestra agregando una clase al popover. Va así y no inyectando HTML al
+// vuelo porque driver.js vuelve a dibujar el popover en cada refresh() —y el
+// watcher de layout llama a refresh() cada vez que algo se mueve—, así que un
+// nodo agregado a mano desaparecería al primer scroll.
+function buildTourAviso(step) {
+    if (!step.esperar) return "";
+    const texto = step.aviso || "Este paso todavía no se completó. Termina la acción que te pide el tutorial para poder seguir.";
+    return `<div class="ac-tour-aviso"><span>${texto}</span></div>`;
+}
+
+function mostrarAvisoDelPaso() {
+    document.querySelector(".driver-popover.ac-tour-popover")?.classList.add("ac-tour-alerta");
+}
+
+function ocultarAvisoDelPaso() {
+    document.querySelector(".driver-popover.ac-tour-popover")?.classList.remove("ac-tour-alerta");
+}
+
 function buildTourMeta(step, groups) {
     // En el paso de cierre todos los puntos quedan completos: el recorrido
     // terminó, no hay un grupo "actual" al que seguir apuntando.
@@ -286,6 +317,10 @@ export function TourProvider({ children }) {
     // dejarían dos esperas vivas y el tour saltaría dos pasos de una. Solo la
     // última intención llega a mover el tour.
     const avanceTokenRef = useRef(0);
+    // Paso que tiene el aviso "esto todavía no se completó" a la vista. Se guarda
+    // acá y no solo en el DOM porque driver.js rehace el popover en cada
+    // refresh(): al volver a dibujarlo hay que volver a encenderlo.
+    const avisoStepIdRef = useRef(null);
     // Se expone para que la UI que flota por encima del dashboard (banner de
     // permisos de notificaciones, asistente Cortex) se oculte mientras el tour
     // corre: ambos usan z-index bajo (50 y 80) y quedarían sepultados bajo el
@@ -316,6 +351,16 @@ export function TourProvider({ children }) {
                 element: step.selector,
                 advanceOnClick: isInteractive,
                 onHighlighted: (element) => {
+                    // Antes del guard de re-entrada: el popover se vuelve a dibujar
+                    // en cada refresh() y perdería el aviso encendido.
+                    if (avisoStepIdRef.current === step.id) {
+                        mostrarAvisoDelPaso();
+                    } else if (avisoStepIdRef.current) {
+                        // Se cambió de paso: el aviso del anterior ya no aplica.
+                        avisoStepIdRef.current = null;
+                        ocultarAvisoDelPaso();
+                    }
+
                     // Re-entrada por refresh() sobre el MISMO paso: ya se aplicó
                     // el efecto secundario, no repetirlo.
                     if (lastHighlightedRef.current === step.id) return;
@@ -378,9 +423,14 @@ export function TourProvider({ children }) {
                     side: step.side || "right",
                     align: step.align || "start",
                     title: `<span class="ac-tour-icon-badge">${TOUR_ICON_SVG}</span><span class="ac-tour-title-text">${step.title}</span>`,
-                    description: `${buildTourMeta(step, tourGroups)}<p class="ac-tour-text">${step.description}</p>`,
+                    description: `${buildTourMeta(step, tourGroups)}<p class="ac-tour-text">${step.description}</p>${buildTourAviso(step)}`,
+                    // Un paso interactivo no ofrece "Siguiente" —avanzar sin
+                    // hacer la acción es justamente lo que rompía el tour— pero sí
+                    // "Atrás". Sin eso, quien no lograba guardar la reserva quedaba
+                    // encerrado: ningún botón lo movía y tenía que cerrar el
+                    // tutorial y empezarlo de nuevo para volver a ese punto.
                     showButtons: isInteractive
-                        ? ["close"]
+                        ? (isFirst || step.noPrevious) ? ["close"] : ["previous", "close"]
                         : (isFirst || step.noPrevious) ? ["next", "close"] : ["next", "previous", "close"],
                     nextBtnText: isLast ? "Finalizar" : "Siguiente",
                     prevBtnText: "Atrás",
@@ -411,6 +461,8 @@ export function TourProvider({ children }) {
 
                         const navegarYAvanzar = () => {
                             if (!vigente()) return;
+                            avisoStepIdRef.current = null;
+                            ocultarAvisoDelPaso();
                             if (next?.route && next.route !== pathnameRef.current) {
                                 router.push(next.route);
                                 waitForRoute(pathnameRef, next.route, advance);
@@ -421,11 +473,21 @@ export function TourProvider({ children }) {
 
                         // Primero se comprueba que lo que este paso pedía haya
                         // ocurrido de verdad (el formulario se abrió, la cita se
-                        // guardó, la ficha se abrió). Si no ocurrió, no se avanza.
-                        esperarCondicionDelPaso(step, pathnameRef, navegarYAvanzar);
+                        // guardó, la ficha se abrió). Si no ocurrió, no se avanza
+                        // y se le dice al usuario por qué sigue en el mismo paso.
+                        esperarCondicionDelPaso(step, pathnameRef, navegarYAvanzar, () => {
+                            if (!vigente()) return;
+                            avisoStepIdRef.current = step.id;
+                            mostrarAvisoDelPaso();
+                            // El aviso cambia el alto del popover: hay que
+                            // reubicarlo para que no quede pisando el elemento.
+                            driverRef.current?.refresh();
+                        });
                     },
                     onPrevClick: () => {
                         const token = (avanceTokenRef.current += 1);
+                        avisoStepIdRef.current = null;
+                        ocultarAvisoDelPaso();
                         const prev = tourSteps[index - 1];
                         const goBack = () =>
                             waitForStableElement(prev?.selector, () => {
@@ -505,6 +567,7 @@ export function TourProvider({ children }) {
         document.documentElement.style.scrollBehavior = "auto";
         lastHighlightedRef.current = null;
         avanceTokenRef.current += 1;
+        avisoStepIdRef.current = null;
         // Una marca vieja (otra corrida del tour, misma pestaña) haría que el
         // paso de "Agendar" se diera por cumplido sin haber agendado nada.
         limpiarReservaDeTour();
