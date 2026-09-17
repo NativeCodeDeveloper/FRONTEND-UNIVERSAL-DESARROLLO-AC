@@ -9,6 +9,8 @@ import {Calendar28} from "@/Componentes/shadcnCalendarSelector";
 import {InfoButton} from "@/Componentes/InfoButton";
 import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
 import {getStateTokens} from "@/lib/designTokens";
+import {useTour} from "@/ContextosGlobales/TourContext";
+import {obtenerRutReservaDeTour} from "@/lib/tourReserva";
 
 import {
     Table,
@@ -47,6 +49,11 @@ export default function AgendaCitas() {
     const dashboardRole = getDashboardRoleFromUser(user);
     const canSeeFichasClinicas = isLoaded && canAccessFichasClinicas(dashboardRole);
     const canSeeReservationAmounts = isLoaded && dashboardRole !== "operador-clinico";
+    const {isRunning: tourEnCurso} = useTour();
+    // RUT de la reserva de prueba creada durante el tour. Se lee al montar y cada
+    // vez que el tour arranca; lo dejó marcado el paso anterior (el "Agendar" del
+    // calendario) justo antes de navegar hasta aquí.
+    const [rutReservaTour, setRutReservaTour] = useState("");
     const [dataLista, setdataLista] = useState([]);
     const [dataListaBase, setDataListaBase] = useState([]);
     const [nombrePaciente, setnombrePaciente] = useState("");
@@ -136,6 +143,13 @@ export default function AgendaCitas() {
             window.localStorage.removeItem(STORAGE_KEYS.estado);
         }
     }, [estadoReserva]);
+
+    // Se relee también cuando llega el listado de citas: entre que esta pantalla
+    // monta y que el tour deja la marca (al agendar en el calendario) puede no
+    // haber un remontaje de por medio, y el ancla del paso quedaría sin fila.
+    useEffect(() => {
+        setRutReservaTour(tourEnCurso ? obtenerRutReservaDeTour() : "");
+    }, [tourEnCurso, dataLista]);
 
     function formatearFechaDashboard(fecha) {
         if (!fecha) return "";
@@ -735,13 +749,20 @@ export default function AgendaCitas() {
         );
     }
 
-    function renderBotonFichaReserva(data) {
+    // `esAnclaTour` marca UN solo botón de toda la pantalla como el ancla del paso
+    // del tour que manda a abrir la ficha. Se activa únicamente en la tabla de
+    // escritorio: las tarjetas móviles renderizan los mismos botones y, aunque
+    // estén ocultas por CSS en desktop, siguen en el DOM y aparecerían primero en
+    // un document.querySelector — driver.js mediría un elemento de 0x0 y dejaría
+    // el recuadro y el popover tirados en una esquina.
+    function renderBotonFichaReserva(data, {esAnclaTour = false} = {}) {
         if (!canSeeFichasClinicas) {
             return null;
         }
 
         return (
             <button
+                data-tour={esAnclaTour ? "dashboard-ver-ficha" : undefined}
                 onClick={() => verFichaClinicaPaciente(data)}
                 disabled={abriendoFichaReservaId === data.id_reserva}
                 className="h-10 w-10 mx-auto rounded-xl bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100 transition-all flex items-center justify-center shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
@@ -761,6 +782,23 @@ export default function AgendaCitas() {
             </button>
         );
     }
+
+    // Fila que el tour resalta en el paso "abre la ficha clínica desde la cita".
+    // Se prefiere la reserva de prueba que el propio usuario acaba de crear —
+    // misma identidad = mismo RUT, que es además la llave con la que se busca o
+    // se crea su ficha. Si esa reserva no está en el listado visible (por ejemplo
+    // porque quedó un filtro de fechas guardado que la deja fuera), se cae a la
+    // primera fila: el paso siempre debe tener un ancla real en pantalla, o el
+    // tour se quedaría esperando un selector que nunca va a aparecer.
+    const idReservaAnclaTour = (() => {
+        if (!tourEnCurso || !canSeeFichasClinicas || dataLista.length === 0) return null;
+
+        const coincidencia = rutReservaTour
+            ? dataLista.find((item) => normalizarRut(item?.rut) === rutReservaTour)
+            : null;
+
+        return (coincidencia ?? dataLista[0])?.id_reserva ?? null;
+    })();
 
     const resumenEstados = dataLista.reduce((acc, item) => {
         const estado = normalizarEstadoReserva(item?.estadoReserva);
@@ -1071,7 +1109,9 @@ export default function AgendaCitas() {
                                                 </TableCell>
                                                 {canSeeFichasClinicas && (
                                                     <TableCell className="py-6 pr-8 text-center">
-                                                        {renderBotonFichaReserva(reserva)}
+                                                        {renderBotonFichaReserva(reserva, {
+                                                            esAnclaTour: reserva.id_reserva === idReservaAnclaTour,
+                                                        })}
                                                     </TableCell>
                                                 )}
                                             </TableRow>

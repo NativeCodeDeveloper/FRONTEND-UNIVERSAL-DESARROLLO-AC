@@ -7,6 +7,7 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { TOUR_STEPS } from "@/lib/tourSteps";
 import { canAccessDashboardPath, getDashboardRoleFromUser } from "@/lib/dashboard-access";
+import { limpiarReservaDeTour, obtenerRutReservaDeTour } from "@/lib/tourReserva";
 
 const COMPLETED_KEY = "ac_tour_completado";
 
@@ -107,6 +108,64 @@ function waitForStableElement(selector, callback, checks = 4) {
     setTimeout(tick, POLL_MS);
 }
 
+// Los pasos interactivos (los que exigen el clic real del usuario sobre el
+// elemento, sin botón "Siguiente") no deben avanzar por el solo hecho de que
+// hubo un clic: tienen que avanzar cuando la acción que pedían de verdad
+// ocurrió. Antes no era así, y eso rompía el tour de formas silenciosas:
+//   - "Agendar" con un campo obligatorio vacío o la hora ocupada mostraba el
+//     error y NO creaba la cita, pero el tour se iba igual al paso siguiente;
+//   - el clic en el ícono de ojo abría la ficha, pero si el usuario cancelaba
+//     el diálogo del navegador el tour también seguía de largo.
+// `esperar` describe la condición real de éxito de cada paso interactivo:
+//   { tipo: "aparece",     selector }  -> el elemento tiene que existir
+//   { tipo: "desaparece",  selector }  -> el elemento tiene que dejar de existir
+//   { tipo: "sale-de-ruta", ruta }     -> la navegación tiene que haber ocurrido
+//   { tipo: "reserva-creada" }         -> el backend confirmó la cita de prueba
+// Si la condición no se cumple, el tour simplemente se queda donde está y el
+// usuario puede reintentar — que es exactamente lo que el propio popover le
+// está pidiendo.
+const GATE_INTENTOS = 300; // 15s a 50ms por tick
+
+function esperarCondicionDelPaso(step, pathnameRef, alCumplirse) {
+    const gate = step?.esperar;
+    if (!gate) {
+        alCumplirse();
+        return;
+    }
+
+    const cumplida = () => {
+        if (gate.tipo === "aparece") return !!document.querySelector(gate.selector);
+        if (gate.tipo === "desaparece") return !document.querySelector(gate.selector);
+        if (gate.tipo === "sale-de-ruta") return pathnameRef.current !== gate.ruta;
+        // La marca la deja el calendario recién cuando el backend confirmó la
+        // reserva. Es más exacta que "el panel se cerró": cancelar el panel
+        // también lo cierra, y así el tour no confunde un "Cancelar" con un
+        // agendamiento exitoso. El tour la borra al arrancar, de modo que solo
+        // puede venir de esta corrida.
+        if (gate.tipo === "reserva-creada") return !!obtenerRutReservaDeTour();
+        return true;
+    };
+
+    if (cumplida()) {
+        alCumplirse();
+        return;
+    }
+
+    let attempts = 0;
+    const tick = () => {
+        if (cumplida()) {
+            alCumplirse();
+            return;
+        }
+        attempts += 1;
+        // Se agota el plazo: no se avanza. El paso sigue vivo y el usuario puede
+        // corregir y volver a intentarlo.
+        if (attempts > (gate.intentos ?? GATE_INTENTOS)) return;
+        setTimeout(tick, POLL_MS);
+    };
+    setTimeout(tick, POLL_MS);
+}
+
 // Algunos tramos del tour se bifurcan: al abrir la ficha desde una reserva, el
 // usuario aterriza en /dashboard/NuevaFicha si el paciente todavía no tenía
 // ficha, o en /dashboard/FichasPacientes si ya la tenía. Los pasos de cada rama
@@ -143,7 +202,11 @@ function resolveBranchTarget(steps, fromIndex, callback) {
             }
         }
         attempts += 1;
-        if (attempts > 100) {
+        // 12s, no 5s: entrar a la ficha implica una consulta al backend, a veces
+        // crear al paciente y recién después montar la pantalla nueva. Con un
+        // plazo corto, una conexión lenta hacía que el tour se saltara el tramo
+        // completo de "Pacientes y Fichas" sin avisar.
+        if (attempts > 240) {
             callback(candidates[candidates.length - 1]);
             return;
         }
@@ -187,7 +250,9 @@ function attachLayoutWatchers(getDriver) {
 }
 
 function buildTourMeta(step, groups) {
-    const currentGroupIndex = groups.indexOf(step.grupo);
+    // En el paso de cierre todos los puntos quedan completos: el recorrido
+    // terminó, no hay un grupo "actual" al que seguir apuntando.
+    const currentGroupIndex = step.final ? groups.length : groups.indexOf(step.grupo);
     const dots = groups
         .map((_, index) => {
             const state = index < currentGroupIndex ? "done" : index === currentGroupIndex ? "active" : "pending";
@@ -215,6 +280,12 @@ export function TourProvider({ children }) {
     // Guardar el id (y no un booleano) permite que volver al mismo paso con
     // "Atrás" sí vuelva a ejecutar la lógica, porque en el medio hubo otro.
     const lastHighlightedRef = useRef(null);
+    // Cada intento de avance/retroceso toma un número. Como esperar a que la
+    // acción del paso se concrete es asíncrono, dos clics seguidos (típico en
+    // "Agendar": el primero falla por un campo vacío, el segundo funciona)
+    // dejarían dos esperas vivas y el tour saltaría dos pasos de una. Solo la
+    // última intención llega a mover el tour.
+    const avanceTokenRef = useRef(0);
     // Se expone para que la UI que flota por encima del dashboard (banner de
     // permisos de notificaciones, asistente Cortex) se oculte mientras el tour
     // corre: ambos usan z-index bajo (50 y 80) y quedarían sepultados bajo el
@@ -322,11 +393,14 @@ export function TourProvider({ children }) {
                     // la espera de estabilidad es incondicional; lo único
                     // condicional es la navegación previa.
                     onNextClick: () => {
+                        const token = (avanceTokenRef.current += 1);
+                        const vigente = () => token === avanceTokenRef.current;
                         const nextIndex = index + 1;
                         const next = tourSteps[nextIndex];
                         const advance = () =>
                             resolveBranchTarget(tourSteps, nextIndex, (target) => {
                                 waitForStableElement(tourSteps[target]?.selector, () => {
+                                    if (!vigente()) return;
                                     if (target === nextIndex) {
                                         driverRef.current?.moveNext();
                                     } else {
@@ -335,17 +409,29 @@ export function TourProvider({ children }) {
                                 });
                             });
 
-                        if (next?.route && next.route !== pathnameRef.current) {
-                            router.push(next.route);
-                            waitForRoute(pathnameRef, next.route, advance);
-                            return;
-                        }
-                        advance();
+                        const navegarYAvanzar = () => {
+                            if (!vigente()) return;
+                            if (next?.route && next.route !== pathnameRef.current) {
+                                router.push(next.route);
+                                waitForRoute(pathnameRef, next.route, advance);
+                                return;
+                            }
+                            advance();
+                        };
+
+                        // Primero se comprueba que lo que este paso pedía haya
+                        // ocurrido de verdad (el formulario se abrió, la cita se
+                        // guardó, la ficha se abrió). Si no ocurrió, no se avanza.
+                        esperarCondicionDelPaso(step, pathnameRef, navegarYAvanzar);
                     },
                     onPrevClick: () => {
+                        const token = (avanceTokenRef.current += 1);
                         const prev = tourSteps[index - 1];
                         const goBack = () =>
-                            waitForStableElement(prev?.selector, () => driverRef.current?.movePrevious());
+                            waitForStableElement(prev?.selector, () => {
+                                if (token !== avanceTokenRef.current) return;
+                                driverRef.current?.movePrevious();
+                            });
 
                         if (prev?.route && prev.route !== pathnameRef.current) {
                             router.push(prev.route);
@@ -361,7 +447,13 @@ export function TourProvider({ children }) {
         const instance = driver({
             showProgress: false,
             allowClose: true,
-            overlayClickBehavior: "nextStep",
+            // La capa oscura NO mueve el tour. Antes avanzaba ("nextStep") y eso
+            // convertía cualquier clic fuera del recuadro en un salto de paso:
+            // el usuario intentaba pulsar el elemento real, erraba por unos
+            // pixeles o le pegaba a la fila de al lado, y el tour se adelantaba
+            // sin que la acción hubiera pasado. El recorrido se mueve solo con
+            // "Siguiente"/"Atrás" o con el clic sobre el elemento resaltado.
+            overlayClickBehavior: () => {},
             overlayOpacity: 0.55,
             stagePadding: 6,
             stageRadius: 12,
@@ -412,6 +504,10 @@ export function TourProvider({ children }) {
         scrollPrevioRef.current = document.documentElement.style.scrollBehavior;
         document.documentElement.style.scrollBehavior = "auto";
         lastHighlightedRef.current = null;
+        avanceTokenRef.current += 1;
+        // Una marca vieja (otra corrida del tour, misma pestaña) haría que el
+        // paso de "Agendar" se diera por cumplido sin haber agendado nada.
+        limpiarReservaDeTour();
         detachWatchersRef.current?.();
         detachWatchersRef.current = attachLayoutWatchers(() => driverRef.current);
 

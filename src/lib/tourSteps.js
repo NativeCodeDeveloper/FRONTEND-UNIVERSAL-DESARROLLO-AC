@@ -26,6 +26,14 @@
  *                        acordeones abiertos que persiste en sessionStorage.
  * selector: null      -> paso sin elemento anclado (mensaje centrado, usado
  *                        solo para el cierre del tour).
+ * esperar: {...}    -> condición real de éxito de un paso interactivo. El tour
+ *                        solo avanza cuando se cumple, no por el hecho de que
+ *                        hubo un clic. Formas admitidas:
+ *                          { tipo: "aparece", selector }     el elemento debe existir
+ *                          { tipo: "desaparece", selector }  el elemento debe irse
+ *                          { tipo: "sale-de-ruta", ruta }    debe haber navegado
+ *                        Si no se cumple, el paso se queda donde está y el
+ *                        usuario puede corregir y volver a intentarlo.
  * optional: true     -> el paso pertenece a una rama que puede no existir en
  *                        esta corrida (ej. ficha nueva vs. ficha existente).
  *                        El tour compite entre los pasos opcionales
@@ -63,7 +71,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-nuevo"]',
     title: "Paso 1: Crea un profesional",
-    description: "Cada profesional que registres aparece aquí como una tarjeta, con su agenda propia. Presiona <strong>\"Registrar Profesional\"</strong> — te abrimos el formulario y seguimos juntos.",
+    description: "Cada profesional que registres aparece aquí como una tarjeta, con su agenda propia. El botón resaltado es <strong>\"Nuevo Profesional\"</strong> — lo abrimos por ti y seguimos juntos dentro del formulario.",
     side: "bottom",
     // El formulario vive en un modal: el tour lo abre solo para que los pasos
     // siguientes encuentren los campos en pantalla.
@@ -273,6 +281,9 @@ export const TOUR_STEPS = [
     side: "left",
     align: "start",
     interactive: true,
+    // Avanza cuando el panel de la reserva está realmente en pantalla; si no se
+    // abrió, los pasos siguientes anclarían a campos que no existen.
+    esperar: { tipo: "aparece", selector: '[data-tour="reserva-drawer"]' },
   },
   {
     id: "calendario-horario",
@@ -311,6 +322,12 @@ export const TOUR_STEPS = [
     description: "Haz clic en <strong>\"Agendar\"</strong> para guardar de verdad. <div class=\"ac-tour-callout\"><span>Si falta un dato obligatorio o el horario ya está ocupado, el sistema te avisa con un mensaje en pantalla y la cita <strong>no</strong> se guarda. Si eso pasa, corrige lo que falte y vuelve a presionar \"Agendar\" antes de continuar.</span></div>",
     side: "top",
     interactive: true,
+    // Avanza solo cuando el backend confirmó la cita. Si faltaba un dato o la
+    // hora estaba ocupada, la reserva no se creó: el tour se queda en este paso
+    // para que el usuario corrija y vuelva a presionar "Agendar". Se mira la
+    // reserva creada y no "el panel se cerró", porque "Cancelar" también lo
+    // cierra y eso no es haber agendado.
+    esperar: { tipo: "reserva-creada" },
   },
 
   // ── De la reserva a la ficha clínica ─────────────────────────────────────
@@ -323,17 +340,30 @@ export const TOUR_STEPS = [
     id: "panel-ver-ficha",
     grupo: "Pacientes y Fichas",
     route: "/dashboard",
-    // Se ancla al encabezado y no a la tarjeta completa: con cientos de citas ese
-    // contenedor mide miles de pixeles y driver.js no puede recuadrarlo, dejando el
-    // popover tirado en una esquina.
-    selector: '[data-tour="dashboard-citas-header"]',
+    // Ancla el BOTÓN de ojo de la fila correcta, no el encabezado de la tabla.
+    // Antes apuntaba a '[data-tour="dashboard-citas-header"]' y el paso era
+    // inservible: el recuadro resaltaba una franja donde no hay nada que pulsar,
+    // mientras el ícono de ojo quedaba debajo de la capa oscura de driver.js —
+    // el clic del usuario ni siquiera llegaba al botón, así que la ficha no se
+    // abría y el tour se iba igual al tramo siguiente.
+    //
+    // El Panel de Reservas marca con este data-tour un único botón: el de la
+    // reserva de prueba recién creada (se reconoce por el RUT, ver
+    // src/lib/tourReserva.js) o, si esa cita no está en el listado visible, el
+    // de la primera fila. Anclar al botón y no a la fila mantiene el recuadro
+    // pequeño y el popover bien puesto aunque haya cientos de citas.
+    selector: '[data-tour="dashboard-ver-ficha"]',
     title: "Pacientes y Fichas",
-    description: "Tu reserva de prueba ya aparece aquí — la vas a reconocer por tu propio nombre. Búscala y <strong>haz clic en el ícono de ojo</strong> de esa fila para abrir su ficha. <div class=\"ac-tour-callout\"><span>Si el paciente todavía no tiene ficha, el navegador te va a mostrar una ventana preguntando si quieres crearla: presiona <strong>Aceptar</strong> y el tour sigue solo.</span></div>",
-    side: "top",
+    description: "Desde cualquier cita puedes saltar a la ficha clínica del paciente. Te dejamos resaltado el <strong>ícono de ojo</strong> de tu reserva de prueba: haz clic ahí para abrirla. <div class=\"ac-tour-callout\"><span>Si el paciente todavía no tiene ficha, el navegador te va a mostrar una ventana preguntando si quieres crearla: presiona <strong>Aceptar</strong> y el tour sigue solo.</span></div>",
+    side: "left",
+    align: "center",
     // Interactivo a propósito: antes tenía botón "Siguiente", y quien lo
     // presionaba se quedaba en /dashboard mientras el tour buscaba anclas que
     // solo existen en la ficha — se saltaba el tramo completo sin avisar.
     interactive: true,
+    // Y solo avanza cuando la ficha se abrió de verdad. Si el usuario cancela la
+    // ventana del navegador, sigue en el Panel y el tour lo espera acá.
+    esperar: { tipo: "sale-de-ruta", ruta: "/dashboard" },
     // Viene después de "calendario-guardar", que es interactivo: al guardar, el
     // drawer de la reserva se cierra, así que "Atrás" apuntaría a un formulario
     // que ya no existe.
@@ -450,7 +480,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/finanzas",
     selector: '[data-tour="finanzas-periodo"]',
     title: "Finanzas",
-    description: "Aquí ves cuánto ha generado tu clínica. Elige el período que quieres revisar: mes actual, mes anterior, o un rango de fechas a tu elección.",
+    description: "Aquí ves cuánto ha generado tu clínica. Elige el período que quieres revisar: <strong>Mes actual</strong>, <strong>Mes anterior</strong> o <strong>Rango personalizado</strong> para elegir tú las fechas.",
     side: "bottom",
   },
   {
@@ -487,6 +517,7 @@ export const TOUR_STEPS = [
     grupo: "Finanzas",
     route: null,
     selector: null,
+    final: true,
     title: "Tutorial completado",
     description: "Ya viste lo esencial: crear un profesional, un servicio y asignarlos (lo más importante para empezar), agendar y guardar citas, crear fichas clínicas, bloquear horarios y revisar tus finanzas. Si te quedan dudas, visita la <a href=\"https://academia.agendaclinicas.cl/dashboard\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"ac-tour-link\">Academia de Agenda Clínica</a> para más contenido.",
   },

@@ -21,6 +21,8 @@ import { AppointmentCard } from "@/Componentes/AppointmentCard";
 import { StatusFilterChips } from "@/Componentes/StatusFilterChips";
 import { getStateTokens } from "@/lib/designTokens";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
+import { useTour } from "@/ContextosGlobales/TourContext";
+import { marcarReservaDeTour } from "@/lib/tourReserva";
 
 dayjs.locale("es");
 const localizer = dayjsLocalizer(dayjs);
@@ -56,6 +58,10 @@ function CalendarioContent() {
 
     const API = process.env.NEXT_PUBLIC_API_URL;
     const { user, isLoaded: usuarioCargado } = useUser();
+    // Solo se deja la marca de "reserva de prueba" mientras el tour corre: fuera
+    // del tour, un agendamiento normal no debe quedar marcado ni terminar
+    // resaltando una fila cualquiera la proxima vez que alguien abra el tutorial.
+    const { isRunning: tourEnCurso } = useTour();
     const idProfesionalAgendaAsignada = normalizarIdProfesional(
         user?.publicMetadata?.idProfesionalAgenda
     );
@@ -2035,6 +2041,12 @@ function CalendarioContent() {
                     motivo_reserva: popupForm.motivo_reserva ?? "",
                     fechaPrimaria: formatearFechaLocal(selectionDraft.start),
                 });
+            }
+            // El tour necesita saber DESPUES, ya en el Panel de Reservas, cual de
+            // las citas del listado es la que el usuario acaba de crear, para
+            // resaltar el icono de ojo de esa fila y no el de otra.
+            if (tourEnCurso) {
+                marcarReservaDeTour(popupForm.rut);
             }
             setNombrePaciente(popupForm.nombrePaciente);
             setApellidoPaciente(popupForm.apellidoPaciente);
