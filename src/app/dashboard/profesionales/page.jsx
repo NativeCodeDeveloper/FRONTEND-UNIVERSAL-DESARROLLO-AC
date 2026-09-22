@@ -5,6 +5,7 @@ import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 import ProfesionalModal from "@/Componentes/ProfesionalModal";
 import { formatRut } from "@/lib/designTokens";
+import { useTour } from "@/ContextosGlobales/TourContext";
 
 // Paleta de acento por tarjeta: se elige de forma estable a partir del nombre,
 // asi un mismo profesional conserva siempre su color.
@@ -46,6 +47,7 @@ function FilaDato({ icono, children }) {
 
 export default function Profesionales() {
     const API = process.env.NEXT_PUBLIC_API_URL;
+    const { actualizarCantidadProfesionales } = useTour();
 
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [cargando, setCargando] = useState(true);
@@ -57,6 +59,7 @@ export default function Profesionales() {
     const [eliminandoId, setEliminandoId] = useState(null);
 
     async function seleccionarTodosProfesionales() {
+        actualizarCantidadProfesionales(null);
         try {
             const res = await fetch(`${API}/profesionales/seleccionarTodosProfesionales`, {
                 method: 'GET',
@@ -74,7 +77,9 @@ export default function Profesionales() {
                 return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
             }
 
-            setListaProfesionales(Array.isArray(respuestaBackend) ? respuestaBackend : []);
+            const profesionales = Array.isArray(respuestaBackend) ? respuestaBackend : [];
+            setListaProfesionales(profesionales);
+            actualizarCantidadProfesionales(profesionales.length);
         } catch (error) {
             return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
         } finally {
@@ -119,6 +124,7 @@ export default function Profesionales() {
 
     useEffect(() => {
         seleccionarTodosProfesionales();
+        return () => actualizarCantidadProfesionales(null);
     }, []);
 
     const profesionalesFiltrados = useMemo(() => {

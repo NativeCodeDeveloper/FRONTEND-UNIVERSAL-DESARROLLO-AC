@@ -61,7 +61,7 @@ function CalendarioContent() {
     // Solo se deja la marca de "reserva de prueba" mientras el tour corre: fuera
     // del tour, un agendamiento normal no debe quedar marcado ni terminar
     // resaltando una fila cualquiera la proxima vez que alguien abra el tutorial.
-    const { isRunning: tourEnCurso } = useTour();
+    const { isRunning: tourEnCurso, continuarTourTrasGuardarReserva } = useTour();
     const idProfesionalAgendaAsignada = normalizarIdProfesional(
         user?.publicMetadata?.idProfesionalAgenda
     );
@@ -1308,6 +1308,10 @@ function CalendarioContent() {
                     return false;
                 }
                 if (respuestaBackend.message === true) {
+                    if (tourEnCurso) {
+                        marcarReservaDeTour(rutLimpio);
+                        continuarTourTrasGuardarReserva();
+                    }
                     setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
                     await refrescarCalendario();
                     toast.success("Se ha ingresado correctamente el agendamiento");
@@ -2041,12 +2045,6 @@ function CalendarioContent() {
                     motivo_reserva: popupForm.motivo_reserva ?? "",
                     fechaPrimaria: formatearFechaLocal(selectionDraft.start),
                 });
-            }
-            // El tour necesita saber DESPUES, ya en el Panel de Reservas, cual de
-            // las citas del listado es la que el usuario acaba de crear, para
-            // resaltar el icono de ojo de esa fila y no el de otra.
-            if (tourEnCurso) {
-                marcarReservaDeTour(popupForm.rut);
             }
             setNombrePaciente(popupForm.nombrePaciente);
             setApellidoPaciente(popupForm.apellidoPaciente);

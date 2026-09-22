@@ -2,18 +2,13 @@
  * tourReserva.js
  * Memoria corta de "la reserva de prueba que el usuario creó durante el tour".
  *
- * El paso del tour que manda a abrir la ficha clínica necesita apuntar al ícono
- * de ojo de UNA fila concreta del Panel de Reservas — no al encabezado de la
- * tabla ni a una fila cualquiera. El backend de agendamiento responde
- * `{ message: true }` sin devolver el id de la reserva creada, así que la única
- * identidad estable que tenemos del paciente recién agendado es su RUT, que es
- * además exactamente la llave con la que el dashboard busca/crea su ficha
- * (`buscarPacientePorRut`).
+ * La marca confirma que el backend guardó la cita, incluso si el paciente no
+ * informó RUT. Cuando hay RUT, también permite identificar esa reserva en el
+ * Panel de Reservas.
  *
  * Se guarda en sessionStorage y no en un ref de React porque entre el paso que
- * crea la reserva (/dashboard/calendario) y el que abre la ficha (/dashboard)
- * hay una navegación: un recargado completo de la pestaña mataría cualquier
- * estado en memoria, y el tour quedaría otra vez sin saber qué fila marcar.
+ * crea la reserva (/dashboard/calendario) y los pasos siguientes puede haber
+ * navegación. Un recargado completo de la pestaña perdería el estado en memoria.
  *
  * La marca caduca sola: si quedó de una corrida vieja del tour, no queremos que
  * resalte una fila al azar la próxima vez.
@@ -31,28 +26,34 @@ export function normalizarRutTour(valor) {
 
 export function marcarReservaDeTour(rut) {
   const rutNormalizado = normalizarRutTour(rut);
-  if (!rutNormalizado) return;
-
   try {
     sessionStorage.setItem(CLAVE, JSON.stringify({ rut: rutNormalizado, ts: Date.now() }));
   } catch {}
 }
 
-export function obtenerRutReservaDeTour() {
+function obtenerReservaVigente() {
   try {
     const crudo = sessionStorage.getItem(CLAVE);
-    if (!crudo) return "";
+    if (!crudo) return null;
 
     const { rut, ts } = JSON.parse(crudo);
-    if (!rut || typeof ts !== "number" || Date.now() - ts > VIGENCIA_MS) {
+    if (typeof rut !== "string" || typeof ts !== "number" || Date.now() - ts > VIGENCIA_MS) {
       sessionStorage.removeItem(CLAVE);
-      return "";
+      return null;
     }
 
-    return rut;
+    return { rut, ts };
   } catch {
-    return "";
+    return null;
   }
+}
+
+export function reservaConfirmadaDeTour() {
+  return !!obtenerReservaVigente();
+}
+
+export function obtenerRutReservaDeTour() {
+  return obtenerReservaVigente()?.rut ?? "";
 }
 
 export function limpiarReservaDeTour() {

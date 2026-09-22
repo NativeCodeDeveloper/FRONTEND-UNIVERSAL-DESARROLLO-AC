@@ -12,6 +12,7 @@ import { format, eachDayOfInterval } from "date-fns";
 import ToasterClient from "@/Componentes/ToasterClient";
 import { InfoButton } from "@/Componentes/InfoButton";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
+import { useTour } from "@/ContextosGlobales/TourContext";
 import {
     Table,
     TableBody,
@@ -23,6 +24,7 @@ import {
 
 
 export default function BloqueosAgendas() {
+    const { continuarTourTrasGuardarBloqueo } = useTour();
     const API = process.env.NEXT_PUBLIC_API_URL;
     const { user, isLoaded: usuarioCargado } = useUser();
     const idProfesionalAgendaAsignada = String(user?.publicMetadata?.idProfesionalAgenda || "").trim();
@@ -145,6 +147,10 @@ export default function BloqueosAgendas() {
 
     async function verTodosLosBloqueos() {
         try {
+            if (idProfesionalAgendaActiva) {
+                return filtrarPorProfesional(idProfesionalAgendaActiva);
+            }
+
             const res = await fetch(`${API}/bloqueoAgenda/seleccionarTodos`, {
                 method: 'GET',
                 headers: { Accept: 'application/json' },
@@ -289,6 +295,7 @@ export default function BloqueosAgendas() {
         } else {
             toast.error("Ya existe una cita agendada o un bloqueo previo en ese horario.");
         }
+        if (exitosos > 0) continuarTourTrasGuardarBloqueo();
     }
 
     async function eliminarBloqueo(id_bloqueo) {
@@ -417,7 +424,7 @@ export default function BloqueosAgendas() {
                             <div className="p-6 space-y-5">
 
                                 {/* Profesional */}
-                                <div className="space-y-2">
+                                <div data-tour="bloqueo-profesional" data-tour-completo={Boolean(id_profesional)} className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Profesional</label>
                                     {idProfesionalAgendaActiva ? (
                                         <div className="flex h-10 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-3 text-[13px] font-semibold text-violet-900">
@@ -441,12 +448,14 @@ export default function BloqueosAgendas() {
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Días a bloquear</label>
                                     <div data-tour="bloqueo-modo-selector" className="flex rounded-xl border border-slate-200 bg-slate-100/60 p-1 gap-1">
                                         <button
+                                            data-tour="bloqueo-especificos-boton"
                                             onClick={() => setModoSeleccion("especifico")}
                                             className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "especifico" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                         >
                                             Días específicos
                                         </button>
                                         <button
+                                            data-tour="bloqueo-rango-boton"
                                             onClick={() => setModoSeleccion("rango")}
                                             className={`flex-1 py-2 text-[12px] font-semibold rounded-lg transition-all ${modoSeleccion === "rango" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                         >
@@ -457,8 +466,12 @@ export default function BloqueosAgendas() {
 
                                 {/* Modo: Rango de fechas */}
                                 {modoSeleccion === "rango" && (
-                                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 space-y-4">
-                                        <div className="grid grid-cols-2 gap-3">
+                                    <div data-tour="bloqueo-rango-panel" className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 space-y-4">
+                                        <div
+                                            data-tour="bloqueo-rango-fechas"
+                                            data-tour-completo={Boolean(rangoDesde && rangoHasta && rangoHasta >= rangoDesde)}
+                                            className="grid grid-cols-2 gap-3"
+                                        >
                                             <div className="space-y-1">
                                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Desde</label>
                                                 <input
@@ -483,7 +496,11 @@ export default function BloqueosAgendas() {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div
+                                            data-tour="bloqueo-rango-dias"
+                                            data-tour-completo={diasSemanaSeleccionados.length > 0}
+                                            className="space-y-2"
+                                        >
                                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Días de la semana</label>
                                             <div className="flex gap-1.5">
                                                 {DIAS_SEMANA.map(dia => (
@@ -503,6 +520,8 @@ export default function BloqueosAgendas() {
                                         </div>
 
                                         <button
+                                            data-tour="bloqueo-rango-generar"
+                                            data-tour-completo={diasSeleccionados.length > 0}
                                             onClick={generarDiasDesdeRango}
                                             className="w-full py-2.5 text-[13px] font-bold rounded-xl border-2 border-dashed border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all"
                                         >
@@ -513,7 +532,7 @@ export default function BloqueosAgendas() {
 
                                 {/* Modo: Días específicos — Calendario */}
                                 {modoSeleccion === "especifico" && (
-                                <div data-tour="bloqueo-calendario" className="rounded-2xl border border-slate-200 bg-slate-50/50 flex justify-center py-2">
+                                <div data-tour="bloqueo-calendario" data-tour-completo={diasSeleccionados.length > 0} className="rounded-2xl border border-slate-200 bg-slate-50/50 flex justify-center py-2">
                                     <Calendar
                                         mode="multiple"
                                         selected={diasSeleccionados}
@@ -576,7 +595,7 @@ export default function BloqueosAgendas() {
                                 </div>
 
                                 {/* Rango horario */}
-                                <div data-tour="bloqueo-rango-horario" className="space-y-2">
+                                <div data-tour="bloqueo-rango-horario" data-tour-completo={Boolean(horaInicio && horaFinalizacion && horaFinalizacion > horaInicio)} className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Rango horario</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1">
@@ -585,6 +604,7 @@ export default function BloqueosAgendas() {
                                                 value={horaInicio}
                                                 onChange={setHoraInicio}
                                                 placeholder="00:00"
+                                                elevarDuranteTour
                                             />
                                         </div>
                                         <div className="space-y-1">
@@ -593,13 +613,14 @@ export default function BloqueosAgendas() {
                                                 value={horaFinalizacion}
                                                 onChange={setHoraFinalizacion}
                                                 placeholder="00:00"
+                                                elevarDuranteTour
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Motivo */}
-                                <div data-tour="bloqueo-motivo" className="space-y-2">
+                                <div data-tour="bloqueo-motivo" data-tour-completo={Boolean(motivo.trim())} className="space-y-2">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Motivo del bloqueo</label>
                                     <InputTextDinamic
                                         value={motivo}

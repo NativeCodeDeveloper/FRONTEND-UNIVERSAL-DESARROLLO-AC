@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { createPortal } from "react-dom"
+import { cn } from "@/lib/utils"
 
 const HORAS = Array.from({ length: 18 }, (_, i) => String(i + 6).padStart(2, "0"))
 const MINUTOS = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"))
 
-function ScrollColumn({ items, selected, onSelect, dataAttr, scrollRef, label }) {
+function ScrollColumn({ items, selected, onSelect, dataAttr, scrollRef, label, alturaLista }) {
     const [atTop, setAtTop] = useState(true)
     const [atBottom, setAtBottom] = useState(false)
 
@@ -47,7 +49,8 @@ function ScrollColumn({ items, selected, onSelect, dataAttr, scrollRef, label })
             <div className="relative">
                 <div
                     ref={scrollRef}
-                    className="h-48 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                    className={cn("overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden", !alturaLista && "h-48")}
+                    style={alturaLista ? { height: alturaLista } : undefined}
                 >
                     <div className="py-1">
                         {items.map(item => (
@@ -95,9 +98,10 @@ function ScrollColumn({ items, selected, onSelect, dataAttr, scrollRef, label })
     )
 }
 
-export function TimePicker({ value = "", onChange, placeholder = "00:00", label = "" }) {
+export function TimePicker({ value = "", onChange, placeholder = "00:00", label = "", elevarDuranteTour = false }) {
     const [open, setOpen] = useState(false)
     const [openUp, setOpenUp] = useState(false)
+    const [posicionTour, setPosicionTour] = useState(null)
     const containerRef = useRef(null)
     const dropdownRef = useRef(null)
     const horasRef = useRef(null)
@@ -105,11 +109,58 @@ export function TimePicker({ value = "", onChange, placeholder = "00:00", label 
 
     const [hora, minuto] = value ? value.split(":") : ["", ""]
 
+    const actualizarPosicionTour = useCallback(() => {
+        const rect = containerRef.current?.getBoundingClientRect()
+        if (!rect) return
+
+        const margen = 8
+        const espacioArriba = rect.top - margen
+        const espacioAbajo = window.innerHeight - rect.bottom - margen
+        const arriba = espacioArriba >= espacioAbajo
+        const espacioDisponible = arriba ? espacioArriba : espacioAbajo
+        const alturaLista = Math.min(192, Math.max(32, Math.floor(espacioDisponible - 132)))
+        const siguiente = {
+            izquierda: Math.max(margen, rect.left),
+            ancho: Math.min(rect.width, window.innerWidth - margen * 2),
+            borde: arriba ? window.innerHeight - rect.top + 6 : rect.bottom + 6,
+            arriba,
+            alturaLista,
+        }
+
+        setOpenUp(arriba)
+        setPosicionTour((actual) =>
+            actual && Object.keys(siguiente).every((clave) => actual[clave] === siguiente[clave])
+                ? actual
+                : siguiente
+        )
+    }, [])
+
+    function cerrarDesplegable() {
+        setOpen(false)
+        setPosicionTour(null)
+    }
+
+    function alternarDesplegable() {
+        if (open) {
+            cerrarDesplegable()
+            return
+        }
+
+        if (elevarDuranteTour && document.body.classList.contains("driver-active")) {
+            actualizarPosicionTour()
+        } else {
+            setPosicionTour(null)
+        }
+        setOpen(true)
+    }
+
     // Cerrar al hacer clic fuera
     useEffect(() => {
         if (!open) return
         function onClickOutside(e) {
-            if (!containerRef.current?.contains(e.target)) setOpen(false)
+            if (!containerRef.current?.contains(e.target) && !dropdownRef.current?.contains(e.target)) {
+                cerrarDesplegable()
+            }
         }
         document.addEventListener("mousedown", onClickOutside)
         return () => document.removeEventListener("mousedown", onClickOutside)
@@ -117,11 +168,21 @@ export function TimePicker({ value = "", onChange, placeholder = "00:00", label 
 
     // Detectar si el dropdown cabe hacia abajo, si no abrirlo hacia arriba
     useEffect(() => {
-        if (!open || !containerRef.current) return
+        if (!open || posicionTour || !containerRef.current) return
         const rect = containerRef.current.getBoundingClientRect()
         const spaceBelow = window.innerHeight - rect.bottom
         setOpenUp(spaceBelow < 320)
-    }, [open])
+    }, [open, posicionTour])
+
+    useEffect(() => {
+        if (!open || !posicionTour) return
+        window.addEventListener("scroll", actualizarPosicionTour, true)
+        window.addEventListener("resize", actualizarPosicionTour)
+        return () => {
+            window.removeEventListener("scroll", actualizarPosicionTour, true)
+            window.removeEventListener("resize", actualizarPosicionTour)
+        }
+    }, [open, Boolean(posicionTour), actualizarPosicionTour])
 
     // Scroll automático al valor seleccionado cuando se abre
     useEffect(() => {
@@ -146,13 +207,74 @@ export function TimePicker({ value = "", onChange, placeholder = "00:00", label 
         onChange(`${hora || "00"}:${m}`)
     }
 
+    const desplegable = open && (
+        <div
+            ref={dropdownRef}
+            className={cn(
+                "bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden",
+                posicionTour
+                    ? "fixed z-[10001] !pointer-events-auto [&_*]:!pointer-events-auto"
+                    : `absolute z-50 left-0 right-0 ${openUp ? "bottom-full mb-1.5" : "top-full mt-1.5"}`
+            )}
+            style={posicionTour ? {
+                left: posicionTour.izquierda,
+                width: posicionTour.ancho,
+                ...(posicionTour.arriba ? { bottom: posicionTour.borde } : { top: posicionTour.borde }),
+            } : undefined}
+        >
+            <div className="grid grid-cols-2 border-b border-slate-100 bg-slate-50/70">
+                <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center">
+                    Hora
+                </div>
+                <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center border-l border-slate-100">
+                    Minuto
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 divide-x divide-slate-100">
+                <ScrollColumn
+                    items={HORAS}
+                    selected={hora}
+                    onSelect={seleccionarHora}
+                    dataAttr="data-h"
+                    scrollRef={horasRef}
+                    label="Hora"
+                    alturaLista={posicionTour?.alturaLista}
+                />
+                <ScrollColumn
+                    items={MINUTOS}
+                    selected={minuto}
+                    onSelect={seleccionarMinuto}
+                    dataAttr="data-m"
+                    scrollRef={minutosRef}
+                    label="Minuto"
+                    alturaLista={posicionTour?.alturaLista}
+                />
+            </div>
+
+            <div className="border-t border-slate-100 bg-slate-50/70 px-4 py-2.5 flex items-center justify-between">
+                <span className="text-[11px] text-slate-400 font-medium">
+                    {value ? `Seleccionado: ` : "Sin seleccionar"}
+                    {value && <span className="font-bold text-[#6E56CF]">{value}</span>}
+                </span>
+                <button
+                    type="button"
+                    onClick={cerrarDesplegable}
+                    className="text-[11px] font-bold text-[#6E56CF] hover:text-[#5b45bc] transition-colors"
+                >
+                    Listo ✓
+                </button>
+            </div>
+        </div>
+    )
+
     return (
         <div ref={containerRef} className="relative w-full">
 
             {/* Trigger */}
             <button
                 type="button"
-                onClick={() => setOpen(prev => !prev)}
+                onClick={alternarDesplegable}
                 className={`w-full rounded-xl border bg-white px-3 py-2.5 text-[13px] font-medium transition-all flex items-center justify-between gap-2
                     ${open
                         ? "border-[#6E56CF] ring-2 ring-[#6E56CF]/30 text-slate-700"
@@ -179,59 +301,7 @@ export function TimePicker({ value = "", onChange, placeholder = "00:00", label 
             </button>
 
             {/* Dropdown */}
-            {open && (
-                <div
-                    ref={dropdownRef}
-                    className={`absolute z-50 left-0 right-0 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden
-                        ${openUp ? "bottom-full mb-1.5" : "top-full mt-1.5"}`}
-                >
-
-                    {/* Header */}
-                    <div className="grid grid-cols-2 border-b border-slate-100 bg-slate-50/70">
-                        <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center">
-                            Hora
-                        </div>
-                        <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-center border-l border-slate-100">
-                            Minuto
-                        </div>
-                    </div>
-
-                    {/* Columnas */}
-                    <div className="grid grid-cols-2 divide-x divide-slate-100">
-                        <ScrollColumn
-                            items={HORAS}
-                            selected={hora}
-                            onSelect={seleccionarHora}
-                            dataAttr="data-h"
-                            scrollRef={horasRef}
-                            label="Hora"
-                        />
-                        <ScrollColumn
-                            items={MINUTOS}
-                            selected={minuto}
-                            onSelect={seleccionarMinuto}
-                            dataAttr="data-m"
-                            scrollRef={minutosRef}
-                            label="Minuto"
-                        />
-                    </div>
-
-                    {/* Footer con valor seleccionado */}
-                    <div className="border-t border-slate-100 bg-slate-50/70 px-4 py-2.5 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400 font-medium">
-                            {value ? `Seleccionado: ` : "Sin seleccionar"}
-                            {value && <span className="font-bold text-[#6E56CF]">{value}</span>}
-                        </span>
-                        <button
-                            type="button"
-                            onClick={() => setOpen(false)}
-                            className="text-[11px] font-bold text-[#6E56CF] hover:text-[#5b45bc] transition-colors"
-                        >
-                            Listo ✓
-                        </button>
-                    </div>
-                </div>
-            )}
+            {desplegable && (posicionTour ? createPortal(desplegable, document.body) : desplegable)}
         </div>
     )
 }

@@ -7,9 +7,59 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { TOUR_STEPS } from "@/lib/tourSteps";
 import { canAccessDashboardPath, getDashboardRoleFromUser } from "@/lib/dashboard-access";
-import { limpiarReservaDeTour, obtenerRutReservaDeTour } from "@/lib/tourReserva";
+import { limpiarReservaDeTour, reservaConfirmadaDeTour } from "@/lib/tourReserva";
 
 const COMPLETED_KEY = "ac_tour_completado";
+const PASOS_CON_CAMPO_OBLIGATORIO = new Set([
+    "profesional-nombre",
+    "profesional-correo",
+    "profesional-telefono",
+    "profesional-rut",
+    "profesional-descripcion",
+    "servicio-nombre",
+    "servicio-descripcion",
+    "tarifa-select-profesional",
+    "tarifa-select-servicio",
+    "tarifa-precio-duracion",
+]);
+const PASOS_FORMULARIO_PROFESIONAL = new Set([
+    "profesional-nombre",
+    "profesional-correo",
+    "profesional-telefono",
+    "profesional-rut",
+    "profesional-descripcion",
+    "profesional-guardar",
+]);
+const SELECTORES_PASOS_FORMULARIO_PROFESIONAL = new Set(
+    [...PASOS_FORMULARIO_PROFESIONAL].map((id) => `[data-tour="${id}"]`)
+);
+const PASOS_FORMULARIO_SERVICIO = new Set([
+    "servicio-nombre",
+    "servicio-descripcion",
+    "servicio-guardar",
+]);
+const SELECTORES_PASOS_FORMULARIO_SERVICIO = new Set(
+    [...PASOS_FORMULARIO_SERVICIO].map((id) => `[data-tour="${id}"]`)
+);
+const PASOS_BLOQUEO_CON_CAMPO_OBLIGATORIO = new Set([
+    "bloqueos-profesional",
+    "bloqueos-calendario",
+    "bloqueos-horario",
+    "bloqueos-motivo",
+    "bloqueos-rango-profesional",
+    "bloqueos-rango-fechas",
+    "bloqueos-rango-dias",
+    "bloqueos-rango-horario",
+    "bloqueos-rango-motivo",
+]);
+const PASOS_GUARDADO_BLOQUEO = new Set(["bloqueos-guardar", "bloqueos-rango-guardar"]);
+const PASOS_TARIFA = new Set([
+    "tarifa-select-profesional",
+    "tarifa-select-servicio",
+    "tarifa-precio-duracion",
+    "tarifa-guardar",
+]);
+const SELECTORES_PASOS_TARIFA = new Set([...PASOS_TARIFA].map((id) => `[data-tour="${id}"]`));
 
 const TOUR_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
   <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round" />
@@ -42,10 +92,14 @@ function waitForRoute(pathnameRef, target, callback) {
     }
     let attempts = 0;
     const tick = () => {
-        if (pathnameRef.current === target || attempts > 100) {
+        if (pathnameRef.current === target) {
             callback();
             return;
         }
+        // No se debe mostrar el paso de la ruta de destino sobre la pantalla
+        // anterior. Si la navegación falla, el popover actual permanece vivo y
+        // el usuario puede volver a intentarlo o cerrar el tutorial.
+        if (attempts > 100) return;
         attempts += 1;
         setTimeout(tick, POLL_MS);
     };
@@ -144,12 +198,15 @@ function esperarCondicionDelPaso(step, pathnameRef, alCumplirse, alDemorarse) {
         if (gate.tipo === "aparece") return !!document.querySelector(gate.selector);
         if (gate.tipo === "desaparece") return !document.querySelector(gate.selector);
         if (gate.tipo === "sale-de-ruta") return pathnameRef.current !== gate.ruta;
+        if (gate.tipo === "atributo") {
+            return document.querySelector(gate.selector)?.getAttribute(gate.atributo) === gate.valor;
+        }
         // La marca la deja el calendario recién cuando el backend confirmó la
         // reserva. Es más exacta que "el panel se cerró": cancelar el panel
         // también lo cierra, y así el tour no confunde un "Cancelar" con un
         // agendamiento exitoso. El tour la borra al arrancar, de modo que solo
         // puede venir de esta corrida.
-        if (gate.tipo === "reserva-creada") return !!obtenerRutReservaDeTour();
+        if (gate.tipo === "reserva-creada") return reservaConfirmadaDeTour();
         return true;
     };
 
@@ -303,6 +360,11 @@ export function TourProvider({ children }) {
     const driverRef = useRef(null);
     const pathnameRef = useRef(pathname);
     const detachWatchersRef = useRef(null);
+    const limpiarValidacionCampoRef = useRef(null);
+    const cantidadProfesionalesRef = useRef(null);
+    const cantidadServiciosRef = useRef(null);
+    const cantidadTarifasRef = useRef(null);
+    const bloqueosGuardadosTourRef = useRef(0);
     // Último paso cuyo onHighlighted ya se ejecutó. driver.js vuelve a disparar
     // onHighlighted en cada refresh(), y el watcher de layout llama a refresh()
     // cada vez que algo se mueve — sin este guard, los efectos secundarios del
@@ -334,9 +396,60 @@ export function TourProvider({ children }) {
         pathnameRef.current = pathname;
     }, [pathname]);
 
+    const actualizarCantidadProfesionales = useCallback((cantidad) => {
+        cantidadProfesionalesRef.current = Number.isInteger(cantidad) && cantidad >= 0 ? cantidad : null;
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (SELECTORES_PASOS_FORMULARIO_PROFESIONAL.has(pasoActivo?.element)) {
+            driverRef.current.refresh();
+        }
+    }, []);
+
+    const actualizarCantidadServicios = useCallback((cantidad) => {
+        cantidadServiciosRef.current = Number.isInteger(cantidad) && cantidad >= 0 ? cantidad : null;
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (SELECTORES_PASOS_FORMULARIO_SERVICIO.has(pasoActivo?.element)) {
+            driverRef.current.refresh();
+        }
+    }, []);
+
+    const continuarTourTrasGuardarServicio = useCallback(() => {
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (pasoActivo?.element !== '[data-tour="servicio-guardar"]') return;
+        pasoActivo.popover?.onNextClick?.();
+    }, []);
+
+    const continuarTourTrasGuardarReserva = useCallback(() => {
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (pasoActivo?.element !== '[data-tour="reserva-guardar"]') return;
+        pasoActivo.popover?.onNextClick?.();
+    }, []);
+
+    const actualizarCantidadTarifas = useCallback((cantidad) => {
+        cantidadTarifasRef.current = Number.isInteger(cantidad) && cantidad >= 0 ? cantidad : null;
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (SELECTORES_PASOS_TARIFA.has(pasoActivo?.element)) {
+            driverRef.current.refresh();
+        }
+    }, []);
+
+    const continuarTourTrasGuardarTarifa = useCallback(() => {
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (pasoActivo?.element !== '[data-tour="tarifa-guardar"]') return;
+        pasoActivo.popover?.onNextClick?.();
+    }, []);
+
+    const continuarTourTrasGuardarBloqueo = useCallback(() => {
+        const pasoActivo = driverRef.current?.getActiveStep();
+        if (pasoActivo?.element !== '[data-tour="bloqueo-guardar"]') return;
+        bloqueosGuardadosTourRef.current += 1;
+        pasoActivo.popover?.onNextClick?.();
+    }, []);
+
     useEffect(() => () => {
         detachWatchersRef.current?.();
         detachWatchersRef.current = null;
+        limpiarValidacionCampoRef.current?.();
+        limpiarValidacionCampoRef.current = null;
         driverRef.current?.destroy();
         driverRef.current = null;
     }, []);
@@ -346,10 +459,123 @@ export function TourProvider({ children }) {
             const isFirst = index === 0;
             const isLast = index === tourSteps.length - 1;
             const isInteractive = step.interactive === true;
+            const camposDelPaso = () =>
+                document.querySelector(step.selector)?.querySelectorAll("input, textarea, select");
+            const camposDelPasoCompletos = () => {
+                if (PASOS_BLOQUEO_CON_CAMPO_OBLIGATORIO.has(step.id)) {
+                    return document.querySelector(step.selector)?.getAttribute("data-tour-completo") === "true";
+                }
+                const campos = camposDelPaso();
+                return !!campos?.length && [...campos].every((campo) => {
+                    const valor = campo.value.trim();
+                    if (!valor) return false;
+                    return step.id !== "tarifa-precio-duracion" || Number(valor) > 0;
+                });
+            };
+
+            const obtenerIndiceDestino = (omitir = false) => {
+                if ((!omitir && step.id !== "calendario-guardar") || !step.omitirHasta) return index + 1;
+
+                const indiceConfigurado = tourSteps.findIndex((candidate) => candidate.id === step.omitirHasta);
+                if (indiceConfigurado >= 0) return indiceConfigurado;
+
+                // El rol puede no tener acceso al destino configurado. En ese
+                // caso se toma el primer paso permitido que venga después en el
+                // recorrido original, en vez de caer en un tramo dependiente.
+                const indiceOriginal = TOUR_STEPS.findIndex((candidate) => candidate.id === step.omitirHasta);
+                if (indiceOriginal >= 0) {
+                    const idsPosteriores = new Set(TOUR_STEPS.slice(indiceOriginal + 1).map((candidate) => candidate.id));
+                    const siguientePermitido = tourSteps.findIndex(
+                        (candidate, candidateIndex) => candidateIndex > index && idsPosteriores.has(candidate.id)
+                    );
+                    if (siguientePermitido >= 0) return siguientePermitido;
+                }
+
+                return index + 1;
+            };
+
+            // Tanto "Siguiente" como "Omitir" usan esta misma navegación para
+            // conservar los cambios de ruta, las ramas opcionales y la espera de
+            // layout estable. La diferencia es que "Omitir" no ejecuta la
+            // condición `esperar` del paso actual.
+            const moverAlDestino = (fromIndex, token) => {
+                const vigente = () => token === avanceTokenRef.current;
+                const firstTarget = tourSteps[fromIndex];
+
+                if (!firstTarget) {
+                    if (vigente()) driverRef.current?.moveNext();
+                    return;
+                }
+
+                const resolverDestino = () =>
+                    resolveBranchTarget(tourSteps, fromIndex, (target) => {
+                        if (!vigente()) return;
+
+                        const targetStep = tourSteps[target];
+                        const mostrarDestino = () =>
+                            waitForStableElement(targetStep?.selector, () => {
+                                if (!vigente()) return;
+                                if (target === index + 1) {
+                                    driverRef.current?.moveNext();
+                                } else {
+                                    driverRef.current?.drive(target);
+                                }
+                            });
+
+                        // El destino resuelto puede ser distinto del candidato
+                        // inicial (ramas opcionales). Se comprueba nuevamente su
+                        // ruta para que un salto nunca quede buscando el ancla en
+                        // la pantalla anterior.
+                        if (targetStep?.route && targetStep.route !== pathnameRef.current) {
+                            router.push(targetStep.route);
+                            waitForRoute(pathnameRef, targetStep.route, mostrarDestino);
+                            return;
+                        }
+                        mostrarDestino();
+                    });
+
+                if (firstTarget.route && firstTarget.route !== pathnameRef.current) {
+                    router.push(firstTarget.route);
+                    waitForRoute(pathnameRef, firstTarget.route, resolverDestino);
+                    return;
+                }
+                resolverDestino();
+            };
+
+            const avanzarDesdePaso = (omitir = false) => {
+                if (omitir && PASOS_FORMULARIO_PROFESIONAL.has(step.id) && !(cantidadProfesionalesRef.current > 0)) return;
+                if (omitir && PASOS_FORMULARIO_SERVICIO.has(step.id) && !(cantidadServiciosRef.current > 0)) return;
+                if (omitir && PASOS_TARIFA.has(step.id) && !(cantidadTarifasRef.current > 0)) return;
+                if (omitir && step.grupo === "Bloqueos") return;
+                const guardadosRequeridos = step.id === "bloqueos-rango-guardar" ? 2 : 1;
+                if (PASOS_GUARDADO_BLOQUEO.has(step.id) && bloqueosGuardadosTourRef.current < guardadosRequeridos) return;
+                const token = (avanceTokenRef.current += 1);
+                const navegarYAvanzar = () => {
+                    if (token !== avanceTokenRef.current) return;
+                    avisoStepIdRef.current = null;
+                    ocultarAvisoDelPaso();
+                    moverAlDestino(obtenerIndiceDestino(omitir), token);
+                };
+
+                if (omitir) {
+                    navegarYAvanzar();
+                    return;
+                }
+
+                // El avance normal mantiene las validaciones reales del paso.
+                // Solo "Omitir" pasa directamente al destino seguro.
+                esperarCondicionDelPaso(step, pathnameRef, navegarYAvanzar, () => {
+                    if (token !== avanceTokenRef.current) return;
+                    avisoStepIdRef.current = step.id;
+                    mostrarAvisoDelPaso();
+                    driverRef.current?.refresh();
+                });
+            };
 
             return {
                 element: step.selector,
                 advanceOnClick: isInteractive,
+                ...(step.grupo === "Bloqueos" ? { skipMissingElement: false } : {}),
                 onHighlighted: (element) => {
                     // Antes del guard de re-entrada: el popover se vuelve a dibujar
                     // en cada refresh() y perdería el aviso encendido.
@@ -424,75 +650,108 @@ export function TourProvider({ children }) {
                     align: step.align || "start",
                     title: `<span class="ac-tour-icon-badge">${TOUR_ICON_SVG}</span><span class="ac-tour-title-text">${step.title}</span>`,
                     description: `${buildTourMeta(step, tourGroups)}<p class="ac-tour-text">${step.description}</p>${buildTourAviso(step)}`,
-                    // Un paso interactivo no ofrece "Siguiente" —avanzar sin
+                    // Un paso interactivo o un guardado no ofrece "Siguiente" —avanzar sin
                     // hacer la acción es justamente lo que rompía el tour— pero sí
                     // "Atrás". Sin eso, quien no lograba guardar la reserva quedaba
                     // encerrado: ningún botón lo movía y tenía que cerrar el
                     // tutorial y empezarlo de nuevo para volver a ese punto.
-                    showButtons: isInteractive
+                    showButtons: (isInteractive || step.id === "servicio-guardar" || step.id === "tarifa-guardar" || PASOS_GUARDADO_BLOQUEO.has(step.id))
                         ? (isFirst || step.noPrevious) ? ["close"] : ["previous", "close"]
                         : (isFirst || step.noPrevious) ? ["next", "close"] : ["next", "previous", "close"],
                     nextBtnText: isLast ? "Finalizar" : "Siguiente",
                     prevBtnText: "Atrás",
-                    // Antes se esperaba layout estable SOLO cuando el paso
-                    // siguiente cambiaba de ruta. Pero un paso con route:null
-                    // también puede aterrizar sobre un elemento que todavía se
-                    // está moviendo (la animación de DashboardPageTransition, un
-                    // acordeón abriéndose, datos que llegan async), y ahí driver
-                    // medía antes de tiempo y dejaba el recuadro corrido. Ahora
-                    // la espera de estabilidad es incondicional; lo único
-                    // condicional es la navegación previa.
-                    onNextClick: () => {
-                        const token = (avanceTokenRef.current += 1);
-                        const vigente = () => token === avanceTokenRef.current;
-                        const nextIndex = index + 1;
-                        const next = tourSteps[nextIndex];
-                        const advance = () =>
-                            resolveBranchTarget(tourSteps, nextIndex, (target) => {
-                                waitForStableElement(tourSteps[target]?.selector, () => {
-                                    if (!vigente()) return;
-                                    if (target === nextIndex) {
-                                        driverRef.current?.moveNext();
-                                    } else {
-                                        driverRef.current?.drive(target);
-                                    }
-                                });
+                    onPopoverRender: (popover) => {
+                        limpiarValidacionCampoRef.current?.();
+                        limpiarValidacionCampoRef.current = null;
+
+                        if ((PASOS_CON_CAMPO_OBLIGATORIO.has(step.id) || PASOS_BLOQUEO_CON_CAMPO_OBLIGATORIO.has(step.id)) && popover?.nextButton) {
+                            const campos = camposDelPaso();
+                            const botonSiguiente = popover.nextButton;
+                            const actualizarBoton = () => {
+                                botonSiguiente.disabled = !camposDelPasoCompletos();
+                            };
+                            let esperaActualizacion = null;
+                            const actualizarDespuesDeEdicion = () => {
+                                window.clearTimeout(esperaActualizacion);
+                                esperaActualizacion = window.setTimeout(actualizarBoton, 0);
+                            };
+
+                            botonSiguiente.classList.add("disabled:!cursor-not-allowed", "disabled:!opacity-50");
+                            actualizarBoton();
+                            campos?.forEach((campo) => {
+                                campo.addEventListener("input", actualizarDespuesDeEdicion);
+                                campo.addEventListener("change", actualizarDespuesDeEdicion);
+                                campo.addEventListener("paste", actualizarDespuesDeEdicion);
                             });
+                            const raizDelPaso = PASOS_BLOQUEO_CON_CAMPO_OBLIGATORIO.has(step.id)
+                                ? document.querySelector(step.selector)
+                                : null;
+                            const observador = raizDelPaso ? new MutationObserver(actualizarBoton) : null;
+                            if (observador) observador.observe(raizDelPaso, { attributes: true, attributeFilter: ["data-tour-completo"] });
+                            limpiarValidacionCampoRef.current = () => {
+                                window.clearTimeout(esperaActualizacion);
+                                observador?.disconnect();
+                                campos?.forEach((campo) => {
+                                    campo.removeEventListener("input", actualizarDespuesDeEdicion);
+                                    campo.removeEventListener("change", actualizarDespuesDeEdicion);
+                                    campo.removeEventListener("paste", actualizarDespuesDeEdicion);
+                                });
+                            };
+                        }
 
-                        const navegarYAvanzar = () => {
-                            if (!vigente()) return;
-                            avisoStepIdRef.current = null;
-                            ocultarAvisoDelPaso();
-                            if (next?.route && next.route !== pathnameRef.current) {
-                                router.push(next.route);
-                                waitForRoute(pathnameRef, next.route, advance);
-                                return;
-                            }
-                            advance();
-                        };
+                        if (
+                            step.final ||
+                            step.id === "config-clinica" ||
+                            step.id === "config-profesionales" ||
+                            step.id === "config-servicios" ||
+                            step.id === "config-tarifa" ||
+                            step.id === "contenido-web" ||
+                            ["panel-resumen", "panel-filtros", "panel-exportar"].includes(step.id) ||
+                            ["calendario-horario", "calendario-paciente", "calendario-servicio"].includes(step.id) ||
+                            step.id === "profesional-nuevo" ||
+                            step.id === "profesional-lista" ||
+                            (PASOS_FORMULARIO_PROFESIONAL.has(step.id) && !(cantidadProfesionalesRef.current > 0)) ||
+                            (PASOS_FORMULARIO_SERVICIO.has(step.id) && !(cantidadServiciosRef.current > 0)) ||
+                            (PASOS_TARIFA.has(step.id) && !(cantidadTarifasRef.current > 0)) ||
+                            step.grupo === "Bloqueos" ||
+                            !popover?.footerButtons
+                        ) return;
 
-                        // Primero se comprueba que lo que este paso pedía haya
-                        // ocurrido de verdad (el formulario se abrió, la cita se
-                        // guardó, la ficha se abrió). Si no ocurrió, no se avanza
-                        // y se le dice al usuario por qué sigue en el mismo paso.
-                        esperarCondicionDelPaso(step, pathnameRef, navegarYAvanzar, () => {
-                            if (!vigente()) return;
-                            avisoStepIdRef.current = step.id;
-                            mostrarAvisoDelPaso();
-                            // El aviso cambia el alto del popover: hay que
-                            // reubicarlo para que no quede pisando el elemento.
-                            driverRef.current?.refresh();
-                        });
+                        const botonOmitir = document.createElement("button");
+                        botonOmitir.type = "button";
+                        botonOmitir.textContent = "Omitir";
+                        botonOmitir.setAttribute("aria-label", "Omitir este paso del tutorial");
+                        botonOmitir.className = "ac-tour-omitir-btn !border-amber-200 !bg-amber-50 !text-amber-800 hover:!bg-amber-100 focus-visible:!outline-none focus-visible:!ring-2 focus-visible:!ring-amber-400";
+                        botonOmitir.addEventListener("click", () => avanzarDesdePaso(true), { once: true });
+
+                        // Algunos pasos interactivos no muestran los botones
+                        // nativos de navegación; se fuerza el footer visible para
+                        // que "Omitir" siga estando disponible.
+                        popover.footer?.classList.add("!flex");
+                        popover.footerButtons.insertBefore(botonOmitir, popover.nextButton);
+                    },
+                    onNextClick: () => {
+                        if ((PASOS_CON_CAMPO_OBLIGATORIO.has(step.id) || PASOS_BLOQUEO_CON_CAMPO_OBLIGATORIO.has(step.id)) && !camposDelPasoCompletos()) return;
+                        avanzarDesdePaso(false);
                     },
                     onPrevClick: () => {
                         const token = (avanceTokenRef.current += 1);
                         avisoStepIdRef.current = null;
                         ocultarAvisoDelPaso();
-                        const prev = tourSteps[index - 1];
+                        const idRetroceso = step.retrocederHasta || (step.id === "profesional-lista" ? "profesional-nuevo" : null);
+                        const indiceRetrocesoConfigurado = idRetroceso
+                            ? tourSteps.findIndex((candidate) => candidate.id === idRetroceso)
+                            : -1;
+                        const prevIndex = indiceRetrocesoConfigurado >= 0 ? indiceRetrocesoConfigurado : index - 1;
+                        const prev = tourSteps[prevIndex];
                         const goBack = () =>
                             waitForStableElement(prev?.selector, () => {
                                 if (token !== avanceTokenRef.current) return;
-                                driverRef.current?.movePrevious();
+                                if (prevIndex === index - 1) {
+                                    driverRef.current?.movePrevious();
+                                } else {
+                                    driverRef.current?.drive(prevIndex);
+                                }
                             });
 
                         if (prev?.route && prev.route !== pathnameRef.current) {
@@ -536,6 +795,8 @@ export function TourProvider({ children }) {
             onDestroyed: (_element, _step, opts) => {
                 detachWatchersRef.current?.();
                 detachWatchersRef.current = null;
+                limpiarValidacionCampoRef.current?.();
+                limpiarValidacionCampoRef.current = null;
                 setIsRunning(false);
                 document.documentElement.style.scrollBehavior = scrollPrevioRef.current || "";
                 try { localStorage.setItem(COMPLETED_KEY, "1"); } catch {}
@@ -568,6 +829,7 @@ export function TourProvider({ children }) {
         lastHighlightedRef.current = null;
         avanceTokenRef.current += 1;
         avisoStepIdRef.current = null;
+        bloqueosGuardadosTourRef.current = 0;
         // Una marca vieja (otra corrida del tour, misma pestaña) haría que el
         // paso de "Agendar" se diera por cumplido sin haber agendado nada.
         limpiarReservaDeTour();
@@ -594,7 +856,7 @@ export function TourProvider({ children }) {
     }, []);
 
     return (
-        <TourContext.Provider value={{ start, skip, isRunning }}>
+        <TourContext.Provider value={{ start, skip, isRunning, actualizarCantidadProfesionales, actualizarCantidadServicios, continuarTourTrasGuardarServicio, continuarTourTrasGuardarReserva, actualizarCantidadTarifas, continuarTourTrasGuardarTarifa, continuarTourTrasGuardarBloqueo }}>
             {children}
         </TourContext.Provider>
     );

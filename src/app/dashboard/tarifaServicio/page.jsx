@@ -5,6 +5,7 @@ import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import { SelectDinamic } from "@/Componentes/SelectDinamic";
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
+import { useTour } from "@/ContextosGlobales/TourContext";
 import {
     Table,
     TableBody,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/table"
 
 export default function TarifaServicio() {
+    const { actualizarCantidadTarifas, continuarTourTrasGuardarTarifa } = useTour();
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [listaServiciosProfesionales, setListaServiciosProfesionales] = useState([]);
     const [listaTarifasProfesionales, setListaTarifasProfesionales] = useState([]);
@@ -34,6 +36,7 @@ export default function TarifaServicio() {
 
 
     async function seleccionarTodasTarifasProfesionales() {
+        actualizarCantidadTarifas(null);
         try {
             const res = await fetch(`${API}/tarifasProfesional/seleccionarTodasTarifasConNombres`, {
                 method: 'GET',
@@ -46,8 +49,9 @@ export default function TarifaServicio() {
             }else{
 
                 const respustaBackend = await res.json();
-                if(respustaBackend){
+                if(Array.isArray(respustaBackend)){
                     setListaTarifasProfesionales(respustaBackend);
+                    actualizarCantidadTarifas(respustaBackend.length);
 
                 }else{
                     return toast.error('Error al cargar los Tarifas y Servicios Profesionales, por favor intente nuevamente .');
@@ -61,6 +65,7 @@ export default function TarifaServicio() {
 
     useEffect(() => {
         seleccionarTodasTarifasProfesionales();
+        return () => actualizarCantidadTarifas(null);
     }, []);
 
 
@@ -135,6 +140,7 @@ export default function TarifaServicio() {
                     setservicio_id('');
                     setId_tarifaProfesional('');
                     await seleccionarTodasTarifasProfesionales();
+                    continuarTourTrasGuardarTarifa();
 
                     return toast.success('Tarifa guardada correctamente.');
 

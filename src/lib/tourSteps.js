@@ -13,6 +13,13 @@
  * noPrevious: true   -> oculta el botón "Atrás" en este paso (usado después
  *                        de un paso interactivo, donde volver atrás no aplica
  *                        de forma segura).
+ * retrocederHasta: "id" -> al presionar "Atrás", vuelve a un paso estable
+ *                        específico. Es útil cuando el paso inmediatamente
+ *                        anterior depende de estado local que se pierde al
+ *                        cambiar de ruta.
+ * omitirHasta: "id"  -> al presionar "Omitir", salta directamente al paso
+ *                        indicado. Se usa cuando el paso siguiente depende de
+ *                        una acción que el usuario decidió no realizar.
  * skipIfExpanded: true -> para pasos interactivos que abren un acordeón con
  *                        toggle: si el usuario repite el tour y ya lo dejó
  *                        abierto de una corrida anterior, el clic normal lo
@@ -32,6 +39,8 @@
  *                          { tipo: "aparece", selector }     el elemento debe existir
  *                          { tipo: "desaparece", selector }  el elemento debe irse
  *                          { tipo: "sale-de-ruta", ruta }    debe haber navegado
+ *                          { tipo: "atributo", selector,
+ *                            atributo, valor }                el atributo debe coincidir
  *                        Si no se cumple, el paso se queda donde está y el
  *                        usuario puede corregir y volver a intentarlo.
  * aviso: "texto"    -> qué mostrar dentro del popover si la condición de
@@ -77,11 +86,12 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-nuevo"]',
     title: "Paso 1: Crea un profesional",
-    description: "Cada profesional que registres aparece aquí como una tarjeta, con su agenda propia. El botón resaltado es <strong>\"Nuevo Profesional\"</strong> — lo abrimos por ti y seguimos juntos dentro del formulario.",
+    description: "Cada profesional que registres aparece aquí como una tarjeta, con su agenda propia. Haz clic en el botón <strong>\"Nuevo Profesional\"</strong> resaltado para abrir el formulario; desde ahí te guiaremos campo por campo.",
     side: "bottom",
-    // El formulario vive en un modal: el tour lo abre solo para que los pasos
-    // siguientes encuentren los campos en pantalla.
-    autoAbrir: true,
+    interactive: true,
+    esperar: { tipo: "aparece", selector: '[data-tour="profesional-nombre"]' },
+    aviso: "El formulario de nuevo profesional todavía no se abrió. Haz clic en el botón <strong>\"Nuevo Profesional\"</strong> resaltado para continuar.",
+    omitirHasta: "profesional-lista",
   },
   {
     id: "profesional-nombre",
@@ -89,7 +99,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-nombre"]',
     title: "Paso 1: Crea un profesional",
-    description: "Escribe aquí el nombre completo del profesional (por ejemplo: <em>Dra. Andrea Moran</em>). Este nombre es el que va a aparecer para que tus pacientes elijan con quién atenderse.",
+    description: "Este será el <strong>nombre visible del profesional en tu agenda</strong>. Escríbelo tal como quieres que lo identifiquen al reservar, por ejemplo: <em>Dr. Greg House</em>.",
     side: "bottom",
   },
   {
@@ -98,7 +108,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-correo"]',
     title: "Paso 1: Crea un profesional",
-    description: "El <strong>correo del profesional</strong>. Es obligatorio y sirve para contactarlo y para identificarlo dentro de la plataforma.",
+    description: "Este correo es <strong>muy importante</strong>: aquí llegarán las notificaciones de nuevos agendamientos y los avisos cuando sus agendas se creen o se actualicen. Así el profesional puede mantenerse informado de los cambios.",
     side: "bottom",
   },
   {
@@ -107,7 +117,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-telefono"]',
     title: "Paso 1: Crea un profesional",
-    description: "El <strong>teléfono</strong>, también obligatorio. Puedes escribirlo como 12345678 o +56912345678: el campo lo ordena solo y te avisa si quedó incompleto.",
+    description: "El <strong>teléfono</strong> es un dato de contacto relevante para otras funciones dentro del sistema. Puedes escribirlo como 12345678 o +56912345678: el campo lo ordena automáticamente y te avisa si quedó incompleto.",
     side: "bottom",
   },
   {
@@ -116,7 +126,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-rut"]',
     title: "Paso 1: Crea un profesional",
-    description: "El <strong>RUT del profesional</strong>. Escríbelo sin puntos ni guión, que se formatea solo. <strong>Es importante:</strong> este RUT viaja después al pie de firma de cada receta, orden de examen y presupuesto que emita, sin que nadie tenga que volver a escribirlo.",
+    description: "El <strong>RUT del profesional</strong> es importante si presta servicios de salud, porque esta información es requerida en las fichas clínicas. Escríbelo sin puntos ni guión: el sistema lo formatea automáticamente.",
     side: "bottom",
   },
   {
@@ -125,7 +135,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/profesionales",
     selector: '[data-tour="profesional-descripcion"]',
     title: "Paso 1: Crea un profesional",
-    description: "Aquí va la especialidad del profesional. <strong>Que sea corta, de una o dos líneas</strong>: se muestra tal cual en tu página web, así que mientras más simple y clara, mejor se ve para tus pacientes. El correo, el teléfono y el RUT también son obligatorios — el RUT se usa después para firmar recetas y documentos.",
+    description: "Aquí escribe el <strong>título o la especialidad</strong>, por ejemplo: Médico, Matrona, Cirujano Dentista, Nutricionista, Psicólogo o la especialidad que estimes pertinente. Los pacientes verán este texto al agendar desde la web, por eso debe ser claro y no demasiado largo.",
     side: "bottom",
   },
   {
@@ -136,6 +146,10 @@ export const TOUR_STEPS = [
     title: "Paso 1: Crea un profesional",
     description: "Presiona <strong>\"Registrar Profesional\"</strong> para crearlo. En cuanto lo guardes aparece como tarjeta en la lista, con su agenda lista — solo falta darle un servicio para que pueda recibir reservas. Repite este paso por cada profesional de tu clínica.",
     side: "top",
+    interactive: true,
+    esperar: { tipo: "desaparece", selector: '[data-tour="profesional-guardar"]' },
+    aviso: "El profesional <strong>todavía no se guardó</strong>. Revisa los campos obligatorios y los mensajes del formulario; luego vuelve a presionar <strong>\"Registrar Profesional\"</strong>.",
+    omitirHasta: "profesional-lista",
   },
   {
     id: "profesional-lista",
@@ -218,7 +232,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/tarifaServicio",
     selector: '[data-tour="tarifa-precio-duracion"]',
     title: "Paso 3: Asigna el servicio (obligatorio)",
-    description: "Define el precio de la consulta y cuántos minutos dura. La duración es importante: de eso depende cada cuánto tiempo se generan los horarios disponibles en la agenda (ej: cada 30 o 60 minutos).",
+    description: "Ingresa el precio y la duración en minutos (por ejemplo, 30 o 60).",
     side: "bottom",
   },
   {
@@ -283,7 +297,7 @@ export const TOUR_STEPS = [
     title: "Calendario y Reservas",
     // Se nombra el botón por su texto, no por su color: el resaltado del tour ya
     // lo señala y "morado" no le sirve a quien no distingue ese color.
-    description: "Haz clic en el botón <strong>\"Nueva reserva\"</strong> que está resaltado para abrir el formulario de la cita.",
+    description: "Haz clic en el botón <strong>\"Nueva reserva\"</strong> que está resaltado para abrir el formulario de la cita. Si eliges <strong>\"Omitir\"</strong>, el tour pasará directamente a explicar los bloqueos de horarios.",
     side: "left",
     align: "start",
     interactive: true,
@@ -291,6 +305,7 @@ export const TOUR_STEPS = [
     // abrió, los pasos siguientes anclarían a campos que no existen.
     esperar: { tipo: "aparece", selector: '[data-tour="reserva-drawer"]' },
     aviso: "El formulario de la cita todavía no se abrió, y el tutorial no puede seguir sin él. Vuelve a hacer clic en el botón <strong>\"Nueva reserva\"</strong> resaltado.",
+    omitirHasta: "bloqueos-profesional",
   },
   {
     id: "calendario-horario",
@@ -308,7 +323,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/calendario",
     selector: '[data-tour="reserva-paciente"]',
     title: "Calendario y Reservas",
-    description: "Datos del paciente. Para esta prueba, usa tu propio nombre, RUT, correo y celular — así vas a recibir de verdad las notificaciones y ver cómo funcionan.",
+    description: "Para esta prueba, usa tu propio nombre, RUT, correo y celular para recibir las notificaciones. Si no conoces el RUT, puedes marcar la casilla <strong>\"RUT desconocido\"</strong>. <div class=\"ac-tour-callout\"><span>Ten presente que el RUT se utiliza para crear la ficha clínica. Sin este dato, <strong>no podrás crear una ficha para el paciente</strong>.</span></div>",
     side: "left",
   },
   {
@@ -326,7 +341,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/calendario",
     selector: '[data-tour="reserva-guardar"]',
     title: "Calendario y Reservas",
-    description: "Haz clic en <strong>\"Agendar\"</strong> para guardar de verdad. <div class=\"ac-tour-callout\"><span>Si falta un dato obligatorio o el horario ya está ocupado, el sistema te avisa con un mensaje en pantalla y la cita <strong>no</strong> se guarda. Si eso pasa, corrige lo que falte y vuelve a presionar \"Agendar\" antes de continuar.</span></div>",
+    description: "Te recomendamos <strong>agendarte a ti mismo</strong> con tu correo y celular para comprobar cómo aparece la cita en la agenda y qué mensajes recibes. Haz clic en <strong>\"Agendar\"</strong> para guardarla; cuando se confirme, el tour pasará directamente a <strong>Bloqueos de agendas</strong>. Si prefieres no crear una cita, presiona <strong>\"Omitir\"</strong> para ir a esa misma sección. <div class=\"ac-tour-callout\"><span>Si falta un dato obligatorio o el horario ya está ocupado, el sistema te avisa con un mensaje en pantalla y la cita <strong>no</strong> se guarda. Si eso pasa, corrige lo que falte y vuelve a presionar \"Agendar\" antes de continuar.</span></div>",
     side: "top",
     interactive: true,
     // Avanza solo cuando el backend confirmó la cita. Si faltaba un dato o la
@@ -336,6 +351,7 @@ export const TOUR_STEPS = [
     // cierra y eso no es haber agendado.
     esperar: { tipo: "reserva-creada" },
     aviso: "La cita <strong>todavía no se guardó</strong>, así que el tutorial se queda aquí. Mira el mensaje que salió en pantalla: suele faltar un dato obligatorio o el horario ya está ocupado. Usa <strong>\"Atrás\"</strong> para volver a los campos, corrige y presiona <strong>\"Agendar\"</strong> de nuevo.",
+    omitirHasta: "bloqueos-profesional",
   },
 
   // ── De la reserva a la ficha clínica ─────────────────────────────────────
@@ -373,6 +389,7 @@ export const TOUR_STEPS = [
     // ventana del navegador, sigue en el Panel y el tour lo espera acá.
     esperar: { tipo: "sale-de-ruta", ruta: "/dashboard" },
     aviso: "La ficha todavía no se abrió. Haz clic en el <strong>ícono de ojo</strong> resaltado; si el navegador te muestra una ventana preguntando si quieres crear la ficha, presiona <strong>Aceptar</strong>.",
+    omitirHasta: "bloqueos-profesional",
     // Viene después de "calendario-guardar", que es interactivo: al guardar, el
     // drawer de la reserva se cierra, así que "Atrás" apuntaría a un formulario
     // que ya no existe.
@@ -437,13 +454,35 @@ export const TOUR_STEPS = [
 
   // ── Bloqueos ─────────────────────────────────────────────────────────────
   {
+    id: "bloqueos-profesional",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-profesional"]',
+    title: "Bloqueos",
+    description: "Selecciona el profesional cuya agenda vas a bloquear. Si ya tienes una agenda asignada, aparecerá seleccionada automáticamente.",
+    side: "right",
+    retrocederHasta: "calendario-nueva-reserva",
+  },
+  {
     id: "bloqueos-modo",
     grupo: "Bloqueos",
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-modo-selector"]',
     title: "Bloqueos",
-    description: "Este tramo es solo explicativo — no hace falta que crees un bloqueo real ahora, luego lo haces tú con calma. Elige \"Días específicos\" para marcar días sueltos en el calendario (por ejemplo, solo los miércoles), o \"Rango de fechas\" para bloquear un período completo indicando los días de la semana.",
+    description: "Primero crearás un bloqueo con <strong>Días específicos</strong>: puedes elegir una o varias fechas sueltas. Cuando guardes tu primer bloqueo, te mostraré cómo funciona <strong>Rango de fechas</strong> para repetirlo en determinados días de un período.",
     side: "right",
+  },
+  {
+    id: "bloqueos-especificos-boton",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-especificos-boton"]',
+    title: "Bloqueos: día específico",
+    description: "Haz clic en <strong>Días específicos</strong> para elegir en el calendario al menos un día que quieras bloquear.",
+    side: "right",
+    interactive: true,
+    esperar: { tipo: "aparece", selector: '[data-tour="bloqueo-calendario"]' },
+    aviso: "Selecciona <strong>Días específicos</strong> para abrir el calendario.",
   },
   {
     id: "bloqueos-calendario",
@@ -451,7 +490,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-calendario"]',
     title: "Bloqueos",
-    description: "Haz clic en los días que quieres bloquear; puedes seleccionar varios días no consecutivos.",
+    description: "Selecciona al menos un día futuro en el calendario. Puedes marcar varios días no consecutivos; cada uno se guardará como un bloqueo independiente.",
     side: "right",
   },
   {
@@ -460,7 +499,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-rango-horario"]',
     title: "Bloqueos",
-    description: "Define la hora de inicio y término: se aplica a todos los días que seleccionaste.",
+    description: "Define una hora de inicio y una de término posterior. Este horario se aplicará a todos los días seleccionados.",
     side: "right",
   },
   {
@@ -469,7 +508,7 @@ export const TOUR_STEPS = [
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-motivo"]',
     title: "Bloqueos",
-    description: "El motivo es obligatorio: sin él no vas a poder guardar el bloqueo. Ej: Vacaciones, Congreso, capacitación.",
+    description: "Escribe el motivo del bloqueo, por ejemplo: Vacaciones, Congreso o capacitación.",
     side: "right",
   },
   {
@@ -478,8 +517,91 @@ export const TOUR_STEPS = [
     route: "/dashboard/bloqueosAgenda",
     selector: '[data-tour="bloqueo-guardar"]',
     title: "Bloqueos",
-    description: "Este botón guarda el bloqueo. Cada día queda bloqueado de forma independiente y se puede eliminar por separado más tarde desde la tabla de la derecha; el calendario de arriba no se marca visualmente, así que no te preocupes si se ve igual. <div class=\"ac-tour-callout\"><span>Hasta aquí llega la parte explicativa — cuando quieras, créalo tú mismo con tranquilidad para tus bloqueos reales.</span></div>",
+    description: "Presiona <strong>Ingresar Bloqueo(s)</strong> para crear tu primer bloqueo. El tutorial continuará solo cuando se haya guardado al menos un día; después te mostraré la opción <strong>Rango de fechas</strong>.",
     side: "top",
+  },
+  {
+    id: "bloqueos-rango-profesional",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-profesional"]',
+    title: "Bloqueos: elige un profesional",
+    description: "Antes de crear el rango, selecciona nuevamente al profesional cuya agenda quieres bloquear. Si tienes una agenda asignada, el profesional aparecerá elegido automáticamente.",
+    side: "right",
+  },
+  {
+    id: "bloqueos-rango-boton",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-rango-boton"]',
+    title: "Bloqueos: rango de fechas",
+    description: "Ya creaste un bloqueo individual. Ahora haz clic en <strong>Rango de fechas</strong> para conocer la otra forma de seleccionar días.",
+    side: "right",
+    interactive: true,
+    esperar: { tipo: "aparece", selector: '[data-tour="bloqueo-rango-panel"]' },
+    aviso: "Abre <strong>Rango de fechas</strong> para continuar.",
+  },
+  {
+    id: "bloqueos-rango-fechas",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-rango-fechas"]',
+    title: "Bloqueos: rango de fechas",
+    description: "Elige una fecha <strong>Desde</strong> y otra <strong>Hasta</strong>. El período puede abarcar como máximo los próximos tres meses.",
+    side: "right",
+  },
+  {
+    id: "bloqueos-rango-dias",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-rango-dias"]',
+    title: "Bloqueos: días de la semana",
+    description: "Marca al menos un día de la semana. Por ejemplo, selecciona <strong>X</strong> para generar todos los miércoles incluidos en el período.",
+    side: "right",
+  },
+  {
+    id: "bloqueos-rango-generar",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-rango-generar"]',
+    title: "Bloqueos: generar días",
+    description: "Pulsa <strong>Generar días</strong>. El tutorial continuará cuando el rango produzca al menos una fecha válida.",
+    side: "right",
+    interactive: true,
+    esperar: {
+      tipo: "atributo",
+      selector: '[data-tour="bloqueo-rango-generar"]',
+      atributo: "data-tour-completo",
+      valor: "true",
+    },
+    aviso: "Todavía no se generaron fechas. Revisa el período, selecciona al menos un día de la semana y vuelve a pulsar <strong>Generar días</strong>.",
+  },
+  {
+    id: "bloqueos-rango-horario",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-rango-horario"]',
+    title: "Bloqueos: horario del rango",
+    description: "Define una hora de inicio y una hora de término posterior. El horario se aplicará a todas las fechas generadas.",
+    side: "right",
+  },
+  {
+    id: "bloqueos-rango-motivo",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-motivo"]',
+    title: "Bloqueos: motivo del rango",
+    description: "Escribe el motivo que tendrán todos los bloqueos generados en este rango.",
+    side: "right",
+  },
+  {
+    id: "bloqueos-rango-guardar",
+    grupo: "Bloqueos",
+    route: "/dashboard/bloqueosAgenda",
+    selector: '[data-tour="bloqueo-guardar"]',
+    title: "Bloqueos: guardar el rango",
+    description: "Presiona <strong>Ingresar Bloqueo(s)</strong>. Cada día se guardará por separado, para que puedas eliminarlo individualmente cuando lo necesites. Cuando los bloqueos se guarden correctamente, el tutorial te llevará automáticamente a Finanzas.",
+    side: "right",
   },
 
   // ── Finanzas ─────────────────────────────────────────────────────────────
@@ -491,6 +613,7 @@ export const TOUR_STEPS = [
     title: "Finanzas",
     description: "Aquí ves cuánto ha generado tu clínica. Elige el período que quieres revisar: <strong>Mes actual</strong>, <strong>Mes anterior</strong> o <strong>Rango personalizado</strong> para elegir tú las fechas.",
     side: "bottom",
+    retrocederHasta: "bloqueos-rango-profesional",
   },
   {
     id: "finanzas-kpis",

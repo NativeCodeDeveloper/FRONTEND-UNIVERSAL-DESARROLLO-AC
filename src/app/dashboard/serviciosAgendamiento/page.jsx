@@ -7,9 +7,11 @@ import { TextAreaDinamic } from "@/Componentes/TextAreaDinamic";
 import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import toast from "react-hot-toast";
 import ToasterClient from "@/Componentes/ToasterClient";
+import { useTour } from "@/ContextosGlobales/TourContext";
 
 
 export default function ServiciosAgendamiento() {
+    const { actualizarCantidadServicios, continuarTourTrasGuardarServicio } = useTour();
     const [listaServiciosProfesionales, setListaServiciosProfesionales] = useState([]);
     const [nombreServicio, setNombreServicio] = useState('');
     const [descripcionServicio, setDescripcionServicio] = useState('');
@@ -19,6 +21,7 @@ export default function ServiciosAgendamiento() {
 
 
     async function seleccionarTodosServiciosProfesionales() {
+        actualizarCantidadServicios(null);
         try {
             const res = await fetch(`${API}/serviciosProfesionales/seleccionarTodosServiciosProfesionales`, {
                 method: 'GET',
@@ -31,8 +34,9 @@ export default function ServiciosAgendamiento() {
             }else{
 
                 const respustaBackend = await res.json();
-                if(respustaBackend){
+                if(Array.isArray(respustaBackend)){
                     setListaServiciosProfesionales(respustaBackend);
+                    actualizarCantidadServicios(respustaBackend.length);
 
                 }else{
                     return toast.error('Error al cargar los Servicios Profesionales, por favor intente nuevamente .');
@@ -46,6 +50,7 @@ export default function ServiciosAgendamiento() {
 
     useEffect(() => {
         seleccionarTodosServiciosProfesionales();
+        return () => actualizarCantidadServicios(null);
     }, []);
 
 
@@ -75,6 +80,7 @@ export default function ServiciosAgendamiento() {
                     setNombreServicio('');
                     setDescripcionServicio('');
                     await seleccionarTodosServiciosProfesionales();
+                    continuarTourTrasGuardarServicio();
                     return toast.success('Servicio profesional insertado correctamente.');
 
                 }else{
