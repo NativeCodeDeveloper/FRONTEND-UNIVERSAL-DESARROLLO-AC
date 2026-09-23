@@ -3,6 +3,7 @@
 import {useMemo, useRef, useState} from "react";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import jsPDF from "jspdf";
+import { dibujarBloqueFirma } from "@/lib/pdfFirma";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import ShadcnInput from "@/Componentes/shadcnInput2";
@@ -121,154 +122,203 @@ export default function RecetaRapida() {
             return toast.error(errorFormulario);
         }
 
+        // ── Mismo sistema visual que la receta de la carpeta del paciente ──
+        // (src/app/dashboard/recetaPacientes/[id_paciente]/page.jsx): mismo
+        // encabezado, misma caja "Identificacion clinica", mismo bloque de
+        // indicaciones con paginacion y mismo pie. Cambian solo los datos: aca
+        // hay fecha de caducidad y numero de ficha, y no hay nacimiento,
+        // edad ni prevision porque la receta rapida no parte de un paciente
+        // registrado.
         const doc = new jsPDF("p", "mm", "letter");
         const pageW = doc.internal.pageSize.getWidth();
         const pageH = doc.internal.pageSize.getHeight();
-        const margin = 20;
+        const margin = 18;
         const rightX = pageW - margin;
+        const anchoContenido = rightX - margin;
+
+        const texto = (valor, fallback = "-") => {
+            const limpio = String(valor ?? "").trim();
+            return limpio || fallback;
+        };
+        const fecha = (valor) => {
+            if (!valor) return "-";
+            try {
+                return new Date(`${valor}T00:00:00`).toLocaleDateString("es-CL");
+            } catch {
+                return "-";
+            }
+        };
+
+        const nombreProfesionalPDF = texto(nombreProfesional);
+        const rutProfesionalPDF = texto(rutProfesional);
+        const especialidadProfesionalPDF = texto(especialidadProfesional, "Profesional tratante");
+        const diagnosticoPDF = diagnostico.trim();
 
         try {
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(18);
-            doc.setTextColor(20, 30, 48);
-            doc.text(empresaNombre, margin, 20);
+            const footerY = pageH - 12;
+            const limiteContenidoY = pageH - 34;
+            const lineHeight = 6.6;
 
-            doc.setFont("helvetica", "italic");
+            const dibujarEncabezado = () => {
+                doc.setDrawColor(15, 23, 42);
+                doc.setLineWidth(0.6);
+                doc.line(margin, 18, rightX, 18);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(18);
+                doc.setTextColor(20, 30, 48);
+                doc.text(empresaNombre, margin, 27);
+
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(8.5);
+                doc.setTextColor(92, 108, 128);
+                doc.text("AgendaClínica — Healthcare Information System", margin, 32);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(100, 116, 139);
+                doc.text("Receta médica", margin, 36.5);
+                doc.text(`Ficha: ${texto(idFicha)}`, rightX, 27, {align: "right"});
+                doc.text("Documento clínico", rightX, 32, {align: "right"});
+            };
+
+            const dibujarPie = () => {
+                doc.setDrawColor(203, 213, 225);
+                doc.setLineWidth(0.3);
+                doc.line(margin, footerY - 6, rightX, footerY - 6);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(7.5);
+                doc.setTextColor(148, 163, 184);
+                doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin, footerY - 1);
+                doc.text(`Paciente: ${texto(rutPaciente)}`, rightX, footerY - 1, {align: "right"});
+            };
+
+            dibujarEncabezado();
+
+            let y = 51;
+
+            const altoBoxClinico = diagnosticoPDF ? 67 : 54;
+
+            doc.setDrawColor(203, 213, 225);
+            doc.setLineWidth(0.35);
+            doc.roundedRect(margin, y, anchoContenido, altoBoxClinico, 1.8, 1.8);
+
+            doc.setFont("helvetica", "bold");
             doc.setFontSize(8.5);
-            doc.setTextColor(92, 108, 128);
-            doc.text("AgendaClínica — Healthcare Information System", margin, 25);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.text("Receta médica", margin, 29);
-
-            doc.setDrawColor(15, 23, 42);
-            doc.setLineWidth(0.45);
-            doc.line(margin, 33, rightX, 33);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.setTextColor(71, 85, 105);
-            doc.text(`Ficha: ${idFicha}`, rightX, 20, {align: "right"});
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(7);
-            doc.setTextColor(148, 163, 184);
-            doc.text(formatearGeneracionPDF(new Date()), rightX, 25, {align: "right"});
-
-            let y = 44;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.text("PACIENTE", margin, y);
-            doc.text("RUT", 128, y);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(11);
             doc.setTextColor(15, 23, 42);
-            doc.text(nombreCompletoPaciente, margin, y + 7);
-            doc.text(rutPaciente, 128, y + 7);
-
-            y += 22;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.text("FECHA DE EMISIÓN", margin, y);
-            doc.text("FECHA DE CADUCIDAD", 84, y);
-            doc.text("PROFESIONAL", 148, y);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(15, 23, 42);
-            doc.text(new Date(`${fechaEmision}T00:00:00`).toLocaleDateString("es-CL"), margin, y + 7);
-            doc.text(new Date(`${fechaCaducidad}T00:00:00`).toLocaleDateString("es-CL"), 84, y + 7);
-            doc.setFontSize(9.5);
-            doc.text(doc.splitTextToSize(nombreProfesional, rightX - 148), 148, y + 7);
-
-            y += 18;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.text("RUT PROFESIONAL", margin, y);
-            doc.text("ESPECIALIDAD", 100, y);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9.5);
-            doc.setTextColor(15, 23, 42);
-            doc.text(rutProfesional.trim() || "-", margin, y + 7);
-            doc.text(doc.splitTextToSize(especialidadProfesional || "-", rightX - 100), 100, y + 7);
-
-            y += 18;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.text("DIAGNÓSTICO", margin, y);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.setTextColor(15, 23, 42);
-            doc.text(doc.splitTextToSize(diagnostico.trim(), rightX - margin), margin, y + 7);
-
-            y += 18;
+            doc.text("Identificación clínica", margin + 4, y + 7);
 
             doc.setDrawColor(226, 232, 240);
-            doc.setLineWidth(0.35);
-            doc.line(margin, y, rightX, y);
-
-            y += 10;
+            doc.setLineWidth(0.25);
+            doc.line(margin + 4, y + 11, rightX - 4, y + 11);
 
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(8);
+            doc.setFontSize(7.2);
             doc.setTextColor(100, 116, 139);
-            doc.text("INDICACIÓN / RECETA", margin, y);
-
-            y += 8;
+            doc.text("PACIENTE", margin + 4, y + 18);
+            doc.text("RUT PACIENTE", margin + 74, y + 18);
+            doc.text("PROFESIONAL", margin + 4, y + 31);
+            doc.text("RUT PROFESIONAL", margin + 74, y + 31);
+            doc.text("ESPECIALIDAD / CARGO", margin + 130, y + 31);
+            doc.text("FECHA DE EMISIÓN", margin + 4, y + 44);
+            doc.text("FECHA DE CADUCIDAD", margin + 74, y + 44);
 
             doc.setFont("helvetica", "normal");
+            doc.setFontSize(9.4);
+            doc.setTextColor(15, 23, 42);
+            doc.text(texto(nombreCompletoPaciente), margin + 4, y + 23);
+            doc.text(texto(rutPaciente), margin + 74, y + 23);
+            doc.text(doc.splitTextToSize(nombreProfesionalPDF, 66), margin + 4, y + 36);
+            doc.text(rutProfesionalPDF, margin + 74, y + 36);
+            doc.text(doc.splitTextToSize(especialidadProfesionalPDF, 58), margin + 130, y + 36, {lineHeightFactor: 1.3});
+            doc.text(fecha(fechaEmision), margin + 4, y + 49);
+            doc.text(fecha(fechaCaducidad), margin + 74, y + 49);
+
+            if (diagnosticoPDF) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7.2);
+                doc.setTextColor(100, 116, 139);
+                doc.text("DIAGNÓSTICO", margin + 4, y + 57);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9.4);
+                doc.setTextColor(15, 23, 42);
+                doc.text(doc.splitTextToSize(diagnosticoPDF, anchoContenido - 12), margin + 4, y + 62);
+            }
+
+            y += altoBoxClinico + 7;
+
+            doc.setFont("helvetica", "bold");
             doc.setFontSize(9);
             doc.setTextColor(15, 23, 42);
+            doc.text("Indicaciones médicas", margin, y);
 
-            const lineasReceta = doc.splitTextToSize(descripcionReceta.trim(), rightX - margin);
-            doc.text(lineasReceta, margin, y, {maxWidth: rightX - margin, lineHeightFactor: 1.5});
+            y += 6;
 
-            const alturaTexto = lineasReceta.length * 5;
-            const inicioCaja = y - 6;
-            const altoCaja = Math.max(88, alturaTexto + 18);
-            doc.roundedRect(margin - 2, inicioCaja, rightX - margin + 4, altoCaja, 1.5, 1.5);
+            const lineasReceta = doc.splitTextToSize(descripcionReceta.trim(), anchoContenido - 10);
+            let indiceLinea = 0;
+            let primeraPaginaTexto = true;
 
-            // pageH - 51: el bloque de firma crecio 5mm al sumar el RUT; este tope
-            // conserva la misma separacion con el pie de pagina que habia antes.
-            const firmaY = Math.min(pageH - 51, inicioCaja + altoCaja + 34);
+            while (indiceLinea < lineasReceta.length) {
+                const alturaDisponible = limiteContenidoY - y;
+                const lineasPorPagina = Math.max(1, Math.floor((alturaDisponible - 10) / lineHeight));
+                const bloque = lineasReceta.slice(indiceLinea, indiceLinea + lineasPorPagina);
+                const altoBloque = Math.max(20, (bloque.length * lineHeight) + 8);
+
+                doc.setDrawColor(203, 213, 225);
+                doc.setLineWidth(0.35);
+                doc.roundedRect(margin, y, anchoContenido, altoBloque, 1.8, 1.8);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(15, 23, 42);
+                doc.text(bloque, margin + 5, y + 6, {
+                    maxWidth: anchoContenido - 10,
+                    lineHeightFactor: 1.5
+                });
+
+                indiceLinea += bloque.length;
+                y += altoBloque + 10;
+
+                if (indiceLinea < lineasReceta.length) {
+                    dibujarPie();
+                    doc.addPage();
+                    dibujarEncabezado();
+                    y = 48;
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(9);
+                    doc.setTextColor(15, 23, 42);
+                    doc.text(primeraPaginaTexto ? "Indicaciones médicas (continuación)" : "Continuación de receta", margin, y);
+                    y += 6;
+                    primeraPaginaTexto = false;
+                }
+            }
+
+            if (y + 31 > limiteContenidoY) {
+                dibujarPie();
+                doc.addPage();
+                dibujarEncabezado();
+                y = 48;
+            }
 
             doc.setDrawColor(148, 163, 184);
             doc.setLineWidth(0.35);
-            doc.line(118, firmaY, rightX, firmaY);
+            const anchoFirma = 62; // el mismo largo de la raya de firma
+            doc.line(rightX - anchoFirma, y + 10, rightX, y + 10);
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(71, 85, 105);
-            doc.text(nombreProfesional, rightX, firmaY + 6, {align: "right"});
-            doc.setFontSize(8);
-            const rutFirma = (rutProfesional || "").trim();
-            doc.text(rutFirma ? `RUT: ${rutFirma}` : "-", rightX, firmaY + 11, {align: "right"});
-            doc.text(especialidadProfesional || "-", rightX, firmaY + 16, {align: "right"});
-            doc.text("Firma y timbre profesional", rightX, firmaY + 21, {align: "right"});
-            doc.setTextColor(148, 163, 184);
-            doc.text(empresaNombre, rightX, firmaY + 26, {align: "right"});
+            dibujarBloqueFirma(doc, {
+                x: rightX,
+                y: y + 16,
+                anchoMax: anchoFirma,
+                align: "right",
+                nombre: nombreProfesionalPDF,
+                rut: rutProfesionalPDF,
+                especialidad: especialidadProfesionalPDF,
+                empresa: empresaNombre,
+            });
 
-            const footerY = pageH - 14;
-            doc.setDrawColor(226, 232, 240);
-            doc.line(margin, footerY - 4, rightX, footerY - 4);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(7.5);
-            doc.setTextColor(148, 163, 184);
-            doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin, footerY);
-            doc.text("Uso profesional", rightX, footerY, {align: "right"});
+            dibujarPie();
 
             const nombreArchivo = `receta-rapida-${nombreCompletoPaciente || "paciente"}`
                 .toLowerCase()

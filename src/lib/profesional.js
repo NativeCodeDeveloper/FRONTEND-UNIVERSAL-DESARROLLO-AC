@@ -71,6 +71,35 @@ export function etiquetaProfesionalConRut(profesional) {
 }
 
 /**
+ * Inverso de etiquetaProfesionalConRut: separa un texto guardado como
+ * "Nombre · RUT: 12.345.678-9" en sus dos partes.
+ *
+ * Hace falta porque la ficha clinica guarda al profesional como texto libre en
+ * un solo campo del backend. Al imprimirlo tal cual en un PDF, el "RUT:" queda
+ * pegado al nombre y, si el bloque es angosto, la linea se parte en medio de la
+ * etiqueta ("... · RUT:" arriba y el numero abajo).
+ *
+ * Tolera tanto "· RUT: 123" como "· RUT 123" y textos sin RUT, y NO cambia el
+ * formato guardado: solo lo interpreta al momento de dibujar, asi que las
+ * fichas antiguas se ven igual de bien que las nuevas.
+ *
+ * @param {string} texto
+ * @returns {{nombre: string, rut: string}}
+ */
+export function separarNombreYRut(texto) {
+  const limpio = String(texto ?? "").trim();
+  if (!limpio) return { nombre: "", rut: "" };
+
+  const coincidencia = limpio.match(/^(.*?)\s*[·|-]\s*RUT:?\s*(.+)$/i);
+  if (!coincidencia) return { nombre: limpio, rut: "" };
+
+  return {
+    nombre: coincidencia[1].trim(),
+    rut: coincidencia[2].trim(),
+  };
+}
+
+/**
  * Profesional cuyo nombre coincide, ignorando mayusculas y espacios sobrantes.
  * Se usa cuando un documento guardo el nombre del profesional como texto y no su
  * id: permite recuperar el RUT para la firma. Devuelve null si no calza exacto,

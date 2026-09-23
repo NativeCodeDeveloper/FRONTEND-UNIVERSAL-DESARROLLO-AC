@@ -4,10 +4,14 @@ import {useState, useEffect, useRef, useMemo} from "react";
 import { useUser } from "@clerk/nextjs";
 import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
 import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
+import EditarFichaModal from "@/Componentes/EditarFichaModal";
 import { claveFechaCivil, formatearFechaCivil } from "@/lib/fechas";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { dibujarBloqueFirma, altoBloqueFirma } from "@/lib/pdfFirma";
+import { separarNombreYRut, profesionalPorNombre, datosProfesionalParaDocumento } from "@/lib/profesional";
+import { useProfesionales } from "@/hooks/useProfesionales";
 import ToasterClient from "@/Componentes/ToasterClient";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales.js"
 import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
@@ -194,8 +198,11 @@ export default function Paciente() {
         router.push(`/dashboard/cotizacionesPaciente/${id_paciente}`);
     }
 
+    // Antes navegaba a /dashboard/EdicionFicha/[id_ficha]: habia que salir de
+    // la ficha del paciente, editar en otra pagina y volver. Ahora se edita
+    // encima, sin perder el contexto ni el scroll de la lista.
     function editarFichaClinica(id_ficha) {
-        router.push(`/dashboard/EdicionFicha/${id_ficha}`);
+        setFichaEnEdicion(id_ficha);
     }
 
     function agendarPaciente() {
@@ -245,8 +252,19 @@ export default function Paciente() {
 
     const [listaFichas, setListaFichas] = useState([]);
     const [filtroProfesional, setFiltroProfesional] = useState("");
+    // id de la ficha que se esta editando en el popup; null = cerrado.
+    const [fichaEnEdicion, setFichaEnEdicion] = useState(null);
+    // Filtro por fecha de consulta. Se aplica sobre la lista ya cargada, no
+    // contra el backend: asi se combina con la busqueda por profesional en vez
+    // de reemplazarla, y no hace falta un endpoint nuevo.
+    const [filtroFecha, setFiltroFecha] = useState("");
     const [rutProfesionalFirma, setRutProfesionalFirma] = useState("");
     const [especialidadProfesionalFirma, setEspecialidadProfesionalFirma] = useState("");
+    // Para completar solos el RUT y la especialidad del pie de firma cuando el
+    // profesional de la ficha esta registrado: antes solo salian si alguien los
+    // escribia a mano en el panel "Filtros y firma PDF", asi que casi siempre
+    // faltaban.
+    const listaProfesionales = useProfesionales();
     const [fichasExpandidas, setFichasExpandidas] = useState(new Set());
     const [ultimaAtencion, setUltimaAtencion] = useState(null);
     const pacienteAtencionRef = useRef(null);
@@ -453,6 +471,7 @@ export default function Paciente() {
 
     function limpiarFiltro() {
         setFiltroProfesional("")
+        setFiltroFecha("")
         listarFichasClinicasPaciente(id_paciente)
     }
 
@@ -639,10 +658,20 @@ export default function Paciente() {
 
 
     const pacienteActual = detallePaciente[0];
-    const totalFichas = listaFichas.length;
+    // claveFechaCivil devuelve "AAAA-MM-DD", el mismo formato que entrega un
+    // <input type="date">: se comparan como texto, sin pasar por Date, que
+    // correria el dia segun la zona horaria.
+    const fichasFiltradas = useMemo(() => {
+        if (!filtroFecha) return listaFichas;
+        return listaFichas.filter((ficha) => claveFechaCivil(ficha.fechaConsulta) === filtroFecha);
+    }, [listaFichas, filtroFecha]);
+
+    // Cuenta lo que se esta listando: con un filtro puesto, decir el total del
+    // paciente mientras se muestran dos fichas confunde.
+    const totalFichas = fichasFiltradas.length;
 
     const listaFichasOrdenada = useMemo(() => {
-        return [...listaFichas].sort((a, b) => {
+        return [...fichasFiltradas].sort((a, b) => {
             // Se comparan como texto "AAAA-MM-DD" para no pasar por Date, que
             // desplaza el dia segun la zona horaria.
             const fechaA = claveFechaCivil(a.fechaConsulta);
@@ -652,7 +681,7 @@ export default function Paciente() {
 
             return Number(b.id_ficha) - Number(a.id_ficha);
         });
-    }, [listaFichas]);
+    }, [fichasFiltradas]);
 
     const fichasAgrupadasPorMes = useMemo(() => {
         const grupos = [];
@@ -731,7 +760,12 @@ export default function Paciente() {
             const datos = parsearDatosDinamicos(ficha.datosDinamicos);
             const plantillaNombre = datos?._plantillaNombre;
             const tituloFicha = plantillaNombre || ficha.tipoAtencion || "Consulta General";
-            const profesionalFicha = ficha.observaciones || "No informado";
+            // El backend guarda al profesional como texto libre, del tipo
+            // "Nombre · RUT: 12.345.678-9". Se separa para que el nombre y el
+            // RUT vayan en lineas distintas y no se parta la etiqueta "RUT:".
+            const { nombre: nombreProfesionalFicha, rut: rutEnNombreProfesional } =
+                separarNombreYRut(ficha.observaciones);
+            const profesionalFicha = nombreProfesionalFicha || "No informado";
 
             const dibujarEncabezado = () => {
                 doc.setDrawColor(15, 23, 42);
@@ -757,7 +791,14 @@ export default function Paciente() {
                 doc.text(`Descarga: ${formatearFecha(fechaDescarga)} ${horaDescarga}`, rightX, 32, {align: "right"});
             };
 
+            // Las dos tablas de la ficha llaman a dibujarPie desde su
+            // didDrawPage, y ambas pasan por la pagina 1: el pie terminaba
+            // impreso dos veces, uno encima del otro. Se lleva registro de las
+            // paginas que ya lo tienen.
+            const paginasConPie = new Set();
             const dibujarPie = (data) => {
+                if (paginasConPie.has(data.pageNumber)) return;
+                paginasConPie.add(data.pageNumber);
                 doc.setDrawColor(203, 213, 225);
                 doc.setLineWidth(0.3);
                 doc.line(margin, pageH - 18, rightX, pageH - 18);
@@ -802,7 +843,7 @@ export default function Paciente() {
             escribirDato("ID PACIENTE", id_paciente, margin + 130, y + 18, 34);
             escribirDato("PROFESIONAL", profesionalFicha, margin + 4, y + 32, 58);
             escribirDato("FECHA CONSULTA", formatearFecha(ficha.fechaConsulta), margin + 74, y + 32, 38);
-            escribirDato("TIPO / PLANTILLA", tituloFicha, margin + 130, y + 32, 58);
+            escribirDato("TIPO DE FICHA", tituloFicha, margin + 130, y + 32, 58);
             escribirDato("NACIMIENTO", formatearFecha(pacienteActual.nacimiento), margin + 4, y + 46, 50);
             escribirDato("EDAD", calcularEdad(pacienteActual.nacimiento) === "-" ? "-" : `${calcularEdad(pacienteActual.nacimiento)} años`, margin + 74, y + 46, 35);
             escribirDato("PREVISIÓN", previsionDesdeId(pacienteActual.prevision_id), margin + 130, y + 46, 45);
@@ -825,7 +866,7 @@ export default function Paciente() {
                         normalizarTextoPDF(label),
                         normalizarTextoPDF(value)
                     ]),
-                    margin: {left: margin, right: margin, top: 38, bottom: 24},
+                    margin: {left: margin, right: margin, top: 44, bottom: 24},
                     theme: "plain",
                     headStyles: {
                         fillColor: [51, 65, 85],
@@ -901,10 +942,10 @@ export default function Paciente() {
                 startY: y,
                 head: [["Contenido de la ficha", normalizarTextoPDF(tituloFicha)]],
                 body: filasFicha,
-                margin: {left: margin, right: margin, top: 38, bottom: 24},
+                margin: {left: margin, right: margin, top: 44, bottom: 24},
                 theme: "plain",
                 headStyles: {
-                    fillColor: [109, 40, 217],
+                    fillColor: [51, 65, 85],
                     textColor: [255, 255, 255],
                     fontStyle: "bold",
                     fontSize: 8,
@@ -928,8 +969,8 @@ export default function Paciente() {
                 didParseCell: (data) => {
                     const row = data.row.raw;
                     if (data.section === "body" && row?.[1] === "") {
-                        data.cell.styles.fillColor = [237, 233, 254];
-                        data.cell.styles.textColor = [91, 33, 182];
+                        data.cell.styles.fillColor = [226, 232, 240];
+                        data.cell.styles.textColor = [15, 23, 42];
                         data.cell.styles.fontStyle = "bold";
                     }
                 },
@@ -939,9 +980,36 @@ export default function Paciente() {
                 },
             });
 
-            const rutProfesionalVisible = esDatoVisible(rutProfesionalFirma);
-            const especialidadProfesionalVisible = esDatoVisible(especialidadProfesionalFirma);
-            const altoFirma = 21 + (rutProfesionalVisible ? 5 : 0) + (especialidadProfesionalVisible ? 5 : 0);
+            // Datos del profesional registrado que calce exactamente con el
+            // nombre guardado en la ficha. profesionalPorNombre devuelve null si
+            // no calza, para no atribuirle el RUT a otra persona.
+            const registrado = datosProfesionalParaDocumento(
+                profesionalPorNombre(listaProfesionales, profesionalFicha)
+            );
+
+            // Prioridad: lo escrito a mano manda; si no, lo que venia dentro del
+            // nombre guardado; si no, la ficha del profesional registrado.
+            const rutFirmaEfectivo = esDatoVisible(rutProfesionalFirma)
+                ? rutProfesionalFirma.trim()
+                : (rutEnNombreProfesional || registrado.rut);
+            const especialidadFirma = esDatoVisible(especialidadProfesionalFirma)
+                ? especialidadProfesionalFirma.trim()
+                : registrado.especialidad;
+
+            const anchoFirma = 62; // el mismo largo de la raya de firma
+            const datosFirma = {
+                nombre: profesionalFicha,
+                rut: rutFirmaEfectivo,
+                especialidad: especialidadFirma,
+                empresa: empresaNombre,
+                anchoMax: anchoFirma,
+            };
+
+            // Se mide con la misma fuente con la que se dibujara, si no el
+            // calculo del alto no sirve.
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            const altoFirma = 6 + altoBloqueFirma(doc, datosFirma);
 
             let firmaY = doc.lastAutoTable.finalY + 14;
             if (firmaY + altoFirma > pageH - 24) {
@@ -953,30 +1021,8 @@ export default function Paciente() {
 
             doc.setDrawColor(148, 163, 184);
             doc.setLineWidth(0.35);
-            doc.line(rightX - 62, firmaY, rightX, firmaY);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(71, 85, 105);
-            doc.text(profesionalFicha, rightX, firmaY + 6, {align: "right"});
-
-            let offsetFirma = 6;
-            doc.setFontSize(8);
-            if (rutProfesionalVisible) {
-                offsetFirma += 5;
-                doc.text(`RUT: ${rutProfesionalFirma.trim()}`, rightX, firmaY + offsetFirma, {align: "right"});
-            }
-            if (especialidadProfesionalVisible) {
-                offsetFirma += 5;
-                doc.text(especialidadProfesionalFirma.trim(), rightX, firmaY + offsetFirma, {align: "right"});
-            }
-
-            offsetFirma += 5;
-            doc.setFontSize(9);
-            doc.text("Firma y timbre profesional", rightX, firmaY + offsetFirma, {align: "right"});
-
-            offsetFirma += 5;
-            doc.setTextColor(148, 163, 184);
-            doc.text(empresaNombre, rightX, firmaY + offsetFirma, {align: "right"});
+            doc.line(rightX - anchoFirma, firmaY, rightX, firmaY);
+            dibujarBloqueFirma(doc, {...datosFirma, x: rightX, y: firmaY + 6, align: "right"});
 
             const rutPacienteArchivo = sanitizarNombreArchivo(pacienteActual.rut || id_paciente || "paciente");
             doc.save(`ficha_clinica_${rutPacienteArchivo || "paciente"}_${ficha.id_ficha}.pdf`);
@@ -1360,8 +1406,11 @@ export default function Paciente() {
                                 </summary>
                                 <div className="space-y-3 border-t border-slate-100 p-4">
                                     <div>
-                                        <p className="text-[11px] font-bold text-slate-800">Buscar fichas por profesional</p>
-                                        <p className="mt-0.5 text-[12px] text-slate-500">Escribe un nombre y presiona Buscar.</p>
+                                        <p className="text-[11px] font-bold text-slate-800">Buscar fichas</p>
+                                        <p className="mt-0.5 text-[12px] text-slate-500">
+                                            Por profesional: escribe un nombre y presiona Buscar. Por fecha: el filtro se
+                                            aplica solo, sobre las fichas listadas.
+                                        </p>
                                     </div>
                                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                         <div className="relative min-w-0 flex-1">
@@ -1377,8 +1426,18 @@ export default function Paciente() {
                                                 className="h-11 w-full rounded-xl border-none bg-slate-50 pl-11 pr-4 text-sm transition-all focus:ring-2 focus:ring-violet-100"
                                             />
                                         </div>
-                                        <button onClick={buscarPorProfesional} className="h-11 rounded-xl bg-slate-900 px-6 text-[13px] font-bold text-white transition-all hover:bg-slate-800">Buscar</button>
-                                        {filtroProfesional && <button onClick={limpiarFiltro} className="h-11 rounded-xl bg-slate-100 px-5 text-[13px] font-bold text-slate-600 hover:bg-slate-200">Limpiar</button>}
+                                        <button onClick={buscarPorProfesional} className="h-11 shrink-0 rounded-xl bg-slate-900 px-6 text-[13px] font-bold text-white transition-all hover:bg-slate-800">Buscar</button>
+                                        {/* Va en la misma fila para no alargar el panel hacia abajo. */}
+                                        <input
+                                            type="date"
+                                            value={filtroFecha}
+                                            onChange={(e) => setFiltroFecha(e.target.value)}
+                                            aria-label="Filtrar por fecha de consulta"
+                                            title="Filtrar por fecha de consulta"
+                                            className="h-11 w-full shrink-0 appearance-none rounded-xl border-none bg-slate-50 px-4 text-[16px] transition-all focus:ring-2 focus:ring-violet-100 sm:w-[168px] sm:text-sm"
+                                            style={{ colorScheme: "light" }}
+                                        />
+                                        {(filtroProfesional || filtroFecha) && <button onClick={limpiarFiltro} className="h-11 shrink-0 rounded-xl bg-slate-100 px-5 text-[13px] font-bold text-slate-600 hover:bg-slate-200">Limpiar</button>}
                                     </div>
                                 </div>
                                 <div className="border-t border-slate-100 p-4">
@@ -1507,12 +1566,24 @@ export default function Paciente() {
                                 </div>
                             </div>
                             {/* Fichas Propiamente Tales */}
-                            {listaFichas.length === 0 ? (
+                            {fichasFiltradas.length === 0 ? (
                                 <div className="bg-white rounded-[32px] border border-dashed border-slate-200 py-24 text-center">
                                     <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                                     </div>
-                                    <p className="text-slate-400 text-sm font-medium">No se han encontrado registros clínicos.</p>
+                                    <p className="text-slate-400 text-sm font-medium">
+                                        {filtroFecha
+                                            ? `No hay fichas con fecha ${formatearFechaCivil(filtroFecha)}.`
+                                            : "No se han encontrado registros clínicos."}
+                                    </p>
+                                    {filtroFecha && (
+                                        <button
+                                            onClick={limpiarFiltro}
+                                            className="mt-4 h-10 rounded-xl bg-slate-100 px-5 text-[13px] font-bold text-slate-600 transition-colors hover:bg-slate-200"
+                                        >
+                                            Quitar filtros
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="space-y-7">
@@ -1643,6 +1714,14 @@ export default function Paciente() {
                 paciente={pacienteActual}
                 id_paciente={id_paciente}
                 onCerrar={() => setModalFichaAbierto(false)}
+                onGuardada={() => listarFichasClinicasPaciente(id_paciente)}
+            />
+
+            <EditarFichaModal
+                abierto={fichaEnEdicion !== null}
+                id_ficha={fichaEnEdicion}
+                paciente={pacienteActual}
+                onCerrar={() => setFichaEnEdicion(null)}
                 onGuardada={() => listarFichasClinicasPaciente(id_paciente)}
             />
         </div>

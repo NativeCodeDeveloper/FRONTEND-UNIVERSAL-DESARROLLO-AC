@@ -17,6 +17,23 @@ import {
 } from "@/lib/fichaPlantilla";
 import { formatRut } from "@/lib/designTokens";
 
+// Arma el aviso nombrando lo que falta, en vez de mandar a revisar la pantalla.
+//   uno:    "Falta ingresar la fecha de atención."
+//   varios: "Falta seleccionar la plantilla e ingresar la fecha de atención."
+//
+// El verbo va en singular aunque falten varias cosas: lo que sigue son
+// infinitivos ("falta seleccionar", no "faltan seleccionar").
+function avisoDeFaltantes(faltantes) {
+  if (faltantes.length === 0) return "";
+  if (faltantes.length === 1) return `Falta ${faltantes[0]}.`;
+
+  const ultimo = faltantes[faltantes.length - 1];
+  // "y" pasa a "e" delante de sonido /i/: "...la plantilla e ingresar...".
+  const conjuncion = /^(i|hi)(?!e)/i.test(ultimo) ? "e" : "y";
+
+  return `Falta ${faltantes.slice(0, -1).join(", ")} ${conjuncion} ${ultimo}.`;
+}
+
 export default function FichaClinicaModal({ abierto, paciente, id_paciente, onCerrar, onGuardada }) {
   const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -105,11 +122,24 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, onCe
 
   async function guardar() {
     const nuevosErrores = {};
+    const pendientes = [];
 
-    if (!id_paciente) nuevosErrores.paciente = "Debe seleccionar un paciente.";
-    if (!idPlantilla || !plantillaCompleta) nuevosErrores.plantilla = "Seleccione una plantilla.";
-    if (!fechaConsulta) nuevosErrores.fecha = "Seleccione la fecha de la consulta.";
-    if (!profesionalTexto.trim()) nuevosErrores.profesional = "Seleccione el profesional a cargo.";
+    if (!id_paciente) {
+      nuevosErrores.paciente = "Debe seleccionar un paciente.";
+      pendientes.push("seleccionar el paciente");
+    }
+    if (!idPlantilla || !plantillaCompleta) {
+      nuevosErrores.plantilla = "Seleccione una plantilla.";
+      pendientes.push("seleccionar la plantilla");
+    }
+    if (!fechaConsulta) {
+      nuevosErrores.fecha = "Seleccione la fecha de la consulta.";
+      pendientes.push("ingresar la fecha de atención");
+    }
+    if (!profesionalTexto.trim()) {
+      nuevosErrores.profesional = "Seleccione el profesional a cargo.";
+      pendientes.push("seleccionar el profesional a cargo");
+    }
 
     const faltantes = camposObligatoriosFaltantes(plantillaCompleta, datosDinamicos);
     if (faltantes.length > 0) {
@@ -118,7 +148,8 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, onCe
 
     if (Object.keys(nuevosErrores).length > 0) {
       setErrores(nuevosErrores);
-      toast.error(nuevosErrores.campos || "Revisa los campos marcados antes de guardar.");
+      // Los campos de la plantilla se nombran aparte porque pueden ser muchos.
+      toast.error(avisoDeFaltantes(pendientes) || nuevosErrores.campos);
       return;
     }
 
@@ -243,7 +274,14 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, onCe
             etiqueta="Fecha de consulta"
             requerido
             error={errores.fecha}
-            ayuda="Fecha en que se realizó la atención."
+            // Mientras esta vacia lo dice explicitamente, en vez de dejarlo a
+            // cargo de un asterisco: es el campo que mas se olvida al crear.
+            ayuda={
+              fechaConsulta
+                ? "Fecha en que se realizó la atención."
+                : "Obligatorio · selecciona la fecha de la atención."
+            }
+            resaltarAyuda={!fechaConsulta}
           >
             <ShadcnDatePicker
               label=""

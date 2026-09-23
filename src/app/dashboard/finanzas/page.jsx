@@ -473,14 +473,22 @@ export default function Finanzas() {
 
             // El nombre de la empresa puede ser largo: el tamaño de fuente se reduce
             // hasta que quepa sin invadir el recuadro "INFORME FINANCIERO" de la derecha.
-            const tituloTexto = nombreEmpresa.toUpperCase();
+            let tituloTexto = nombreEmpresa.toUpperCase();
             const anchoDisponibleTitulo = rightX - 65 - margen;
             documento.setFont("helvetica", "bold");
             let tamanoTitulo = 16;
             documento.setFontSize(tamanoTitulo);
-            while (tamanoTitulo > 10 && documento.getTextWidth(tituloTexto) > anchoDisponibleTitulo) {
+            while (tamanoTitulo > 9 && documento.getTextWidth(tituloTexto) > anchoDisponibleTitulo) {
                 tamanoTitulo -= 0.5;
                 documento.setFontSize(tamanoTitulo);
+            }
+            // Si ni en 9pt cabe, se recorta: un nombre de empresa muy largo
+            // seguia dibujandose por encima del recuadro "INFORME FINANCIERO".
+            if (documento.getTextWidth(tituloTexto) > anchoDisponibleTitulo) {
+                while (tituloTexto.length > 4 && documento.getTextWidth(`${tituloTexto}…`) > anchoDisponibleTitulo) {
+                    tituloTexto = tituloTexto.slice(0, -1);
+                }
+                tituloTexto = `${tituloTexto.trimEnd()}…`;
             }
             documento.setTextColor(...BLACK);
             documento.text(tituloTexto, margen, 14);
@@ -506,7 +514,14 @@ export default function Finanzas() {
             documento.text(periodoLabelTexto, rightX - 30, 20, { align: "center" });
         }
 
+        // Cuatro tablas distintas llaman a dibujarPiePagina desde su
+        // didDrawPage, y varias coinciden en la misma pagina: el pie terminaba
+        // impreso dos veces, uno encima del otro.
+        const paginasConPie = new Set();
         function dibujarPiePagina() {
+            const paginaActual = documento.internal.getCurrentPageInfo().pageNumber;
+            if (paginasConPie.has(paginaActual)) return;
+            paginasConPie.add(paginaActual);
             const posicionPie = altoPagina - 12;
             documento.setDrawColor(...BORDE);
             documento.setLineWidth(0.3);
@@ -554,7 +569,7 @@ export default function Finanzas() {
                 ["Tasa de confirmación", `${resumen.tasaConfirmacion}%`],
             ],
             startY: y,
-            margin: { left: margen, right: margen, bottom: 26 },
+            margin: { left: margen, right: margen, top: 40, bottom: 26 },
             theme: "plain",
             headStyles: {
                 fillColor: DARK,
@@ -603,7 +618,7 @@ export default function Finanzas() {
             ]),
             foot: [["Total", "", "", formatCLP(resumen.ingresoConfirmado)]],
             startY: finalY,
-            margin: { left: margen, right: margen, bottom: 26 },
+            margin: { left: margen, right: margen, top: 40, bottom: 26 },
             theme: "plain",
             headStyles: {
                 fillColor: DARK,
@@ -664,7 +679,7 @@ export default function Finanzas() {
                 head: [["Profesional", "Servicio", "Citas", "Total"]],
                 body: filasServicios,
                 startY: finalY,
-                margin: { left: margen, right: margen, bottom: 26 },
+                margin: { left: margen, right: margen, top: 40, bottom: 26 },
                 theme: "plain",
                 headStyles: {
                     fillColor: DARK,
@@ -723,7 +738,7 @@ export default function Finanzas() {
                     formatCLP(liquidacionTotales.totalClinica),
                 ]],
                 startY: finalY,
-                margin: { left: margen, right: margen, bottom: 26 },
+                margin: { left: margen, right: margen, top: 40, bottom: 26 },
                 theme: "plain",
                 headStyles: {
                     fillColor: DARK,

@@ -11,11 +11,31 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { partesFechaCivil } from "@/lib/fechas"
+
+/**
+ * Convierte el valor recibido a una fecha en MEDIANOCHE LOCAL.
+ *
+ * `new Date("2026-09-22")` la interpreta como UTC: en Chile (UTC-3) eso es el
+ * 21 a las 21:00, y el campo mostraba un dia menos del que estaba guardado.
+ * Al guardar ya se emitia en hora local (ver onSelect), asi que leer en UTC
+ * dejaba al componente inconsistente consigo mismo: escribia 22 y leia 21.
+ */
+function aFechaLocal(valor) {
+    const p = partesFechaCivil(valor)
+    if (!p) return undefined
+    return new Date(p.anio, p.mes - 1, p.dia)
+}
 
 export default function ShadcnDatePicker({label = "Fecha", value, onChange, className = "w-48", placeholder = "Select date"}) {
     const [open, setOpen] = React.useState(false)
-    const initialDate = value ? new Date(value) : undefined
-    const [date, setDate] = React.useState(initialDate)
+    const [date, setDate] = React.useState(() => aFechaLocal(value))
+
+    // El valor puede llegar despues del montaje (una ficha que se carga por
+    // fetch, por ejemplo). Sin esto el campo quedaba vacio para siempre.
+    React.useEffect(() => {
+        setDate(aFechaLocal(value))
+    }, [value])
 
     function formatDate(d) {
         if (!d) return ""

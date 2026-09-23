@@ -2,10 +2,12 @@
 
 import {useEffect, useMemo, useRef, useState} from "react";
 import { useProfesionales } from "@/hooks/useProfesionales";
-import { profesionalPorNombre, rutDeProfesional } from "@/lib/profesional";
+import { profesionalPorNombre, datosProfesionalParaDocumento } from "@/lib/profesional";
+import { formatRut } from "@/lib/designTokens";
 import {useParams, useRouter} from "next/navigation";
 import {jsPDF} from "jspdf";
 import {autoTable} from "jspdf-autotable";
+import { dibujarBloqueFirma, altoBloqueFirma } from "@/lib/pdfFirma";
 import {toast, Toaster} from "react-hot-toast";
 
 import {
@@ -885,8 +887,16 @@ export default function DetalleCotizacion() {
             ? new Date(`${fechaEmisionPDF}T00:00:00`).toLocaleDateString("es-CL", {day: "2-digit", month: "long", year: "numeric"})
             : "-";
         const nombrePacienteTexto = `${cotizacionActual.nombre ?? ""} ${cotizacionActual.apellido ?? ""}`.trim() || "-";
-        const rutPacienteTexto = String(cotizacionActual.rut ?? "").trim();
+        // Se formatea solo para el PDF (12.345.678-9). Lo que quedo guardado en
+        // el backend no cambia: formatRut es presentacion pura.
+        const rutPacienteTexto = formatRut(String(cotizacionActual.rut ?? "").trim());
         const profesionalTexto = String(cotizacionActual.profesional_solicitante_nombre ?? "").trim() || "-";
+        // Datos del profesional registrado que calce exactamente con ese nombre.
+        // Sirven tanto para la caja de arriba como para el pie de firma: si no
+        // calza, profesionalPorNombre devuelve null y los campos quedan vacios
+        // en vez de atribuirle un RUT a otra persona.
+        const registrado = profesionalPorNombre(listaProfesionales, profesionalTexto);
+        const datosDelProfesional = datosProfesionalParaDocumento(registrado);
         const hayAbono = Number(abonoAplicado) > 0;
 
         function dibujarEncabezado() {
@@ -922,7 +932,14 @@ export default function DetalleCotizacion() {
             documento.text(folio, rightX - 30, 20, {align: "center"});
         }
 
+        // didDrawPage lo llama por cada pagina de la tabla, y al final se
+        // llama otra vez para la ultima: la ultima pagina terminaba con el pie
+        // impreso dos veces, uno encima del otro.
+        const paginasConPie = new Set();
         function dibujarPiePagina() {
+            const paginaActual = documento.internal.getCurrentPageInfo().pageNumber;
+            if (paginasConPie.has(paginaActual)) return;
+            paginasConPie.add(paginaActual);
             const posicionPie = altoPagina - 12;
             documento.setDrawColor(...BORDE);
             documento.setLineWidth(0.3);
@@ -936,43 +953,64 @@ export default function DetalleCotizacion() {
 
         dibujarEncabezado();
 
+        // ── Caja de datos ────────────────────────────────────────────────
+        // Todo en la misma escala: rotulos en 6.5 y valores en 8. Antes el
+        // nombre del profesional iba en 10, el paciente en 9 y la fecha en 8.5,
+        // y el nombre terminaba siendo el texto mas grande del documento.
+        // Cada dato lleva su rotulo: el RUT del paciente iba pegado al nombre
+        // con un punto medio y sin decir que era.
         let y = 42;
+        const altoCaja = 30;
         documento.setFillColor(...BGMID);
-        documento.roundedRect(margen, y, rightX - margen, 26, 1, 1, "F");
+        documento.roundedRect(margen, y, rightX - margen, altoCaja, 1, 1, "F");
         documento.setDrawColor(...BORDE);
         documento.setLineWidth(0.3);
-        documento.roundedRect(margen, y, rightX - margen, 26, 1, 1, "S");
+        documento.roundedRect(margen, y, rightX - margen, altoCaja, 1, 1, "S");
 
         const midCol = margen + (rightX - margen) / 2;
-        documento.line(midCol, y + 2, midCol, y + 24);
+        documento.line(midCol, y + 2, midCol, y + altoCaja - 2);
 
-        documento.setFont("helvetica", "bold");
-        documento.setFontSize(6.5);
-        documento.setTextColor(...MID);
-        documento.text("PROFESIONAL RESPONSABLE", margen + 5, y + 8);
-        documento.setFont("helvetica", "normal");
-        documento.setFontSize(10);
-        documento.setTextColor(...BLACK);
-        documento.text(profesionalTexto, margen + 5, y + 14);
+        const anchoSub = (midCol - margen) / 2;      // media columna
+        const colIzqA = margen + 5;
+        const colIzqB = margen + 5 + anchoSub;
+        const colDerA = midCol + 5;
+        const colDerB = midCol + 5 + anchoSub;
 
-        documento.setFont("helvetica", "normal");
-        documento.setFontSize(6.5);
-        documento.setTextColor(...MID);
-        documento.text(`Cotización: ${String(cotizacionActual.nombre_cotizacion ?? "-").trim() || "-"}`, margen + 5, y + 20);
+        const rotulo = (texto, x, posY) => {
+            documento.setFont("helvetica", "normal");
+            documento.setFontSize(6.5);
+            documento.setTextColor(...MID);
+            documento.text(texto, x, posY);
+        };
+        const valor = (texto, x, posY, ancho) => {
+            documento.setFont("helvetica", "normal");
+            documento.setFontSize(8);
+            documento.setTextColor(...BLACK);
+            documento.text(documento.splitTextToSize(String(texto ?? "-").trim() || "-", ancho), x, posY);
+        };
 
-        documento.setFont("helvetica", "bold");
-        documento.setFontSize(6.5);
-        documento.setTextColor(...MID);
-        documento.text("PACIENTE", midCol + 5, y + 8);
-        documento.text("FECHA DE EMISIÓN", midCol + 5, y + 19);
-        documento.setFont("helvetica", "normal");
-        documento.setFontSize(9);
-        documento.setTextColor(...BLACK);
-        documento.text(nombrePacienteTexto + (rutPacienteTexto ? `  ·  ${rutPacienteTexto}` : ""), midCol + 5, y + 14);
-        documento.setFontSize(8.5);
-        documento.text(fechaEmisionTexto, midCol + 5, y + 24);
+        // El nombre ocupa el ancho completo de su mitad: es el dato principal y
+        // con media columna un nombre largo se parte en tres lineas que invaden
+        // los rotulos de la fila de abajo.
+        const anchoMitad = (midCol - margen) - 10;
 
-        y += 32;
+        // Izquierda: profesional
+        rotulo("PROFESIONAL RESPONSABLE", colIzqA, y + 7);
+        valor(profesionalTexto, colIzqA, y + 12, anchoMitad);
+        rotulo("RUT", colIzqA, y + 19);
+        valor(datosDelProfesional.rut, colIzqA, y + 24, anchoSub - 6);
+        rotulo("ESPECIALIDAD", colIzqB, y + 19);
+        valor(datosDelProfesional.especialidad, colIzqB, y + 24, anchoSub - 6);
+
+        // Derecha: paciente
+        rotulo("PACIENTE", colDerA, y + 7);
+        valor(nombrePacienteTexto, colDerA, y + 12, anchoMitad);
+        rotulo("RUT", colDerA, y + 19);
+        valor(rutPacienteTexto, colDerA, y + 24, anchoSub - 6);
+        rotulo("FECHA DE EMISIÓN", colDerB, y + 19);
+        valor(fechaEmisionTexto, colDerB, y + 24, anchoSub - 6);
+
+        y += altoCaja + 6;
 
         autoTable(documento, {
             head: [["#", "Servicio / Procedimiento", "Observación", "Valor (CLP)"]],
@@ -994,7 +1032,8 @@ export default function DetalleCotizacion() {
                 halign: "left"
             },
             columnStyles: {
-                0: {cellWidth: 10, halign: "center", textColor: MID},
+                0: {cellWidth: 12, halign: "center", textColor: MID,
+                    cellPadding: {top: 4, bottom: 4, left: 1, right: 1}},
                 1: {cellWidth: 76},
                 2: {cellWidth: "auto", textColor: DARK},
                 3: {cellWidth: 34, halign: "right", fontStyle: "bold"}
@@ -1067,32 +1106,54 @@ export default function DetalleCotizacion() {
         documento.text("• Para consultas comuníquese con la clínica antes de iniciar cualquier tratamiento.", margen, finalY + 10);
 
         finalY += 24;
-        // El pie de firma puede ocupar hasta finalY + 17 (nombre, RUT y centro).
-        if (finalY + 22 > altoPagina - 22) {
+
+        const sigW = 65;
+        const datosFirma = {
+            nombre: profesionalTexto,
+            rut: datosDelProfesional.rut,
+            especialidad: datosDelProfesional.especialidad,
+            empresa: nombreEmpresa,
+            anchoMax: sigW,
+            salto: 4,
+            tamanoNombre: 7,
+            tamanoDetalle: 6,
+            tamanoLeyenda: 7,
+        };
+
+        // El alto se calcula, no se asume: un nombre o una especialidad largos
+        // envuelven y el bloque crece. Antes habia un 22 fijo que alcanzaba solo
+        // para el caso corto; con un nombre largo la firma caia sobre el pie.
+        documento.setFont("helvetica", "normal");
+        const altoFirma = 5 + altoBloqueFirma(documento, datosFirma);
+        if (finalY + altoFirma > altoPagina - 22) {
             documento.addPage();
             dibujarEncabezado();
             finalY = 48;
         }
 
-        const sigW = 65;
         documento.setDrawColor(...BORDE);
         documento.setLineWidth(0.3);
         documento.line(margen, finalY, margen + sigW, finalY);
         documento.setFont("helvetica", "normal");
         documento.setFontSize(7);
         documento.setTextColor(...MID);
-        documento.text("Firma y Timbre Profesional", margen + sigW / 2, finalY + 5, {align: "center"});
         documento.setFontSize(6);
         if (profesionalTexto && profesionalTexto !== "-") {
-            documento.text(profesionalTexto, margen + sigW / 2, finalY + 9, {align: "center"});
-            // El RUT solo se imprime si el nombre calza con un profesional registrado,
-            // para no atribuir un RUT al profesional equivocado.
-            const rutFirma = rutDeProfesional(profesionalPorNombre(listaProfesionales, profesionalTexto));
-            if (rutFirma) {
-                documento.text(`RUT: ${rutFirma}`, margen + sigW / 2, finalY + 13, {align: "center"});
-            }
-            documento.text(nombreEmpresa, margen + sigW / 2, finalY + (rutFirma ? 17 : 13), {align: "center"});
+            // RUT y especialidad solo si el nombre calza con un profesional
+            // registrado, para no atribuirle datos al profesional equivocado.
+            dibujarBloqueFirma(documento, {
+                ...datosFirma,
+                x: margen + sigW / 2,
+                y: finalY + 5,
+                align: "center",
+                leyenda: "Firma y Timbre Profesional",
+                colorTexto: MID,
+                colorEmpresa: MID,
+            });
         } else {
+            documento.setFontSize(7);
+            documento.text("Firma y Timbre Profesional", margen + sigW / 2, finalY + 5, {align: "center"});
+            documento.setFontSize(6);
             documento.text(nombreEmpresa, margen + sigW / 2, finalY + 9, {align: "center"});
         }
 

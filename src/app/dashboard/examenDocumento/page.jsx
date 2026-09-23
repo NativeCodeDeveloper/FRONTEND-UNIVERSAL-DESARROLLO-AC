@@ -4,6 +4,7 @@ import React, {useEffect, useMemo, useRef, useState} from "react";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import toast from "react-hot-toast";
 import jsPDF from "jspdf";
+import { dibujarBloqueFirma } from "@/lib/pdfFirma";
 import autoTable from "jspdf-autotable";
 import ToasterClient from "@/Componentes/ToasterClient";
 import ShadcnInput from "@/Componentes/shadcnInput2";
@@ -329,14 +330,25 @@ export default function ExamenDocumento() {
         doc.text("Firma profesional", contentLeft, firmaY + 5);
         doc.text("Recepción paciente", contentRight, firmaY + 5, {align: "right"});
 
-        doc.setFontSize(6.5);
-        doc.setTextColor(120, 120, 120);
-        const rutEmisor = rutProfesional.trim();
-        doc.text(
-            `${nombreProfesional.trim() || "-"}${rutEmisor ? ` · RUT ${rutEmisor}` : ""} · ${empresaNombre}`,
-            contentLeft,
-            firmaY + 10
-        );
+        // Antes iba todo en una linea separada por puntos medios; con un nombre
+        // largo se pasaba del ancho y la etiqueta "RUT" quedaba cortada.
+        dibujarBloqueFirma(doc, {
+            x: contentLeft,
+            y: firmaY + 10,
+            anchoMax: 66, // el largo de la raya de firma
+            align: "left",
+            salto: 3.2,
+            nombre: nombreProfesional.trim(),
+            rut: rutProfesional.trim(),
+            especialidad: especialidadProfesional || "",
+            empresa: empresaNombre,
+            leyenda: "",   // la leyenda de este documento ya va sobre la raya
+            tamanoNombre: 6.5,
+            tamanoDetalle: 6.5,
+            tamanoLeyenda: 6.5,
+            colorTexto: [120, 120, 120],
+            colorEmpresa: [120, 120, 120],
+        });
 
         doc.setDrawColor(190, 190, 190);
         doc.line(contentLeft, footerY - 5, contentRight, footerY - 5);

@@ -2,6 +2,7 @@
 
 import {useMemo, useRef, useState} from "react";
 import jsPDF from "jspdf";
+import { dibujarBloqueFirma } from "@/lib/pdfFirma";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import ShadcnInput from "@/Componentes/shadcnInput2";
@@ -222,9 +223,11 @@ export default function RecetaLentesPage() {
         doc.line(startX, startY + rowH, startX + totalW, startY + rowH);
         doc.line(startX, startY + (rowH * 2), startX + totalW, startY + (rowH * 2));
 
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9.5);
-        doc.setTextColor(55, 65, 81);
+        // Encabezados y etiquetas de fila: livianos y tenues. El peso se
+        // reserva para los valores de la receta, que son el dato que importa.
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.setTextColor(100, 116, 139);
         doc.text("ESF", startX + labelW + (colW / 2), startY + 6.4, {align: "center"});
         doc.text("CYL", startX + labelW + colW + (colW / 2), startY + 6.4, {align: "center"});
         doc.text("EJE°", startX + labelW + (colW * 2) + (colW / 2), startY + 6.4, {align: "center"});
@@ -233,7 +236,7 @@ export default function RecetaLentesPage() {
         doc.text("OI", startX + (labelW / 2), startY + (rowH * 2) + 6.4, {align: "center"});
 
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(9);
+        doc.setFontSize(8.5);
         doc.setTextColor(17, 24, 39);
         doc.text(valorVisual(values.od.esf, ""), startX + labelW + (colW / 2), startY + rowH + 6.4, {align: "center"});
         doc.text(valorVisual(values.od.cyl, ""), startX + labelW + colW + (colW / 2), startY + rowH + 6.4, {align: "center"});
@@ -281,15 +284,22 @@ export default function RecetaLentesPage() {
             doc.setDrawColor(...line);
             doc.line(margin + 6, 33.5, pageW - margin - 6, 33.5);
 
-            let y = 41.5;
+            // ── Ritmo vertical de la A5 (210mm de alto) ──────────────────
+            // Todo cabe en una pagina: caja de datos 37-65, tablas hasta 149,
+            // observaciones 156-170 y la firma 174-192, siempre por encima del
+            // pie (linea en 194). Antes la firma arrancaba en pageH-32 y sus
+            // ultimas lineas caian justo sobre el pie.
+            let y = 37;
             const metaBoxY = y;
             const metaX = margin + 8;
             const metaW = contentW - 16;
-            const metaBoxH = 36;
+            const metaBoxH = 28;
             const patientX = metaX + 4;
             const rutX = metaX + 54;
-            const fechaX = metaX + 84;
-            const fullValueWidth = metaW - 8;
+            // 76 y no 84: con 84 la columna de especialidad quedaba en 16mm y
+            // una como "Médico Cirujano" se partía en dos líneas contra el borde
+            // de la caja. Asi queda en 24mm y entra en una.
+            const fechaX = metaX + 76;
 
             doc.setFillColor(248, 250, 252);
             doc.roundedRect(metaX, metaBoxY, metaW, metaBoxH, 3, 3, "F");
@@ -297,119 +307,138 @@ export default function RecetaLentesPage() {
             doc.roundedRect(metaX, metaBoxY, metaW, metaBoxH, 3, 3);
 
             // Fila 1: paciente | rut paciente | fecha
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(7.5);
-            doc.setTextColor(...muted);
-            doc.text("PACIENTE", patientX, metaBoxY + 6);
-            doc.text("RUT", rutX, metaBoxY + 6);
-            doc.text("FECHA", fechaX, metaBoxY + 6);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8.2);
-            doc.setTextColor(...text);
-            doc.text(doc.splitTextToSize(valorVisual(formulario.nombrePaciente, "-"), rutX - patientX - 4), patientX, metaBoxY + 12);
-            doc.text(doc.splitTextToSize(valorVisual(formulario.rutPaciente, "-"), fechaX - rutX - 4), rutX, metaBoxY + 12);
-            doc.setFontSize(7.6);
-            doc.text(formatDateDashed(formulario.fechaEmision), fechaX, metaBoxY + 12);
-
-            // Fila 2: profesional (ancho completo, para nombres largos)
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(7.5);
-            doc.setTextColor(...muted);
-            doc.text("PROFESIONAL", patientX, metaBoxY + 20);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8.2);
-            doc.setTextColor(...text);
-            doc.text(doc.splitTextToSize(valorVisual(formulario.nombreProfesional, "-"), fullValueWidth), patientX, metaBoxY + 26);
-
-            // Fila 3: RUT profesional + especialidad (ancho completo)
             doc.setFont("helvetica", "normal");
             doc.setFontSize(6.5);
             doc.setTextColor(...muted);
-            const profesionalSecundario = [
-                formulario.rutProfesional.trim() ? `RUT: ${formulario.rutProfesional.trim()}` : null,
-                especialidadProfesional || null,
-            ].filter(Boolean).join("  ·  ") || "-";
-            doc.text(doc.splitTextToSize(profesionalSecundario, fullValueWidth), patientX, metaBoxY + 31.5, {lineHeightFactor: 1.15});
+            doc.text("PACIENTE", patientX, metaBoxY + 5.5);
+            doc.text("RUT", rutX, metaBoxY + 5.5);
+            doc.text("FECHA", fechaX, metaBoxY + 5.5);
 
-            y = 82;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
+            // Los valores tampoco van en negrita: con todo en negrita nada
+            // destaca y el documento se ve recargado.
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
             doc.setTextColor(...text);
-            doc.text("PARA LEJOS", margin + 6, y);
-            drawTable(doc, margin + 10, y + 5, {
+            doc.text(doc.splitTextToSize(valorVisual(formulario.nombrePaciente, "-"), rutX - patientX - 4), patientX, metaBoxY + 10.5);
+            doc.text(doc.splitTextToSize(valorVisual(formulario.rutPaciente, "-"), fechaX - rutX - 4), rutX, metaBoxY + 10.5);
+            doc.text(formatDateDashed(formulario.fechaEmision), fechaX, metaBoxY + 10.5);
+
+            // Fila 2: profesional | su RUT | especialidad, cada uno con su
+            // rotulo. Antes el RUT y la especialidad iban juntos en una linea
+            // separada por un punto medio, que ademas se salia de la caja.
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(6.5);
+            doc.setTextColor(...muted);
+            // "RUT" a secas: la fila ya dice PROFESIONAL, asi que no hace falta
+            // repetirlo, y con "RUT PROFESIONAL" el rotulo invadia la columna
+            // de al lado y se leia pegado a "ESPECIALIDAD".
+            doc.text("PROFESIONAL", patientX, metaBoxY + 17);
+            doc.text("RUT", rutX, metaBoxY + 17);
+            doc.text("ESPECIALIDAD", fechaX, metaBoxY + 17);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(...text);
+            doc.text(doc.splitTextToSize(valorVisual(formulario.nombreProfesional, "-"), rutX - patientX - 4), patientX, metaBoxY + 22);
+            doc.text(doc.splitTextToSize(valorVisual(formulario.rutProfesional, "-"), fechaX - rutX - 4), rutX, metaBoxY + 22);
+            doc.text(doc.splitTextToSize(especialidadProfesional || "-", metaW - (fechaX - metaX) - 4), fechaX, metaBoxY + 22);
+
+            // Titulos de seccion: al mismo tamaño y color que los rotulos de la
+            // caja de datos. Antes iban en 12pt negro y dominaban la receta.
+            const tituloSeccion = (texto, posY) => {
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(7);
+                doc.setTextColor(...muted);
+                doc.text(texto, margin + 6, posY);
+            };
+
+            y = 71;
+            tituloSeccion("PARA LEJOS", y);
+            drawTable(doc, margin + 10, y + 4, {
                 od: formulario.lejosOd,
                 oi: formulario.lejosOi
             });
 
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.setTextColor(...text);
-            doc.text("DP pl:", pageW - margin - 34, y + 37);
-            doc.setDrawColor(180, 187, 200);
-            doc.line(pageW - margin - 18, y + 37.5, pageW - margin - 4, y + 37.5);
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(8.5);
-            doc.text(valorVisual(formulario.dpLejos, ""), pageW - margin - 11, y + 35.8, {align: "center"});
-
-            y = 124;
-
+            doc.setFontSize(7);
+            doc.setTextColor(...muted);
+            doc.text("DP pl:", pageW - margin - 34, y + 36);
+            doc.setDrawColor(180, 187, 200);
+            doc.line(pageW - margin - 18, y + 36.5, pageW - margin - 4, y + 36.5);
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
+            doc.setFontSize(8.5);
             doc.setTextColor(...text);
-            doc.text("PARA CERCA", margin + 6, y);
-            drawTable(doc, margin + 10, y + 5, {
+            doc.text(valorVisual(formulario.dpLejos, ""), pageW - margin - 11, y + 34.8, {align: "center"});
+
+            y = 113;
+            tituloSeccion("PARA CERCA", y);
+            drawTable(doc, margin + 10, y + 4, {
                 od: formulario.cercaOd,
                 oi: formulario.cercaOi
             });
 
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.setTextColor(...text);
-            doc.text("ADD", margin + 12, y + 40);
-            doc.line(margin + 24, y + 40.5, margin + 48, y + 40.5);
             doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            doc.setTextColor(...muted);
+            doc.text("ADD", margin + 12, y + 36);
+            doc.line(margin + 24, y + 36.5, margin + 48, y + 36.5);
+            doc.setFont("helvetica", "bold");
             doc.setFontSize(8.5);
-            doc.text(valorVisual(formulario.add, ""), margin + 36, y + 38.8, {align: "center"});
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.text("DP pc:", pageW - margin - 34, y + 40);
-            doc.line(pageW - margin - 18, y + 40.5, pageW - margin - 4, y + 40.5);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8.5);
-            doc.text(valorVisual(formulario.dpCerca, ""), pageW - margin - 11, y + 38.8, {align: "center"});
-
-            y = 179;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
             doc.setTextColor(...text);
-            doc.text("OBSERVACIONES:", margin + 6, y);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            const observaciones = formulario.observaciones.trim() || formulario.notas.trim() || " ";
-            const observacionesLineas = doc.splitTextToSize(observaciones, contentW - 20);
-            doc.text(observacionesLineas, margin + 6, y + 7, {lineHeightFactor: 1.5});
+            doc.text(valorVisual(formulario.add, ""), margin + 36, y + 34.8, {align: "center"});
 
-            // pageH - 32: el bloque de firma sumo la linea del RUT; sin subirlo, esa
-            // linea caia por debajo del pie de pagina (pageH - 16).
-            const signatureY = pageH - 32;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            doc.setTextColor(...muted);
+            doc.text("DP pc:", pageW - margin - 34, y + 36);
+            doc.line(pageW - margin - 18, y + 36.5, pageW - margin - 4, y + 36.5);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(8.5);
+            doc.setTextColor(...text);
+            doc.text(valorVisual(formulario.dpCerca, ""), pageW - margin - 11, y + 34.8, {align: "center"});
+
+            // Observaciones: ahora ocupan el ancho completo y van ARRIBA de la
+            // firma. Antes quedaban a un costado de ella, como si fueran parte
+            // del bloque de firma.
+            y = 156;
+            tituloSeccion("OBSERVACIONES", y);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(...text);
+            const observaciones = formulario.observaciones.trim() || formulario.notas.trim() || "";
+            if (observaciones) {
+                // Tope de 3 lineas: es lo que cabe antes de la firma. Con mas,
+                // la receta se iria a una segunda pagina casi vacia.
+                const MAX_LINEAS_OBS = 3;
+                const lineas = doc.splitTextToSize(observaciones, contentW - 20);
+                const visibles = lineas.slice(0, MAX_LINEAS_OBS);
+                if (lineas.length > MAX_LINEAS_OBS) {
+                    visibles[MAX_LINEAS_OBS - 1] = `${visibles[MAX_LINEAS_OBS - 1].replace(/\s+\S*$/, "")}…`;
+                }
+                doc.text(visibles, margin + 6, y + 5.5, {lineHeightFactor: 1.35});
+            }
+
+            // ── Pie de firma, al final del documento ─────────────────────
+            const signatureY = 174;
             doc.setDrawColor(180, 187, 200);
             doc.line(pageW - margin - 54, signatureY, pageW - margin - 6, signatureY);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(7.5);
-            doc.setTextColor(...muted);
-            doc.text("Firma y timbre del profesional", pageW - margin - 30, signatureY + 5, {align: "center"});
-            doc.setTextColor(...text);
-            doc.text(valorVisual(formulario.nombreProfesional, ""), pageW - margin - 30, signatureY + 9, {align: "center"});
-            const rutFirmaLentes = formulario.rutProfesional.trim();
-            if (rutFirmaLentes) {
-                doc.setTextColor(...muted);
-                doc.text(`RUT: ${rutFirmaLentes}`, pageW - margin - 30, signatureY + 13, {align: "center"});
-            }
+            dibujarBloqueFirma(doc, {
+                x: pageW - margin - 30,
+                y: signatureY + 4,
+                anchoMax: 48,
+                align: "center",
+                salto: 3.4,
+                nombre: valorVisual(formulario.nombreProfesional, ""),
+                rut: formulario.rutProfesional.trim(),
+                especialidad: especialidadProfesional || "",
+                empresa: empresaNombre,
+                tamanoNombre: 7.5,
+                tamanoDetalle: 7,
+                tamanoLeyenda: 7,
+                colorTexto: text,
+                colorEmpresa: muted,
+            });
 
             doc.setDrawColor(...line);
             doc.line(margin + 6, pageH - 16, pageW - margin - 6, pageH - 16);

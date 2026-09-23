@@ -6,6 +6,7 @@ import { profesionalPorId, rutDeProfesional } from "@/lib/profesional";
 import {useParams, useRouter} from "next/navigation";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
+import { dibujarBloqueFirma } from "@/lib/pdfFirma";
 import ToasterClient from "@/Componentes/ToasterClient";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales";
 import {InfoButton} from "@/Componentes/InfoButton";
@@ -268,10 +269,15 @@ export default function ReecetasPacientes() {
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9.4);
             doc.setTextColor(15, 23, 42);
-            doc.text(normalizarTextoPDF(`${nombre_paciente} ${apellido_paciente}`), margin + 4, y + 23);
-            doc.text(normalizarTextoPDF(rut_paciente), margin + 74, y + 23);
-            doc.text(nombreProfesionalPDF, margin + 4, y + 36);
-            doc.text(rutProfesionalPDF, margin + 74, y + 36);
+            // Cada valor acotado al ancho de SU columna. Sin esto, un nombre
+            // largo se seguia dibujando hacia la derecha y se montaba sobre el
+            // RUT de la columna de al lado.
+            const anchoCol1 = 66;  // de margin+4 hasta margin+74
+            const anchoCol2 = 52;  // de margin+74 hasta margin+130
+            doc.text(doc.splitTextToSize(normalizarTextoPDF(`${nombre_paciente} ${apellido_paciente}`), anchoCol1), margin + 4, y + 23);
+            doc.text(doc.splitTextToSize(normalizarTextoPDF(rut_paciente), anchoCol2), margin + 74, y + 23);
+            doc.text(doc.splitTextToSize(nombreProfesionalPDF, anchoCol1), margin + 4, y + 36);
+            doc.text(doc.splitTextToSize(rutProfesionalPDF, anchoCol2), margin + 74, y + 36);
             doc.text(doc.splitTextToSize(especialidadProfesionalPDF, 58), margin + 130, y + 36, {lineHeightFactor: 1.3});
             doc.text(normalizarTextoPDF(formatearFecha(paciente?.nacimiento)), margin + 4, y + 49);
             doc.text(`${calcularEdad(paciente?.nacimiento)} años`, margin + 74, y + 49);
@@ -355,17 +361,19 @@ export default function ReecetasPacientes() {
 
             doc.setDrawColor(148, 163, 184);
             doc.setLineWidth(0.35);
-            doc.line(rightX - 62, y + 10, rightX, y + 10);
+            const anchoFirma = 62; // el mismo largo de la raya de firma
+            doc.line(rightX - anchoFirma, y + 10, rightX, y + 10);
 
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(71, 85, 105);
-            doc.text(nombreProfesionalPDF, rightX, y + 16, {align: "right"});
-            doc.text(rutProfesionalPDF ? `RUT: ${rutProfesionalPDF}` : "-", rightX, y + 21, {align: "right"});
-            doc.text(especialidadProfesionalFirmaPDF, rightX, y + 26, {align: "right"});
-            doc.text("Firma y timbre profesional", rightX, y + 31, {align: "right"});
-            doc.setTextColor(148, 163, 184);
-            doc.text(empresaNombre, rightX, y + 36, {align: "right"});
+            dibujarBloqueFirma(doc, {
+                x: rightX,
+                y: y + 16,
+                anchoMax: anchoFirma,
+                align: "right",
+                nombre: nombreProfesionalPDF,
+                rut: rutProfesionalPDF,
+                especialidad: especialidadProfesionalFirmaPDF,
+                empresa: empresaNombre,
+            });
 
             dibujarPie();
 

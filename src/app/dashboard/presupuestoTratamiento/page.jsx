@@ -14,6 +14,7 @@ import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 
 import jsPDF from "jspdf";
+import { dibujarBloqueFirma } from "@/lib/pdfFirma";
 import autoTable from "jspdf-autotable";
 import {SelectDinamic} from "@/Componentes/SelectDinamic";
 import {InputTextDinamic} from "@/Componentes/InputTextDinamic";
@@ -154,53 +155,56 @@ export default function PresupuestoTratamiento() {
         // ── DATOS DEL DOCUMENTO ──────────────────────────────────────
         let y = 42;
 
-        // Caja info: Profesional | Paciente | RUT | Fecha
+        // ── Caja de datos ────────────────────────────────────────────
+        // Misma grilla y misma escala que detalleCotizacion, que es el
+        // documento hermano: rotulos en 6.5 y valores en 8, cada dato con su
+        // rotulo y acotado al ancho de su columna. Antes el nombre iba en 10pt
+        // sin limite de ancho y se montaba sobre la columna del paciente, y el
+        // RUT viajaba pegado al nombre con un punto medio.
+        const altoCajaInfo = 30;
         doc.setFillColor(...BGMID);
-        doc.roundedRect(margin, y, rightX - margin, 26, 1, 1, "F");
+        doc.roundedRect(margin, y, rightX - margin, altoCajaInfo, 1, 1, "F");
         doc.setDrawColor(...BORDER);
         doc.setLineWidth(0.3);
-        doc.roundedRect(margin, y, rightX - margin, 26, 1, 1, "S");
+        doc.roundedRect(margin, y, rightX - margin, altoCajaInfo, 1, 1, "S");
 
-        // Línea vertical divisoria
         const midCol = margin + (rightX - margin) / 2;
-        doc.line(midCol, y + 2, midCol, y + 24);
+        doc.line(midCol, y + 2, midCol, y + altoCajaInfo - 2);
 
-        // Columna izquierda: Profesional
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(6.5);
-        doc.setTextColor(...MID);
-        doc.text("PROFESIONAL RESPONSABLE", margin + 5, y + 8);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(...BLACK);
-        doc.text(profesionalLabel?.nombreProfesional || "—", margin + 5, y + 14);
+        const anchoSub = (midCol - margin) / 2;
+        const rotuloInfo = (texto, x, posY) => {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(6.5);
+            doc.setTextColor(...MID);
+            doc.text(texto, x, posY);
+        };
+        const valorInfo = (texto, x, posY, ancho) => {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(...BLACK);
+            doc.text(doc.splitTextToSize(String(texto ?? "").trim() || "—", ancho), x, posY);
+        };
 
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(6.5);
-        doc.setTextColor(...MID);
-        const profesionalSecundario = [
-            rutProfesionalManual.trim() ? `RUT: ${rutProfesionalManual.trim()}` : null,
-            profesionalLabel?.descripcionProfesional || profesionalLabel?.especialidad || null,
-        ].filter(Boolean).join("  ·  ");
-        if (profesionalSecundario) {
-            doc.text(profesionalSecundario, margin + 5, y + 20);
-        }
+        // El nombre ocupa el ancho completo de su mitad: es el dato principal y
+        // con media columna un nombre largo se partia en tres lineas que
+        // terminaban invadiendo los rotulos de la fila de abajo.
+        const anchoMitad = (midCol - margin) - 10;
+        rotuloInfo("PROFESIONAL RESPONSABLE", margin + 5, y + 7);
+        valorInfo(profesionalLabel?.nombreProfesional, margin + 5, y + 12, anchoMitad);
+        rotuloInfo("RUT", margin + 5, y + 19);
+        valorInfo(rutProfesionalManual, margin + 5, y + 24, anchoSub - 6);
+        rotuloInfo("ESPECIALIDAD", margin + 5 + anchoSub, y + 19);
+        valorInfo(profesionalLabel?.descripcionProfesional || profesionalLabel?.especialidad, margin + 5 + anchoSub, y + 24, anchoSub - 6);
 
-        // Columna derecha: Paciente + RUT | Fecha
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(6.5);
-        doc.setTextColor(...MID);
-        doc.text("PACIENTE", midCol + 5, y + 8);
-        doc.text("FECHA DE EMISIÓN", midCol + 5, y + 19);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(...BLACK);
-        doc.text((nombrePaciente || "—") + (rutaPaciente ? `  ·  ${rutaPaciente}` : ""), midCol + 5, y + 14);
-        doc.setFontSize(8.5);
-        doc.text(fechaEmision, midCol + 5, y + 24);
+        rotuloInfo("PACIENTE", midCol + 5, y + 7);
+        valorInfo(nombrePaciente, midCol + 5, y + 12, anchoMitad);
+        rotuloInfo("RUT", midCol + 5, y + 19);
+        valorInfo(rutaPaciente, midCol + 5, y + 24, anchoSub - 6);
+        rotuloInfo("FECHA DE EMISIÓN", midCol + 5 + anchoSub, y + 19);
+        valorInfo(fechaEmision, midCol + 5 + anchoSub, y + 24, anchoSub - 6);
 
         // ── TABLA DE SERVICIOS ───────────────────────────────────────
-        y += 32;
+        y += altoCajaInfo + 6;
 
         const columns = ["#", "Servicio / Procedimiento", "Observación", "Valor (CLP)"];
         const rows = listaPresupuesto.map((srv, i) => [
@@ -247,6 +251,15 @@ export default function PresupuestoTratamiento() {
 
         // ── TOTALES ──────────────────────────────────────────────────
         let finalY = doc.lastAutoTable.finalY + 8;
+
+        // Totales (22) + notas (30+10) + firma (24+21): si no caben en lo que
+        // queda de hoja, van a una pagina nueva. Antes se dibujaban donde
+        // terminara la tabla y con muchos servicios quedaban fuera del papel.
+        const altoCierre = 22 + 40 + 45;
+        if (finalY + altoCierre > pageH - 20) {
+            doc.addPage();
+            finalY = 40;
+        }
 
         // Caja de total alineada a la derecha
         const boxW = 70;
@@ -295,9 +308,25 @@ export default function PresupuestoTratamiento() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(7);
         doc.setTextColor(...MID);
-        doc.text("Firma y Timbre Profesional", margin + sigW / 2, finalY + 5, { align: "center" });
-        doc.setFontSize(6);
-        doc.text(empresaNombre, margin + sigW / 2, finalY + 9, { align: "center" });
+        // Antes solo decia "Firma y Timbre Profesional" y la empresa: no quedaba
+        // registro de QUIEN emitio el presupuesto.
+        dibujarBloqueFirma(doc, {
+            x: margin + sigW / 2,
+            y: finalY + 5,
+            anchoMax: sigW,
+            align: "center",
+            salto: 4,
+            nombre: profesionalLabel?.nombreProfesional || "",
+            rut: rutProfesionalManual.trim(),
+            especialidad: profesionalLabel?.descripcionProfesional || profesionalLabel?.especialidad || "",
+            empresa: empresaNombre,
+            leyenda: "Firma y Timbre Profesional",
+            tamanoNombre: 6,
+            tamanoDetalle: 6,
+            tamanoLeyenda: 7,
+            colorTexto: MID,
+            colorEmpresa: MID,
+        });
         // Firma paciente
         doc.setFontSize(7);
         doc.line(rightX - sigW, finalY, rightX, finalY);
