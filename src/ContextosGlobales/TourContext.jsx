@@ -388,6 +388,10 @@ export function TourProvider({ children }) {
     // corre: ambos usan z-index bajo (50 y 80) y quedarían sepultados bajo el
     // overlay de driver.js (z-10000), viéndose como manchas grises.
     const [isRunning, setIsRunning] = useState(false);
+    // El tour breve de la Carpeta Clínica (TutorialGuiadoFichas) corre su
+    // propio driver.js fuera de este contexto. Pide por acá el mismo
+    // tratamiento que isRunning: mismo overlay, mismas piezas que ocultar.
+    const [tourExternoActivo, setTourExternoActivo] = useState(false);
     const role = getDashboardRoleFromUser(user);
     const tourSteps = useMemo(() => getStepsForRole(role), [role]);
     const tourGroups = useMemo(() => [...new Set(tourSteps.map((step) => step.grupo))], [tourSteps]);
@@ -856,7 +860,7 @@ export function TourProvider({ children }) {
     }, []);
 
     return (
-        <TourContext.Provider value={{ start, skip, isRunning, actualizarCantidadProfesionales, actualizarCantidadServicios, continuarTourTrasGuardarServicio, continuarTourTrasGuardarReserva, actualizarCantidadTarifas, continuarTourTrasGuardarTarifa, continuarTourTrasGuardarBloqueo }}>
+        <TourContext.Provider value={{ start, skip, isRunning, tourExternoActivo, setTourExternoActivo, actualizarCantidadProfesionales, actualizarCantidadServicios, continuarTourTrasGuardarServicio, continuarTourTrasGuardarReserva, actualizarCantidadTarifas, continuarTourTrasGuardarTarifa, continuarTourTrasGuardarBloqueo }}>
             {children}
         </TourContext.Provider>
     );

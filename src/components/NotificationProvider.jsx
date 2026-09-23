@@ -32,7 +32,9 @@ export default function NotificationProvider() {
     // "denied"  → bloqueado → no hacer nada
     const [permiso, setPermiso] = useState("idle")
     const [bannerVisible, setBannerVisible] = useState(false)
-    const { isRunning: tourActivo } = useTour()
+    // tourExternoActivo: el tutorial breve de la ficha del paciente corre su
+    // propio driver.js; pide ocultar el banner igual que el tour principal.
+    const { isRunning: tourActivo, tourExternoActivo } = useTour()
 
     useEffect(() => {
         if (typeof Notification === "undefined") return
@@ -73,7 +75,7 @@ export default function NotificationProvider() {
     // gris ilegible abajo al centro, compitiendo con el paso resaltado. No se
     // marca como descartado — `bannerVisible` sigue en true y el banner vuelve
     // solo en cuanto el usuario cierra o termina el tour.
-    if (!bannerVisible || permiso !== "default" || tourActivo) return null
+    if (!bannerVisible || permiso !== "default" || tourActivo || tourExternoActivo) return null
 
     return (
         <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4 animate-in slide-in-from-bottom-4 fade-in duration-300">

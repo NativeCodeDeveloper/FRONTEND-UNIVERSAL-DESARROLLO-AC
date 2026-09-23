@@ -22,7 +22,9 @@ const THINKING_LABELS = [
 ];
 
 export default function CortexAssistant() {
-  const { isRunning: tourActivo } = useTour();
+  // tourExternoActivo: el tutorial breve de la ficha del paciente corre su
+  // propio driver.js; pide ocultarse igual que el tour principal.
+  const { isRunning: tourActivo, tourExternoActivo } = useTour();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [mockConversation, setMockConversation] = useState([]);
@@ -93,7 +95,7 @@ export default function CortexAssistant() {
   // Igual que el banner de notificaciones: z-[80] queda por debajo del overlay
   // del tour (z-10000), así que durante el tutorial el orbe se vería como una
   // mancha apagada en la esquina. Se oculta y vuelve al terminar.
-  if (tourActivo) return null;
+  if (tourActivo || tourExternoActivo) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[80]">

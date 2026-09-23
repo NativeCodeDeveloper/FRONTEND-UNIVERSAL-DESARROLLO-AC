@@ -29,6 +29,7 @@ import {
 } from "@/lib/dashboard-access";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
+import TutorialGuiadoFichas from "@/Componentes/TutorialGuiadoFichas";
 
 
 function parsearDatosDinamicos(datos) {
@@ -1017,6 +1018,11 @@ export default function Paciente() {
                             className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]"
                         />
+                        <TutorialGuiadoFichas
+                            ariaLabel="Iniciar el tutorial guiado de la ficha del paciente"
+                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]"
+                        />
                         <div className="flex gap-2">
                             <button
                                 onClick={() => volverAFichas()}
@@ -1127,7 +1133,7 @@ export default function Paciente() {
                         
                         {/* Acciones Rápidas */}
                         <div data-tour="ficha-acciones-rapidas" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                            <button onClick={() => nuevaFichaClinica(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                            <button data-tour="ficha-boton-nueva" onClick={() => nuevaFichaClinica(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
                                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 </span>
@@ -1170,7 +1176,7 @@ export default function Paciente() {
                         </div>
 
                         {pacienteActual && (
-                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
+                            <details data-tour="ficha-info-ingreso" className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1182,6 +1188,7 @@ export default function Paciente() {
                                     </div>
                                     <button
                                         type="button"
+                                        data-tour="ficha-editar-ingreso"
                                         onClick={(event) => {
                                             event.preventDefault();
                                             event.stopPropagation();
@@ -1335,7 +1342,7 @@ export default function Paciente() {
                             
                             {/* Filtros y firma PDF — colapsado por defecto, igual que "Información de ingreso",
                                 para no dejar espacio en blanco cuando no se está usando. */}
-                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
+                            <details data-tour="ficha-filtros" className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1405,7 +1412,7 @@ export default function Paciente() {
                                 el total, para que el profesional vea de un vistazo cuántas veces ha
                                 venido este paciente. Colapsado por defecto, mismo patrón que "Filtros"
                                 e "Información de ingreso". */}
-                            <details className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
+                            <details data-tour="ficha-historial" className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
                                     <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
