@@ -1,64 +1,158 @@
-const SIZE_CLASSES = {
-  140: "size-36",
-  180: "size-44",
-  220: "size-56",
-};
+"use client";
 
-const DELAY_CLASSES = [
-  "[animation-delay:0ms]",
-  "[animation-delay:120ms]",
-  "[animation-delay:240ms]",
-  "[animation-delay:360ms]",
-  "[animation-delay:480ms]",
-  "[animation-delay:600ms]",
-  "[animation-delay:720ms]",
-  "[animation-delay:840ms]",
-];
+// ── Pantalla de carga / estado de la plataforma ──────────────────────────────
+// Base monocroma (fondo #FAFAFB translúcido, pista #EAEAEC) con un acento
+// violeta contenido: solo el arco de progreso y un halo muy tenue detrás.
+// La usan src/app/loading.jsx (fallback de Suspense) y src/app/not-found.jsx.
+//
+// OJO con el porcentaje: un fallback de Suspense no tiene progreso real que
+// medir — React no informa cuánto falta. El número sigue una curva que
+// desacelera y se detiene en 99 hasta que la página entra y el loader se
+// desmonta. Da la sensación de avance sin mentir con un 100% que no ocurrió.
 
-export function Component({ size = 180, text = "Cargando", label = text }) {
-  const sizeClass = SIZE_CLASSES[size] || SIZE_CLASSES[180];
-  const letters = text.split("");
+import { useEffect, useRef, useState } from "react";
+
+const ACENTO = "#7C5CF0";
+const PISTA = "#EAEAEC";
+const TINTA = "#16181C";
+
+// Constante de tiempo de la curva: más alto = avanza más lento al principio.
+const TAU_MS = 1500;
+const TOPE = 99;
+
+export function Component({
+  size = 180,
+  text = "Cargando",
+  label = text,
+  mostrarPorcentaje = true,
+}) {
+  const diametro = Math.round(size * 0.8);
+  const grosor = size >= 220 ? 4 : 3;
+  const radio = (diametro - grosor) / 2;
+  const circunferencia = 2 * Math.PI * radio;
+
+  const progreso = useProgresoSimulado(mostrarPorcentaje);
+
+  // Sin porcentaje (404) el anillo no está "cargando": queda un arco fijo.
+  const fraccion = mostrarPorcentaje ? progreso / 100 : 0.72;
+  const textoCentral = mostrarPorcentaje ? null : text;
 
   return (
     <div
-      className="fixed inset-0 z-50 grid min-h-dvh place-items-center overflow-hidden bg-[#0d0718] text-white"
+      className="fixed inset-0 z-50 grid min-h-dvh place-items-center overflow-hidden bg-[#FAFAFB]/70 backdrop-blur-md"
+      style={{ color: TINTA }}
       role="status"
       aria-live="polite"
-      aria-label={label}
+      aria-label={mostrarPorcentaje ? `${label} ${Math.round(progreso)}%` : label}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.24),transparent_52%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(168,85,247,0.22),transparent_56%)]" />
-
-      <div className="absolute left-1/2 top-1/2 size-[min(92vw,38rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/20 blur-[110px] motion-safe:animate-pulse" />
-      <div className="absolute left-[18%] top-[20%] size-32 rounded-full bg-fuchsia-500/15 blur-3xl motion-safe:animate-pulse" />
-      <div className="absolute bottom-[14%] right-[16%] size-40 rounded-full bg-purple-500/15 blur-3xl motion-safe:animate-pulse [animation-delay:700ms]" />
-
       <div className="relative flex flex-col items-center justify-center">
-        <div className={`${sizeClass} relative grid place-items-center select-none`}>
-          <div className="absolute inset-0 rounded-full border border-violet-200/15" />
-          <div className="absolute inset-3 rounded-full border border-fuchsia-200/10" />
+        {/* Halo violeta: el único color fuera del arco, apenas perceptible. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute rounded-full blur-3xl"
+          style={{
+            width: diametro * 2,
+            height: diametro * 2,
+            background: `radial-gradient(circle, rgba(124,92,240,0.16), transparent 68%)`,
+          }}
+        />
 
-          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-r-violet-300 border-t-fuchsia-300/95 shadow-[0_0_28px_rgba(168,85,247,0.62)] motion-safe:animate-spin [animation-duration:4.8s]" />
-          <div className="absolute inset-4 rounded-full border-2 border-transparent border-b-violet-300/75 border-l-fuchsia-400/80 shadow-[0_0_20px_rgba(217,70,239,0.35)] motion-safe:animate-spin [animation-direction:reverse] [animation-duration:3.2s]" />
+        <div
+          className="relative grid place-items-center select-none"
+          style={{ width: diametro, height: diametro }}
+        >
+          <svg
+            width={diametro}
+            height={diametro}
+            viewBox={`0 0 ${diametro} ${diametro}`}
+            className={mostrarPorcentaje ? undefined : "motion-safe:animate-spin [animation-duration:2.6s]"}
+            style={{ transform: "rotate(-90deg)" }}
+          >
+            <circle
+              cx={diametro / 2}
+              cy={diametro / 2}
+              r={radio}
+              fill="none"
+              stroke={PISTA}
+              strokeWidth={grosor}
+            />
+            <circle
+              cx={diametro / 2}
+              cy={diametro / 2}
+              r={radio}
+              fill="none"
+              stroke={ACENTO}
+              strokeWidth={grosor}
+              strokeLinecap="round"
+              strokeDasharray={circunferencia}
+              strokeDashoffset={circunferencia * (1 - fraccion)}
+              style={{
+                // Sin transition a propósito: el progreso ya se recalcula en
+                // cada frame (requestAnimationFrame). Una transición encima
+                // dejaba el arco corriendo ~180ms detrás del número.
+                filter: `drop-shadow(0 0 6px rgba(124,92,240,0.35))`,
+              }}
+            />
+          </svg>
 
-          <div className="relative z-10 grid size-24 place-items-center rounded-full bg-violet-950/65 px-3 shadow-[inset_0_0_26px_rgba(196,181,253,0.16),0_0_34px_rgba(139,92,246,0.28)] ring-1 ring-white/10 backdrop-blur-sm">
-            <div className="flex items-center justify-center gap-0.5 text-sm font-semibold tracking-[0.08em] text-violet-50">
-              {letters.map((letter, index) => (
+          <div className="absolute inset-0 grid place-items-center">
+            {mostrarPorcentaje ? (
+              <div
+                className="font-semibold tabular-nums tracking-tight"
+                style={{ fontSize: diametro * 0.26, color: TINTA }}
+              >
+                {Math.round(progreso)}
                 <span
-                  key={`${letter}-${index}`}
-                  className={`inline-block motion-safe:animate-pulse ${DELAY_CLASSES[index % DELAY_CLASSES.length]}`}
+                  className="font-medium"
+                  style={{ fontSize: "0.5em", color: "#8B8F96", marginLeft: "0.06em" }}
                 >
-                  {letter}
+                  %
                 </span>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div
+                className="font-semibold tracking-tight"
+                style={{ fontSize: diametro * 0.24, color: TINTA }}
+              >
+                {textoCentral}
+              </div>
+            )}
           </div>
         </div>
 
-        <span className="mt-7 text-xs font-medium uppercase tracking-[0.32em] text-violet-100/75">
+        <span
+          className="mt-6 text-[11px] font-medium uppercase tracking-[0.22em]"
+          style={{ color: "#8B8F96" }}
+        >
           {label}
         </span>
       </div>
     </div>
   );
+}
+
+// Curva exponencial que desacelera: rápida al principio, lenta al final, y se
+// queda en TOPE. Nunca llega a 100 porque nadie le avisó que terminó.
+function useProgresoSimulado(activo) {
+  const [progreso, setProgreso] = useState(0);
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    if (!activo) return;
+
+    const inicio = performance.now();
+    const paso = (ahora) => {
+      const transcurrido = ahora - inicio;
+      const valor = TOPE * (1 - Math.exp(-transcurrido / TAU_MS));
+      setProgreso(valor);
+      if (valor < TOPE - 0.2) rafRef.current = requestAnimationFrame(paso);
+    };
+    rafRef.current = requestAnimationFrame(paso);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [activo]);
+
+  return progreso;
 }

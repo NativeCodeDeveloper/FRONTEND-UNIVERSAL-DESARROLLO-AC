@@ -2942,6 +2942,8 @@ function CalendarioContent() {
                         actualizarFecha={actualizarFechaSeleccionDraft}
                         formatHora={formatHoraCorta}
                         formatFechaLarga={formatFechaLarga}
+                        horaMinima={HORA_MINIMA_AGENDA}
+                        horaMaxima={HORA_MAXIMA_AGENDA}
                     />
                 )}
 

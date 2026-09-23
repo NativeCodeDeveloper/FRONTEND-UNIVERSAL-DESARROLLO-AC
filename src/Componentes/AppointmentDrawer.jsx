@@ -255,13 +255,13 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+    <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 overflow-hidden">
       <button
         type="button"
         onClick={() => setAbierto((prev) => !prev)}
         className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left"
       >
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-600">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-600">
           Repetir cita en más fechas (opcional)
           {fechasRepeticion.length > 0 && (
             <span className="ml-2 inline-flex items-center justify-center rounded-full bg-violet-100 text-[#6E56CF] text-[10px] font-bold px-1.5 py-0.5 normal-case tracking-normal">
@@ -356,6 +356,234 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
   );
 }
 
+// ─── Selector de hora (formato 24 horas) ─────────────────────────────────────
+// Dos campos: hora y minuto, ambos en 24 horas. Se eligio 24 h sobre AM/PM a
+// proposito: confundir 12 AM con 12 PM es un error clasico, y con 24 h el
+// problema no existe. Ademas desaparece un control de la fila.
+//
+// CONTRATO: emite el mismo string "HH:MM" en 24 horas que entregaba el
+// <input type="time">, asi que actualizarHora() y toda la validacion de
+// calendario/page.jsx siguen funcionando sin cambios.
+
+const TODOS_LOS_MINUTOS = Array.from({ length: 60 }, (_, m) => m);
+
+const dosDigitos = (n) => String(n).padStart(2, "0");
+
+function partesDesde24(valor24) {
+  const [h, m] = String(valor24 ?? "").split(":").map(Number);
+  if (!Number.isInteger(h) || !Number.isInteger(m)) return null;
+  if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return { hora: h, minuto: m };
+}
+
+// Campo combinado: se escribe el numero o se elige de una lista que scrollea
+// dentro de su propia caja. Sin flechas y sin listas a pantalla completa.
+//
+// Solo acepta digitos. Mientras se escribe, el texto vive en estado local para
+// poder teclear con libertad; al salir del campo se vuelve al valor real, de
+// modo que el campo nunca queda mostrando algo distinto de lo que se guardara.
+function CampoNumerico({
+  valor,
+  opciones,
+  onElegir,
+  etiquetaAria,
+  estaHabilitada = () => true,
+  inputClass,
+}) {
+  const [abierto, setAbierto] = useState(false);
+  const [texto, setTexto] = useState(null); // null = mostrar el valor real
+  const cajaRef = useRef(null);
+  const listaRef = useRef(null);
+
+  // Cerrar al hacer clic fuera del campo.
+  useEffect(() => {
+    if (!abierto) return;
+    const alClicarFuera = (e) => {
+      if (!cajaRef.current?.contains(e.target)) {
+        setAbierto(false);
+        setTexto(null);
+      }
+    };
+    document.addEventListener("mousedown", alClicarFuera);
+    return () => document.removeEventListener("mousedown", alClicarFuera);
+  }, [abierto]);
+
+  // Al abrir, dejar a la vista la opcion elegida: si esta "mas abajo", la lista
+  // aparece ya scrolleada hasta ella.
+  useEffect(() => {
+    if (!abierto) return;
+    const elegido = listaRef.current?.querySelector('[data-elegido="si"]');
+    if (elegido) elegido.scrollIntoView({ block: "center" });
+  }, [abierto, valor]);
+
+  const tope = opciones.length ? opciones[opciones.length - 1] : 59;
+  const mostrado = texto !== null ? texto : dosDigitos(valor);
+
+  function escribir(bruto) {
+    // Solo digitos, maximo 2. Letras y signos no entran.
+    const digitos = bruto.replace(/\D/g, "").slice(0, 2);
+    if (digitos === "") {
+      setTexto("");
+      return;
+    }
+    const n = Number(digitos);
+    // Un numero que ni siquiera puede existir (un 60 en los minutos, un 30 en
+    // la hora) se ignora: la tecla no entra y queda lo anterior.
+    if (n > tope) return;
+    setTexto(digitos);
+    // Se guarda solo si es una opcion permitida Y habilitada. Lo segundo es
+    // clave: la lista ya apaga los valores que la agenda rechazaria (el minuto
+    // 30 cuando la hora es 23), pero sin esta condicion el mismo valor entraba
+    // igual escribiendolo a mano y rebotaba con un toast de error.
+    // Los valores intermedios (el "1" mientras se escribe "14") se muestran
+    // pero no se emiten.
+    if (opciones.includes(n) && estaHabilitada(n)) onElegir(n);
+  }
+
+  function cerrar() {
+    setTexto(null);
+    setAbierto(false);
+  }
+
+  return (
+    <div ref={cajaRef} className="relative">
+      <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
+        aria-label={etiquetaAria}
+        value={mostrado}
+        onChange={(e) => escribir(e.target.value)}
+        onFocus={() => setAbierto(true)}
+        onClick={() => setAbierto(true)}
+        onBlur={() => setTexto(null)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { e.preventDefault(); cerrar(); }
+          if (e.key === "Escape") cerrar();
+        }}
+        className={`${inputClass} pr-7 text-center`}
+        style={{ colorScheme: "light" }}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400"
+      >
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+
+      {abierto && (
+        <ul
+          ref={listaRef}
+          role="listbox"
+          aria-label={etiquetaAria}
+          className="absolute z-30 mt-1 max-h-[184px] w-full overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-white py-1 shadow-[0_12px_28px_rgba(15,23,42,0.14)]"
+        >
+          {opciones.map((n) => {
+            const habilitada = n === valor || estaHabilitada(n);
+            const elegido = n === valor;
+            return (
+              <li key={n}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={elegido}
+                  data-elegido={elegido ? "si" : "no"}
+                  disabled={!habilitada}
+                  // onMouseDown y no onClick: el blur del input ocurre antes que
+                  // el click y cerraria la lista antes de alcanzar a elegir.
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onElegir(n);
+                    cerrar();
+                  }}
+                  className={`w-full px-3 py-1.5 text-left text-[13px] tabular-nums transition-colors ${
+                    elegido
+                      ? "bg-violet-50 font-semibold text-violet-700"
+                      : habilitada
+                        ? "text-slate-700 hover:bg-slate-50"
+                        : "cursor-not-allowed text-slate-300"
+                  }`}
+                >
+                  {dosDigitos(n)}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function SelectorHora({
+  etiqueta,
+  valor,
+  onCambio,
+  labelClass,
+  inputClass,
+  // Horas que ofrece la lista (ej: 8..23). Vienen del rango de la agenda.
+  horas,
+  // Recibe el total de minutos del dia y responde si esa hora es elegible.
+  esValida = () => true,
+}) {
+  const partes = partesDesde24(valor);
+  if (!partes) return null;
+  const { hora, minuto } = partes;
+
+  const emitir = (h, m) => onCambio(`${dosDigitos(h)}:${dosDigitos(m)}`);
+  const totalDe = (h, m) => h * 60 + m;
+
+  // Al elegir una hora nueva, si el minuto actual ya no sirve para ella (las 23
+  // con minuto 30, por ejemplo) se baja al primer minuto que si sirve. Asi no
+  // salta el toast de horario invalido.
+  function elegirHora(h) {
+    if (esValida(totalDe(h, minuto))) return emitir(h, minuto);
+    const primerMinutoValido = TODOS_LOS_MINUTOS.find((m) => esValida(totalDe(h, m)));
+    emitir(h, primerMinutoValido ?? 0);
+  }
+
+  const horaHabilitada = (h) => TODOS_LOS_MINUTOS.some((m) => esValida(totalDe(h, m)));
+  const minutoHabilitado = (m) => esValida(totalDe(hora, m));
+
+  // Aviso cuando la hora mostrada cae fuera del horario de la agenda. El caso
+  // real es abrir una reserva antigua agendada fuera de rango: se muestra tal
+  // cual (no se toca el dato) pero se advierte por que.
+  const valorFueraDeRango = !esValida(totalDe(hora, minuto));
+
+  return (
+    <div>
+      <label className={labelClass}>{etiqueta}</label>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1.5">
+        <CampoNumerico
+          valor={hora}
+          opciones={horas}
+          onElegir={elegirHora}
+          etiquetaAria={`${etiqueta}: hora`}
+          estaHabilitada={horaHabilitada}
+          inputClass={inputClass}
+        />
+        <span aria-hidden className="text-[15px] font-semibold text-slate-400">:</span>
+        <CampoNumerico
+          valor={minuto}
+          opciones={TODOS_LOS_MINUTOS}
+          onElegir={(m) => emitir(hora, m)}
+          etiquetaAria={`${etiqueta}: minutos`}
+          estaHabilitada={minutoHabilitado}
+          inputClass={inputClass}
+        />
+      </div>
+
+      {valorFueraDeRango && (
+        <p className="mt-1.5 text-[11px] font-medium text-amber-600">
+          Ese horario queda fuera del horario de la agenda.
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Formulario crear / editar ────────────────────────────────────────────────
 function FormSection({
   mode,
@@ -376,6 +604,11 @@ function FormSection({
   listaTarifasProfesional = [],
   onBloquear,
   onCambiarEstado,
+  // Rango horario de la agenda, en horas. Llegan desde calendario/page.jsx
+  // (HORA_MINIMA_AGENDA / HORA_MAXIMA_AGENDA) para no duplicar el valor aca.
+  // Los defaults no restringen: si no llegan, se comporta como antes.
+  horaMinima = 0,
+  horaMaxima = 24,
 }) {
   const formatLocal = (d) => {
     if (!d) return "";
@@ -398,9 +631,39 @@ function FormSection({
     }
   };
 
+  // text-[16px] en movil no es capricho: iOS Safari hace zoom automatico al
+  // enfocar un input con letra menor a 16px, y ese zoom descuadra el panel.
+  // Desde sm vuelve a 13px. h-11 = 44px, el objetivo tactil minimo de Apple.
   const inputClass =
-    "h-9 w-full rounded-xl border border-slate-200 bg-white px-3 text-[13px] text-slate-800 outline-none transition-all focus:border-violet-300 focus:ring-2 focus:ring-violet-100";
-  const labelClass = "block text-[11px] font-semibold text-slate-500 mb-1";
+    "h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 text-[16px] sm:text-[13px] text-slate-800 outline-none transition-shadow placeholder:text-slate-400 focus:border-violet-300 focus:ring-4 focus:ring-violet-100/70";
+  const labelClass = "block text-[11px] font-medium text-slate-500 mb-1.5";
+  const selectClass = `${inputClass} cursor-pointer pr-8`;
+
+  // Reglas de que horas se pueden elegir. Son las mismas que ya valida
+  // calendario/page.jsx; aca solo se usan para apagar las opciones imposibles,
+  // que es el punto del cambio: que no se pueda elegir mal, en vez de elegir
+  // mal y recibir un error.
+  const minutosAgenda = (d) =>
+    d instanceof Date && !Number.isNaN(d.getTime()) ? d.getHours() * 60 + d.getMinutes() : null;
+  const limiteInferior = horaMinima * 60;
+  const limiteSuperior = horaMaxima * 60;
+  const inicioEnMinutos = minutosAgenda(selectionDraft?.start);
+
+  const inicioValido = (total) => total >= limiteInferior && total < limiteSuperior;
+  const terminoValido = (total) =>
+    total <= limiteSuperior && (inicioEnMinutos === null || total > inicioEnMinutos);
+
+  // Horas que ofrecen las listas: exactamente la ventana de la agenda.
+  const horasDeAgenda = [];
+  for (let h = horaMinima; h <= Math.min(horaMaxima, 23); h += 1) horasDeAgenda.push(h);
+  const estiloSelect = {
+    colorScheme: "light",
+    backgroundImage:
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2394a3b8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E\")",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 0.55rem center",
+    backgroundSize: "15px",
+  };
   const API = process.env.NEXT_PUBLIC_API_URL;
   const [pacienteCoincidente, setPacienteCoincidente] = useState(null);
   const [buscandoPaciente, setBuscandoPaciente] = useState(false);
@@ -473,11 +736,11 @@ function FormSection({
   }, [API, esRutDesconocido, popupForm.rut]);
 
   return (
-    <div className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col gap-3.5 p-4 sm:p-5">
       {/* Rango de fecha/hora */}
       {selectionDraft && (
-        <div data-tour="reserva-horario" className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 mb-2">
+        <div data-tour="reserva-horario" className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
             Horario
           </p>
           <div>
@@ -489,27 +752,26 @@ function FormSection({
               className={inputClass} style={{ colorScheme: "light" }}
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className={labelClass}>Inicio</label>
-              <input
-                type="time"
-                step="900"
-                value={formatTimeVal(selectionDraft.start)}
-                onChange={(e) => actualizarHora("start", e.target.value)}
-                className={inputClass} style={{ colorScheme: "light" }}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Término</label>
-              <input
-                type="time"
-                step="900"
-                value={formatTimeVal(selectionDraft.end)}
-                onChange={(e) => actualizarHora("end", e.target.value)}
-                className={inputClass} style={{ colorScheme: "light" }}
-              />
-            </div>
+          <div className="space-y-2.5">
+            <SelectorHora
+              etiqueta="Inicio"
+              valor={formatTimeVal(selectionDraft.start)}
+              onCambio={(hhmm) => actualizarHora("start", hhmm)}
+              labelClass={labelClass}
+              inputClass={inputClass}
+              horas={horasDeAgenda}
+              esValida={inicioValido}
+            />
+            <SelectorHora
+              etiqueta="Término"
+              valor={formatTimeVal(selectionDraft.end)}
+              onCambio={(hhmm) => actualizarHora("end", hhmm)}
+              labelClass={labelClass}
+              inputClass={inputClass}
+              horas={horasDeAgenda}
+              esValida={terminoValido}
+            />
+
           </div>
           {selectionDraft.profesional && (
             <p className="text-[12px] text-slate-500">
@@ -521,8 +783,8 @@ function FormSection({
 
       {/* Datos del paciente */}
       {mode !== "bloqueo" && (
-        <div data-tour="reserva-paciente" className="rounded-xl border border-violet-100 bg-violet-50/50 p-3 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-violet-600 mb-2">
+        <div data-tour="reserva-paciente" className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-500 mb-2.5">
             Datos del paciente
           </p>
           <div>
@@ -543,13 +805,14 @@ function FormSection({
                 type="text"
                 value="RUT DESCONOCIDO"
                 disabled
-                className="h-10 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-3 text-[13px] font-semibold text-slate-500 outline-none"
+                className="h-11 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-3.5 text-[16px] sm:text-[13px] font-semibold text-slate-500 outline-none"
                 aria-label="RUT desconocido"
               />
             ) : (
               <RutInput
                 value={popupForm.rut}
                 onChange={(clean) => onPopupFormChange("rut", clean)}
+                className="h-11! rounded-xl! text-[16px]! sm:text-[13px]!"
               />
             )}
             {buscandoPaciente && (
@@ -575,7 +838,7 @@ function FormSection({
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-2.5">
             <div>
               <label className={labelClass}>Nombre</label>
               <input
@@ -600,6 +863,7 @@ function FormSection({
             <PhoneInput
               value={popupForm.telefono}
               onChange={(full) => onPopupFormChange("telefono", full)}
+              className="h-11! text-[16px]! sm:text-[13px]!"
             />
           </div>
           <div>
@@ -617,8 +881,8 @@ function FormSection({
 
       {/* Selector de tarifa / servicio del profesional */}
       {mode !== "bloqueo" && listaTarifasProfesional.length > 0 && (
-        <div data-tour="reserva-servicio" className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-1">
+        <div data-tour="reserva-servicio" className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
             Servicio
           </p>
           <div>
@@ -640,8 +904,8 @@ function FormSection({
                   onPopupFormChange("monto_reserva", tarifa.precio);
                 }
               }}
-              className={inputClass}
-              style={{ colorScheme: "light" }}
+              className={selectClass}
+              style={estiloSelect}
             >
               <option value="">— Seleccione un servicio —</option>
               {listaTarifasProfesional.map((t) => (
@@ -758,8 +1022,8 @@ function FormSection({
 
       {/* Bloqueo rápido */}
       {mode === "create" && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 mb-2">
+        <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
             Bloqueo rápido (opcional)
           </p>
           <div>
@@ -788,8 +1052,8 @@ function FormSection({
 
       {/* Cambio de estado en modo edición */}
       {mode === "edit" && (
-        <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 mb-2">
+        <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
             Cambiar estado
           </p>
           <div className="grid grid-cols-1 gap-1.5">
@@ -840,6 +1104,11 @@ export function AppointmentDrawer({
   actualizarFecha,
   formatHora,
   formatFechaLarga,
+  // Rango horario permitido por la agenda, en horas (ej: 8 y 23). Viene de
+  // calendario/page.jsx para que el selector de hora apague las opciones que
+  // igual serian rechazadas. Sin estas props no se restringe nada.
+  horaMinima,
+  horaMaxima,
 }) {
   const [mounted, setMounted] = useState(false);
   const drawerRef = useRef(null);
@@ -884,7 +1153,7 @@ export function AppointmentDrawer({
       <aside
         ref={drawerRef}
         data-tour="reserva-drawer"
-        className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[400px] flex-col bg-white shadow-[-20px_0_60px_rgba(0,0,0,0.10)] border-l border-slate-200"
+        className="fixed right-2.5 top-2.5 bottom-2.5 z-50 flex w-[calc(100%-1.25rem)] max-w-[420px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.16)]"
         style={{ animation: "slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1)" }}
       >
         {/* Header del drawer */}
@@ -893,7 +1162,7 @@ export function AppointmentDrawer({
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-500">
               Agenda Clínica
             </p>
-            <h2 className="text-[16px] font-bold text-slate-800 leading-snug mt-0.5">
+            <h2 className="text-[17px] font-semibold tracking-[-0.015em] text-slate-900 leading-snug mt-0.5">
               {title}
             </h2>
             {mode === "edit" && canSeeFichasClinicas && (
@@ -920,7 +1189,7 @@ export function AppointmentDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
             aria-label="Cerrar panel"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -930,7 +1199,7 @@ export function AppointmentDrawer({
         </div>
 
         {/* Cuerpo desplazable */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
           {isViewMode ? (
             <InfoSection
               reserva={reserva}
@@ -956,17 +1225,19 @@ export function AppointmentDrawer({
               onCambiarEstado={onCambiarEstado}
               listaPrestaciones={listaPrestaciones}
               listaTarifasProfesional={listaTarifasProfesional}
+              horaMinima={horaMinima}
+              horaMaxima={horaMaxima}
             />
           )}
         </div>
 
         {/* Footer con acciones primarias */}
-        <div className="flex flex-col gap-2 border-t border-slate-100 bg-slate-50 px-5 py-4 flex-shrink-0">
+        <div className="flex flex-col gap-2 border-t border-slate-100 bg-slate-50/80 px-5 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex-shrink-0">
           {isViewMode ? (
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 active:scale-[0.99] transition-all"
             >
               Cerrar
             </button>
@@ -976,7 +1247,7 @@ export function AppointmentDrawer({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                  className="h-11 flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 hover:bg-slate-50 active:scale-[0.99] transition-all"
                 >
                   Cancelar
                 </button>
@@ -998,7 +1269,7 @@ export function AppointmentDrawer({
                           onConfirmar?.();
                         }
                       }}
-                      className="flex-1 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-11 flex-1 rounded-xl bg-black px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                       title={requiereConfirmarRepeticion ? "Revisa y confirma la lista de fechas adicionales antes de agendar" : undefined}
                     >
                       {popupForm.motivoBloqueo?.trim() ? "Bloquear horario" : "Agendar"}
@@ -1010,14 +1281,14 @@ export function AppointmentDrawer({
                     <button
                       type="button"
                       onClick={onEliminar}
-                      className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700 hover:bg-rose-100 transition-colors"
+                      className="h-11 rounded-xl border border-rose-200 bg-rose-50 px-4 text-sm font-semibold text-rose-700 hover:bg-rose-100 active:scale-[0.99] transition-all"
                     >
                       Eliminar
                     </button>
                     <button
                       type="button"
                       onClick={onActualizar}
-                      className="flex-1 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800"
+                      className="h-11 flex-1 rounded-xl bg-black px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.99]"
                     >
                       Actualizar
                     </button>
@@ -1026,7 +1297,7 @@ export function AppointmentDrawer({
               </div>
             </div>
           )}
-          <p className="text-center text-[10px] text-slate-400 mt-1">Atajo: <kbd className="rounded bg-slate-200 px-1 py-0.5 text-[10px] font-mono">Esc</kbd> para cerrar</p>
+          <p className="hidden sm:block text-center text-[10px] text-slate-400 mt-1">Atajo: <kbd className="rounded bg-slate-200 px-1 py-0.5 text-[10px] font-mono">Esc</kbd> para cerrar</p>
         </div>
       </aside>
 

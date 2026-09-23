@@ -1,6 +1,7 @@
 import "./globals.css";
 import { AnimatedLayout } from "@/Componentes/AnimatedLayout";
 import AgendaProvider from "@/ContextosGlobales/AgendaContext";
+import OverlaySinConexion from "@/Componentes/OverlaySinConexion";
 import { Geist, Geist_Mono, Inter, Outfit, Lora } from "next/font/google";
 import Script from "next/script";
 
@@ -119,6 +120,10 @@ export default function RootLayout({ children }) {
                 {children}
             </AnimatedLayout>
         </AgendaProvider>
+
+        {/* Aviso de "sin conexión" global: vive fuera de AnimatedLayout para que
+            no se remonte al navegar y pueda aparecer en cualquier ruta. */}
+        <OverlaySinConexion />
 
         {process.env.NODE_ENV === "production" && (
             <Script
