@@ -99,7 +99,7 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, onCerrar
         return estructura;
       } catch (error) {
         console.log(error);
-        toast.error("Error al cargar la plantilla.");
+        toast.error("No se pudo conectar para cargar la plantilla.");
         return null;
       } finally {
         setCargandoPlantilla(false);
@@ -140,7 +140,7 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, onCerrar
 
         const fichas = await res.json();
         if (cancelado || !Array.isArray(fichas) || fichas.length === 0) {
-          if (!cancelado) toast.error("No se encontró la ficha seleccionada.");
+          if (!cancelado) toast.error(`No se encontró la ficha #${id_ficha}.`);
           return;
         }
 
@@ -186,7 +186,7 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, onCerrar
         }
       } catch (error) {
         console.log(error);
-        if (!cancelado) toast.error("Error al cargar la ficha.");
+        if (!cancelado) toast.error("No se pudo conectar para cargar la ficha.");
       } finally {
         if (!cancelado) setCargandoFicha(false);
       }
@@ -273,14 +273,14 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, onCerrar
       });
 
       if (!res.ok) {
-        toast.error("Ha ocurrido un error en la respuesta del servidor, contacte a soporte.");
+        toast.error("El servidor rechazó la actualización. Intenta nuevamente o contacta a soporte.");
         return;
       }
 
       const respuesta = await res.json();
 
       if (respuesta?.message !== true) {
-        toast.error("No ha sido posible actualizar la ficha clínica.");
+        toast.error("No se pudo guardar la ficha. Revisa los datos e intenta nuevamente.");
         return;
       }
 
@@ -289,7 +289,7 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, onCerrar
       onCerrar();
     } catch (error) {
       console.log(error);
-      toast.error("Ha ocurrido un error en el servidor, contacte a soporte técnico.");
+      toast.error("No se pudo conectar con el servidor. Revisa tu conexión e intenta nuevamente.");
     } finally {
       setGuardando(false);
     }

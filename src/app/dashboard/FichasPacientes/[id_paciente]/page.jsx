@@ -410,7 +410,7 @@ export default function Paciente() {
     async function listarFichasClinicasPaciente(id_paciente) {
         try {
             if (!id_paciente) {
-                return toast.error("No se ha seleccionado ningun Id, si el problema persiste contcate a soporte de Medify")
+                return toast.error("No se ha seleccionado ninguna ficha. Si el problema persiste, contacta a soporte.")
             } else {
                 const res = await fetch(`${API}/ficha/seleccionarFichasPaciente`, {
                     method: "POST",
@@ -423,7 +423,7 @@ export default function Paciente() {
                 })
 
                 if (!res.ok) {
-                    return toast.error("Ha ocurrido un error Contacte a soporte de Medify")
+                    return toast.error("Ha ocurrido un error. Intenta nuevamente o contacta a soporte.")
                 }
 
                 const dataFichasClinicas = await res.json();
@@ -606,7 +606,7 @@ export default function Paciente() {
 
         } catch (error) {
             console.log(error);
-            return toast.error("No se puede cargar los datos del paciente seleccionado. Por favor contacte a soporte de Medify");
+            return toast.error("No se pudieron cargar los datos del paciente. Intenta nuevamente o contacta a soporte.");
         }
     }
 

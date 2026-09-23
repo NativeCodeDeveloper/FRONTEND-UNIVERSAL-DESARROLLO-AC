@@ -1114,7 +1114,7 @@ function CalendarioContent() {
                 method: "GET",
                 headers: { Accept: "application/json" }
             });
-            if (!res.ok) return toast.error('No fue posible cargar las agendas, Contacte a soporte de Medify');
+            if (!res.ok) return toast.error('No fue posible cargar las agendas. Intenta nuevamente o contacta a soporte.');
             const data = await res.json();
             return Array.isArray(data) ? data : [];
         } catch (err) {
@@ -1413,7 +1413,7 @@ function CalendarioContent() {
         if (exitosos > 0 && conflictos === 0 && errores === 0) {
             toast.success(`Se agendaron ${exitosos} fecha(s) adicionales correctamente.`);
         } else if (exitosos > 0) {
-            toast.success(`${exitosos} fecha(s) adicionales agendadas. ${conflictos + errores} no se pudieron agendar (hora ocupada, bloqueada o fecha pasada).`);
+            toast(`${exitosos} fecha(s) adicionales agendadas. ${conflictos + errores} no se pudieron agendar (hora ocupada, bloqueada o fecha pasada).`);
         } else {
             toast.error(`No se pudo agendar ninguna fecha adicional (${conflictos} ocupada(s)/bloqueada(s), ${errores} con error).`);
         }
@@ -2128,7 +2128,7 @@ function CalendarioContent() {
                     setEstadoReserva("");
                     return toast.success("Se ha eliminado con exito la reserva");
                 } else if (respuestaBackend.message === false) {
-                    return toast.success("No se ha podido eliminar la reserva. Intente mas tarde.");
+                    return toast.error("No se ha podido eliminar la reserva. Intenta más tarde.");
                 } else {
                     return toast.error("No hay conexion con el servidor por favor contacte a Soporte");
                 }

@@ -90,7 +90,7 @@ export default function AgendaDetalle() {
                     setmensajeEliminacion("Esta reserva ha sido eliminada. Ya no podra acceder a la informacion de esta cita.")
                     return toast.success("Se ha eliminado con exito la reserva");
                 } else if (respuestaBackend.message === false) {
-                    return toast.success("No se ha podido eliminar la reserva. Intente mas tarde.");
+                    return toast.error("No se ha podido eliminar la reserva. Intenta más tarde.");
                 } else {
                     return toast.error("No hay conexion con el servidor por favor contacte a Soporte");
                 }

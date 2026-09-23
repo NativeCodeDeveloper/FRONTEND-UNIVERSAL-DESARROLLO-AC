@@ -93,7 +93,7 @@ export default function ListaPacientes() {
             return toast.error("No se han encontrado similitudes.");
         } catch (err) {
             console.log(err);
-            return toast.error("Ha habido un problema en el servidor por favor contacte a soporte de Medify");
+            return toast.error("Ha habido un problema en el servidor. Intenta nuevamente o contacta a soporte.");
         }
     }
 
@@ -108,14 +108,14 @@ export default function ListaPacientes() {
             });
 
             if (!res.ok) {
-                return toast.error("Ha ocurrido un error listando los pacientes . contacte a soporte IT de Medify");
+                return toast.error("No fue posible listar los pacientes. Intenta nuevamente o contacta a soporte.");
             }
 
             const dataPacientes = await res.json();
             setListaPacientes(dataPacientes);
         } catch (error) {
             console.log(error);
-            return toast.success("Ha ocurrido un error contacte a soporte de Medify");
+            return toast.error("Ha ocurrido un error. Intenta nuevamente o contacta a soporte.");
         }
     }
 

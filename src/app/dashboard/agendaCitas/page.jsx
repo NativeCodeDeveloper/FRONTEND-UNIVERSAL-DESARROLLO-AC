@@ -149,7 +149,7 @@ export default function AgendaCitas() {
                     return toast.success(`Se encontraron ${respuestaBackend.length} citas en el período seleccionado.`);
                 } else {
                     setdataLista([]);
-                    return toast.success("No se encontraron citas en el período seleccionado.");
+                    return toast("No se encontraron citas en el período seleccionado.");
                 }
             }
         } catch (error) {

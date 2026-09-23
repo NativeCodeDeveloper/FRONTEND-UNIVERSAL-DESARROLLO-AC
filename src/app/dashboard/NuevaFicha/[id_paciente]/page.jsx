@@ -216,7 +216,7 @@ export default function NuevaFicha() {
             }
         } catch (error) {
             console.log(error);
-            return toast.error("Ha ocurrido un error en el servidor, Contacte a soporte tecnico de Medify");
+            return toast.error("Ha ocurrido un error en el servidor. Intenta nuevamente o contacta a soporte.");
         }
     }
 
@@ -246,7 +246,7 @@ export default function NuevaFicha() {
         } catch (error) {
             console.log(error);
             return toast.error(
-                "No se puede cargar los datos del paciente seleccionado. Por favor contacte a soporte de Medify"
+                "No se pudieron cargar los datos del paciente. Intenta nuevamente o contacta a soporte."
             );
         }
     }

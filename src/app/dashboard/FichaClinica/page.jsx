@@ -94,7 +94,7 @@ export default function FichaClinica() {
             }
         } catch (err) {
             console.log(err);
-            return toast.error("Ha habido un problema en el servidor por favor contacte a soporte de Medify");
+            return toast.error("Ha habido un problema en el servidor. Intenta nuevamente o contacta a soporte.");
         }
     }
 
@@ -109,14 +109,14 @@ export default function FichaClinica() {
             })
 
             if (!res.ok) {
-                return toast.error("Ha ocurrido un error listando los pacientes . contacte a soporte IT de Medify")
+                return toast.error("No fue posible listar los pacientes. Intenta nuevamente o contacta a soporte.")
             } else {
                 const dataPacientes = await res.json()
                 setListaPacientes(dataPacientes);
             }
         } catch (error) {
             console.log(error);
-            return toast.success("Ha ocurrido un error contacte a soporte de Medify");
+            return toast.error("Ha ocurrido un error. Intenta nuevamente o contacta a soporte.");
         }
     }
 

@@ -448,7 +448,7 @@ export default function AgendaCitas() {
                 if (reservasFiltradas.length > 0) {
                     return toast.success(`Se encontraron ${reservasFiltradas.length} citas en el período seleccionado.`);
                 }
-                return toast.success("No se encontraron citas en el período seleccionado.");
+                return toast("No se encontraron citas en el período seleccionado.");
             }
 
             return true;
@@ -485,7 +485,7 @@ export default function AgendaCitas() {
             }
         } catch (error) {
             console.log(error);
-            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de Medify");
+            return toast.error("No fue posible realizar la búsqueda. Intenta nuevamente o contacta a soporte.");
         }
     }
 
@@ -516,7 +516,7 @@ export default function AgendaCitas() {
             }
         } catch (error) {
             console.log(error);
-            return toast.error("No ha sido posible buscar, contacte a soporte Tecnico de Medify");
+            return toast.error("No fue posible realizar la búsqueda. Intenta nuevamente o contacta a soporte.");
         }
     }
 

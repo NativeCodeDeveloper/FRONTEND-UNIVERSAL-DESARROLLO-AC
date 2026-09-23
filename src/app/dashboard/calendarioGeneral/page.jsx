@@ -311,7 +311,7 @@ export default function Calendario() {
             })
 
             if (!res.ok) {
-                return toast.error('No fue posible cargar las agendas, Contacte a soporte de Medify')
+                return toast.error('No fue posible cargar las agendas. Intenta nuevamente o contacta a soporte.')
             }
 
             const data = await res.json();

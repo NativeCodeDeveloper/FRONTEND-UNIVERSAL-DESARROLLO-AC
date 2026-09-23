@@ -109,7 +109,7 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, onCe
       setPlantillaCompleta(transformarPlantilla(await res.json()));
     } catch (error) {
       console.log(error);
-      toast.error("Error al cargar la plantilla.");
+      toast.error("No se pudo conectar para cargar la plantilla.");
     } finally {
       setCargandoPlantilla(false);
     }
@@ -180,23 +180,23 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, onCe
       });
 
       if (!res.ok) {
-        toast.error("Faltan datos para ingresar la nueva ficha.");
+        toast.error("El servidor rechazó la ficha. Intenta nuevamente o contacta a soporte.");
         return;
       }
 
       const respuesta = await res.json();
 
       if (respuesta?.message !== true) {
-        toast.error("Faltan datos para ingresar la nueva ficha.");
+        toast.error("No se pudo guardar la ficha. Revisa los datos e intenta nuevamente.");
         return;
       }
 
-      toast.success("Nueva ficha ingresada con éxito.");
+      toast.success("Ficha clínica creada.");
       await onGuardada?.();
       onCerrar();
     } catch (error) {
       console.log(error);
-      toast.error("Ha ocurrido un error en el servidor, contacte a soporte técnico de Medify.");
+      toast.error("No se pudo conectar con el servidor. Revisa tu conexión e intenta nuevamente.");
     } finally {
       setGuardando(false);
     }

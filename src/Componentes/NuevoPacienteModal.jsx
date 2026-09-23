@@ -244,7 +244,7 @@ export default function NuevoPacienteModal({ abierto, onCerrar, onCreado }) {
 
       if (!res.ok || respuesta?.message !== true) {
         toast.error(
-          "Problema al ingresar el nuevo paciente en el servidor. Contacte a soporte técnico de Medify."
+          "No se pudo registrar el paciente. Intenta nuevamente o contacta a soporte."
         );
         return;
       }
@@ -255,7 +255,7 @@ export default function NuevoPacienteModal({ abierto, onCerrar, onCreado }) {
     } catch (error) {
       console.error(error);
       toast.error(
-        "Problema al ingresar el nuevo paciente en el servidor. Contacte a soporte técnico de Medify."
+        "No se pudo registrar el paciente. Intenta nuevamente o contacta a soporte."
       );
     } finally {
       setEnviando(false);

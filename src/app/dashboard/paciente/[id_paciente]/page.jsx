@@ -189,7 +189,7 @@ export default function Paciente(){
 
         }catch(error){
             console.log(error);
-            return toast.error("No se puede cargar los datos del paciente seleccionado. Por favor contacte a soporte de Medify");
+            return toast.error("No se pudieron cargar los datos del paciente. Intenta nuevamente o contacta a soporte.");
 
         }
     }

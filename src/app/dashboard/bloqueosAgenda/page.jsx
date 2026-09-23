@@ -291,7 +291,7 @@ export default function BloqueosAgendas() {
         if (exitosos > 0 && conflictoReserva === 0 && conflictoBloqueo === 0) {
             toast.success(`Se bloquearon ${exitosos} día(s) correctamente.`);
         } else if (exitosos > 0) {
-            toast.success(`${exitosos} día(s) bloqueados. ${conflictoReserva + conflictoBloqueo} no se bloquearon por citas o bloqueos previos.`);
+            toast(`${exitosos} día(s) bloqueados. ${conflictoReserva + conflictoBloqueo} no se bloquearon por citas o bloqueos previos.`);
         } else {
             toast.error("Ya existe una cita agendada o un bloqueo previo en ese horario.");
         }
@@ -350,7 +350,7 @@ export default function BloqueosAgendas() {
         if (errores === 0) {
             toast.success(`Se eliminaron ${eliminados} bloqueo(s) correctamente.`);
         } else {
-            toast.success(`${eliminados} eliminado(s). ${errores} no se pudieron eliminar.`);
+            toast(`${eliminados} eliminado(s). ${errores} no se pudieron eliminar.`);
         }
     }
 
