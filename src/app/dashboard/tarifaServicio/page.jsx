@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { InputNumberDinamic } from "@/Componentes/InputNumberDinamic";
 import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import { SelectDinamic } from "@/Componentes/SelectDinamic";
+import TutorialGuiadoTarifa from "@/Componentes/TutorialGuiadoTarifa";
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 import { useTour } from "@/ContextosGlobales/TourContext";
@@ -310,13 +311,20 @@ export default function TarifaServicio() {
 
                 {/* Header */}
                 <div className="mb-8 rounded-[32px] border border-slate-200 bg-white/90 p-6 shadow-sm">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Cobro por Consulta o Servicio
-                        </h1>
-                        <p className="text-sm text-slate-500">
-                            Consultas y valores por cada consulta y profesional
-                        </p>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-1">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                                Cobro por Consulta o Servicio
+                            </h1>
+                            <p className="text-sm text-slate-500">
+                                Consultas y valores por cada consulta y profesional
+                            </p>
+                        </div>
+                        <TutorialGuiadoTarifa
+                            ariaLabel="Iniciar el tutorial guiado de tarifas de servicios agendables"
+                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2 sm:self-auto"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                        />
                     </div>
                 </div>
 
@@ -451,7 +459,7 @@ export default function TarifaServicio() {
 
 
 
-                <div className="mt-8 rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div data-tour="tarifa-listado" className="mt-8 rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="space-y-1 mb-0 p-6 pb-5 border-b border-slate-100">
                         <h2 className="text-base font-semibold text-slate-900">Tarifas registradas</h2>
                         <p className="text-sm text-slate-500">Lista de valores por consulta y profesional.</p>

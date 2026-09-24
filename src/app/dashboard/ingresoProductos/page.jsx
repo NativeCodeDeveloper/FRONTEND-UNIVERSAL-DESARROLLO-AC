@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
+import TutorialGuiadoProductos from "@/Componentes/TutorialGuiadoProductos";
 import {
     Table,
     TableBody,
@@ -14,8 +15,6 @@ import {ShadcnButton} from "@/Componentes/shadcnButton";
 import {toast} from "react-hot-toast";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {ButtonDinamic} from "@/Componentes/ButtonDinamic";
-import {InfoButton} from "@/Componentes/InfoButton";
-
 const normalizarLista = (data) => Array.isArray(data) ? data : [];
 const normalizarIdOpcional = (value) => value && value !== 0 && value !== "0" ? value : "";
 const normalizarIdParaEnvio = (value) => value ? value : "0";
@@ -438,15 +437,10 @@ useEffect(() => {
                             ariaLabel="Abrir video tutorial de prestaciones y servicios"
                             className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
                         />
-                        <InfoButton
-                            informacion={'Registra los servicios, prestaciones y productos disponibles para generar presupuestos de tratamiento.'}
-                            pasos={[
-                                'Completa los campos obligatorios: Categoría Principal, Sub-Categoría, Sub-Sub Categoría, Nombre, Descripción y Valor.',
-                                'Presiona "Ingresar" para guardar un registro nuevo (o "Limpiar" para vaciar el formulario).',
-                                'Para editar uno existente, búscalo en la tabla inferior y presiona "Editar": sus datos se cargan en el formulario.',
-                                'Modifica lo necesario y presiona "Actualizar" para guardar los cambios.',
-                            ]}
-                            nota={'Si algún campo obligatorio queda vacío, el sistema no permitirá guardar el registro.'}
+                        <TutorialGuiadoProductos
+                            ariaLabel="Iniciar el tutorial guiado de prestaciones y servicios"
+                            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
                         />
                     </div>
                 </div>
@@ -457,7 +451,7 @@ useEffect(() => {
                 {/* ── FORMULARIO ── */}
                 <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm">
                     {/* Cabecera del card */}
-                    <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center gap-2.5">
+                    <div data-tour="productos-formulario" className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center gap-2.5">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF]">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-white">
                                 <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
@@ -626,7 +620,7 @@ useEffect(() => {
 
 
                 {/* ── FILTROS ── */}
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div data-tour="productos-filtros" className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
 
                     {/* Filtro por categoria */}
                     <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm">
@@ -688,7 +682,7 @@ useEffect(() => {
                 {/* ── TABLA ── */}
                 <div className="mt-8 rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                     {/* Cabecera de tabla */}
-                    <div className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center justify-between">
+                    <div data-tour="productos-listado" className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
                             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF]">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-white">

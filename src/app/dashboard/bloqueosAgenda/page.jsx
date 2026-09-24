@@ -12,6 +12,7 @@ import { format, eachDayOfInterval } from "date-fns";
 import ToasterClient from "@/Componentes/ToasterClient";
 import { InfoButton } from "@/Componentes/InfoButton";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
+import TutorialGuiadoBloqueos from "@/Componentes/TutorialGuiadoBloqueos";
 import { useTour } from "@/ContextosGlobales/TourContext";
 import {
     Table,
@@ -393,6 +394,11 @@ export default function BloqueosAgendas() {
                             ariaLabel="Abrir video tutorial de bloqueo de agenda"
                             className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                         />
+                        <TutorialGuiadoBloqueos
+                            etiqueta="Tutorial Guiado"
+                            ariaLabel="Iniciar el tutorial guiado del bloqueo de agenda"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                        />
                         <InfoButton
                             informacion={'Bloquea días u horarios específicos para que no queden disponibles en la agenda pública.'}
                             pasos={[
@@ -672,7 +678,7 @@ export default function BloqueosAgendas() {
 
                     {/* ── Columna Derecha: Listado ── */}
                     <div className="lg:col-span-7 space-y-6">
-                        <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+                        <div data-tour="bloqueos-listado" className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-6 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">

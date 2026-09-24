@@ -7,6 +7,7 @@ import { TextAreaDinamic } from "@/Componentes/TextAreaDinamic";
 import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
 import toast from "react-hot-toast";
 import ToasterClient from "@/Componentes/ToasterClient";
+import TutorialGuiadoServicios from "@/Componentes/TutorialGuiadoServicios";
 import { useTour } from "@/ContextosGlobales/TourContext";
 
 
@@ -217,13 +218,20 @@ export default function ServiciosAgendamiento() {
             <div className="mx-auto w-full max-w-6xl px-6 py-10">
                 {/* Header */}
                 <div className="mb-8 rounded-[32px] border border-slate-200 bg-white/90 p-6 shadow-sm">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                            Agendamiento con Cobro
-                        </h1>
-                        <p className="text-sm text-slate-500">
-                            Consultas y valores por cada consulta y profesional
-                        </p>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-1">
+                            <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                                Agendamiento con Cobro
+                            </h1>
+                            <p className="text-sm text-slate-500">
+                                Consultas y valores por cada consulta y profesional
+                            </p>
+                        </div>
+                        <TutorialGuiadoServicios
+                            ariaLabel="Iniciar el tutorial guiado de servicios de agendamiento"
+                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2 sm:self-auto"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                        />
                     </div>
                 </div>
 
@@ -282,7 +290,7 @@ export default function ServiciosAgendamiento() {
                 </div>
 
                 {/* Tabla de servicios disponibles */}
-                <details className="group mt-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_45px_-32px_rgba(15,23,42,0.35)] transition-all duration-300">
+                <details data-tour="servicio-listado" className="group mt-8 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_45px_-32px_rgba(15,23,42,0.35)] transition-all duration-300">
                     <summary className="flex cursor-pointer list-none flex-col gap-4 border-b border-slate-100 bg-slate-50/40 px-6 py-5 transition-colors duration-300 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between [&::-webkit-details-marker]:hidden">
                         <div>
                             <h2 className="text-base font-semibold tracking-tight text-slate-900">Servicios disponibles</h2>

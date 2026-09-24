@@ -34,6 +34,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import TutorialGuiadoCotizaciones from "@/Componentes/TutorialGuiadoCotizaciones";
 
 function calcularEdadPaciente(fechaNacimiento) {
     if (!fechaNacimiento) return "-";
@@ -472,8 +473,16 @@ function formatearFechaHora(fechaISO) {
                             <span className="mt-1 text-sm font-bold leading-none text-slate-900">{cotizacionesPaciente.length} registros</span>
                         </div>
 
+                        <TutorialGuiadoCotizaciones
+                            etiqueta="Tutorial Guiado"
+                            ariaLabel="Iniciar el tutorial guiado de las cotizaciones del paciente"
+                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]"
+                        />
+
                         <button
                             type="button"
+                            data-tour="cotizaciones-boton-nueva"
                             onClick={() => actualizarVisibilidadFormulario((actual) => !actual)}
                             className="flex h-14 items-center gap-2 rounded-lg bg-slate-900 px-5 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-slate-800"
                         >
@@ -484,7 +493,7 @@ function formatearFechaHora(fechaISO) {
                 </header>
 
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)] xl:gap-6">
-                    <aside className="self-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6">
+                    <aside data-tour="cotizaciones-tarjeta-paciente" className="self-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6">
                         <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/30 p-4">
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] text-base font-bold text-white shadow-md shadow-indigo-100">
                                 {paciente[0]?.nombre?.charAt(0) ?? ""}{paciente[0]?.apellido?.charAt(0) ?? ""}
@@ -623,7 +632,7 @@ function formatearFechaHora(fechaISO) {
                             </div>
 
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                <label className="min-w-0 sm:w-52">
+                                <label data-tour="cotizaciones-filtro-estado" className="min-w-0 sm:w-52">
                                     <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Estado</span>
                                     <select
                                         // 1. Usamos e para capturar el valor seleccionado
@@ -642,7 +651,7 @@ function formatearFechaHora(fechaISO) {
                                     </select>
                                 </label>
 
-                                <label className="min-w-0 sm:w-72">
+                                <label data-tour="cotizaciones-filtro-profesional" className="min-w-0 sm:w-72">
                                     <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Profesional</span>
                                     <div className="relative">
                                         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"/>
@@ -671,6 +680,7 @@ function formatearFechaHora(fechaISO) {
                                 return (
                                     <article
                                         key={cotizacion.id_cotizacion_paciente}
+                                        data-tour="cotizaciones-tarjeta"
                                         className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_16px_-10px_rgba(15,23,42,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_14px_32px_-18px_rgba(79,70,229,0.28)]"
                                     >
                                         <div className="p-4 sm:p-5">
@@ -760,7 +770,7 @@ function formatearFechaHora(fechaISO) {
                                         </div>
 
                                         <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-3 sm:px-5 xl:flex-row xl:items-center xl:justify-between">
-                                            <label className="block w-full xl:max-w-[340px]">
+                                            <label data-tour="cotizaciones-cambiar-estado" className="block w-full xl:max-w-[340px]">
                                                 <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">
                                                     Cambiar estado de la cotización
                                                 </span>
@@ -781,7 +791,7 @@ function formatearFechaHora(fechaISO) {
                                                 </select>
                                             </label>
 
-                                            <div className="flex w-full flex-col gap-2 sm:flex-row xl:w-auto xl:justify-end">
+                                            <div data-tour="cotizaciones-acciones" className="flex w-full flex-col gap-2 sm:flex-row xl:w-auto xl:justify-end">
                                                 <button
                                                     type="button"
                                                     onClick={() => router.push(`/dashboard/detalleCotizacion/${cotizacion.id_cotizacion_paciente}`)}

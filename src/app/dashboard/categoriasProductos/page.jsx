@@ -4,6 +4,7 @@ import {useState, useEffect} from "react";
 import ToasterClient from "@/Componentes/ToasterClient";
 import { toast } from 'react-hot-toast';
 import {useRouter} from "next/navigation";
+import TutorialGuiadoCategorias from "@/Componentes/TutorialGuiadoCategorias";
 
 
 export default function CategoriasProductos() {
@@ -192,18 +193,25 @@ return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
 
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                    Gestion de Categorias
-                </h1>
-                <p className="mt-1 text-[13px] text-slate-500">Crea, edita y administra las categorias de tus productos.</p>
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                        Gestion de Categorias
+                    </h1>
+                    <p className="mt-1 text-[13px] text-slate-500">Crea, edita y administra las categorias de tus productos.</p>
+                </div>
+                <TutorialGuiadoCategorias
+                    ariaLabel="Iniciar el tutorial guiado de categorías"
+                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                    claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                />
             </div>
 
             <div className="space-y-6">
 
                 {/* Formulario de ingreso */}
                 <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
-                    <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center gap-2">
+                    <div data-tour="categorias-formulario" className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -272,7 +280,7 @@ return (
 
                 {/* Lista de categorias */}
                 <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
-                    <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center justify-between">
+                    <div data-tour="categorias-listado" className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
@@ -348,6 +356,7 @@ return (
 
                                             <button
                                                 type="button"
+                                                data-tour="categorias-boton-subcategoria"
                                                 className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-100 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
                                                 onClick={() => navegarSubcategoria(categoria.id_categoriaProducto)}
                                                 disabled={isLoading}

@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 import ProfesionalModal from "@/Componentes/ProfesionalModal";
+import TutorialGuiadoProfesionales from "@/Componentes/TutorialGuiadoProfesionales";
 import { formatRut } from "@/lib/designTokens";
 import { useTour } from "@/ContextosGlobales/TourContext";
 
@@ -209,16 +210,23 @@ export default function Profesionales() {
                                 : `${listaProfesionales.length} ${listaProfesionales.length === 1 ? "profesional registrado" : "profesionales registrados"}`}
                         </p>
                     </div>
-                    <button
-                        onClick={abrirNuevo}
-                        data-tour="profesional-nuevo"
-                        className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl bg-black px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Nuevo Profesional
-                    </button>
+                    <div className="flex shrink-0 flex-wrap items-center gap-3">
+                        <TutorialGuiadoProfesionales
+                            ariaLabel="Iniciar el tutorial guiado de profesionales"
+                            className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                        />
+                        <button
+                            onClick={abrirNuevo}
+                            data-tour="profesional-nuevo"
+                            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl bg-black px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Nuevo Profesional
+                        </button>
+                    </div>
                 </div>
 
                 {/* ── Buscador ── */}
@@ -232,6 +240,7 @@ export default function Profesionales() {
                         type="search"
                         value={busqueda}
                         onChange={(e) => setBusqueda(e.target.value)}
+                        data-tour="profesional-buscador"
                         placeholder="Buscar por nombre, especialidad, correo o RUT..."
                         aria-label="Buscar profesional"
                         className="h-11 w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-4 text-[13px] text-slate-800 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-slate-900"

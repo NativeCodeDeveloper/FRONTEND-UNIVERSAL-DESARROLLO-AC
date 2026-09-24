@@ -9,6 +9,7 @@ import {jsPDF} from "jspdf";
 import {autoTable} from "jspdf-autotable";
 import { dibujarBloqueFirma, altoBloqueFirma } from "@/lib/pdfFirma";
 import {toast, Toaster} from "react-hot-toast";
+import TutorialGuiadoDetalleCotizaciones from "@/Componentes/TutorialGuiadoDetalleCotizaciones";
 
 import {
     Table,
@@ -19,14 +20,26 @@ import {
     TableRow
 } from "@/components/ui/table";
 import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
     ArrowLeft,
     ChevronDown,
     CircleCheck,
     ClipboardList,
     FileDown,
+    FileText,
+    IdCard,
     LoaderCircle,
     Mail,
     Package,
+    Phone,
     Plus,
     Save,
     Search,
@@ -376,25 +389,66 @@ export default function DetalleCotizacion() {
 
 
     const [productos, setProductos] = useState([]);
+    const [categorias, setCategorias] = useState([]);
+    const [subcategorias, setSubcategorias] = useState([]);
+    const [subSubcategorias, setSubSubcategorias] = useState([]);
+    const [catalogoCargando, setCatalogoCargando] = useState(true);
+
     async function obtenerListaProductos() {
         try {
-            const res = await fetch(`${API}/producto/seleccionar_por_categorias`, {
-                    method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                }
-            })
+            setCatalogoCargando(true);
 
-            if (!res.ok) {
-                return toast.error(`Ocurrio un problema en el servidor por favor contacte a soporte.`);
+            const respuestas = await Promise.all([
+                fetch(`${API}/producto/seleccionarProducto`, {
+                    method: "GET",
+                    headers: {"Accept": "application/json"},
+                    mode: "cors",
+                    cache: "no-cache"
+                }),
+                fetch(`${API}/categorias/seleccionarCategoria`, {
+                    method: "GET",
+                    headers: {"Accept": "application/json"},
+                    mode: "cors",
+                    cache: "no-cache"
+                }),
+                fetch(`${API}/subcategorias/seleccionarSubCategoria`, {
+                    method: "GET",
+                    headers: {"Accept": "application/json"},
+                    mode: "cors",
+                    cache: "no-cache"
+                }),
+                fetch(`${API}/subsubcategorias/seleccionarTodas`, {
+                    method: "GET",
+                    headers: {"Accept": "application/json"},
+                    mode: "cors",
+                    cache: "no-cache"
+                })
+            ]);
+
+            if (respuestas.some((respuesta) => !respuesta.ok)) {
+                throw new Error("No fue posible cargar el catálogo completo.");
             }
 
-            const data = await res.json();
-            setProductos(data);
+            const [
+                dataProductos,
+                dataCategorias,
+                dataSubcategorias,
+                dataSubSubcategorias
+            ] = await Promise.all(respuestas.map((respuesta) => respuesta.json()));
+
+            setProductos(Array.isArray(dataProductos) ? dataProductos : []);
+            setCategorias(Array.isArray(dataCategorias) ? dataCategorias : []);
+            setSubcategorias(Array.isArray(dataSubcategorias) ? dataSubcategorias : []);
+            setSubSubcategorias(Array.isArray(dataSubSubcategorias) ? dataSubSubcategorias : []);
 
         }catch(error) {
-            return toast.error(`Ocurrio un problema en el servidor por favor contacte a soporte.`);
+            setProductos([]);
+            setCategorias([]);
+            setSubcategorias([]);
+            setSubSubcategorias([]);
+            return toast.error(`No se pudo cargar el catálogo de productos y sus categorías.`);
+        } finally {
+            setCatalogoCargando(false);
         }
     }
 
@@ -710,60 +764,93 @@ export default function DetalleCotizacion() {
     const [subSubcategoriaSeleccionada, actualizarSubSubcategoriaSeleccionada] = useState("todas");
 
     // Indica si el listado superior de prestaciones y servicios se encuentra desplegado.
-    const [listadoPrestacionesVisible, actualizarListadoPrestacionesVisible] = useState(false);
+    const [listadoPrestacionesVisible, actualizarListadoPrestacionesVisible] = useState(true);
+
+    const nombresCategorias = useMemo(() => new Map(
+        categorias.map((categoria) => [
+            String(categoria.id_categoriaProducto),
+            categoria.descripcionCategoria
+        ])
+    ), [categorias]);
+
+    const nombresSubcategorias = useMemo(() => new Map(
+        subcategorias.map((subcategoria) => [
+            String(subcategoria.id_subcategoria),
+            subcategoria.descripcionCategoria
+        ])
+    ), [subcategorias]);
+
+    const nombresSubSubcategorias = useMemo(() => new Map(
+        subSubcategorias.map((subSubcategoria) => [
+            String(subSubcategoria.id_subsubcategoria),
+            subSubcategoria.descripcionSubSubCategoria
+        ])
+    ), [subSubcategorias]);
 
     const categoriasDisponibles = useMemo(() => {
-        return [...new Set(
-            productos
-                .map((elemento) => elemento.categoria_nombre)
-                .filter(Boolean)
-        )];
-    }, [productos]);
+        const idsCategoriasConProductos = new Set(
+            productos.map((producto) => String(producto.categoriaProducto))
+        );
+
+        return categorias.filter((categoria) =>
+            idsCategoriasConProductos.has(String(categoria.id_categoriaProducto))
+        );
+    }, [categorias, productos]);
 
     const subcategoriasDisponibles = useMemo(() => {
-        const elementosCategoria = categoriaSeleccionada === "todas"
-            ? productos
-            : productos.filter((elemento) => elemento.categoria_nombre === categoriaSeleccionada);
+        if (categoriaSeleccionada === "todas") {
+            return [];
+        }
 
-        return [...new Set(
-            elementosCategoria
-                .map((elemento) => elemento.subcategoria_nombre)
-                .filter(Boolean)
-        )];
-    }, [categoriaSeleccionada, productos]);
+        const idsSubcategoriasConProductos = new Set(
+            productos
+                .filter((producto) => String(producto.categoriaProducto) === categoriaSeleccionada)
+                .map((producto) => String(producto.subcategoria))
+        );
+
+        return subcategorias.filter((subcategoria) =>
+            String(subcategoria.id_categoriaProducto) === categoriaSeleccionada
+            && idsSubcategoriasConProductos.has(String(subcategoria.id_subcategoria))
+        );
+    }, [categoriaSeleccionada, productos, subcategorias]);
 
     const subSubcategoriasDisponibles = useMemo(() => {
-        const elementosSubcategoria = productos.filter((elemento) => {
-            const coincideCategoria = categoriaSeleccionada === "todas"
-                || elemento.categoria_nombre === categoriaSeleccionada;
-            const coincideSubcategoria = subcategoriaSeleccionada === "todas"
-                || elemento.subcategoria_nombre === subcategoriaSeleccionada;
+        if (subcategoriaSeleccionada === "todas") {
+            return [];
+        }
 
-            return coincideCategoria && coincideSubcategoria;
-        });
+        const idsSubSubcategoriasConProductos = new Set(
+            productos
+                .filter((producto) => String(producto.subcategoria) === subcategoriaSeleccionada)
+                .map((producto) => String(producto.subsubcategoria))
+        );
 
-        return [...new Set(
-            elementosSubcategoria
-                .map((elemento) => elemento.sub_sub_categoría_nombre)
-                .filter(Boolean)
-        )];
-    }, [categoriaSeleccionada, subcategoriaSeleccionada, productos]);
+        return subSubcategorias.filter((subSubcategoria) =>
+            String(subSubcategoria.id_subcategoria) === subcategoriaSeleccionada
+            && idsSubSubcategoriasConProductos.has(String(subSubcategoria.id_subsubcategoria))
+        );
+    }, [productos, subcategoriaSeleccionada, subSubcategorias]);
 
     const elementosCatalogoVisibles = useMemo(() => {
         const texto = busquedaCatalogo.trim().toLowerCase();
 
         return productos.filter((elemento) => {
+            const nombreCategoria = nombresCategorias.get(String(elemento.categoriaProducto))
+                ?? elemento.descripcionCategoria
+                ?? "";
+            const nombreSubcategoria = nombresSubcategorias.get(String(elemento.subcategoria)) ?? "";
+            const nombreSubSubcategoria = nombresSubSubcategorias.get(String(elemento.subsubcategoria)) ?? "";
             const coincideCategoria = categoriaSeleccionada === "todas"
-                || elemento.categoria_nombre === categoriaSeleccionada;
+                || String(elemento.categoriaProducto) === categoriaSeleccionada;
             const coincideSubcategoria = subcategoriaSeleccionada === "todas"
-                || elemento.subcategoria_nombre === subcategoriaSeleccionada;
+                || String(elemento.subcategoria) === subcategoriaSeleccionada;
             const coincideSubSubcategoria = subSubcategoriaSeleccionada === "todas"
-                || elemento.sub_sub_categoría_nombre === subSubcategoriaSeleccionada;
+                || String(elemento.subsubcategoria) === subSubcategoriaSeleccionada;
             const coincideBusqueda = !texto || [
                 elemento.tituloProducto,
-                elemento.categoria_nombre,
-                elemento.subcategoria_nombre,
-                elemento.sub_sub_categoría_nombre,
+                nombreCategoria,
+                nombreSubcategoria,
+                nombreSubSubcategoria,
                 elemento.descripcionProducto
             ].some((valor) => String(valor ?? "").toLowerCase().includes(texto));
 
@@ -775,6 +862,9 @@ export default function DetalleCotizacion() {
     }, [
         busquedaCatalogo,
         categoriaSeleccionada,
+        nombresCategorias,
+        nombresSubcategorias,
+        nombresSubSubcategorias,
         subcategoriaSeleccionada,
         subSubcategoriaSeleccionada,
         productos
@@ -1217,7 +1307,13 @@ export default function DetalleCotizacion() {
                     </div>
 
                     <div className="flex flex-col gap-3 xl:items-end">
-                        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
+                        <div data-tour="detalle-cotizacion-acciones" className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
+                            <TutorialGuiadoDetalleCotizaciones
+                                etiqueta="Tutorial Guiado"
+                                ariaLabel="Iniciar el tutorial guiado del detalle de la cotización"
+                                className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-4 text-xs font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 sm:w-auto"
+                                claseIcono="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#F3F0FF] text-[#6E56CF]"
+                            />
                             <label className="flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 shadow-sm sm:w-auto">
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                     Fecha PDF
@@ -1262,78 +1358,105 @@ export default function DetalleCotizacion() {
                     </div>
                 </header>
 
-                <section className="mb-6 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-                    <div className="flex items-center gap-4 border-b border-slate-100 bg-slate-50/30 p-8">
-                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-[#6E56CF] text-xl font-bold text-white shadow-lg shadow-indigo-100">
-                            {cotizacionActual?.nombre?.charAt(0) ?? ""}{cotizacionActual?.apellido?.charAt(0) ?? ""}
+                <section data-tour="detalle-cotizacion-paciente" className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/60 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between md:px-5">
+                        <div className="flex min-w-0 items-center gap-3">
+                            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] text-base font-bold text-white shadow-md shadow-violet-100">
+                                {cotizacionActual?.nombre?.charAt(0) ?? ""}{cotizacionActual?.apellido?.charAt(0) ?? ""}
+                            </div>
+                            <div className="min-w-0">
+                                <h2 className="truncate text-base font-bold leading-tight text-slate-900">
+                                    {cotizacionActual?.nombre} {cotizacionActual?.apellido}
+                                </h2>
+                                <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                    ID paciente #{cotizacionActual?.id_paciente ?? "-"}
+                                </p>
+                            </div>
                         </div>
-                        <div className="min-w-0">
-                            <h2 className="truncate text-lg font-bold leading-tight text-slate-900">
-                                {cotizacionActual?.nombre} {cotizacionActual?.apellido}
-                            </h2>
-                            <p className="mt-1 text-[12px] font-medium uppercase tracking-wider text-slate-400">
-                                ID Paciente #{cotizacionActual?.id_paciente ?? "-"}
-                            </p>
+                        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-[11px] font-bold text-[#6E56CF]">
+                            <FileText className="size-3.5" aria-hidden="true"/>
+                            Cotización #{id_cotizacion_paciente}
                         </div>
                     </div>
 
-                    {cotizacionSeleccionada.map((cotizacion) => (
-                        <dl key={cotizacion.id_cotizacion_paciente} className="grid grid-cols-1 gap-x-8 gap-y-6 p-8 sm:grid-cols-2 lg:grid-cols-3">
-                            <div className="min-w-0 space-y-1">
-                                <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-400">RUT</dt>
-                                <dd className="break-words font-mono text-[13px] font-semibold text-slate-700" title={cotizacion.rut}>{cotizacion.rut}</dd>
+                    <dl className="grid grid-cols-1 gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                        <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
+                            <IdCard className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
+                            <div className="min-w-0">
+                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">RUT</dt>
+                                <dd className="mt-0.5 truncate font-mono text-xs font-semibold text-slate-700" title={cotizacionActual?.rut}>
+                                    {formatRut(String(cotizacionActual?.rut ?? "")) || "-"}
+                                </dd>
                             </div>
-                            <div className="min-w-0 space-y-1">
-                                <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Teléfono</dt>
-                                <dd className="break-words text-[13px] font-semibold text-slate-700" title={cotizacion.telefono}>{cotizacion.telefono}</dd>
+                        </div>
+                        <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
+                            <Phone className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
+                            <div className="min-w-0">
+                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Teléfono</dt>
+                                <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.telefono}>
+                                    {cotizacionActual?.telefono || "-"}
+                                </dd>
                             </div>
-                            <div className="min-w-0 space-y-1">
-                                <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Correo</dt>
-                                <dd className="break-words text-[13px] font-semibold text-slate-700" title={cotizacion.correo}>{cotizacion.correo}</dd>
+                        </div>
+                        <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5 lg:col-span-1 sm:col-span-2 xl:col-span-1">
+                            <Mail className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
+                            <div className="min-w-0">
+                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Correo</dt>
+                                <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.correo}>
+                                    {cotizacionActual?.correo || "-"}
+                                </dd>
                             </div>
-                            <div className="min-w-0 space-y-1">
-                                <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cotización</dt>
-                                <dd className="break-words text-[13px] font-semibold text-slate-700" title={cotizacion.nombre_cotizacion}>{cotizacion.nombre_cotizacion}</dd>
+                        </div>
+                        <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
+                            <ClipboardList className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
+                            <div className="min-w-0">
+                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Cotización</dt>
+                                <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.nombre_cotizacion}>
+                                    {cotizacionActual?.nombre_cotizacion || "-"}
+                                </dd>
                             </div>
-                            <div className="min-w-0 space-y-1">
-                                <dt className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Profesional</dt>
-                                <dd className="break-words text-[13px] font-semibold text-slate-700" title={cotizacion.profesional_solicitante_nombre}>{cotizacion.profesional_solicitante_nombre}</dd>
+                        </div>
+                        <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
+                            <Stethoscope className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
+                            <div className="min-w-0">
+                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Profesional</dt>
+                                <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.profesional_solicitante_nombre}>
+                                    {cotizacionActual?.profesional_solicitante_nombre || "-"}
+                                </dd>
                             </div>
-                        </dl>
-                    ))}
+                        </div>
+                    </dl>
                 </section>
 
-                <section className="mb-6 rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-sm">
-                    <label className="block">
-                        <span className="mb-2 block text-xs font-semibold text-slate-700">
-                            Observaciones
-                        </span>
-                        <textarea
-                            value={observacionesDetalle}
-                            onChange={(evento) => setObservacionesDetalle(evento.target.value)}
-                            placeholder="Escribe observaciones generales sobre esta cotización"
-                            aria-label="Observaciones generales de la cotización"
-                            className="min-h-24 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[13px] leading-relaxed text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100"
-                        />
-                        <span className="mt-1.5 block text-[10px] text-slate-400">
-                            Añade notas generales relacionadas con el presupuesto o tratamiento.
-                        </span>
-                    </label>
-                    <div className="mt-4 flex justify-end">
+                <section data-tour="detalle-cotizacion-observaciones" className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="grid items-end gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+                        <label className="block min-w-0">
+                            <span className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                                <span className="text-xs font-bold text-slate-700">Observaciones</span>
+                                <span className="text-[10px] text-slate-400">Notas generales del presupuesto o tratamiento.</span>
+                            </span>
+                            <Textarea
+                                value={observacionesDetalle}
+                                onChange={(evento) => setObservacionesDetalle(evento.target.value)}
+                                placeholder="Escribe una observación general"
+                                aria-label="Observaciones generales de la cotización"
+                                className="min-h-16 resize-y bg-slate-50/60 text-[13px] leading-relaxed text-slate-700 placeholder:text-slate-400 focus-visible:bg-white"
+                            />
+                        </label>
                         <button
                             onClick={() => actualizarObservacion(observacionesDetalle, id_cotizacion_paciente)}
                             type="button"
-                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 sm:w-auto"
+                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 lg:w-auto"
                         >
-                            <Save className="h-4 w-4" aria-hidden="true"/>
+                            <Save className="size-4" aria-hidden="true"/>
                             Guardar observación
                         </button>
                     </div>
                 </section>
 
-                <div className="space-y-8">
-                    <section className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-                        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-5 py-3">
+                <div className="flex flex-col gap-6">
+                    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div data-tour="detalle-cotizacion-catalogo" className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-5 py-3">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF] text-white">
                                     <ClipboardList className="h-3.5 w-3.5"/>
@@ -1342,7 +1465,7 @@ export default function DetalleCotizacion() {
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#F3F0FF] px-2 text-[11px] font-bold text-[#6E56CF]">
-                                    {elementosCatalogoVisibles.length}
+                                    {elementosCatalogoVisibles.length} de {productos.length}
                                 </span>
                                 <button
                                     type="button"
@@ -1359,63 +1482,93 @@ export default function DetalleCotizacion() {
 
                         {listadoPrestacionesVisible && (
                             <div id="listado-prestaciones">
-                                <div className="grid grid-cols-1 gap-3 border-b border-slate-100 p-4 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(170px,1fr))]">
-                            <label className="block">
-                                <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Buscar</span>
-                                <div className="relative">
-                                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"/>
-                                    <input
-                                        value={busquedaCatalogo}
-                                        onChange={(evento) => actualizarBusquedaCatalogo(evento.target.value)}
-                                        placeholder="Nombre, categoría o descripción"
-                                        className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-[12px] text-slate-700 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-                                    />
-                                </div>
-                            </label>
-                            <label className="block">
-                                <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Categoría</span>
-                                <select
-                                    value={categoriaSeleccionada}
-                                    onChange={(evento) => cambiarCategoria(evento.target.value)}
-                                    className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-                                >
-                                    <option value="todas">Todas las categorías</option>
-                                    {categoriasDisponibles.map((categoria) => (
-                                        <option key={categoria} value={categoria}>{categoria}</option>
-                                    ))}
-                                </select>
-                            </label>
-                            <label className="block">
-                                <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Subcategoría</span>
-                                <select
-                                    value={subcategoriaSeleccionada}
-                                    onChange={(evento) => cambiarSubcategoria(evento.target.value)}
-                                    disabled={categoriaSeleccionada === "todas"}
-                                    className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-                                >
-                                    <option value="todas">Todas las subcategorías</option>
-                                    {subcategoriasDisponibles.map((subcategoria) => (
-                                        <option key={subcategoria} value={subcategoria}>{subcategoria}</option>
-                                    ))}
-                                </select>
-                            </label>
-                            <label className="block">
-                                <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Sub-subcategoría</span>
-                                <select
-                                    value={subSubcategoriaSeleccionada}
-                                    onChange={(evento) => actualizarSubSubcategoriaSeleccionada(evento.target.value)}
-                                    disabled={subcategoriaSeleccionada === "todas"}
-                                    className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-                                >
-                                    <option value="todas">Todas las sub-subcategorías</option>
-                                    {subSubcategoriasDisponibles.map((subSubcategoria) => (
-                                        <option key={subSubcategoria} value={subSubcategoria}>{subSubcategoria}</option>
-                                    ))}
-                                </select>
-                            </label>
+                                <div className="grid grid-cols-1 gap-3 border-b border-slate-100 bg-slate-50/30 p-4 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(3,minmax(170px,1fr))]">
+                                    <label className="block">
+                                        <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Buscar</span>
+                                        <div className="relative">
+                                            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"/>
+                                            <input
+                                                value={busquedaCatalogo}
+                                                onChange={(evento) => actualizarBusquedaCatalogo(evento.target.value)}
+                                                placeholder="Nombre, categoría o descripción"
+                                                className="h-9 w-full rounded-md border border-slate-200 bg-white pl-9 pr-3 text-xs text-slate-700 shadow-xs outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                            />
+                                        </div>
+                                    </label>
+                                    <label className="block">
+                                        <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Categoría</span>
+                                        <Select value={categoriaSeleccionada} onValueChange={cambiarCategoria} disabled={catalogoCargando}>
+                                            <SelectTrigger className="w-full bg-white" aria-label="Filtrar por categoría">
+                                                <SelectValue placeholder="Todas las categorías"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="todas">Todas las categorías</SelectItem>
+                                                    {categoriasDisponibles.map((categoria) => (
+                                                        <SelectItem
+                                                            key={categoria.id_categoriaProducto}
+                                                            value={String(categoria.id_categoriaProducto)}
+                                                        >
+                                                            {categoria.descripcionCategoria}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </label>
+                                    <label className="block">
+                                        <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Subcategoría</span>
+                                        <Select
+                                            value={subcategoriaSeleccionada}
+                                            onValueChange={cambiarSubcategoria}
+                                            disabled={categoriaSeleccionada === "todas" || catalogoCargando}
+                                        >
+                                            <SelectTrigger className="w-full bg-white" aria-label="Filtrar por subcategoría">
+                                                <SelectValue placeholder="Todas las subcategorías"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="todas">Todas las subcategorías</SelectItem>
+                                                    {subcategoriasDisponibles.map((subcategoria) => (
+                                                        <SelectItem
+                                                            key={subcategoria.id_subcategoria}
+                                                            value={String(subcategoria.id_subcategoria)}
+                                                        >
+                                                            {subcategoria.descripcionCategoria}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </label>
+                                    <label className="block">
+                                        <span className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Sub-subcategoría</span>
+                                        <Select
+                                            value={subSubcategoriaSeleccionada}
+                                            onValueChange={actualizarSubSubcategoriaSeleccionada}
+                                            disabled={subcategoriaSeleccionada === "todas" || catalogoCargando}
+                                        >
+                                            <SelectTrigger className="w-full bg-white" aria-label="Filtrar por sub-subcategoría">
+                                                <SelectValue placeholder="Todas las sub-subcategorías"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="todas">Todas las sub-subcategorías</SelectItem>
+                                                    {subSubcategoriasDisponibles.map((subSubcategoria) => (
+                                                        <SelectItem
+                                                            key={subSubcategoria.id_subsubcategoria}
+                                                            value={String(subSubcategoria.id_subsubcategoria)}
+                                                        >
+                                                            {subSubcategoria.descripcionSubSubCategoria}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </label>
                                 </div>
 
-                                <div className="max-h-[280px] overflow-y-auto">
+                                <div className="max-h-[320px] overflow-auto">
                                     <Table className="text-sm">
                                 <TableHeader className="sticky top-0 z-10 bg-white">
                                     <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
@@ -1429,20 +1582,30 @@ export default function DetalleCotizacion() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody className="divide-y divide-slate-100">
-                                    {elementosCatalogoVisibles.length === 0 && (
+                                    {catalogoCargando && (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="py-10 text-center text-sm text-slate-400">
+                                                <span className="inline-flex items-center gap-2">
+                                                    <LoaderCircle className="size-4 animate-spin" aria-hidden="true"/>
+                                                    Cargando catálogo y categorías
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                    {!catalogoCargando && elementosCatalogoVisibles.length === 0 && (
                                         <TableRow>
                                             <TableCell colSpan={7} className="py-12 text-center text-sm text-slate-400">
                                                 No se encontraron servicios o productos
                                             </TableCell>
                                         </TableRow>
                                     )}
-                                    {elementosCatalogoVisibles.map((elemento, index) => (
+                                    {!catalogoCargando && elementosCatalogoVisibles.map((elemento, index) => (
                                         <TableRow
                                             key={elemento.id_producto ?? [
                                                 elemento.tituloProducto,
-                                                elemento.categoria_nombre,
-                                                elemento.subcategoria_nombre,
-                                                elemento.sub_sub_categoría_nombre,
+                                                elemento.categoriaProducto,
+                                                elemento.subcategoria,
+                                                elemento.subsubcategoria,
                                                 index
                                             ].join("-")}
                                             className="transition-colors duration-150 hover:bg-slate-50"
@@ -1451,14 +1614,14 @@ export default function DetalleCotizacion() {
                                                 {elemento.tituloProducto}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-slate-500">
-                                                {elemento.categoria_nombre}
+                                                {nombresCategorias.get(String(elemento.categoriaProducto)) ?? elemento.descripcionCategoria ?? "—"}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-slate-500">
-                                                {elemento.subcategoria_nombre}
+                                                {nombresSubcategorias.get(String(elemento.subcategoria)) ?? "—"}
                                             </TableCell>
 
                                             <TableCell className="px-4 py-3 text-slate-500">
-                                                {elemento.sub_sub_categoría_nombre}
+                                                {nombresSubSubcategorias.get(String(elemento.subsubcategoria)) ?? "—"}
                                             </TableCell>
 
                                             <TableCell className="hidden max-w-[250px] truncate px-4 py-3 text-slate-500 md:table-cell">
@@ -1494,7 +1657,7 @@ export default function DetalleCotizacion() {
                     </section>
 
                     <main className="min-w-0 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-                        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-5 py-3">
+                        <div data-tour="detalle-cotizacion-detalle" className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-5 py-3">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF] text-white">
                                     <ClipboardList className="h-3.5 w-3.5"/>
@@ -1605,7 +1768,7 @@ export default function DetalleCotizacion() {
                         </div>
 
                         <div className="border-t border-slate-200 bg-slate-50/70 px-5 py-4">
-                            <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(280px,420px)_1fr] xl:items-end">
+                            <div data-tour="detalle-cotizacion-abono" className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(280px,420px)_1fr] xl:items-end">
                                 <div>
                                     <div className="mb-2 flex items-center gap-2">
                                         <WalletCards className="h-4 w-4 text-[#6E56CF]"/>

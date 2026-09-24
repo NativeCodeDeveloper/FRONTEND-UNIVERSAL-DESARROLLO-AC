@@ -418,7 +418,7 @@ export default function AgendaCitas() {
 
             const nuevoPaciente = await crearPacienteDesdeReserva(reserva);
             toast.success("Paciente creado correctamente. Complete ahora la ficha clínica.");
-            router.push(`/dashboard/NuevaFicha/${nuevoPaciente.id_paciente}`);
+            router.push(`/dashboard/FichasPacientes/${nuevoPaciente.id_paciente}`);
         } catch (error) {
             console.log(error);
             return toast.error("No se ha podido abrir o crear la ficha clinica de este paciente");

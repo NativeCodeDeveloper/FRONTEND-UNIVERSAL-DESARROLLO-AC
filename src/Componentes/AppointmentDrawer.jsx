@@ -258,6 +258,7 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
     <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 overflow-hidden">
       <button
         type="button"
+        data-tour="reserva-repetir"
         onClick={() => setAbierto((prev) => !prev)}
         className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left"
       >
@@ -282,7 +283,7 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
       </button>
 
       {abierto && (
-        <div className="px-3 pb-3 space-y-2">
+        <div data-tour="reserva-repetir-panel" className="px-3 pb-3 space-y-2">
           <p className="text-[11px] text-slate-400 mb-1">
             Agenda al mismo paciente en otros días, a la misma hora{selectionDraft?.start && selectionDraft?.end ? ` (${formatHora ? formatHora(selectionDraft.start) : ""}–${formatHora ? formatHora(selectionDraft.end) : ""})` : ""}. Haz clic con cuidado: cada día que selecciones acá crea una reserva real.
           </p>
