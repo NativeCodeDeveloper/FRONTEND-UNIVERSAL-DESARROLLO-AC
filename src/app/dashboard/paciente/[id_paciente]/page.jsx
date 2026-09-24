@@ -1,5 +1,6 @@
 "use client"
 import {useParams, useSearchParams} from "next/navigation";
+import { claveFechaCivil } from "@/lib/fechas";
 import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
 import {useState, useEffect, useRef} from "react";
 import {toast} from "react-hot-toast";
@@ -90,8 +91,9 @@ export default function Paciente(){
     function convertirFecha(isoString) {
         if (!isoString) return null;
 
-        const date = new Date(isoString);
-        return date.toISOString().split("T")[0];
+        // Sin esto, toISOString convertia a UTC y corria el dia: en Chile una
+        // fecha de nacimiento podia guardarse con el dia anterior.
+        return claveFechaCivil(isoString);
     }
 
 

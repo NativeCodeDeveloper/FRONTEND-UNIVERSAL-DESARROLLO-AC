@@ -113,21 +113,10 @@ function esFechaPlaceholder(fecha) {
 function convertirFechaParaBackend(fecha) {
     if (!fecha) return "";
 
-    if (typeof fecha === "string") {
-        const fechaLimpia = fecha.includes("T") ? fecha.split("T")[0] : fecha;
-        const date = new Date(fechaLimpia);
-
-        if (!Number.isNaN(date.getTime())) {
-            return date.toISOString().split("T")[0];
-        }
-
-        return fechaLimpia;
-    }
-
-    const date = new Date(fecha);
-    if (Number.isNaN(date.getTime())) return "";
-
-    return date.toISOString().split("T")[0];
+    // claveFechaCivil lee los componentes del texto (o los locales de un Date)
+    // sin convertir zona. toISOString devolvia UTC y corria el dia: una fecha
+    // elegida despues de las 21:00 en Chile se guardaba con el dia siguiente.
+    return claveFechaCivil(fecha);
 }
 
 function normalizarTextoPDF(valor, fallback = "-") {
@@ -787,7 +776,7 @@ export default function Paciente() {
                 doc.setTextColor(100, 116, 139);
                 doc.text("Ficha clínica del paciente", margin, 36.5);
                 doc.text(`Ficha #${normalizarTextoPDF(ficha.id_ficha)}`, rightX, 27, {align: "right"});
-                const horaDescarga = fechaDescarga.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+                const horaDescarga = fechaDescarga.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false});
                 doc.text(`Descarga: ${formatearFecha(fechaDescarga)} ${horaDescarga}`, rightX, 32, {align: "right"});
             };
 
@@ -1048,14 +1037,17 @@ export default function Paciente() {
                             Carpeta Clínica: {pacienteActual ? `${pacienteActual.nombre} ${pacienteActual.apellido}` : "Paciente"}
                         </h1>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
+                    {/* justify-end: sin esto, al envolverse en pantallas medianas
+                        las filas se alineaban a la izquierda y el borde derecho
+                        quedaba irregular. */}
+                    <div className="flex flex-wrap items-center justify-end gap-3">
                         <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">RUT</span>
                             <span className="text-sm font-bold text-slate-900 mt-1 leading-none font-mono">{formatRut(pacienteActual?.rut) || "-"}</span>
                         </div>
                         <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Registros</span>
-                            <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{totalFichas} Fichas</span>
+                            <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{totalFichas}</span>
                         </div>
                         <BotonVideoTutorial
                             videoId="KWLr1mHjhA0"

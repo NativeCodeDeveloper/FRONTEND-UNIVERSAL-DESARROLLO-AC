@@ -146,7 +146,7 @@ export default function ReecetasPacientes() {
     }
 
     function formatearFechaHoraDocumento(fecha = new Date()) {
-        const hora = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        const hora = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false});
         return `${formatearFechaDocumento(fecha)} ${hora}`;
     }
 

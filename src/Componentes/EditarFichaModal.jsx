@@ -30,6 +30,7 @@ import {
   transformarPlantilla,
 } from "@/lib/fichaPlantilla";
 import { formatRut } from "@/lib/designTokens";
+import { claveFechaCivil } from "@/lib/fechas";
 
 // Arma el aviso nombrando lo que falta, en vez de mandar a revisar la pantalla.
 //   uno:    "Falta ingresar la fecha de atención."
@@ -146,7 +147,11 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, onCerrar
 
         const ficha = fichas[0];
         setNumeroFicha(ficha.id_ficha ?? "");
-        setFechaConsulta(ficha.fechaConsulta || "");
+        // El backend entrega "2026-09-22T00:00:00.000Z"; al crear se guarda
+        // "2026-09-22". Sin normalizar, editar sin tocar la fecha reenviaba el
+        // ISO con hora: el mismo campo terminaba con dos formatos distintos,
+        // y el ISO es justo el que arrastra el desfase de zona horaria.
+        setFechaConsulta(claveFechaCivil(ficha.fechaConsulta));
         setProfesionalTexto(ficha.observaciones || "");
 
         // El profesional viaja como texto ("Nombre · RUT: 12.345.678-9"). Se

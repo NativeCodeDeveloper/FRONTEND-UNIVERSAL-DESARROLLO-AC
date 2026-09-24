@@ -100,7 +100,7 @@ export default function PresupuestoTratamiento() {
         const rightX = pageW - margin;
         const fechaGeneracion = new Date();
         const fechaEmision = fechaGeneracion.toLocaleDateString("es-CL", { day: "2-digit", month: "long", year: "numeric" });
-        const horaGeneracion = fechaGeneracion.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        const horaGeneracion = fechaGeneracion.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false});
         const folio = `N° ${String(Date.now()).slice(-6)}`; // folio temporal
 
         const profesionalLabel = listaProfesionales.find(p => String(p.id_profesional) === String(nombreProfesional));

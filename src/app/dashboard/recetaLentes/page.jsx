@@ -1,6 +1,7 @@
 'use client'
 
 import {useMemo, useRef, useState} from "react";
+import { claveFechaCivil } from "@/lib/fechas";
 import jsPDF from "jspdf";
 import { dibujarBloqueFirma } from "@/lib/pdfFirma";
 import ToasterClient from "@/Componentes/ToasterClient";
@@ -25,7 +26,7 @@ const emptyGraduacion = {
 };
 
 const emptyFormulario = {
-    fechaEmision: new Date().toISOString().split("T")[0],
+    fechaEmision: claveFechaCivil(new Date()),
     nombrePaciente: "",
     rutPaciente: "",
     idProfesional: "",
@@ -447,7 +448,7 @@ export default function RecetaLentesPage() {
             doc.setTextColor(...muted);
             doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin + 6, pageH - 11);
             doc.text(
-                `Generado: ${fechaGeneracion.toLocaleDateString("es-CL")} ${fechaGeneracion.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"})}`,
+                `Generado: ${fechaGeneracion.toLocaleDateString("es-CL")} ${fechaGeneracion.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false})}`,
                 pageW - margin - 6,
                 pageH - 11,
                 {align: "right"}

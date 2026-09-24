@@ -337,7 +337,7 @@ export default function SidebarNav() {
               </div>
               <div>
                 <p className="text-[11px] font-semibold text-rose-800">Cuenta suspendida</p>
-                <p className="mt-0.5 text-[10px] text-rose-600/80">Suscripcion cancelada</p>
+                <p className="mt-0.5 text-[10px] text-rose-600/80">Suscripción cancelada</p>
               </div>
             </div>
             <p className="mt-3 text-[11px] leading-[1.5] text-rose-700/90">

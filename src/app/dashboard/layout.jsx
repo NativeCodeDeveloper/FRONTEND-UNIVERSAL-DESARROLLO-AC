@@ -27,10 +27,23 @@ export default function DashboardLayout({ children }) {
                     <div className="flex h-full w-full">
 
                         {/* ═══════════════ SIDEBAR PREMIUM ═══════════════ */}
-                        <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col border-r border-[#EAEAEC] bg-white">
+                        {/* ── SIDEBAR FLOTANTE ──────────────────────────────
+                            Antes iba pegado al borde con una línea dura a la
+                            derecha. Ahora es una tarjeta despegada de los
+                            bordes, con el mismo tratamiento del pie de
+                            notificaciones: borde hairline y sombra en dos
+                            capas — una de contacto (1px, casi opaca) y otra
+                            difusa y muy abierta. Esa combinación da profundidad
+                            sin que se vea una sombra "dibujada".
 
-                            {/* ── Navegación + UserMenu (componente cliente para persistencia) ── */}
-                            <SidebarNav />
+                            La columna mide 284px para que la tarjeta conserve
+                            sus 260px: el respiro se gana afuera, no quitándole
+                            ancho al menú. */}
+                        <aside className="hidden md:flex h-screen w-[284px] shrink-0 flex-col p-3">
+                            <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[22px] border border-slate-200/70 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_28px_-18px_rgba(15,23,42,0.30)]">
+                                {/* ── Navegación + UserMenu (componente cliente para persistencia) ── */}
+                                <SidebarNav />
+                            </div>
                         </aside>
 
                         {/* ═══════════════ CONTENT ═══════════════ */}

@@ -1,6 +1,7 @@
 'use client'
 
 import React, {useEffect, useMemo, useRef, useState} from "react";
+import { claveFechaCivil } from "@/lib/fechas";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import toast from "react-hot-toast";
 import jsPDF from "jspdf";
@@ -31,7 +32,7 @@ export default function ExamenDocumento() {
     const [idProfesional, setIdProfesional] = useState("");
     const [nombreProfesional, setNombreProfesional] = useState("");
     const [rutProfesional, setRutProfesional] = useState("");
-    const [fechaSolicitud, setFechaSolicitud] = useState(new Date().toISOString().split("T")[0]);
+    const [fechaSolicitud, setFechaSolicitud] = useState(claveFechaCivil(new Date()));
     const [listaExamenes, setListaExamenes] = useState([]);
     const [listaExamenesSolicitados, setListaExamenesSolicitados] = useState([]);
     const [busquedaExamen, setBusquedaExamen] = useState("");
@@ -44,7 +45,7 @@ export default function ExamenDocumento() {
 
     function formatearGeneracionPDF(fecha) {
         const fechaTexto = fecha.toLocaleDateString("es-CL");
-        const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false});
         return `Generado: ${fechaTexto} ${horaTexto}`;
     }
 
@@ -133,7 +134,7 @@ export default function ExamenDocumento() {
         setRutProfesional("");
         setListaExamenesSolicitados([]);
         setBusquedaExamen("");
-        setFechaSolicitud(new Date().toISOString().split("T")[0]);
+        setFechaSolicitud(claveFechaCivil(new Date()));
     }
 
     const listaExamenesFiltrados = useMemo(() => {
@@ -201,7 +202,7 @@ export default function ExamenDocumento() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(90, 90, 90);
-        doc.text("Solicitud de exámenes clínicos", contentLeft, 33);
+        doc.text("Orden de exámenes clínicos", contentLeft, 33);
 
         doc.setDrawColor(60, 60, 60);
         doc.setLineWidth(0.6);
@@ -315,7 +316,7 @@ export default function ExamenDocumento() {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
         doc.setTextColor(95, 95, 95);
-        doc.text("Documento de solicitud clínica", contentRight, finalY, {align: "right"});
+        doc.text("Orden de exámenes", contentRight, finalY, {align: "right"});
 
         const footerY = pageH - 18;
         const firmaY = Math.min(Math.max(finalY + 22, pageH - 52), footerY - 24);
@@ -362,7 +363,7 @@ export default function ExamenDocumento() {
             .replace(/\s+/g, "-")
             .toLowerCase();
 
-        doc.save(`solicitud-examenes-${nombrePacienteArchivo || "paciente"}.pdf`);
+        doc.save(`orden-examenes-${nombrePacienteArchivo || "paciente"}.pdf`);
         toast.success("PDF generado correctamente.");
     }
 
@@ -375,14 +376,14 @@ export default function ExamenDocumento() {
                     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-                                Solicitud de exámenes
+                                Orden de exámenes
                             </h1>
                             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
                                 Completa los antecedentes clínicos básicos y arma una orden de exámenes con un formato sobrio, legible y adecuado para entrega hospitalaria.
                             </p>
                             <BotonVideoTutorial
                                 videoId="w7lKsLYkDmU"
-                                titulo="Solicitud de exámenes"
+                                titulo="Orden de exámenes"
                                 etiqueta="Video tutorial"
                                 ariaLabel="Abrir video tutorial de solicitud de exámenes"
                                 className="mt-4 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
@@ -601,7 +602,11 @@ export default function ExamenDocumento() {
                                                         type="button"
                                                         onClick={() => agregarExamen(examen)}
                                                         disabled={yaAgregado}
-                                                        className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 ${
+                                                        // w-full en móvil y ancho fijo desde md: el texto cambia
+                                                        // de "Agregar al documento" a "Agregado" y el botón se
+                                                        // encogía a la mitad, dejando la columna despareja.
+                                                        // shrink-0 evita además que lo apriete una descripción larga.
+                                                        className={`inline-flex w-full shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 md:w-[196px] ${
                                                             yaAgregado
                                                                 ? "cursor-not-allowed border border-emerald-200 bg-emerald-50 text-emerald-700"
                                                                 : "bg-black hover:bg-slate-800 text-white shadow-sm"

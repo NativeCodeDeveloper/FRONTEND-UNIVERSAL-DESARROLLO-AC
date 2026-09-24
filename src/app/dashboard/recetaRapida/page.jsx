@@ -1,6 +1,7 @@
 'use client'
 
 import {useMemo, useRef, useState} from "react";
+import { claveFechaCivil } from "@/lib/fechas";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 import jsPDF from "jspdf";
 import { dibujarBloqueFirma } from "@/lib/pdfFirma";
@@ -28,7 +29,7 @@ export default function RecetaRapida() {
     const [apellidoPaciente, setApellidoPaciente] = useState("");
     const [rutPaciente, setRutPaciente] = useState("");
     const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-    const [fechaEmision, setFechaEmision] = useState(new Date().toISOString().split("T")[0]);
+    const [fechaEmision, setFechaEmision] = useState(claveFechaCivil(new Date()));
     const [fechaCaducidad, setFechaCaducidad] = useState("");
     const [descripcionReceta, setDescripcionReceta] = useState("");
     const [idProfesional, setIdProfesional] = useState("");
@@ -39,7 +40,7 @@ export default function RecetaRapida() {
 
     function formatearGeneracionPDF(fecha) {
         const fechaTexto = fecha.toLocaleDateString("es-CL");
-        const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit"});
+        const horaTexto = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false});
         return `Generado: ${fechaTexto} ${horaTexto}`;
     }
 
@@ -87,7 +88,7 @@ export default function RecetaRapida() {
         setNombrePaciente("");
         setApellidoPaciente("");
         setRutPaciente("");
-        setFechaEmision(new Date().toISOString().split("T")[0]);
+        setFechaEmision(claveFechaCivil(new Date()));
         setFechaCaducidad("");
         setDescripcionReceta("");
         setIdProfesional("");

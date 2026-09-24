@@ -409,7 +409,7 @@ const DASHBOARD_NAV_SECTIONS = [
     icon: "users",
     items: [
       { label: "Listado de Pacientes", href: "/dashboard/listaPacientes", icon: "users" },
-      { label: "Ficha Clinica", href: "/dashboard/FichaClinica", icon: "fileText" },
+      { label: "Ficha Clínica", href: "/dashboard/FichaClinica", icon: "fileText" },
     ],
   },
   {
@@ -424,12 +424,12 @@ const DASHBOARD_NAV_SECTIONS = [
   {
     id: "documentos",
     title: "Documentos",
-    accordionLabel: "Documentos Clinicos",
+    accordionLabel: "Documentos Clínicos",
     icon: "document",
     items: [
-      { label: "Receta Medica", href: "/dashboard/recetaRapida", icon: "fileText" },
+      { label: "Receta Médica", href: "/dashboard/recetaRapida", icon: "fileText" },
       { label: "Receta de Lentes", href: "/dashboard/recetaLentes", icon: "fileText" },
-      { label: "Solicitar Examenes", href: "/dashboard/examenDocumento", icon: "fileText" },
+      { label: "Solicitar Exámenes", href: "/dashboard/examenDocumento", icon: "fileText" },
     ],
   },
   {
@@ -438,27 +438,29 @@ const DASHBOARD_NAV_SECTIONS = [
     accordionLabel: "Presupuestos",
     icon: "budget",
     items: [
-      { label: "Generar Presupuesto", href: "/dashboard/presupuestoTratamiento", icon: "budget" },
+      // Ordenados como se usan: primero se define la categoría, luego los
+      // tratamientos que la componen y al final se genera el presupuesto.
+      { label: "Categorías", href: "/dashboard/categoriasProductos", icon: "budget" },
       { label: "Tratamientos Disponibles", href: "/dashboard/ingresoProductos", icon: "budget" },
-      { label: "Categorias", href: "/dashboard/categoriasProductos", icon: "budget" },
+      { label: "Generar Presupuesto", href: "/dashboard/presupuestoTratamiento", icon: "budget" },
     ],
   },
   {
     id: "configuracion",
-    title: "Configuracion Clinica",
-    accordionLabel: "Configuracion Clinica",
+    title: "Configuración Clínica",
+    accordionLabel: "Configuración Clínica",
     icon: "settings",
     items: [
       { label: "Profesionales y Agendas", href: "/dashboard/profesionales", icon: "settings" },
       { label: "Servicios Agendables", href: "/dashboard/serviciosAgendamiento", icon: "settings" },
       { label: "Tarifas de Consulta", href: "/dashboard/tarifaServicio", icon: "settings" },
-      { label: "Examenes Clinicos", href: "/dashboard/examenesClinicos", icon: "folder" },
+      { label: "Exámenes Clínicos", href: "/dashboard/examenesClinicos", icon: "folder" },
     ],
   },
   {
     id: "plantillas",
     title: "Plantillas",
-    accordionLabel: "Plantillas y Examenes",
+    accordionLabel: "Plantillas y Exámenes",
     icon: "folder",
     items: [
       { label: "Modelos de Fichas", href: "/dashboard/fichasClinicasPlantillas", icon: "folder" },
@@ -504,7 +506,7 @@ const DASHBOARD_ROLE_DETAILS = {
     ],
   },
   "administrador-clinico": {
-    label: "Administrador Clinico",
+    label: "Administrador Clínico",
     description: "Administra casi toda la operación clínica, documental y de configuración.",
     recommendedFor: "Directores clínicos o encargados operativos con responsabilidades amplias.",
     access: [
@@ -524,7 +526,7 @@ const DASHBOARD_ROLE_DETAILS = {
     ],
   },
   "operador-clinico": {
-    label: "Operador Clinico",
+    label: "Operador Clínico",
     description: "Gestiona pacientes y fichas clínicas con una vista económica restringida.",
     recommendedFor: "Personal clínico que registra atenciones sin administrar agenda ni valores.",
     access: [
@@ -541,7 +543,7 @@ const DASHBOARD_ROLE_DETAILS = {
     ],
   },
   "operador-medico": {
-    label: "Operador Medico",
+    label: "Operador Médico",
     description: "Gestiona pacientes, fichas y documentos médicos, sin funciones odontológicas.",
     recommendedFor: "Médicos que atienden pacientes y emiten documentación clínica.",
     access: [
@@ -656,7 +658,7 @@ const DASHBOARD_ROLE_DETAILS = {
     ],
   },
   "clinico-medico": {
-    label: "Clinico Medico",
+    label: "Clínico Médico",
     description: "Perfil clínico amplio para fichas, recetas médicas y solicitudes de exámenes.",
     recommendedFor: "Consultas médicas que también administran agenda, configuración y contenido.",
     access: [
@@ -727,7 +729,7 @@ const DASHBOARD_ROLE_DETAILS = {
     ],
   },
   configuracion: {
-    label: "Configuracion",
+    label: "Configuración",
     description: "Administra catálogos, plantillas, profesionales y contenido, sin datos clínicos.",
     recommendedFor: "Personal administrativo que mantiene la configuración general del centro.",
     access: [

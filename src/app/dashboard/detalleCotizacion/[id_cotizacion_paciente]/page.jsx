@@ -883,6 +883,11 @@ export default function DetalleCotizacion() {
 
         const nombreEmpresa = String(datosEmpresa.empresaNombre ?? "").trim() || "-";
         const folio = `N° ${id_cotizacion_paciente}`;
+        // Momento real de la descarga, distinto de la fecha de emisión que
+        // elige el usuario: los otros siete documentos ya lo imprimen.
+        const momentoDescarga = new Date();
+        const descargaTexto = `${momentoDescarga.toLocaleDateString("es-CL")} ${momentoDescarga.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false})}`;
+
         const fechaEmisionTexto = fechaEmisionPDF
             ? new Date(`${fechaEmisionPDF}T00:00:00`).toLocaleDateString("es-CL", {day: "2-digit", month: "long", year: "numeric"})
             : "-";
@@ -947,7 +952,7 @@ export default function DetalleCotizacion() {
             documento.setFont("helvetica", "normal");
             documento.setFontSize(6.5);
             documento.setTextColor(...LIGHT);
-            documento.text(`Generado por AgendaClínica | ${nombreEmpresa}`, margen, posicionPie);
+            documento.text(`Generado por AgendaClínica | ${nombreEmpresa}  ·  Descarga: ${descargaTexto}`, margen, posicionPie);
             documento.text(`Folio ${folio}  ·  Emisión: ${fechaEmisionTexto}`, rightX, posicionPie, {align: "right"});
         }
 
