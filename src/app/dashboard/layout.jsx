@@ -8,6 +8,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import MobileNav from "./MobileNav";
 import SidebarNav from "./SidebarNav";
+import RegistroAcceso from "./RegistroAcceso";
 import NotificationProvider from "@/components/NotificationProvider";
 import DashboardPageTransition from "@/components/DashboardPageTransition";
 import CortexAssistant from "@/Componentes/CortexAssistant";
@@ -22,6 +23,9 @@ export const metadata = {
 export default function DashboardLayout({ children }) {
     return (
         <ClerkProvider>
+            {/* Telemetria del Health Score + registro de acceso para proteccion
+                de datos. No renderiza nada. Ver RegistroAcceso.jsx. */}
+            <RegistroAcceso />
             <TourProvider>
                 <div className="h-screen w-full overflow-hidden bg-[#FAFAFB] font-system-apple">
                     <div className="flex h-full w-full">
