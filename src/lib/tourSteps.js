@@ -651,6 +651,6 @@ export const TOUR_STEPS = [
     selector: null,
     final: true,
     title: "Tutorial completado",
-    description: "Ya viste lo esencial: crear un profesional, un servicio y asignarlos (lo más importante para empezar), agendar y guardar citas, crear fichas clínicas, bloquear horarios y revisar tus finanzas. Si te quedan dudas, visita la <a href=\"https://academia.agendaclinicas.cl/dashboard\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"ac-tour-link\">Academia de Agenda Clínica</a> para más contenido.",
+    description: "Ya viste lo esencial: crear un profesional, un servicio y asignarlos (lo más importante para empezar), agendar y guardar citas, crear fichas clínicas, bloquear horarios y revisar tus finanzas. Si te quedan dudas, visita la <a href=\"https://academia.agendaclinicas.cl\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"ac-tour-link\">Academia de Agenda Clínica</a> para más contenido.",
   },
 ];
