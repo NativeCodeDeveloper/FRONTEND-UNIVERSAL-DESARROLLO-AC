@@ -32,9 +32,12 @@ const CLAVE_MODO = "sidebar_modo";
 const RETARDO_ABRIR = 150;
 const RETARDO_CERRAR = 320;
 
-// Apertura y cierre al estilo de las apps de Apple: más largo que una transición
-// web típica y con la curva de los paneles de iOS (sale rápido, frena muy suave).
-const TRANSICION_ANCHO = "width 460ms cubic-bezier(0.32, 0.72, 0, 1)";
+// Apertura y cierre al estilo de las apps de Apple: arranca con decisión y frena muy
+// largo y suave al final (como un resorte sin rebote). Más lento que una transición web típica.
+const TRANSICION_ANCHO = "width 520ms cubic-bezier(0.22, 1, 0.36, 1)";
+// Al cerrar, el contenido del panel se desvanece primero y recién entonces aparecen los
+// iconos; así nunca se ve el texto "aplastado" mientras la tarjeta se recoge.
+const SALIDA_CONTENIDO = 200;
 // Ancho útil del contenido con el panel abierto: tarjeta (284) - padding (2 × 12) - borde (2 × 1).
 const ANCHO_CONTENIDO = ANCHO_EXPANDIDO - 24 - 2;
 
@@ -114,6 +117,31 @@ export default function SidebarShell() {
     // El foco de teclado tambien abre: si no, quien navega con Tab entra a un
     // rail de iconos sin texto y no sabe donde esta parado.
     const abierto = !esRail || hover || foco;
+    const colapsado = esRail && !abierto;
+
+    // Lo que se DIBUJA va un paso atrás de lo que se PIDE al cerrar:
+    //   abrir  → el panel se muestra de inmediato y entra con fundido mientras crece;
+    //   cerrar → el panel se desvanece (SALIDA_CONTENIDO ms) y luego se cambia a iconos.
+    const [vista, setVista] = useState(colapsado ? "rail" : "panel");
+    const [saliendo, setSaliendo] = useState(false);
+    useEffect(() => {
+        if (!colapsado) {
+            setSaliendo(false);
+            setVista("panel");
+            return undefined;
+        }
+        if (menosMovimiento) {
+            setVista("rail");
+            return undefined;
+        }
+        setSaliendo(true);
+        const id = window.setTimeout(() => {
+            setVista("rail");
+            setSaliendo(false);
+        }, SALIDA_CONTENIDO);
+        return () => window.clearTimeout(id);
+    }, [colapsado, menosMovimiento]);
+    const muestraRail = vista === "rail";
 
     return (
         <aside
@@ -149,14 +177,6 @@ export default function SidebarShell() {
                 if (!e.currentTarget.contains(e.relatedTarget)) setFoco(false);
             }}
         >
-            {/* Luz ambiental detrás del vidrio: dos manchas muy suaves y desenfocadas.
-                Sin algo detrás, un vidrio sobre fondo liso se ve como un panel blanco
-                cualquiera; con esto el panel refracta color como en visionOS / macOS. */}
-            <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-0 w-[300px] overflow-hidden">
-                <div className="absolute -left-24 top-[8%] h-80 w-80 rounded-full bg-[#C9BCFF]/35 blur-3xl" />
-                <div className="absolute -left-10 bottom-[10%] h-72 w-72 rounded-full bg-[#BFE3FF]/35 blur-3xl" />
-            </div>
-
             {/* `absolute` y no `static`: asi la tarjeta puede crecer a 284px sin
                 arrastrar la columna, que es lo que produce el overlay. z-[90]
                 para quedar sobre el contenido y sobre CortexAssistant (z-80). */}
@@ -177,19 +197,19 @@ export default function SidebarShell() {
                 <div
                     className={`vidrio flex h-full min-h-0 flex-col rounded-[26px] transition-shadow duration-500 ${
                         esRail && abierto ? "vidrio-flotante" : ""
-                    } ${esRail && !abierto ? "overflow-visible" : "overflow-hidden"}`}
+                    } ${muestraRail ? "overflow-visible" : "overflow-hidden"}`}
                 >
                     {/* El contenido se dibuja ya a su ancho final y la tarjeta lo
                         va descubriendo al crecer: así el texto no se reacomoda
                         cuadro a cuadro. La `key` lo remonta al cambiar entre rail
-                        y panel, para que entre con un fundido suave. */}
+                        y panel: entra con fundido y, al cerrar, primero sale. */}
                     <div
-                        key={esRail && !abierto ? "rail" : "panel"}
-                        className={`flex h-full min-h-0 flex-col ${menosMovimiento ? "" : "vidrio-entrar"}`}
-                        style={{ width: esRail && !abierto ? "100%" : ANCHO_CONTENIDO }}
+                        key={muestraRail ? "rail" : "panel"}
+                        className={`flex h-full min-h-0 flex-col ${menosMovimiento ? "" : saliendo ? "vidrio-salir" : "vidrio-entrar"}`}
+                        style={{ width: muestraRail ? "100%" : ANCHO_CONTENIDO }}
                     >
                         <SidebarNav
-                            colapsado={esRail && !abierto}
+                            colapsado={muestraRail}
                             modo={modo}
                             onCambiarModo={cambiarModo}
                             bloqueadoPorTour={tourActivo}

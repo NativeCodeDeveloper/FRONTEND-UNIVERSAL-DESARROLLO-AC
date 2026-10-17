@@ -813,74 +813,117 @@ body.driver-active [data-tour-modal] {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
- * Liquid glass del sidebar del dashboard (estilo Apple).
- * El vidrio se arma con cuatro capas: fondo translúcido + desenfoque con saturación
- * (lo que hay detrás se "refracta"), un borde hairline claro, un brillo interno arriba
- * (el canto del vidrio) y una sombra suave y amplia. Sin degradados de color.
- * Si el navegador no soporta backdrop-filter, cae a un blanco casi opaco.
+ * Liquid glass del sidebar del dashboard (estilo Apple), en neutro: sin color.
+ *
+ * Lo que hace que se lea como vidrio no es solo el desenfoque (sobre un fondo casi blanco
+ * apenas se nota), sino la LUZ: un canto brillante en el borde, más intenso arriba a la
+ * izquierda, y un reflejo suave en la parte superior. Capas:
+ *   1. fondo translúcido + backdrop-filter (desenfoque y saturación de lo que hay detrás)
+ *   2. ::before → canto de luz: degradado blanco recortado al borde con máscara
+ *   3. ::after  → reflejo superior: blanco que se desvanece hacia abajo
+ *   4. sombra de contacto + sombra amplia y suave
+ * Compatibilidad: Chrome, Edge, Firefox ≥103 y Safari (prefijos -webkit-). Sin
+ * backdrop-filter cae a un blanco casi opaco, que se ve bien igual.
  * ───────────────────────────────────────────────────────────────────────────── */
 @layer components {
   .vidrio {
-    background: rgb(255 255 255 / 0.92);
-    border: 1px solid rgb(255 255 255 / 0.7);
+    position: relative;
+    isolation: isolate;
+    background: rgb(250 250 252 / 0.94);
+    border: 1px solid rgb(15 23 42 / 0.07);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.85),
-      inset 0 -1px 0 rgb(15 23 42 / 0.04),
-      0 1px 2px rgb(15 23 42 / 0.05),
-      0 18px 40px -22px rgb(15 23 42 / 0.32);
+      0 1px 1px rgb(15 23 42 / 0.04),
+      0 2px 6px rgb(15 23 42 / 0.04),
+      0 24px 48px -28px rgb(15 23 42 / 0.30);
   }
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .vidrio {
-      background: rgb(255 255 255 / 0.58);
-      -webkit-backdrop-filter: blur(28px) saturate(185%);
-      backdrop-filter: blur(28px) saturate(185%);
+      background: rgb(255 255 255 / 0.46);
+      -webkit-backdrop-filter: blur(30px) saturate(190%) brightness(1.04);
+      backdrop-filter: blur(30px) saturate(190%) brightness(1.04);
     }
   }
-  /* Panel flotante (rail abierto por hover, flyouts, menú de usuario): un poco más opaco y con más sombra */
+  /* Canto de luz: un degradado blanco que solo se ve en el borde (máscara con exclusión) */
+  .vidrio::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(150deg, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.25) 35%, rgb(255 255 255 / 0.1) 60%, rgb(255 255 255 / 0.55) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+  }
+  /* Reflejo superior: como la luz que entra por arriba de una lámina de vidrio */
+  .vidrio::after {
+    content: "";
+    position: absolute;
+    inset: 1px 1px auto 1px;
+    height: 38%;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0));
+    pointer-events: none;
+  }
+  /* Flotante (rail abierto por hover, flyouts, menús): algo más opaco y con más sombra */
   .vidrio-flotante {
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.9),
-      inset 0 -1px 0 rgb(15 23 42 / 0.04),
-      0 1px 2px rgb(15 23 42 / 0.06),
-      0 28px 60px -24px rgb(15 23 42 / 0.45);
+      0 1px 1px rgb(15 23 42 / 0.05),
+      0 4px 10px rgb(15 23 42 / 0.05),
+      0 32px 64px -28px rgb(15 23 42 / 0.42);
   }
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .vidrio-flotante {
-      background: rgb(255 255 255 / 0.68);
+      background: rgb(255 255 255 / 0.62);
     }
   }
-  /* Pastilla de selección: el ítem activo como una gota de vidrio sobre el panel */
+  /* Pastilla de selección: una gota de vidrio sobre el panel */
   .vidrio-pastilla {
-    background: rgb(255 255 255 / 0.72);
+    background: rgb(255 255 255 / 0.78);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.95),
-      0 0 0 1px rgb(110 86 207 / 0.12),
-      0 4px 14px -6px rgb(110 86 207 / 0.35);
-  }
-  .vidrio-hover:hover {
-    background: rgb(255 255 255 / 0.5);
+      inset 0 1px 0 rgb(255 255 255 / 1),
+      inset 0 0 0 1px rgb(255 255 255 / 0.6),
+      0 0 0 1px rgb(15 23 42 / 0.05),
+      0 6px 16px -8px rgb(15 23 42 / 0.28);
   }
 
-  /* Contenido que aparece al abrir/cerrar el panel: entra con fundido y un leve desenfoque */
+  /*
+   * Entrada y salida del contenido al abrir/cerrar el panel.
+   * Solo opacidad y desplazamiento, SIN retardo y SIN animation-fill-mode: en Chrome,
+   * una animación de opacidad con relleno `backwards`/`both` montada dentro del panel de
+   * vidrio dejaba la capa sin dibujar (el menú quedaba en blanco aunque estaba en el DOM).
+   * Sin retardo, el primer cuadro ya es el estado inicial, así que no hay parpadeo.
+   */
   @keyframes vidrio-entrar {
-    from { opacity: 0; filter: blur(4px); transform: translateX(-6px); }
-    to { opacity: 1; filter: blur(0); transform: none; }
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes vidrio-salir {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateX(-10px); }
   }
   .vidrio-entrar {
-    animation: vidrio-entrar 360ms cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: vidrio-entrar 460ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .vidrio-salir {
+    animation: vidrio-salir 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
   }
   @keyframes vidrio-aparecer {
-    from { opacity: 0; transform: scale(0.96) translateX(-4px); filter: blur(3px); }
-    to { opacity: 1; transform: none; filter: blur(0); }
+    from { opacity: 0; transform: scale(0.95) translateX(-6px); }
+    to { opacity: 1; transform: none; }
   }
   .vidrio-aparecer {
-    animation: vidrio-aparecer 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: vidrio-aparecer 320ms cubic-bezier(0.22, 1, 0.36, 1);
     transform-origin: left top;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .vidrio-entrar,
+  .vidrio-salir,
   .vidrio-aparecer {
     animation: none;
   }
