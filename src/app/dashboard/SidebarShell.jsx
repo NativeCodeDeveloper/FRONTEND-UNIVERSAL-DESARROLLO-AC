@@ -32,6 +32,12 @@ const CLAVE_MODO = "sidebar_modo";
 const RETARDO_ABRIR = 150;
 const RETARDO_CERRAR = 320;
 
+// Apertura y cierre al estilo de las apps de Apple: más largo que una transición
+// web típica y con la curva de los paneles de iOS (sale rápido, frena muy suave).
+const TRANSICION_ANCHO = "width 460ms cubic-bezier(0.32, 0.72, 0, 1)";
+// Ancho útil del contenido con el panel abierto: tarjeta (284) - padding (2 × 12) - borde (2 × 1).
+const ANCHO_CONTENIDO = ANCHO_EXPANDIDO - 24 - 2;
+
 // Quien pide menos movimiento en el sistema no deberia recibir un panel que se
 // desliza cada vez que cruza el raton. Se lee en efecto (no en render) porque
 // matchMedia no existe en el servidor.
@@ -114,7 +120,7 @@ export default function SidebarShell() {
             className="relative hidden h-screen shrink-0 md:block"
             style={{
                 width: esRail ? ANCHO_RAIL : ANCHO_EXPANDIDO,
-                transition: menosMovimiento ? "none" : "width 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+                transition: menosMovimiento ? "none" : TRANSICION_ANCHO,
             }}
             onMouseEnter={() => esRail && programar(true, RETARDO_ABRIR)}
             onMouseLeave={() => esRail && programar(false, RETARDO_CERRAR)}
@@ -143,6 +149,14 @@ export default function SidebarShell() {
                 if (!e.currentTarget.contains(e.relatedTarget)) setFoco(false);
             }}
         >
+            {/* Luz ambiental detrás del vidrio: dos manchas muy suaves y desenfocadas.
+                Sin algo detrás, un vidrio sobre fondo liso se ve como un panel blanco
+                cualquiera; con esto el panel refracta color como en visionOS / macOS. */}
+            <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-0 w-[300px] overflow-hidden">
+                <div className="absolute -left-24 top-[8%] h-80 w-80 rounded-full bg-[#C9BCFF]/35 blur-3xl" />
+                <div className="absolute -left-10 bottom-[10%] h-72 w-72 rounded-full bg-[#BFE3FF]/35 blur-3xl" />
+            </div>
+
             {/* `absolute` y no `static`: asi la tarjeta puede crecer a 284px sin
                 arrastrar la columna, que es lo que produce el overlay. z-[90]
                 para quedar sobre el contenido y sobre CortexAssistant (z-80). */}
@@ -150,31 +164,37 @@ export default function SidebarShell() {
                 className="absolute inset-y-0 left-0 z-[90] flex flex-col p-3"
                 style={{
                     width: abierto ? ANCHO_EXPANDIDO : ANCHO_RAIL,
-                    transition: menosMovimiento ? "none" : "width 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+                    transition: menosMovimiento ? "none" : TRANSICION_ANCHO,
                 }}
             >
                 {/* `overflow-hidden` solo cuando esta abierto: es lo que
                     recorta las esquinas redondeadas, pero en modo rail tambien
                     recortaria el desplegable del avatar, que sale por el
                     costado. Colapsado nada roza los bordes, asi que sobra. */}
+                {/* Liquid glass (clases `vidrio` en globals.css). Abierto por hover
+                    flota sobre el contenido: `vidrio-flotante` le sube opacidad y
+                    sombra para despegarlo de lo que tapa. */}
                 <div
-                    className={`flex h-full min-h-0 flex-col rounded-[22px] border border-slate-200/70 bg-white transition-shadow duration-200 ${
-                        esRail && !abierto ? "overflow-visible" : "overflow-hidden"
-                    }`}
-                    style={{
-                        // Abierto por hover flota sobre el contenido, asi que se
-                        // le sube la sombra para despegarlo de lo que tapa.
-                        boxShadow: esRail && abierto
-                            ? "0 1px 2px rgba(15,23,42,0.06), 0 24px 56px -24px rgba(15,23,42,0.45)"
-                            : "0 1px 2px rgba(15,23,42,0.04), 0 12px 28px -18px rgba(15,23,42,0.30)",
-                    }}
+                    className={`vidrio flex h-full min-h-0 flex-col rounded-[26px] transition-shadow duration-500 ${
+                        esRail && abierto ? "vidrio-flotante" : ""
+                    } ${esRail && !abierto ? "overflow-visible" : "overflow-hidden"}`}
                 >
-                    <SidebarNav
-                        colapsado={esRail && !abierto}
-                        modo={modo}
-                        onCambiarModo={cambiarModo}
-                        bloqueadoPorTour={tourActivo}
-                    />
+                    {/* El contenido se dibuja ya a su ancho final y la tarjeta lo
+                        va descubriendo al crecer: así el texto no se reacomoda
+                        cuadro a cuadro. La `key` lo remonta al cambiar entre rail
+                        y panel, para que entre con un fundido suave. */}
+                    <div
+                        key={esRail && !abierto ? "rail" : "panel"}
+                        className={`flex h-full min-h-0 flex-col ${menosMovimiento ? "" : "vidrio-entrar"}`}
+                        style={{ width: esRail && !abierto ? "100%" : ANCHO_CONTENIDO }}
+                    >
+                        <SidebarNav
+                            colapsado={esRail && !abierto}
+                            modo={modo}
+                            onCambiarModo={cambiarModo}
+                            bloqueadoPorTour={tourActivo}
+                        />
+                    </div>
                 </div>
             </div>
         </aside>

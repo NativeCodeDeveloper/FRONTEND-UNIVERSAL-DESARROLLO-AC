@@ -157,7 +157,7 @@ export default function MobileNav() {
             onClick={() => setOpen(false)}
           />
 
-          <div className="absolute left-0 right-0 z-50 mx-3 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+          <div className="vidrio vidrio-flotante vidrio-aparecer absolute left-0 right-0 z-50 mx-3 mt-2 overflow-hidden rounded-[24px]">
             <div className="border-b border-slate-100 px-5 py-5">
               <div className="flex items-center gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] shadow-sm">

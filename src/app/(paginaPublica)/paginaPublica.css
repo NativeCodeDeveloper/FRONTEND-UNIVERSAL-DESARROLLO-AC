@@ -1,0 +1,329 @@
+/*
+ * Estilos de la página pública del centro (inicio, profesionales y reserva).
+ * Se importa solo desde app/(paginaPublica)/layout.jsx; los tokens de Tailwind
+ * (bg-niebla, text-tinta…) están declarados al final de app/globals.css.
+ *
+ * Sistema visual neutro a propósito: el único color con carácter es --pp-acento,
+ * que a futuro debería venir de la configuración de cada centro.
+ */
+:root {
+  --pp-acento: #0e7c86;
+  --pp-acento-hondo: #0a5f67;
+  --pp-acento-suave: #e8f3f4;
+
+  --pp-tinta: #1d1d1f;
+  --pp-tinta-2: #6e6e73;
+  --pp-tinta-3: #86868b;
+  --pp-papel: #ffffff;
+  --pp-niebla: #f5f5f7;
+  --pp-linea: #d2d2d7;
+  --pp-linea-suave: #e8e8ed;
+}
+
+html:has(.pagina-publica) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+
+/*
+ * La base global pone overflow-x: hidden en html y body, y eso anula position: sticky
+ * (el resumen de la reserva dejaba de acompañar el scroll). "clip" recorta igual pero no
+ * convierte a html/body en contenedores de scroll.
+ */
+html:has(.pagina-publica),
+html:has(.pagina-publica) body {
+  overflow-x: clip;
+}
+
+/*
+ * Tipografía y color base de la página pública.
+ *  - .pagina-publica: el layout de (paginaPublica); además pinta el fondo.
+ *  - .pp-tipografia: la raíz de los portales (Modal, Selector), que se montan en <body>.
+ *    No lleva fondo: si lo llevara taparía la página detrás del velo del modal.
+ */
+.pagina-publica {
+  background: var(--pp-papel);
+}
+.pagina-publica,
+.pp-tipografia {
+  color: var(--pp-tinta);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Componentes en su capa: así las utilidades de Tailwind (md:hidden, w-full…) les ganan */
+@layer components {
+  /* Tipografía al estilo Apple: titulares semibold, tracking negativo y alto de línea corto */
+  .titular-1 {
+    font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
+    line-height: 1.07;
+    font-weight: 600;
+    letter-spacing: -0.028em;
+  }
+  .titular-2 {
+    font-size: clamp(1.875rem, 1.45rem + 1.7vw, 2.75rem);
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  .titular-3 {
+    font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.6rem);
+    line-height: 1.17;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  /* Titular de la portada: tamaño contenido, el protagonismo lo tiene la imagen del centro */
+  .titular-portada {
+    font-size: clamp(1.875rem, 1.45rem + 1.35vw, 2.625rem);
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -0.024em;
+    /* Sin justificar: con letra grande y pocas palabras por línea abriría huecos; se equilibran las líneas */
+    text-wrap: balance;
+  }
+  /*
+   * Justificado limpio: solo estira los espacios entre palabras (nunca entre letras),
+   * divide en sílabas palabras largas para no abrir huecos y deja la última línea a la izquierda.
+   */
+  .texto-justificado {
+    text-align: justify;
+    text-align-last: left;
+    text-justify: inter-word;
+    /*
+     * Cortar en sílabas es lo que evita los huecos grandes entre palabras: sin cortes, el navegador
+     * reparte todo el espacio sobrante en los pocos espacios de la línea. Se permite cortar palabras
+     * desde 6 letras dejando al menos 3 antes y 2 después del guion (Chrome y Safari).
+     */
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphenate-limit-chars: 6 3 2;
+    -webkit-hyphenate-limit-before: 3;
+    -webkit-hyphenate-limit-after: 2;
+    text-wrap: pretty;
+    letter-spacing: -0.012em;
+  }
+  /* En celular las columnas son tan angostas que justificar abre huecos igual: ahí va a la izquierda */
+  @media (max-width: 639px) {
+    .texto-justificado {
+      text-align: left;
+    }
+  }
+  .bajada {
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.3125rem);
+    line-height: 1.42;
+    color: var(--pp-tinta-2);
+    letter-spacing: -0.018em;
+  }
+
+  /* Botones tipo píldora */
+  .boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1.375rem;
+    border-radius: 980px;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: background-color 0.25s var(--ease-apple), color 0.25s var(--ease-apple),
+      box-shadow 0.25s var(--ease-apple), transform 0.25s var(--ease-apple);
+  }
+  .boton:active {
+    transform: scale(0.98);
+  }
+  .boton-principal {
+    background: var(--pp-acento);
+    color: #fff;
+  }
+  .boton-principal:hover {
+    background: var(--pp-acento-hondo);
+  }
+  .boton-principal:disabled {
+    background: var(--pp-linea);
+    color: var(--pp-tinta-3);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .boton-secundario {
+    background: transparent;
+    color: var(--pp-acento);
+    box-shadow: inset 0 0 0 1px var(--pp-acento);
+  }
+  .boton-secundario:hover {
+    background: var(--pp-acento);
+    color: #fff;
+  }
+  .boton-tenue {
+    background: var(--pp-niebla);
+    color: var(--pp-tinta);
+  }
+  .boton-tenue:hover {
+    background: var(--pp-linea-suave);
+  }
+
+  .enlace {
+    color: var(--pp-acento);
+    font-weight: 500;
+  }
+  .enlace:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Caja: el contenedor base de toda la plataforma */
+  .caja {
+    background: var(--pp-papel);
+    border-radius: 22px;
+    box-shadow: var(--shadow-caja);
+  }
+  .caja-interactiva {
+    transition: box-shadow 0.4s var(--ease-apple), transform 0.4s var(--ease-apple);
+  }
+  .caja-interactiva:hover {
+    box-shadow: var(--shadow-caja-alta);
+    transform: translateY(-2px);
+  }
+
+  /* Campos de formulario */
+  .campo {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: var(--pp-papel);
+    box-shadow: inset 0 0 0 1px var(--pp-linea);
+    font-size: 17px;
+    color: var(--pp-tinta);
+    transition: box-shadow 0.2s ease;
+  }
+  .campo::placeholder {
+    color: var(--pp-tinta-3);
+  }
+  .campo:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--pp-acento), 0 0 0 4px var(--pp-acento-suave);
+  }
+  .campo[aria-invalid="true"] {
+    box-shadow: inset 0 0 0 2px #e30000;
+  }
+}
+
+@layer base {
+  /*
+   * La base global (app/globals.css) da a h1–h6 la fuente Geist, peso 700 e interlineado propio.
+   * En la página pública los títulos heredan la tipografía del sistema; tamaño y peso los fijan
+   * las clases titular-* o las utilidades de cada componente.
+   */
+  :is(.pagina-publica, .pp-tipografia) :where(h1, h2, h3, h4, h5, h6) {
+    font-family: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+  }
+
+  :is(.pagina-publica, .pp-tipografia) :focus-visible {
+    outline: 2px solid var(--pp-acento);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+/* Aparición sutil al hacer scroll */
+.revelar {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s var(--ease-apple), transform 0.9s var(--ease-apple);
+}
+.revelar.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* La barra fija de la reserva en celular no debe tapar el pie */
+@media (max-width: 1023px) {
+  body:has(.barra-reserva) footer {
+    padding-bottom: 88px;
+  }
+}
+
+/* Texto largo dentro de una tarjeta de alto fijo: barra fina solo al necesitarla */
+.texto-desplazable {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pp-linea) transparent;
+  overscroll-behavior: contain;
+}
+.texto-desplazable::-webkit-scrollbar {
+  width: 4px;
+}
+.texto-desplazable::-webkit-scrollbar-thumb {
+  background: var(--pp-linea);
+  border-radius: 4px;
+}
+
+.sin-barra {
+  scrollbar-width: none;
+}
+.sin-barra::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes entrar-modal {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes entrar-velo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes entrar-desplegable {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+.animar-desplegable {
+  animation: entrar-desplegable 0.22s var(--ease-apple) both;
+}
+.animar-modal {
+  animation: entrar-modal 0.45s var(--ease-apple) both;
+}
+.animar-velo {
+  animation: entrar-velo 0.3s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.pagina-publica) {
+    scroll-behavior: auto;
+  }
+  .revelar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animar-modal,
+  .animar-velo,
+  .animar-desplegable {
+    animation: none;
+  }
+}
