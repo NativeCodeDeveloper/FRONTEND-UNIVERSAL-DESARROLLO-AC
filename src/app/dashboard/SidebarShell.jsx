@@ -33,11 +33,13 @@ const RETARDO_ABRIR = 150;
 const RETARDO_CERRAR = 320;
 
 // Apertura y cierre al estilo de las apps de Apple: arranca con decisión y frena muy
-// largo y suave al final (como un resorte sin rebote). Más lento que una transición web típica.
-const TRANSICION_ANCHO = "width 520ms cubic-bezier(0.22, 1, 0.36, 1)";
+// largo y suave al final (como un resorte sin rebote). Vale igual para el hover y para
+// el cambio manual de modo. Más lento que una transición web típica.
+const TRANSICION_ANCHO = "width 640ms cubic-bezier(0.22, 1, 0.36, 1)";
 // Al cerrar, el contenido del panel se desvanece primero y recién entonces aparecen los
 // iconos; así nunca se ve el texto "aplastado" mientras la tarjeta se recoge.
-const SALIDA_CONTENIDO = 200;
+// Debe coincidir con la duración de `.vidrio-salir` en globals.css.
+const SALIDA_CONTENIDO = 240;
 // Ancho útil del contenido con el panel abierto: tarjeta (284) - padding (2 × 12) - borde (2 × 1).
 const ANCHO_CONTENIDO = ANCHO_EXPANDIDO - 24 - 2;
 
@@ -78,6 +80,8 @@ export default function SidebarShell() {
     const [hover, setHover] = useState(false);
     const [foco, setFoco] = useState(false);
     const temporizador = useRef(null);
+    const tarjeta = useRef(null);
+    const cuadroLuz = useRef(0);
 
     const menosMovimiento = useMenosMovimiento();
     const { isRunning, tourExternoActivo } = useTour();
@@ -106,7 +110,32 @@ export default function SidebarShell() {
         setFoco(false);
     }, []);
 
-    useEffect(() => () => window.clearTimeout(temporizador.current), []);
+    useEffect(() => () => {
+        window.clearTimeout(temporizador.current);
+        window.cancelAnimationFrame(cuadroLuz.current);
+    }, []);
+
+    // Luz especular del vidrio siguiendo al cursor (variables --luz-x/--luz-y del
+    // ::after). Se escribe directo en el estilo, una vez por cuadro: nada de estado
+    // de React, así mover el ratón no re-renderiza el sidebar.
+    const moverLuz = useCallback((e) => {
+        const el = tarjeta.current;
+        if (!el || menosMovimiento) return;
+        const { clientX, clientY } = e;
+        window.cancelAnimationFrame(cuadroLuz.current);
+        cuadroLuz.current = window.requestAnimationFrame(() => {
+            const r = el.getBoundingClientRect();
+            el.style.setProperty("--luz-x", `${((clientX - r.left) / r.width) * 100}%`);
+            el.style.setProperty("--luz-y", `${((clientY - r.top) / r.height) * 100}%`);
+        });
+    }, [menosMovimiento]);
+    const soltarLuz = useCallback(() => {
+        window.cancelAnimationFrame(cuadroLuz.current);
+        // Sin las variables en línea vuelve a su posición por defecto (arriba a la
+        // izquierda), con la misma transición lenta.
+        tarjeta.current?.style.removeProperty("--luz-x");
+        tarjeta.current?.style.removeProperty("--luz-y");
+    }, []);
 
     const programar = useCallback((valor, retardo) => {
         window.clearTimeout(temporizador.current);
@@ -195,7 +224,10 @@ export default function SidebarShell() {
                     flota sobre el contenido: `vidrio-flotante` le sube opacidad y
                     sombra para despegarlo de lo que tapa. */}
                 <div
-                    className={`vidrio flex h-full min-h-0 flex-col rounded-[26px] transition-shadow duration-500 ${
+                    ref={tarjeta}
+                    onMouseMove={moverLuz}
+                    onMouseLeave={soltarLuz}
+                    className={`vidrio flex h-full min-h-0 flex-col rounded-[26px] ${
                         esRail && abierto ? "vidrio-flotante" : ""
                     } ${muestraRail ? "overflow-visible" : "overflow-hidden"}`}
                 >
