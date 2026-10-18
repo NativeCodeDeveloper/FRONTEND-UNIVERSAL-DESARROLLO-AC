@@ -17,65 +17,65 @@ import { construirUrlSoporte } from "@/lib/soporteWhatsapp";
 
 const ICONS = {
   home: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     </svg>
   ),
   calendar: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   ),
   users: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
   document: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
     </svg>
   ),
   settings: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
   folder: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
     </svg>
   ),
   image: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   ),
   budget: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
     </svg>
   ),
   shield: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z" />
     </svg>
   ),
   academy: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 8.5v7l6-3.5-6-3.5z" />
     </svg>
   ),
   compass: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-2 5-4 1 2-5 4-1z" />
     </svg>
   ),
   finance: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v16a2 2 0 002 2h16M7 15l4-4 3 3 5-6" />
     </svg>
   ),
@@ -113,11 +113,10 @@ function getActiveAccordion(pathname, sections) {
 
 function SectionLabel({ label }) {
   return (
-    <div className="flex items-center gap-2 mt-3 mb-1 px-3">
-      <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400/80 whitespace-nowrap select-none">
+    <div className="mb-1 mt-4 px-2.5">
+      <span className="select-none whitespace-nowrap text-[12px] font-semibold tracking-[-0.01em] text-slate-500">
         {label}
       </span>
-      <div className="flex-1 h-px bg-black/[0.06]" />
     </div>
   );
 }
@@ -132,19 +131,14 @@ function NavItem({ href, icon, label }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center gap-2.5 rounded-[12px] px-3 py-[7px] text-[12.5px] font-medium transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex items-center gap-3 rounded-[12px] px-2.5 py-2 text-[13.5px] tracking-[-0.01em] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isActive
-          ? "vidrio-pastilla text-[#6E56CF]"
-          : "text-slate-600 hover:bg-white/55 hover:text-slate-900"
+          ? "vidrio-pastilla font-medium text-slate-900"
+          : "text-slate-700 hover:bg-white/45 hover:text-slate-900"
       }`}
     >
-      <span
-        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg transition-all duration-150 ${
-          isActive
-            ? "bg-[#EDE9FE] text-[#6E56CF]"
-            : "bg-white/60 text-slate-400 ring-1 ring-black/[0.04] group-hover:bg-white/90 group-hover:text-slate-600"
-        }`}
-      >
+      {/* Ícono suelto, sin caja: como los SF Symbols de visionOS. */}
+      <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
         {icon}
       </span>
       <span className="leading-none">{label}</span>
@@ -161,9 +155,8 @@ function SubNavItem({ href, label, action }) {
       <button
         type="button"
         onClick={() => startTour()}
-        className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 transition-all duration-150 hover:bg-white/55 hover:text-slate-700"
+        className="group flex w-full items-center rounded-[10px] px-2.5 py-1.5 text-left text-[12.5px] tracking-[-0.01em] text-slate-600 transition-all duration-150 hover:bg-white/45 hover:text-slate-900"
       >
-        <div className="h-1 w-1 rounded-full bg-slate-300 transition-colors group-hover:bg-slate-400" />
         <span className="leading-tight">{label}</span>
       </button>
     );
@@ -177,17 +170,12 @@ function SubNavItem({ href, label, action }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center gap-2 rounded-[10px] px-2 py-1.5 text-[11px] font-medium transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex items-center rounded-[10px] px-2.5 py-1.5 text-[12.5px] tracking-[-0.01em] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isActive
-          ? "vidrio-pastilla text-[#6E56CF]"
-          : "text-slate-500 hover:bg-white/55 hover:text-slate-700"
+          ? "vidrio-pastilla font-medium text-slate-900"
+          : "text-slate-600 hover:bg-white/45 hover:text-slate-900"
       }`}
     >
-      <div
-        className={`h-1 w-1 rounded-full transition-colors ${
-          isActive ? "bg-[#6E56CF]" : "bg-slate-300 group-hover:bg-slate-400"
-        }`}
-      />
       <span className="leading-tight">{label}</span>
     </Link>
   );
@@ -205,32 +193,30 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
   }, [isOpen, children]);
 
   return (
-    <div className="mt-1.5">
+    <div className="mt-0.5">
       <button
         type="button"
         data-tour={dataTour}
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
-        className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-[14px] border px-2.5 py-2 text-[12px] font-medium transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-[12px] px-2.5 py-2 text-[13.5px] tracking-[-0.01em] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isOpen
-            ? "border-white/80 bg-white/60 text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_6px_18px_-12px_rgba(15,23,42,0.35)]"
+            ? "font-medium text-slate-900"
             : highlight
-              ? "border-[#EDE9FE]/80 bg-[#FAF9FF]/60 text-slate-700 hover:border-white/80 hover:bg-white/60 hover:text-slate-900"
-              : "border-transparent text-slate-600 hover:border-white/70 hover:bg-white/45 hover:text-slate-900"
+              ? "text-[#6E56CF] hover:bg-white/45"
+              : "text-slate-700 hover:bg-white/45 hover:text-slate-900"
         }`}
       >
+        {/* Sin caja ni borde: ícono suelto + texto, como la lista de visionOS.
+            La pastilla de vidrio queda solo para la opción ACTIVA. */}
         <div className="flex min-w-0 items-center gap-3">
-          <span
-            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
-              isOpen || highlight ? "bg-[#EDE9FE] text-[#6E56CF] shadow-sm" : "bg-white/60 text-slate-500 ring-1 ring-black/[0.04]"
-            }`}
-          >
+          <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
             {icon}
           </span>
           <span className="truncate leading-none">{label}</span>
         </div>
         <svg
-          className={`h-3 w-3 flex-shrink-0 text-slate-400 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "rotate-180 text-[#6E56CF]" : ""}`}
+          className={`h-3 w-3 flex-shrink-0 text-slate-400 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "rotate-180 text-slate-600" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -250,7 +236,7 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
       >
         <div
           ref={contentRef}
-          className={`flex flex-col gap-px pb-1 pl-11 pr-1 pt-1 transition-transform duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "translate-y-0" : "-translate-y-1.5"}`}
+          className={`flex flex-col gap-px pb-1 pl-[30px] pr-0 pt-0.5 transition-transform duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "translate-y-0" : "-translate-y-1.5"}`}
         >
           {children}
         </div>
@@ -345,15 +331,11 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
 
   const contenido = (
     <>
-      {/* Indicador del borde: la pista de "estas aqui" cuando no hay texto. */}
+      {/* Como el rail de visionOS: íconos sueltos y el activo dentro de un
+          círculo de vidrio, que es la pista de "estás aquí" cuando no hay texto. */}
       <span
-        className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#6E56CF] transition-opacity duration-150 ${
-          activo ? "opacity-100" : "opacity-0"
-        }`}
-      />
-      <span
-        className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-150 ${
-          activo ? "vidrio-pastilla text-[#6E56CF]" : "bg-white/60 text-slate-500 ring-1 ring-black/[0.04] group-hover:bg-white/90 group-hover:text-slate-700"
+        className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          activo ? "vidrio-pastilla text-slate-900" : "text-slate-600 group-hover:bg-white/45 group-hover:text-slate-900"
         }`}
       >
         {ICONS[section.icon]}
@@ -407,7 +389,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
               por un hueco muerto, que es lo que hace parpadear a este patron. */}
           <div className="pl-2" role="menu" onMouseEnter={onAbrir} onMouseLeave={onCerrar} onClick={onElegir}>
             <div className="vidrio vidrio-flotante vidrio-aparecer w-[236px] rounded-[20px] p-2">
-              <p className="px-2 pb-1.5 pt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-300">
+              <p className="px-2.5 pb-1 pt-1 text-[12px] font-semibold tracking-[-0.01em] text-slate-500">
                 {etiqueta}
               </p>
               {section.items.map((item) => (
@@ -468,8 +450,8 @@ function NavRail({ sections, pathname, modo, onCambiarModo, urlSoporte }) {
           title="Contacto Soporte"
           className="group relative flex h-11 w-full items-center justify-center"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/60 text-slate-500 ring-1 ring-black/[0.04] transition-all duration-300 group-hover:bg-white/90 group-hover:text-slate-700">
-            <Headset className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition-all duration-300 group-hover:bg-white/45 group-hover:text-slate-900">
+            <Headset className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />
           </span>
 
         </Link>
@@ -627,7 +609,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
           </div>
         </div>
         <div className="mx-4 shrink-0 border-t border-black/[0.06] py-2">
-          <NavItem href={urlSoporteSuspendido} icon={<Headset className="h-3.5 w-3.5" aria-hidden="true" />} label="Contacto Soporte" />
+          <NavItem href={urlSoporteSuspendido} icon={<Headset className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />} label="Contacto Soporte" />
         </div>
       </>
     );
@@ -670,7 +652,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
           })}
 
         <div className="mt-3 border-t border-black/[0.06] pt-2">
-          <NavItem href={urlSoporte} icon={<Headset className="h-3.5 w-3.5" aria-hidden="true" />} label="Contacto Soporte" />
+          <NavItem href={urlSoporte} icon={<Headset className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />} label="Contacto Soporte" />
         </div>
       </nav>
 
