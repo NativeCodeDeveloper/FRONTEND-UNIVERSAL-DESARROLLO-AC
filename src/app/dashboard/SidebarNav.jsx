@@ -113,7 +113,7 @@ function getActiveAccordion(pathname, sections) {
 
 function SectionLabel({ label }) {
   return (
-    <div className="mb-0.5 mt-3.5 px-2.5">
+    <div className="mb-1 mt-5 px-2.5">
       <span className="select-none whitespace-nowrap text-[11px] font-semibold text-slate-500/90">
         {label}
       </span>
@@ -131,7 +131,7 @@ function NavItem({ href, icon, label }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex h-[30px] items-center gap-2 rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex h-8 items-center gap-2 rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isActive
           ? "vidrio-pastilla font-medium text-slate-900"
           : "text-slate-700 hover:bg-white/45 hover:text-slate-900"
@@ -155,7 +155,7 @@ function SubNavItem({ href, label, action }) {
       <button
         type="button"
         onClick={() => startTour()}
-        className="group flex h-7 w-full items-center rounded-[9px] px-2.5 text-left text-[13px] text-slate-600 transition-all duration-150 hover:bg-white/45 hover:text-slate-900"
+        className="group flex h-[30px] w-full items-center rounded-[9px] px-2.5 text-left text-[13px] text-slate-600 transition-all duration-150 hover:bg-white/45 hover:text-slate-900"
       >
         <span className="leading-tight">{label}</span>
       </button>
@@ -170,7 +170,7 @@ function SubNavItem({ href, label, action }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex h-7 items-center rounded-[9px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex h-[30px] items-center rounded-[9px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isActive
           ? "vidrio-pastilla font-medium text-slate-900"
           : "text-slate-600 hover:bg-white/45 hover:text-slate-900"
@@ -199,7 +199,7 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
         data-tour={dataTour}
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
-        className={`group relative flex h-[30px] w-full cursor-pointer items-center justify-between overflow-hidden rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`group relative flex h-8 w-full cursor-pointer items-center justify-between overflow-hidden rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isOpen
             ? "font-medium text-slate-900"
             : highlight
