@@ -227,7 +227,7 @@ export default function SidebarShell() {
                     ref={tarjeta}
                     onMouseMove={moverLuz}
                     onMouseLeave={soltarLuz}
-                    className={`vidrio flex h-full min-h-0 flex-col rounded-[26px] ${
+                    className={`vidrio font-system-apple flex h-full min-h-0 flex-col rounded-[26px] ${
                         esRail && abierto ? "vidrio-flotante" : ""
                     } ${muestraRail ? "overflow-visible" : "overflow-hidden"}`}
                 >

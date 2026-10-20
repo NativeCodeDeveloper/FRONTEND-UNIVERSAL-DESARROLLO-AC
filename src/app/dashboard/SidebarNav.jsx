@@ -113,8 +113,8 @@ function getActiveAccordion(pathname, sections) {
 
 function SectionLabel({ label }) {
   return (
-    <div className="mb-1 mt-4 px-2.5">
-      <span className="select-none whitespace-nowrap text-[12px] font-semibold tracking-[-0.01em] text-slate-500">
+    <div className="mb-0.5 mt-3.5 px-2.5">
+      <span className="select-none whitespace-nowrap text-[11px] font-semibold text-slate-500/90">
         {label}
       </span>
     </div>
@@ -131,13 +131,13 @@ function NavItem({ href, icon, label }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center gap-3 rounded-[12px] px-2.5 py-2 text-[13.5px] tracking-[-0.01em] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex h-[30px] items-center gap-2 rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isActive
           ? "vidrio-pastilla font-medium text-slate-900"
           : "text-slate-700 hover:bg-white/45 hover:text-slate-900"
       }`}
     >
-      {/* Ícono suelto, sin caja: como los SF Symbols de visionOS. */}
+      {/* Ícono suelto, sin caja, como los SF Symbols de la barra lateral de macOS. */}
       <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
         {icon}
       </span>
@@ -155,7 +155,7 @@ function SubNavItem({ href, label, action }) {
       <button
         type="button"
         onClick={() => startTour()}
-        className="group flex w-full items-center rounded-[10px] px-2.5 py-1.5 text-left text-[12.5px] tracking-[-0.01em] text-slate-600 transition-all duration-150 hover:bg-white/45 hover:text-slate-900"
+        className="group flex h-7 w-full items-center rounded-[9px] px-2.5 text-left text-[13px] text-slate-600 transition-all duration-150 hover:bg-white/45 hover:text-slate-900"
       >
         <span className="leading-tight">{label}</span>
       </button>
@@ -170,7 +170,7 @@ function SubNavItem({ href, label, action }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center rounded-[10px] px-2.5 py-1.5 text-[12.5px] tracking-[-0.01em] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex h-7 items-center rounded-[9px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
         isActive
           ? "vidrio-pastilla font-medium text-slate-900"
           : "text-slate-600 hover:bg-white/45 hover:text-slate-900"
@@ -199,29 +199,29 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
         data-tour={dataTour}
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
-        className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-[12px] px-2.5 py-2 text-[13.5px] tracking-[-0.01em] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`group relative flex h-[30px] w-full cursor-pointer items-center justify-between overflow-hidden rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isOpen
             ? "font-medium text-slate-900"
             : highlight
-              ? "text-[#6E56CF] hover:bg-white/45"
+              ? "text-slate-700 hover:bg-white/45 hover:text-slate-900 [&_svg:first-child]:text-[#6E56CF]"
               : "text-slate-700 hover:bg-white/45 hover:text-slate-900"
         }`}
       >
         {/* Sin caja ni borde: ícono suelto + texto, como la lista de visionOS.
             La pastilla de vidrio queda solo para la opción ACTIVA. */}
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
             {icon}
           </span>
           <span className="truncate leading-none">{label}</span>
         </div>
         <svg
-          className={`h-3 w-3 flex-shrink-0 text-slate-400 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "rotate-180 text-slate-600" : ""}`}
+          className={`h-2.5 w-2.5 flex-shrink-0 transition-[transform,color] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "rotate-180 text-slate-500" : "text-slate-300 group-hover:text-slate-500"}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
@@ -236,7 +236,7 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
       >
         <div
           ref={contentRef}
-          className={`flex flex-col gap-px pb-1 pl-[30px] pr-0 pt-0.5 transition-transform duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "translate-y-0" : "-translate-y-1.5"}`}
+          className={`flex flex-col gap-px pb-1 pl-[26px] pr-0 pt-px transition-transform duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${isOpen ? "translate-y-0" : "-translate-y-1.5"}`}
         >
           {children}
         </div>
@@ -301,6 +301,7 @@ function CapaFlotante({ anclaRef, children, separacion = 8 }) {
   return createPortal(
     <div
       ref={capaRef}
+      className="font-system-apple"
       style={{
         position: "fixed",
         left: pos ? pos.left : -9999,
