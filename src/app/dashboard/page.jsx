@@ -574,11 +574,19 @@ export default function AgendaCitas() {
                 mode: "cors"
             });
 
-            const respuestaBackend = await res.json();
-            if (respuestaBackend) {
-                setDataListaBase(respuestaBackend);
-                setdataLista(aplicarFiltrosCombinados(respuestaBackend));
+            // El gate responde 401 con un objeto ({message}), no con la lista:
+            // sin este guard, ese objeto truthy terminaría en un .reduce inexistente.
+            if (!res.ok) {
+                console.warn("[agenda] seleccionarReservados respondió", res.status);
+                setDataListaBase([]);
+                setdataLista([]);
+                return;
             }
+
+            const respuestaBackend = await res.json();
+            const lista = Array.isArray(respuestaBackend) ? respuestaBackend : [];
+            setDataListaBase(lista);
+            setdataLista(aplicarFiltrosCombinados(lista));
         } catch (err) {
             console.log(err);
             return toast.error(err.message);
