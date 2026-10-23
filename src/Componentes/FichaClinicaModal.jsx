@@ -35,7 +35,9 @@ function avisoDeFaltantes(faltantes) {
   return `Falta ${faltantes.slice(0, -1).join(", ")} ${conjuncion} ${ultimo}.`;
 }
 
-export default function FichaClinicaModal({ abierto, paciente, id_paciente, idProfesionalAgendaAsignada, usuarioCargado, onCerrar, onGuardada }) {
+// lateral: mostrar como cajon derecho (telemedicina) en vez de dialogo
+// centrado, para que la videoconsulta siga visible mientras se llena.
+export default function FichaClinicaModal({ abierto, paciente, id_paciente, idProfesionalAgendaAsignada, usuarioCargado, onCerrar, onGuardada, lateral = false }) {
   const API = process.env.NEXT_PUBLIC_API_URL;
 
   const [plantillas, setPlantillas] = useState([]);
@@ -220,6 +222,7 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
       abierto={abierto}
       onCerrar={onCerrar}
       bloquearCierre={guardando}
+      lateral={lateral}
       ancho="max-w-3xl"
       titulo="Nueva ficha clínica"
       descripcion={
@@ -264,9 +267,12 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
       }
     >
       <div className="space-y-5 pb-2">
-        {/* Datos de la atencion */}
-        <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
-          <CampoFormulario etiqueta="Plantilla" requerido error={errores.plantilla} ancho="sm:col-span-2">
+        {/* Datos de la atencion. En el cajon lateral el panel mide ~480px
+            aunque la ventana sea ancha, asi que los dos select quedan en una
+            sola columna: sm:grid-cols-2 mira el ancho de la VENTANA, no del
+            panel, y ahi se quebrarian en dos mitades muy angostas. */}
+        <div className={lateral ? "grid grid-cols-1 gap-y-4" : "grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2"}>
+          <CampoFormulario etiqueta="Plantilla" requerido error={errores.plantilla} ancho={lateral ? undefined : "sm:col-span-2"}>
             <ShadcnSelect
               nombreDefault="Seleccione una plantilla..."
               className="h-11 w-full rounded-xl border-slate-200 bg-white text-sm"

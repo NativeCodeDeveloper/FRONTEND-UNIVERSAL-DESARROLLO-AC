@@ -406,8 +406,8 @@ export default function NavbarDashboard() {
                   mt: 1,
                   boxShadow: '0 4px 24px rgba(15, 23, 42, 0.1), 0 8px 48px rgba(59, 130, 246, 0.08)',
                   border: '1px solid rgba(148, 163, 184, 0.15)',
-                  backdropFilter: 'blur(12px)',
-                  bgcolor: 'rgba(255, 255, 255, 0.98)'
+                  backdropFilter: 'blur(20px) saturate(1.4)',
+                  bgcolor: 'rgba(255, 255, 255, 0.65)'
                 }
               }}
             >

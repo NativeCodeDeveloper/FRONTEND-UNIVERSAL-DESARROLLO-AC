@@ -120,10 +120,6 @@ function esFechaPlaceholder(fecha) {
 
 function convertirFechaParaBackend(fecha) {
     if (!fecha) return "";
-
-    // claveFechaCivil lee los componentes del texto (o los locales de un Date)
-    // sin convertir zona. toISOString devolvia UTC y corria el dia: una fecha
-    // elegida despues de las 21:00 en Chile se guardaba con el dia siguiente.
     return claveFechaCivil(fecha);
 }
 
@@ -1234,6 +1230,15 @@ export default function Paciente() {
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Documentos</span>
+                            </button>
+                            <button
+                                onClick={() => router.push(`/dashboard/telemedicina/${id_paciente}`)}
+                                className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            >
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Telemedicina</span>
                             </button>
                         </div>
 

@@ -114,10 +114,10 @@ function getActiveAccordion(pathname, sections) {
 function SectionLabel({ label }) {
   return (
     <div className="flex items-center gap-2 mt-3 mb-1 px-3">
-      <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-300 whitespace-nowrap select-none">
+      <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500 whitespace-nowrap select-none">
         {label}
       </span>
-      <div className="flex-1 h-px bg-slate-100" />
+      <div className="flex-1 h-px bg-slate-200/50" />
     </div>
   );
 }
@@ -132,17 +132,17 @@ function NavItem({ href, icon, label }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[12.5px] font-medium transition-all duration-150 ${
+      className={`group flex items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-colors duration-[180ms] motion-reduce:transition-none ${
         isActive
-          ? "bg-[#F3F0FF] text-[#6E56CF]"
-          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          ? "bg-violet-100/65 text-[#6147BC]"
+          : "text-slate-600 hover:bg-white/65 hover:text-slate-900"
       }`}
     >
       <span
-        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg transition-all duration-150 ${
+        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg transition-colors duration-[180ms] motion-reduce:transition-none ${
           isActive
-            ? "bg-[#EDE9FE] text-[#6E56CF]"
-            : "bg-slate-100/80 text-slate-400 group-hover:bg-slate-200/60 group-hover:text-slate-600"
+            ? "bg-violet-100/60 text-[#6147BC]"
+            : "bg-transparent text-slate-500 group-hover:bg-white/50 group-hover:text-slate-700"
         }`}
       >
         {icon}
@@ -161,7 +161,7 @@ function SubNavItem({ href, label, action }) {
       <button
         type="button"
         onClick={() => startTour()}
-        className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-slate-500 transition-all duration-150 hover:bg-slate-50 hover:text-slate-700"
+        className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 text-slate-600 transition-colors duration-[180ms] motion-reduce:transition-none hover:bg-white/65 hover:text-slate-800"
       >
         <div className="h-1 w-1 rounded-full bg-slate-300 transition-colors group-hover:bg-slate-400" />
         <span className="leading-tight">{label}</span>
@@ -177,10 +177,10 @@ function SubNavItem({ href, label, action }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 ${
+      className={`group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-colors duration-[180ms] motion-reduce:transition-none ${
         isActive
-          ? "bg-[#F3F0FF] text-[#6E56CF]"
-          : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+          ? "bg-violet-100/65 text-[#6147BC]"
+          : "text-slate-600 hover:bg-white/65 hover:text-slate-800"
       }`}
     >
       <div
@@ -211,18 +211,18 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
         data-tour={dataTour}
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
-        className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-xl border px-2.5 py-2 text-[12px] font-medium transition-all duration-200 ${
+        className={`relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-xl border px-2.5 py-2 text-[12px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-colors duration-[180ms] motion-reduce:transition-none ${
           isOpen
-            ? "border-[#EDE9FE] bg-[#F4F1FF] text-slate-800"
+            ? "border-violet-200/35 bg-violet-100/50 text-slate-800"
             : highlight
-              ? "border-[#EDE9FE] bg-[#FAF9FF] text-slate-700 hover:border-[#E4DEFC] hover:bg-[#F4F1FF] hover:text-slate-900"
-              : "border-transparent text-slate-600 hover:border-slate-100 hover:bg-slate-50/80 hover:text-slate-900"
+              ? "border-violet-200/25 bg-violet-50/40 text-slate-700 hover:border-violet-200/40 hover:bg-violet-100/50 hover:text-slate-900"
+              : "border-transparent text-slate-600 hover:border-white/60 hover:bg-white/60 hover:text-slate-900"
         }`}
       >
         <div className="flex min-w-0 items-center gap-3">
           <span
-            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200 ${
-              isOpen || highlight ? "bg-[#EDE9FE] text-[#6E56CF] shadow-sm" : "bg-slate-50 text-slate-500"
+            className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl transition-colors duration-[180ms] motion-reduce:transition-none ${
+              isOpen || highlight ? "bg-violet-100/55 text-[#6147BC]" : "bg-transparent text-slate-500"
             }`}
           >
             {icon}
@@ -342,13 +342,13 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
     <>
       {/* Indicador del borde: la pista de "estas aqui" cuando no hay texto. */}
       <span
-        className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#6E56CF] transition-opacity duration-150 ${
+        className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#6E56CF] transition-opacity duration-[180ms] motion-reduce:transition-none ${
           activo ? "opacity-100" : "opacity-0"
         }`}
       />
       <span
-        className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-150 ${
-          activo ? "bg-[#EDE9FE] text-[#6E56CF]" : "bg-slate-50 text-slate-500 group-hover:bg-slate-100 group-hover:text-slate-700"
+        className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors duration-[180ms] motion-reduce:transition-none ${
+          activo ? "bg-violet-100/60 text-[#6147BC]" : "bg-transparent text-slate-500 group-hover:bg-white/60 group-hover:text-slate-700"
         }`}
       >
         {ICONS[section.icon]}
@@ -369,7 +369,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
           href={section.items[0].href}
           aria-label={etiqueta}
           onClick={onElegir}
-          className="group relative flex h-11 w-full items-center justify-center"
+          className="group relative flex h-11 w-full items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500"
         >
           {contenido}
         </Link>
@@ -380,7 +380,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
           aria-haspopup="menu"
           aria-expanded={abierto}
           onClick={onAlternar}
-          className="group relative flex h-11 w-full items-center justify-center"
+          className="group relative flex h-11 w-full items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500"
         >
           {contenido}
         </button>
@@ -401,8 +401,8 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
           {/* `pl-2` hace de puente: el raton cruza del icono al panel sin pasar
               por un hueco muerto, que es lo que hace parpadear a este patron. */}
           <div className="pl-2" role="menu" onMouseEnter={onAbrir} onMouseLeave={onCerrar} onClick={onElegir}>
-            <div className="w-[236px] rounded-[18px] border border-slate-200/70 bg-white p-2 shadow-[0_1px_2px_rgba(15,23,42,0.06),0_24px_56px_-24px_rgba(15,23,42,0.45)]">
-              <p className="px-2 pb-1.5 pt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-300">
+            <div className="w-[236px] max-w-[calc(100vw-88px)] max-h-[calc(100dvh-16px)] overflow-y-auto rounded-[24px] border border-white/65 bg-white/85 p-2 shadow-[0_8px_32px_rgba(30,41,59,0.08)] backdrop-blur-[20px] backdrop-saturate-[160%]">
+              <p className="px-2 pb-1.5 pt-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-slate-500">
                 {etiqueta}
               </p>
               {section.items.map((item) => (
@@ -431,7 +431,7 @@ function NavRail({ sections, pathname, modo, onCambiarModo, urlSoporte }) {
     <>
       <BotonModo modo={modo} onCambiarModo={onCambiarModo} colapsado />
       <UserMenu compacto />
-      <div className="mx-3 border-t border-slate-100" />
+      <div className="mx-3 border-t border-slate-200/45" />
       <nav className="flex-1 overflow-y-auto px-2 pt-2 pb-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex flex-col gap-0.5">
           {sections.map((section) => (
@@ -454,16 +454,16 @@ function NavRail({ sections, pathname, modo, onCambiarModo, urlSoporte }) {
           ))}
         </div>
       </nav>
-      <div className="shrink-0 border-t border-slate-100 px-2 py-2">
+      <div className="shrink-0 border-t border-slate-200/45 px-2 py-2">
         <Link
           href={urlSoporte}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contacto Soporte"
           title="Contacto Soporte"
-          className="group relative flex h-11 w-full items-center justify-center"
+          className="group relative flex h-11 w-full items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition-all duration-150 group-hover:bg-slate-100 group-hover:text-slate-700">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-transparent text-slate-500 transition-colors duration-[180ms] motion-reduce:transition-none group-hover:bg-white/60 group-hover:text-slate-700">
             <Headset className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
 
@@ -490,7 +490,7 @@ function BotonModo({ modo, onCambiarModo, colapsado, bloqueado }) {
         aria-pressed={fijado}
         title={bloqueado ? "No se puede cambiar mientras el tutorial está en curso" : fijado ? "Contraer el menú a iconos" : "Fijar el menú abierto"}
         aria-label={fijado ? "Contraer el menú a iconos" : "Fijar el menú abierto"}
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-500 transition-colors duration-[180ms] motion-reduce:transition-none hover:bg-white/65 hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
           <rect x="3" y="4" width="18" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -621,7 +621,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
             </Link>
           </div>
         </div>
-        <div className="mx-4 shrink-0 border-t border-slate-100 py-2">
+        <div className="mx-4 shrink-0 border-t border-slate-200/45 py-2">
           <NavItem href={urlSoporteSuspendido} icon={<Headset className="h-3.5 w-3.5" aria-hidden="true" />} label="Contacto Soporte" />
         </div>
       </>
@@ -632,7 +632,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
     <>
       <BotonModo modo={modo} onCambiarModo={onCambiarModo} bloqueado={bloqueadoPorTour} />
       <UserMenu />
-      <nav className="mx-4 flex-1 overflow-y-auto border-t border-slate-100 pb-4 pt-2.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <nav className="mx-4 flex-1 overflow-y-auto border-t border-slate-200/45 pb-4 pt-2.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {sections.map((section) => {
             if (!section.accordionLabel) {
               return (
@@ -664,7 +664,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
             );
           })}
 
-        <div className="mt-3 border-t border-slate-100 pt-2">
+        <div className="mt-3 border-t border-slate-200/45 pt-2">
           <NavItem href={urlSoporte} icon={<Headset className="h-3.5 w-3.5" aria-hidden="true" />} label="Contacto Soporte" />
         </div>
       </nav>
@@ -677,7 +677,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
           sensación de profundidad suave sin que se vea una sombra "dibujada".
           Sin degradados, acorde al resto del panel. */}
       <div className="shrink-0 px-3 pb-3 pt-1.5">
-        <div className="flex items-center justify-between gap-2 rounded-[18px] border border-slate-200/70 bg-white px-3 py-2 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-16px_rgba(15,23,42,0.28)] transition-shadow duration-200 hover:shadow-[0_1px_2px_rgba(15,23,42,0.05),0_14px_30px_-16px_rgba(15,23,42,0.34)]">
+        <div className="flex items-center justify-between gap-2 rounded-2xl border border-white/60 bg-white/35 px-3 py-2 shadow-[0_2px_8px_rgba(30,41,59,0.025)]">
           <span className="text-[11px] font-semibold tracking-[-0.01em] text-slate-500">Notificaciones</span>
           <NotificationBell />
         </div>

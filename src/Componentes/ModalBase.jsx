@@ -19,6 +19,14 @@ import { createPortal } from "react-dom";
  *   pie          contenido del pie (acciones)
  *   ancho        clase de ancho maximo (default max-w-2xl)
  *   bloquearCierre  impide cerrar mientras hay una operacion en curso
+ *   lateral      cajon anclado a la derecha en vez de dialogo centrado. Sin
+ *                fondo oscuro: lo de detras queda visible e interactuable
+ *                (p. ej. la videoconsulta sigue viendose mientras se llena
+ *                la ficha). Cierra con Escape o con el boton, no al hacer
+ *                click afuera, para no perder el formulario por un toque
+ *                accidental. En movil ocupa todo el ancho.
+ *   anchoLateral clase de ancho del cajon (default sm:w-[480px]); reemplaza
+ *                a `ancho` cuando lateral es true.
  */
 export default function ModalBase({
   abierto,
@@ -28,6 +36,8 @@ export default function ModalBase({
   pie,
   ancho = "max-w-2xl",
   bloquearCierre = false,
+  lateral = false,
+  anchoLateral = "sm:w-[480px]",
   children,
 }) {
   const [montado, setMontado] = useState(false);
@@ -109,27 +119,41 @@ export default function ModalBase({
   if (!montado || !abierto) return null;
 
   return createPortal(
-    <div data-tour-modal className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
-      <div
-        onClick={cerrar}
-        className={`absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity duration-300 ${
-          visible ? "opacity-100" : "opacity-0"
-        }`}
-      />
+    <div
+      data-tour-modal
+      className={`fixed inset-0 z-50 ${lateral ? "flex justify-end" : "flex items-end justify-center sm:items-center sm:p-6"}`}
+    >
+      {/* En lateral no hay velo: la gracia es ver lo de detras (la sala). */}
+      {!lateral && (
+        <div
+          onClick={cerrar}
+          className={`absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-opacity duration-300 ${
+            visible ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      )}
 
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={typeof titulo === "string" ? titulo : undefined}
-        className={`relative flex max-h-[92dvh] w-full ${ancho} flex-col overflow-hidden rounded-t-[24px] bg-white shadow-2xl transition-all duration-300 ease-out sm:max-h-[90dvh] sm:rounded-[24px] ${
-          visible ? "translate-y-0 opacity-100 sm:scale-100" : "translate-y-6 opacity-0 sm:scale-[0.98]"
-        }`}
+        className={
+          lateral
+            ? `relative flex h-[100dvh] w-full ${anchoLateral} flex-col overflow-hidden rounded-l-[24px] border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-out ${
+                visible ? "translate-x-0" : "translate-x-full"
+              }`
+            : `relative flex max-h-[92dvh] w-full ${ancho} flex-col overflow-hidden rounded-t-[24px] bg-white shadow-2xl transition-all duration-300 ease-out sm:max-h-[90dvh] sm:rounded-[24px] ${
+                visible ? "translate-y-0 opacity-100 sm:scale-100" : "translate-y-6 opacity-0 sm:scale-[0.98]"
+              }`
+        }
       >
         {/* Tirador: en movil el panel se arrastra como hoja inferior. */}
-        <div className="flex justify-center pt-3 sm:hidden">
-          <div className="h-1 w-10 rounded-full bg-slate-200" />
-        </div>
+        {!lateral && (
+          <div className="flex justify-center pt-3 sm:hidden">
+            <div className="h-1 w-10 rounded-full bg-slate-200" />
+          </div>
+        )}
 
         <header className="flex items-start justify-between gap-4 px-6 pb-3 pt-5 sm:px-8 sm:pt-7">
           <div className="min-w-0">

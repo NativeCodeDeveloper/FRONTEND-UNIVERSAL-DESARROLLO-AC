@@ -32,6 +32,31 @@ const CLAVE_MODO = "sidebar_modo";
 const RETARDO_ABRIR = 150;
 const RETARDO_CERRAR = 320;
 
+// ─── Coreografia del abrir/cerrar ────────────────────────────────────────────
+// Curva ease-in-out: el panel parte casi en reposo, gana velocidad en el
+// centro del recorrido y vuelve a frenar hasta detenerse. Las curvas que
+// arrancan a toda velocidad (por suave que sea su aterrizaje) se leen como un
+// portazo; la suavidad percibida vive en el arranque tanto como en la parada.
+// Ambas direcciones duran lo mismo, por decision explicita: el usuario prefirio
+// esa simetria antes que el cierre mas corto.
+const CURVA_ANCHO = "cubic-bezier(0.65, 0, 0.35, 1)";
+const DURACION_ABRIR = 380;
+const DURACION_CERRAR = 380;
+
+// El fundido cruzado entre la capa de iconos y la capa completa acompana al
+// ancho casi hasta el final: si terminara mucho antes, el contenido quedaria
+// quieto y legible mientras la tarjeta todavia viaja, y el conjunto se leeria
+// desparejo. Sigue acabando ANTES que el ancho a proposito.
+const DURACION_FUNDIDO = 320;
+
+// La tarjeta vive dentro de una columna con p-3 (12px por lado): estos son sus
+// anchos reales. Las capas de contenido usan este ancho FINAL y constante, no
+// un 100%: si se encogieran junto a la tarjeta, cada fotograma del cierre
+// rearmaria las lineas de texto. A ancho fijo la tarjeta las recorta como una
+// ventana y el contenido no se reflowea mientras se mueve.
+const TARJETA_EXPANDIDA = ANCHO_EXPANDIDO - 24;
+const TARJETA_RAIL = ANCHO_RAIL - 24;
+
 // Quien pide menos movimiento en el sistema no deberia recibir un panel que se
 // desliza cada vez que cruza el raton. Se lee en efecto (no en render) porque
 // matchMedia no existe en el servidor.
@@ -69,6 +94,10 @@ export default function SidebarShell() {
     const [hover, setHover] = useState(false);
     const [foco, setFoco] = useState(false);
     const temporizador = useRef(null);
+    // true mientras el ancho (o el fundido) sigue en movimiento. Sirve para una
+    // sola cosa: decidir si la tarjeta ya puede soltar el `overflow-hidden`.
+    const [enAnimacion, setEnAnimacion] = useState(false);
+    const animacion = useRef(null);
 
     const menosMovimiento = useMenosMovimiento();
     const { isRunning, tourExternoActivo } = useTour();
@@ -109,12 +138,41 @@ export default function SidebarShell() {
     // rail de iconos sin texto y no sabe donde esta parado.
     const abierto = !esRail || hover || foco;
 
+    // `overflow-visible` existe para una unica cosa: que el desplegable del
+    // avatar escape de la tarjeta en el reposo cerrado del rail. Pero durante
+    // la animacion hay que mantener `overflow-hidden`: si no, la capa que se
+    // esta desvaneciendo (a ancho constante) se derramaria fuera de una
+    // tarjeta que todavia se esta encogiendo. Se suelta cuando el movimiento
+    // termino, con un margen. Con menos movimiento no hay animacion que
+    // contener, asi que nunca hace falta.
+    useEffect(() => {
+        if (!esRail || menosMovimiento) {
+            setEnAnimacion(false);
+            return;
+        }
+
+        setEnAnimacion(true);
+        window.clearTimeout(animacion.current);
+        animacion.current = window.setTimeout(
+            () => setEnAnimacion(false),
+            Math.max(DURACION_ABRIR, DURACION_FUNDIDO) + 80,
+        );
+        return () => window.clearTimeout(animacion.current);
+    }, [esRail, abierto, menosMovimiento]);
+
     return (
         <aside
             className="relative hidden h-screen shrink-0 md:block"
             style={{
                 width: esRail ? ANCHO_RAIL : ANCHO_EXPANDIDO,
-                transition: menosMovimiento ? "none" : "width 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+                // La transicion que manda es la del ESTADO DE DESTINO: el valor
+                // que lee el navegador al empezar a animar es el que esta
+                // renderizado ahora, asi que aqui `esRail` ya es el "hacia
+                // donde" — por eso elegir duracion segun `esRail` elige abrir
+                // o cerrar correctamente.
+                transition: menosMovimiento
+                    ? "none"
+                    : `width ${(esRail ? DURACION_CERRAR : DURACION_ABRIR)}ms ${CURVA_ANCHO}`,
             }}
             onMouseEnter={() => esRail && programar(true, RETARDO_ABRIR)}
             onMouseLeave={() => esRail && programar(false, RETARDO_CERRAR)}
@@ -150,31 +208,92 @@ export default function SidebarShell() {
                 className="absolute inset-y-0 left-0 z-[90] flex flex-col p-3"
                 style={{
                     width: abierto ? ANCHO_EXPANDIDO : ANCHO_RAIL,
-                    transition: menosMovimiento ? "none" : "width 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+                    transition: menosMovimiento
+                        ? "none"
+                        : `width ${(abierto ? DURACION_ABRIR : DURACION_CERRAR)}ms ${CURVA_ANCHO}`,
                 }}
             >
-                {/* `overflow-hidden` solo cuando esta abierto: es lo que
-                    recorta las esquinas redondeadas, pero en modo rail tambien
-                    recortaria el desplegable del avatar, que sale por el
-                    costado. Colapsado nada roza los bordes, asi que sobra. */}
+                {/* `overflow-hidden` salvo en el reposo cerrado del rail: es lo
+                    que recorta las esquinas redondeadas (y ahora tambien lo que
+                    hace de "ventana" sobre las capas de ancho constante), pero
+                    en reposo recortaria el desplegable del avatar, que sale por
+                    el costado. `enAnimacion` lo mantiene durante el cierre,
+                    mientras la tarjeta todavia se esta encogiendo. */}
                 <div
-                    className={`flex h-full min-h-0 flex-col rounded-[22px] border border-slate-200/70 bg-white transition-shadow duration-200 ${
-                        esRail && !abierto ? "overflow-visible" : "overflow-hidden"
+                    className={`relative flex h-full min-h-0 flex-col rounded-[24px] border border-white/65 bg-white/78 backdrop-blur-[20px] backdrop-saturate-[160%] transition-shadow duration-[380ms] motion-reduce:transition-none ${
+                        esRail && !abierto && !enAnimacion ? "overflow-visible" : "overflow-hidden"
+                    } ${
+                        esRail && abierto
+                            ? "shadow-[0_12px_36px_rgba(30,41,59,0.10)]"
+                            : "shadow-[0_8px_32px_rgba(30,41,59,0.06)]"
                     }`}
-                    style={{
-                        // Abierto por hover flota sobre el contenido, asi que se
-                        // le sube la sombra para despegarlo de lo que tapa.
-                        boxShadow: esRail && abierto
-                            ? "0 1px 2px rgba(15,23,42,0.06), 0 24px 56px -24px rgba(15,23,42,0.45)"
-                            : "0 1px 2px rgba(15,23,42,0.04), 0 12px 28px -18px rgba(15,23,42,0.30)",
-                    }}
                 >
-                    <SidebarNav
-                        colapsado={esRail && !abierto}
-                        modo={modo}
-                        onCambiarModo={cambiarModo}
-                        bloqueadoPorTour={tourActivo}
-                    />
+                    {/* ── Fundido cruzado ─────────────────────────────────
+                        Antes el contenido CAMBIABA de golpe: al abrirse, el
+                        arbol de iconos se desmontaba y aparecia el menu
+                        completo en el mismo frame en que el ancho empezaba a
+                        moverse. Ese corte seco era lo que hacia brusca la
+                        animacion, no la velocidad. Ahora ambos arboles viven
+                        en capas separadas y se desvanecen entre si mientras
+                        el ancho viaja.
+
+                        Cada capa mide su ancho FINAL (TARJETA_*), no 100%: el
+                        texto no se rearm linea a linea durante el cierre, la
+                        tarjeta simplemente lo va recortando como una ventana.
+
+                        `visibility` con retardo: la capa que sale sigue
+                        existiendo los primeros ms del fundido (para que el
+                        desvanecer se vea) y DESPUES desaparece de verdad, de
+                        forma que en reposo no quedan enlaces focuseables ni
+                        clickables bajo la capa opuesta. Con
+                        `prefers-reduced-motion` no hay transicion: el retardo
+                        de `visibility` tambien desaparece y el cambio es
+                        instantaneo, coherente con el ancho. */}
+                    <div
+                        className="absolute inset-y-0 left-0 flex min-h-0 flex-col"
+                        style={{
+                            width: TARJETA_RAIL,
+                            opacity: abierto ? 0 : 1,
+                            visibility: abierto ? "hidden" : "visible",
+                            transform: abierto ? "translateX(-6px)" : "translateX(0)",
+                            // `visibility` tarda DURACION_FUNDIDO en ocultar la
+                            // capa que sale; sin esto, seguiria interponiendose
+                            // (invisible pero clickable) sobre la capa que
+                            // acaba de ganar.
+                            pointerEvents: abierto ? "none" : "auto",
+                            transition: menosMovimiento
+                                ? "none"
+                                : `opacity ${DURACION_FUNDIDO}ms ${CURVA_ANCHO}, transform ${DURACION_FUNDIDO}ms ${CURVA_ANCHO}, visibility 0s linear ${abierto ? DURACION_FUNDIDO : 0}ms`,
+                        }}
+                    >
+                        <SidebarNav
+                            colapsado
+                            modo={modo}
+                            onCambiarModo={cambiarModo}
+                            bloqueadoPorTour={tourActivo}
+                        />
+                    </div>
+
+                    <div
+                        className="absolute inset-y-0 left-0 flex min-h-0 flex-col"
+                        style={{
+                            width: TARJETA_EXPANDIDA,
+                            opacity: abierto ? 1 : 0,
+                            visibility: abierto ? "visible" : "hidden",
+                            transform: abierto ? "translateX(0)" : "translateX(10px)",
+                            pointerEvents: abierto ? "auto" : "none",
+                            transition: menosMovimiento
+                                ? "none"
+                                : `opacity ${DURACION_FUNDIDO}ms ${CURVA_ANCHO}, transform ${DURACION_FUNDIDO}ms ${CURVA_ANCHO}, visibility 0s linear ${abierto ? 0 : DURACION_FUNDIDO}ms`,
+                        }}
+                    >
+                        <SidebarNav
+                            colapsado={false}
+                            modo={modo}
+                            onCambiarModo={cambiarModo}
+                            bloqueadoPorTour={tourActivo}
+                        />
+                    </div>
                 </div>
             </div>
         </aside>

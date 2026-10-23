@@ -1371,7 +1371,7 @@ function CalendarioContent() {
         }
     }
 
-    // Agenda al mismo paciente en fechas adicionales, mismo horario y mismo profesional/servicio
+    // Agenda
     // que la reserva principal ya creada. Cada fecha se valida por separado con la misma lógica
     // de choques que usa el resto de la agenda (isOverlapping → citas + bloqueos existentes) antes
     // de intentar el POST; si igual choca en el backend, esa fecha se cuenta como conflicto y se

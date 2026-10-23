@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { fetchConCarga as fetch } from '@/lib/fetchConCarga';
 import { suscribirsePush } from '@/lib/pushSubscription';
 
 // Feed real: consume /notificaciones/* del backend (poblado por el cron de
