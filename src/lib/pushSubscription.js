@@ -6,6 +6,8 @@
 // a PWAs agregadas a la pantalla de inicio. En una pestaña normal de Safari, 'PushManager'
 // ni siquiera existe en window — soportaPush() da false y no se intenta suscribir.
 
+import { fetchConCarga as fetch } from '@/lib/fetchConCarga';
+
 const API = () => process.env.NEXT_PUBLIC_API_URL;
 
 function urlBase64ToUint8Array(base64String) {

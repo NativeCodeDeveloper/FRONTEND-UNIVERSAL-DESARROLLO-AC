@@ -13,6 +13,7 @@ import RegistroAcceso from "./RegistroAcceso";
 import NotificationProvider from "@/components/NotificationProvider";
 import DashboardPageTransition from "@/components/DashboardPageTransition";
 import CortexAssistant from "@/Componentes/CortexAssistant";
+import ProveedorTokenApi from "@/Componentes/ProveedorTokenApi";
 import { TourProvider } from "@/ContextosGlobales/TourContext";
 import SecretariaRouteGuard from "./SecretariaRouteGuard";
 import FranjaModoSoporte from "./FranjaModoSoporte";
@@ -30,6 +31,10 @@ export default function DashboardLayout({ children }) {
             {/* Telemetria del Health Score + registro de acceso para proteccion
                 de datos. No renderiza nada. Ver RegistroAcceso.jsx. */}
             <RegistroAcceso />
+            {/* Registra en fetchConCarga el token de Clerk para que toda llamada
+                al backend desde el dashboard viaje con Authorization. Fuera del
+                dashboard (sitio publico) no hay token y no se manda header. */}
+            <ProveedorTokenApi />
             <SecretariaRouteGuard>
                 <TourProvider>
                     <div className="h-screen w-full overflow-hidden bg-[#FAFAFB] font-system-apple">

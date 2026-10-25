@@ -580,8 +580,9 @@ export default function AgendaCitas() {
                 mode: "cors"
             });
 
+            // El gate responde 401 con un objeto ({message}), no con la lista:
+            // solo una lista es válida; cualquier otra respuesta deja la agenda vacía.
             const respuestaBackend = await res.json().catch(() => null);
-            // Solo una lista es válida; un error del backend ({ message }) deja la agenda vacía.
             const reservas = Array.isArray(respuestaBackend) ? respuestaBackend : [];
             if (!res.ok || !Array.isArray(respuestaBackend)) {
                 console.error("[Agenda] seleccionarReservados respondió", res.status, respuestaBackend);

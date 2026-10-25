@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { fetchConCarga as fetch } from "@/lib/fetchConCarga"
 import { obtenerCitasProximas, mostrarNotificacionNavegador } from "@/lib/citasProximas"
 
 const POLL_INTERVAL_MS = 5 * 60 * 1000  // cada 5 minutos

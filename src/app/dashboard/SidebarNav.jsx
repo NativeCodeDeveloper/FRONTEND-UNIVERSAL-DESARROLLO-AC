@@ -131,7 +131,7 @@ function NavItem({ href, icon, label }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex h-8 items-center gap-2 rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex h-8 items-center gap-2 rounded-[10px] px-2.5 text-[13px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
         isActive
           ? "vidrio-pastilla font-medium text-slate-900"
           : "text-slate-700 hover:bg-white/45 hover:text-slate-900"
@@ -155,7 +155,7 @@ function SubNavItem({ href, label, action }) {
       <button
         type="button"
         onClick={() => startTour()}
-        className="group flex h-[30px] w-full items-center rounded-[9px] px-2.5 text-left text-[13px] text-slate-600 transition-all duration-150 hover:bg-white/45 hover:text-slate-900"
+        className="group flex h-[30px] w-full items-center rounded-[9px] px-2.5 text-left text-[13px] text-slate-600 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-all duration-150 motion-reduce:transition-none hover:bg-white/45 hover:text-slate-900"
       >
         <span className="leading-tight">{label}</span>
       </button>
@@ -170,7 +170,7 @@ function SubNavItem({ href, label, action }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className={`group flex h-[30px] items-center rounded-[9px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+      className={`group flex h-[30px] items-center rounded-[9px] px-2.5 text-[13px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
         isActive
           ? "vidrio-pastilla font-medium text-slate-900"
           : "text-slate-600 hover:bg-white/45 hover:text-slate-900"
@@ -199,7 +199,7 @@ function NavAccordion({ id, label, icon, children, openAccordions, onToggle, dat
         data-tour={dataTour}
         onClick={() => onToggle(id)}
         aria-expanded={isOpen}
-        className={`group relative flex h-8 w-full cursor-pointer items-center justify-between overflow-hidden rounded-[10px] px-2.5 text-[13px] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`group relative flex h-8 w-full cursor-pointer items-center justify-between overflow-hidden rounded-[10px] px-2.5 text-[13px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
           isOpen
             ? "font-medium text-slate-900"
             : highlight
@@ -335,7 +335,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
       {/* Como el rail de visionOS: íconos sueltos y el activo dentro de un
           círculo de vidrio, que es la pista de "estás aquí" cuando no hay texto. */}
       <span
-        className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
           activo ? "vidrio-pastilla text-slate-900" : "text-slate-600 group-hover:bg-white/45 group-hover:text-slate-900"
         }`}
       >
@@ -357,7 +357,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
           href={section.items[0].href}
           aria-label={etiqueta}
           onClick={onElegir}
-          className="group relative flex h-11 w-full items-center justify-center"
+          className="group relative flex h-11 w-full items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500"
         >
           {contenido}
         </Link>
@@ -368,7 +368,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
           aria-haspopup="menu"
           aria-expanded={abierto}
           onClick={onAlternar}
-          className="group relative flex h-11 w-full items-center justify-center"
+          className="group relative flex h-11 w-full items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500"
         >
           {contenido}
         </button>
@@ -389,7 +389,7 @@ function IconoRail({ section, activo, abierto, onAbrir, onCerrar, onAlternar, on
           {/* `pl-2` hace de puente: el raton cruza del icono al panel sin pasar
               por un hueco muerto, que es lo que hace parpadear a este patron. */}
           <div className="pl-2" role="menu" onMouseEnter={onAbrir} onMouseLeave={onCerrar} onClick={onElegir}>
-            <div className="vidrio vidrio-flotante vidrio-aparecer w-[236px] rounded-[20px] p-2">
+            <div className="vidrio vidrio-flotante vidrio-aparecer w-[236px] max-w-[calc(100vw-88px)] max-h-[calc(100dvh-16px)] overflow-y-auto rounded-[20px] p-2">
               <p className="px-2.5 pb-1 pt-1 text-[12px] font-semibold tracking-[-0.01em] text-slate-500">
                 {etiqueta}
               </p>
@@ -449,9 +449,9 @@ function NavRail({ sections, pathname, modo, onCambiarModo, urlSoporte }) {
           rel="noopener noreferrer"
           aria-label="Contacto Soporte"
           title="Contacto Soporte"
-          className="group relative flex h-11 w-full items-center justify-center"
+          className="group relative flex h-11 w-full items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-violet-500"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition-all duration-300 group-hover:bg-white/45 group-hover:text-slate-900">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition-all duration-300 motion-reduce:transition-none group-hover:bg-white/45 group-hover:text-slate-900">
             <Headset className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />
           </span>
 
@@ -478,7 +478,7 @@ function BotonModo({ modo, onCambiarModo, colapsado, bloqueado }) {
         aria-pressed={fijado}
         title={bloqueado ? "No se puede cambiar mientras el tutorial está en curso" : fijado ? "Contraer el menú a iconos" : "Fijar el menú abierto"}
         aria-label={fijado ? "Contraer el menú a iconos" : "Fijar el menú abierto"}
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/70 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors motion-reduce:transition-none hover:bg-white/70 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
           <rect x="3" y="4" width="18" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
