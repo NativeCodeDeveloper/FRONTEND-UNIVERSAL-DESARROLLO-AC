@@ -10,6 +10,11 @@ import {SelectDinamic} from "@/Componentes/SelectDinamic";
 import {RutInput} from "@/Componentes/RutInput";
 import {PhoneInput} from "@/Componentes/PhoneInput";
 import {Banknote, CalendarDays, Clock, Stethoscope} from "lucide-react";
+import ConsentimientosReserva from "@/Componentes/PaginaPublica/Reserva/ConsentimientosReserva";
+import {TIPOS_DOCUMENTO, validarDocumento} from "@/lib/rut";
+import {registrarAceptacion, seleccionarVigentes} from "@/lib/consentimientos/apiConsentimientos";
+import {esObligatorio} from "@/lib/consentimientos/textosLegales";
+import {useDatosEmpresa} from "@/hooks/useDatosEmpresa";
 
 /* ─────────────────────────────────────────────
    FORMATO CLP
@@ -42,6 +47,59 @@ export default function FormularioReservaProfesional() {
     const [rut,              setRut]              = useState("");
     const [telefono,         setTelefono]         = useState("");
     const [email,            setEmail]            = useState("");
+    const [tipoDocumento,    setTipoDocumento]    = useState(TIPOS_DOCUMENTO.RUT);
+    // Consentimientos (Ley 21.719 y Ley 20.584): dos aceptaciones separadas, mismas que en la reserva nueva.
+    const datosEmpresaConsentimiento = useDatosEmpresa();
+    const [plantillas,       setPlantillas]       = useState([]);
+    const [cargandoPlantillas, setCargandoPlantillas] = useState(true);
+    const [errorPlantillas,  setErrorPlantillas]  = useState(false);
+    const [consentimientos,  setConsentimientos]  = useState({});
+    const [mostrarErroresConsentimiento, setMostrarErroresConsentimiento] = useState(false);
+
+    useEffect(() => {
+        let vigente = true;
+        seleccionarVigentes()
+            .then(lista => vigente && setPlantillas(lista))
+            .catch(() => vigente && setErrorPlantillas(true))
+            .finally(() => vigente && setCargandoPlantillas(false));
+        return () => { vigente = false; };
+    }, []);
+
+    /**
+     * Valida documento y consentimientos y, si corresponde, registra la aceptación.
+     * Devuelve { ok, token_aceptacion }. Sin aceptación registrada no se agenda.
+     */
+    async function prepararConsentimiento() {
+        const errorDocumento = validarDocumento({ tipo: tipoDocumento, valor: rut });
+        if (errorDocumento) {
+            toast.error(errorDocumento);
+            return { ok: false };
+        }
+        const obligatorias = plantillas.filter(p => esObligatorio(p.codigo));
+        if (!obligatorias.length || !obligatorias.every(p => consentimientos[p.codigo])) {
+            setMostrarErroresConsentimiento(true);
+            toast.error("Debes aceptar la política de privacidad para reservar.");
+            return { ok: false };
+        }
+        try {
+            const { token_aceptacion } = await registrarAceptacion({
+                plantillas,
+                paciente: {
+                    nombre: nombrePaciente.trim(),
+                    apellido: apellidoPaciente.trim(),
+                    tipo_documento: tipoDocumento,
+                    documento: rut.trim(),
+                    correo: email.trim(),
+                    telefono: telefono.trim(),
+                },
+                id_profesional,
+            });
+            return { ok: true, token_aceptacion };
+        } catch {
+            toast.error("No pudimos registrar tu aceptación. Intenta nuevamente.");
+            return { ok: false };
+        }
+    }
 
     /* ── Datos del profesional ── */
     const [profesionalNombre,      setProfesionalNombre]      = useState("");
@@ -199,6 +257,9 @@ export default function FormularioReservaProfesional() {
             return;
         }
 
+        const consentimiento = await prepararConsentimiento();
+        if (!consentimiento.ok) return;
+
         try {
             setProcesando(true);
             const res = await fetch(`${API}/reservaPacientes/insertarReservaPacienteFicha`, {
@@ -220,6 +281,8 @@ export default function FormularioReservaProfesional() {
                     estadoReserva:     "reservada",
                     id_profesional,
                     origen:            "web",
+                    tipo_documento:    tipoDocumento,
+                    ...(consentimiento.token_aceptacion ? { token_aceptacion: consentimiento.token_aceptacion } : {}),
                 }),
             });
 
@@ -302,6 +365,9 @@ export default function FormularioReservaProfesional() {
              return toast.error("Por favor completa todos los campos antes de continuar.");
          }
 
+         const consentimiento = await prepararConsentimiento();
+         if (!consentimiento.ok) return;
+
          setProcesando(true);
          const res = await fetch(`${API}/pagosMercadoPago/create-order`, {
              method: "POST",
@@ -320,7 +386,9 @@ export default function FormularioReservaProfesional() {
                  horaFinalizacion,
                  estadoReserva ,
                  totalPago,
-                 id_profesional
+                 id_profesional,
+                 tipo_documento: tipoDocumento,
+                 ...(consentimiento.token_aceptacion ? { token_aceptacion: consentimiento.token_aceptacion } : {}),
              }),
              cors: "no-cors",
              cache: "no-cache",
@@ -534,7 +602,7 @@ export default function FormularioReservaProfesional() {
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">RUT</label>
-                                <RutInput readOnly={procesando} value={rut} onChange={clean => setRut(clean)} className="h-11 rounded-lg shadow-sm"/>
+                                <RutInput disabled={procesando} permitirExtranjero tipoDocumento={tipoDocumento} onTipoDocumentoChange={setTipoDocumento} value={rut} onChange={clean => setRut(clean)} className="h-11 rounded-lg shadow-sm"/>
                             </div>
                             <div>
                                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">Correo electrónico</label>
@@ -603,6 +671,17 @@ export default function FormularioReservaProfesional() {
                             </div>
                         </div>
                     )}
+
+                                            <ConsentimientosReserva
+                            plantillas={plantillas}
+                            valores={consentimientos}
+                            onCambio={(codigo, valor) => setConsentimientos(c => ({ ...c, [codigo]: valor }))}
+                            mostrarErrores={mostrarErroresConsentimiento}
+                            empresa={datosEmpresaConsentimiento}
+                            profesional={{ nombreProfesional: profesionalNombre }}
+                            cargando={cargandoPlantillas}
+                            errorCarga={errorPlantillas}
+                        />
 
                     <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                         <ShadcnButton2

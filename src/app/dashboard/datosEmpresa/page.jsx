@@ -169,9 +169,11 @@ export default function DatosEmpresa() {
                 {/* Header */}
                 <div className="rounded-[28px] border border-slate-200 bg-white/90 p-6 shadow-sm">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Datos de la Página Web</h1>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Datos de la clínica</h1>
                         <p className="text-sm text-slate-500">
-                            Configura el nombre, contacto, redes sociales y textos que se muestran en toda la página pública.
+                            El nombre, la dirección, el teléfono y el correo de aquí se usan en toda la plataforma: la página
+                            pública, los documentos y recetas, los correos a pacientes, la política de privacidad y los
+                            consentimientos informados. Si cambias un dato, se actualiza en todos esos lugares.
                         </p>
                     </div>
                 </div>

@@ -9,6 +9,9 @@ import {useParams, useRouter} from "next/navigation";
 import {jsPDF} from "jspdf";
 import {autoTable} from "jspdf-autotable";
 import { dibujarBloqueFirma, altoBloqueFirma } from "@/lib/pdfFirma";
+import EmisionDocumento from "@/Componentes/documentos/EmisionDocumento";
+import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
+import { generarCotizacionPdf } from "@/lib/documentos/generadores/cotizacion";
 import {toast, Toaster} from "react-hot-toast";
 import TutorialGuiadoDetalleCotizaciones from "@/Componentes/TutorialGuiadoDetalleCotizaciones";
 
@@ -944,6 +947,30 @@ export default function DetalleCotizacion() {
         programarActualizacionTotal(totalCotizacion, montoNormalizado);
     }
 
+    // ── Emisión con firma electrónica (EmisionDocumento) ─────────────────
+    // El profesional del documento es el registrado cuyo nombre calza con el
+    // solicitante de la cotización; sin calce no se puede firmar por él.
+    const profesionalRegistrado = profesionalPorNombre(listaProfesionales, cotizacionActual?.profesional_solicitante_nombre);
+    const profesionalDocumento = profesionalRegistrado
+        ? { id_profesional: profesionalRegistrado.id_profesional, ...datosProfesionalParaDocumento(profesionalRegistrado) }
+        : null;
+
+    async function generarCuerpoCotizacion({ modo, borrador }) {
+        const fechaEmisionTexto = fechaEmisionPDF
+            ? new Date(`${fechaEmisionPDF}T00:00:00`).toLocaleDateString("es-CL", {day: "2-digit", month: "long", year: "numeric"})
+            : "-";
+        return generarCotizacionPdf({
+            modo,
+            borrador,
+            empresa: datosEmpresa || {},
+            cotizacion: { ...cotizacionActual, id_cotizacion_paciente },
+            detalle: detalleCotizacionArray,
+            totales: { total: totalCotizacion, abono: abonoAplicado ?? 0, saldo: saldoPendiente },
+            profesional: profesionalDocumento || { nombre: cotizacionActual?.profesional_solicitante_nombre || "" },
+            fechaEmisionTexto,
+        });
+    }
+
     function exportarPresupuestoPDF() {
         if (!cotizacionActual) {
             return toast.error(`No se pudieron cargar los datos de la cotización.`);
@@ -1328,6 +1355,7 @@ export default function DetalleCotizacion() {
                                     className="bg-transparent text-xs font-semibold text-slate-700 outline-none disabled:cursor-wait disabled:text-slate-400"
                                 />
                             </label>
+                            {!FIRMA_HABILITADA && (<>
                             <button
                                 type="button"
                                 onClick={exportarPresupuestoPDF}
@@ -1341,6 +1369,7 @@ export default function DetalleCotizacion() {
                                 envioConfirmado={envioCotizacionCorreoConfirmado}
                                 onClick={() => enviarCotizacionCorreo(id_cotizacion_paciente, fechaEmisionPDF)}
                             />
+                            </>)}
                         </div>
                         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
                             <div className="flex h-14 flex-col justify-center rounded-lg border border-slate-200 bg-white px-4 shadow-sm">
@@ -1358,6 +1387,58 @@ export default function DetalleCotizacion() {
                         </div>
                     </div>
                 </header>
+
+                {FIRMA_HABILITADA && cotizacionActual ? (
+
+                    <section className="mb-4">
+
+                        <EmisionDocumento
+
+                            tipoDocumento="cotizacion"
+
+                            titulo={`Cotización N° ${id_cotizacion_paciente}`}
+
+                            referencia={{ tabla: "cotizaciones_pacientes", id: Number(id_cotizacion_paciente) }}
+
+                            paciente={{
+
+                                id_paciente: cotizacionActual.id_paciente,
+
+                                nombre: `${cotizacionActual.nombre ?? ""} ${cotizacionActual.apellido ?? ""}`.trim(),
+
+                                correo: cotizacionActual.correo,
+
+                            }}
+
+                            profesional={profesionalDocumento}
+
+                            generarCuerpoPdf={generarCuerpoCotizacion}
+
+                            metadatos={{ resumen: `Cotización N° ${id_cotizacion_paciente} · ${detalleCotizacionArray.length} ítems` }}
+
+                            nombreArchivo={`cotizacion-${id_cotizacion_paciente}`}
+
+                            deshabilitado={!fechaEmisionPDF || !datosEmpresa || detalleCotizacionArray.length === 0 || !profesionalDocumento}
+
+                            motivoDeshabilitado={
+
+                                !profesionalDocumento
+
+                                    ? "El profesional solicitante no coincide con un profesional registrado."
+
+                                    : detalleCotizacionArray.length === 0
+
+                                    ? "Agrega al menos un ítem para emitir la cotización."
+
+                                    : "Selecciona la fecha del documento."
+
+                            }
+
+                        />
+
+                    </section>
+
+                ) : null}
 
                 <section data-tour="detalle-cotizacion-paciente" className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                     <div className="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/60 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between md:px-5">
@@ -1828,6 +1909,7 @@ export default function DetalleCotizacion() {
                                         className="bg-transparent text-xs font-semibold text-slate-700 outline-none disabled:cursor-wait disabled:text-slate-400"
                                     />
                                 </label>
+                                {!FIRMA_HABILITADA && (<>
                                 <button
                                     type="button"
                                     onClick={exportarPresupuestoPDF}
@@ -1841,6 +1923,7 @@ export default function DetalleCotizacion() {
                                     envioConfirmado={envioCotizacionCorreoConfirmado}
                                     onClick={() => enviarCotizacionCorreo(id_cotizacion_paciente, fechaEmisionPDF)}
                                 />
+                                </>)}
                             </div>
                         </div>
                     </main>

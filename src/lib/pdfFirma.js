@@ -55,6 +55,7 @@ export function altoExtraNombreFirma(doc, { nombre, anchoMax, salto = 5 }) {
  *     Nombre del profesional
  *     RUT: 12.345.678-9
  *     Especialidad
+ *     Reg. Superintendencia de Salud N° 438291   (si lo tiene)
  *     Firma y timbre profesional
  *     Nombre del centro
  *
@@ -80,6 +81,7 @@ export function dibujarBloqueFirma(doc, {
     nombre,
     rut,
     especialidad,
+    registroSis,
     leyenda = "Firma y timbre profesional",
     empresa,
     tamanoNombre = 9,
@@ -109,6 +111,7 @@ export function dibujarBloqueFirma(doc, {
     escribir(nombre || "-", tamanoNombre);
     if (rut) escribir(`RUT: ${String(rut).trim()}`, tamanoDetalle);
     if (especialidad) escribir(String(especialidad).trim(), tamanoDetalle);
+    if (registroSis) escribir(`Reg. Superintendencia de Salud N° ${String(registroSis).trim()}`, tamanoDetalle);
     if (leyenda) escribir(leyenda, tamanoLeyenda);
     if (empresa) {
         doc.setTextColor(...colorEmpresa);
@@ -130,6 +133,7 @@ export function altoBloqueFirma(doc, {
     nombre,
     rut,
     especialidad,
+    registroSis,
     leyenda = true,
     empresa,
     anchoMax,
@@ -152,6 +156,7 @@ export function altoBloqueFirma(doc, {
         contar(String(nombre ?? "").trim() || "-", tamanoNombre) +
         contar(rut ? `RUT: ${rut}` : "", tamanoDetalle) +
         contar(especialidad, tamanoDetalle) +
+        contar(registroSis ? `Reg. Superintendencia de Salud N° ${registroSis}` : "", tamanoDetalle) +
         (leyenda ? 1 : 0) +
         contar(empresa, tamanoDetalle);
 

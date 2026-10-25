@@ -1,17 +1,19 @@
 'use client'
 
 import {useMemo, useRef, useState} from "react";
-import { claveFechaCivil } from "@/lib/fechas";
+import { formatearFechaCivil, hoyCivil } from "@/lib/fechas";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
-import jsPDF from "jspdf";
-import { dibujarBloqueFirma } from "@/lib/pdfFirma";
+import { generarRecetaPdf } from "@/lib/documentos/generadores/receta";
+import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
+import { formatRut } from "@/lib/designTokens";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import ShadcnInput from "@/Componentes/shadcnInput2";
 import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
 import {useProfesionales} from "@/hooks/useProfesionales";
 import {buscarPacientePorRut} from "@/lib/buscarPaciente";
-import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional, registroSisDeProfesional} from "@/lib/profesional";
+import ImpresionManuscrita from "@/Componentes/documentos/ImpresionManuscrita";
 import {
     Select,
     SelectContent,
@@ -22,6 +24,7 @@ import {
 
 export default function RecetaRapida() {
     const empresaNombre = useEmpresaNombre();
+    const datosEmpresa = useDatosEmpresa();
     const listaProfesionales = useProfesionales();
 
     const [idFicha, setIdFicha] = useState("");
@@ -29,7 +32,7 @@ export default function RecetaRapida() {
     const [apellidoPaciente, setApellidoPaciente] = useState("");
     const [rutPaciente, setRutPaciente] = useState("");
     const [buscandoPaciente, setBuscandoPaciente] = useState(false);
-    const [fechaEmision, setFechaEmision] = useState(claveFechaCivil(new Date()));
+    const [fechaEmision, setFechaEmision] = useState(hoyCivil());
     const [fechaCaducidad, setFechaCaducidad] = useState("");
     const [descripcionReceta, setDescripcionReceta] = useState("");
     const [idProfesional, setIdProfesional] = useState("");
@@ -88,7 +91,7 @@ export default function RecetaRapida() {
         setNombrePaciente("");
         setApellidoPaciente("");
         setRutPaciente("");
-        setFechaEmision(claveFechaCivil(new Date()));
+        setFechaEmision(hoyCivil());
         setFechaCaducidad("");
         setDescripcionReceta("");
         setIdProfesional("");
@@ -118,220 +121,37 @@ export default function RecetaRapida() {
         return null;
     }
 
+    // Devuelve el PDF como Blob para imprimirlo sin descargarlo (ImpresionManuscrita):
+    // las recetas se firman de puño y letra, nunca con firma electrónica.
     function generarPDFReceta() {
         const errorFormulario = validarFormulario();
 
         if (errorFormulario) {
-            return toast.error(errorFormulario);
+            toast.error(errorFormulario);
+            return null;
         }
 
-        // ── Mismo sistema visual que la receta de la carpeta del paciente ──
-        // (src/app/dashboard/recetaPacientes/[id_paciente]/page.jsx): mismo
-        // encabezado, misma caja "Identificacion clinica", mismo bloque de
-        // indicaciones con paginacion y mismo pie. Cambian solo los datos: aca
-        // hay fecha de caducidad y numero de ficha, y no hay nacimiento,
-        // edad ni prevision porque la receta rapida no parte de un paciente
-        // registrado.
-        const doc = new jsPDF("p", "mm", "letter");
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
-        const margin = 18;
-        const rightX = pageW - margin;
-        const anchoContenido = rightX - margin;
-
-        const texto = (valor, fallback = "-") => {
-            const limpio = String(valor ?? "").trim();
-            return limpio || fallback;
-        };
-        const fecha = (valor) => {
-            if (!valor) return "-";
-            try {
-                return new Date(`${valor}T00:00:00`).toLocaleDateString("es-CL");
-            } catch {
-                return "-";
-            }
-        };
-
-        const nombreProfesionalPDF = texto(nombreProfesional);
-        const rutProfesionalPDF = texto(rutProfesional);
-        const especialidadProfesionalPDF = texto(especialidadProfesional, "Profesional tratante");
-        const diagnosticoPDF = diagnostico.trim();
-
         try {
-            const footerY = pageH - 12;
-            const limiteContenidoY = pageH - 34;
-            const lineHeight = 6.6;
-
-            const dibujarEncabezado = () => {
-                doc.setDrawColor(15, 23, 42);
-                doc.setLineWidth(0.6);
-                doc.line(margin, 18, rightX, 18);
-
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(18);
-                doc.setTextColor(20, 30, 48);
-                doc.text(empresaNombre, margin, 27);
-
-                doc.setFont("helvetica", "italic");
-                doc.setFontSize(8.5);
-                doc.setTextColor(92, 108, 128);
-                doc.text("AgendaClínica — Healthcare Information System", margin, 32);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.setTextColor(100, 116, 139);
-                doc.text("Receta médica", margin, 36.5);
-                doc.text(`Ficha: ${texto(idFicha)}`, rightX, 27, {align: "right"});
-                doc.text("Documento clínico", rightX, 32, {align: "right"});
-            };
-
-            const dibujarPie = () => {
-                doc.setDrawColor(203, 213, 225);
-                doc.setLineWidth(0.3);
-                doc.line(margin, footerY - 6, rightX, footerY - 6);
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(7.5);
-                doc.setTextColor(148, 163, 184);
-                doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin, footerY - 1);
-                doc.text(`Paciente: ${texto(rutPaciente)}`, rightX, footerY - 1, {align: "right"});
-            };
-
-            dibujarEncabezado();
-
-            let y = 51;
-
-            const altoBoxClinico = diagnosticoPDF ? 67 : 54;
-
-            doc.setDrawColor(203, 213, 225);
-            doc.setLineWidth(0.35);
-            doc.roundedRect(margin, y, anchoContenido, altoBoxClinico, 1.8, 1.8);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8.5);
-            doc.setTextColor(15, 23, 42);
-            doc.text("Identificación clínica", margin + 4, y + 7);
-
-            doc.setDrawColor(226, 232, 240);
-            doc.setLineWidth(0.25);
-            doc.line(margin + 4, y + 11, rightX - 4, y + 11);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(7.2);
-            doc.setTextColor(100, 116, 139);
-            doc.text("PACIENTE", margin + 4, y + 18);
-            doc.text("RUT PACIENTE", margin + 74, y + 18);
-            doc.text("PROFESIONAL", margin + 4, y + 31);
-            doc.text("RUT PROFESIONAL", margin + 74, y + 31);
-            doc.text("ESPECIALIDAD / CARGO", margin + 130, y + 31);
-            doc.text("FECHA DE EMISIÓN", margin + 4, y + 44);
-            doc.text("FECHA DE CADUCIDAD", margin + 74, y + 44);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9.4);
-            doc.setTextColor(15, 23, 42);
-            doc.text(texto(nombreCompletoPaciente), margin + 4, y + 23);
-            doc.text(texto(rutPaciente), margin + 74, y + 23);
-            doc.text(doc.splitTextToSize(nombreProfesionalPDF, 66), margin + 4, y + 36);
-            doc.text(rutProfesionalPDF, margin + 74, y + 36);
-            doc.text(doc.splitTextToSize(especialidadProfesionalPDF, 58), margin + 130, y + 36, {lineHeightFactor: 1.3});
-            doc.text(fecha(fechaEmision), margin + 4, y + 49);
-            doc.text(fecha(fechaCaducidad), margin + 74, y + 49);
-
-            if (diagnosticoPDF) {
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(7.2);
-                doc.setTextColor(100, 116, 139);
-                doc.text("DIAGNÓSTICO", margin + 4, y + 57);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9.4);
-                doc.setTextColor(15, 23, 42);
-                doc.text(doc.splitTextToSize(diagnosticoPDF, anchoContenido - 12), margin + 4, y + 62);
-            }
-
-            y += altoBoxClinico + 7;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(9);
-            doc.setTextColor(15, 23, 42);
-            doc.text("Indicaciones médicas", margin, y);
-
-            y += 6;
-
-            const lineasReceta = doc.splitTextToSize(descripcionReceta.trim(), anchoContenido - 10);
-            let indiceLinea = 0;
-            let primeraPaginaTexto = true;
-
-            while (indiceLinea < lineasReceta.length) {
-                const alturaDisponible = limiteContenidoY - y;
-                const lineasPorPagina = Math.max(1, Math.floor((alturaDisponible - 10) / lineHeight));
-                const bloque = lineasReceta.slice(indiceLinea, indiceLinea + lineasPorPagina);
-                const altoBloque = Math.max(20, (bloque.length * lineHeight) + 8);
-
-                doc.setDrawColor(203, 213, 225);
-                doc.setLineWidth(0.35);
-                doc.roundedRect(margin, y, anchoContenido, altoBloque, 1.8, 1.8);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9);
-                doc.setTextColor(15, 23, 42);
-                doc.text(bloque, margin + 5, y + 6, {
-                    maxWidth: anchoContenido - 10,
-                    lineHeightFactor: 1.5
-                });
-
-                indiceLinea += bloque.length;
-                y += altoBloque + 10;
-
-                if (indiceLinea < lineasReceta.length) {
-                    dibujarPie();
-                    doc.addPage();
-                    dibujarEncabezado();
-                    y = 48;
-
-                    doc.setFont("helvetica", "bold");
-                    doc.setFontSize(9);
-                    doc.setTextColor(15, 23, 42);
-                    doc.text(primeraPaginaTexto ? "Indicaciones médicas (continuación)" : "Continuación de receta", margin, y);
-                    y += 6;
-                    primeraPaginaTexto = false;
-                }
-            }
-
-            if (y + 31 > limiteContenidoY) {
-                dibujarPie();
-                doc.addPage();
-                dibujarEncabezado();
-                y = 48;
-            }
-
-            doc.setDrawColor(148, 163, 184);
-            doc.setLineWidth(0.35);
-            const anchoFirma = 62; // el mismo largo de la raya de firma
-            doc.line(rightX - anchoFirma, y + 10, rightX, y + 10);
-
-            dibujarBloqueFirma(doc, {
-                x: rightX,
-                y: y + 16,
-                anchoMax: anchoFirma,
-                align: "right",
-                nombre: nombreProfesionalPDF,
-                rut: rutProfesionalPDF,
-                especialidad: especialidadProfesionalPDF,
-                empresa: empresaNombre,
+            const { blob } = generarRecetaPdf({
+                empresa: { ...datosEmpresa, empresaNombre: datosEmpresa.empresaNombre || empresaNombre },
+                folio: `Ficha N° ${idFicha.trim()}`,
+                paciente: { nombre: nombreCompletoPaciente, documento: formatRut(rutPaciente.trim()) || rutPaciente.trim() },
+                profesional: {
+                    nombre: nombreProfesional.trim(),
+                    rut: String(rutProfesional ?? "").trim(),
+                    especialidad: especialidadProfesional || "",
+                    registroSis: registroSisDeProfesional(profesionalPorId(listaProfesionales, idProfesional)),
+                },
+                fechaEmisionTexto: formatearFechaCivil(fechaEmision),
+                fechaCaducidadTexto: formatearFechaCivil(fechaCaducidad),
+                diagnostico,
+                indicaciones: descripcionReceta,
             });
-
-            dibujarPie();
-
-            const nombreArchivo = `receta-rapida-${nombreCompletoPaciente || "paciente"}`
-                .toLowerCase()
-                .replace(/\s+/g, "-");
-
-            doc.save(`${nombreArchivo}.pdf`);
-            toast.success("Receta PDF generada correctamente.");
+            return blob;
         } catch (error) {
-            console.log(error);
-            return toast.error("No fue posible generar la receta en PDF.");
+            console.error(error);
+            toast.error("No fue posible generar la receta en PDF.");
+            return null;
         }
     }
 
@@ -556,18 +376,12 @@ export default function RecetaRapida() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-2 border-t border-slate-100 px-5 py-4">
-                                <button
-                                    type="button"
-                                    onClick={generarPDFReceta}
-                                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-slate-800"
-                                >
-                                    Generar PDF
-                                </button>
+                            <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-start">
+                                <ImpresionManuscrita generarPdf={generarPDFReceta} titulo="Receta" className="flex-1" />
                                 <button
                                     type="button"
                                     onClick={limpiarFormulario}
-                                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all duration-150 hover:bg-slate-50"
+                                    className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all duration-150 hover:bg-slate-50"
                                 >
                                     Limpiar
                                 </button>

@@ -1,48 +1,66 @@
 'use client'
 
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 import ProfesionalModal from "@/Componentes/ProfesionalModal";
 import TutorialGuiadoProfesionales from "@/Componentes/TutorialGuiadoProfesionales";
 import { formatRut } from "@/lib/designTokens";
 import { useTour } from "@/ContextosGlobales/TourContext";
+import InsigniaEstado from "@/Componentes/firma/InsigniaEstado";
+import SiluetaProfesional from "@/Componentes/SiluetaProfesional";
+import { cfImageUrl } from "@/lib/cloudflare";
+import { useSesionProfesional } from "@/hooks/useSesionProfesional";
+import { ESTADOS_FIRMA, ESTADOS_REGISTRO_SIS } from "@/lib/firma/constantes";
+import { MODO_MOCK } from "@/lib/firma/apiFirma";
+import { aplicarEstadoMock } from "@/lib/firma/mockFirma";
 
-// Paleta de acento por tarjeta: se elige de forma estable a partir del nombre,
-// asi un mismo profesional conserva siempre su color.
-const ACENTOS = [
-    "bg-slate-900 text-white",
-    "bg-[#EDE9FE] text-[#6E56CF]",
-    "bg-teal-50 text-teal-700",
-    "bg-amber-50 text-amber-700",
-    "bg-sky-50 text-sky-700",
-    "bg-rose-50 text-rose-700",
-];
-
-function acentoDe(nombre = "") {
-    let suma = 0;
-    for (const caracter of String(nombre)) suma += caracter.codePointAt(0);
-    return ACENTOS[suma % ACENTOS.length];
-}
-
-function inicialesDe(nombre = "") {
-    const palabras = String(nombre)
-        .replace(/\b(dr|dra|don|sr|sra)\.?\b/gi, "")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
-
-    if (palabras.length === 0) return "–";
-
-    return (palabras[0][0] + (palabras[1]?.[0] ?? "")).toUpperCase();
-}
-
+// Fila de la lista agrupada de la tarjeta, al estilo de Ajustes de iOS: ícono
+// blanco sobre un cuadrado azul redondeado y el dato a la derecha.
 function FilaDato({ icono, children }) {
     return (
-        <div className="flex items-center gap-2.5 text-[13px] text-slate-600">
-            <span className="shrink-0 text-slate-400">{icono}</span>
+        <div className="flex items-center gap-3 px-3.5 py-2.5 text-[13px] text-[#1D1D1F]">
+            <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[7px] bg-[#007AFF] text-white [&_svg]:h-[15px] [&_svg]:w-[15px]">
+                {icono}
+            </span>
             <span className="min-w-0 truncate">{children || "—"}</span>
+        </div>
+    );
+}
+
+// Estado de la firma electrónica y del registro de la Superintendencia en la
+// tarjeta. Al propio profesional, si le falta algo, se le ofrece completarlo:
+// sin firma no puede emitir documentos firmados electrónicamente.
+function EstadoDocumentosFirmados({ profesional, esPropio, onCompletar }) {
+    const firmaActiva = profesional.firma_estado === "activa";
+    const estadoRegistro = profesional.registro_sis_estado || "no_informado";
+    const faltaRegistro = estadoRegistro === "no_informado" || estadoRegistro === "rechazado";
+
+    return (
+        <div className="mt-3.5 px-5">
+            <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] text-slate-400">Firma</span>
+                <InsigniaEstado estado={ESTADOS_FIRMA[firmaActiva ? "activa" : "ninguna"]} />
+                <span className="ml-2 text-[11px] text-slate-400">Reg. SIS</span>
+                <InsigniaEstado estado={ESTADOS_REGISTRO_SIS[estadoRegistro] || ESTADOS_REGISTRO_SIS.no_informado} />
+            </div>
+            {esPropio && (!firmaActiva || faltaRegistro) ? (
+                <div className="mt-3 flex flex-col gap-2 rounded-2xl bg-[#007AFF]/[0.07] px-3.5 py-2.5 text-[12px] text-[#1D1D1F] sm:flex-row sm:items-center sm:justify-between">
+                    <span>
+                        {!firmaActiva
+                            ? "Registra tu firma electrónica para emitir documentos firmados."
+                            : "Agrega tu N° de registro de la Superintendencia para el pie de firma."}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => onCompletar(!firmaActiva ? "firma" : "registro")}
+                        className="h-8 shrink-0 rounded-full bg-[#007AFF] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#0062CC]"
+                    >
+                        Completar
+                    </button>
+                </div>
+            ) : null}
         </div>
     );
 }
@@ -59,6 +77,12 @@ export default function Profesionales() {
     // Confirmacion en la propia tarjeta: evita un dialogo nativo bloqueante.
     const [confirmandoId, setConfirmandoId] = useState(null);
     const [eliminandoId, setEliminandoId] = useState(null);
+    const [seccionInicial, setSeccionInicial] = useState(null);
+
+    // Un profesional (usuario con agenda asignada) ve y edita solo su propia
+    // tarjeta; la administración de la clínica ve a todo el equipo.
+    const sesion = useSesionProfesional();
+    const soloPropia = sesion.cargado && Boolean(sesion.idProfesional) && !sesion.esAdministrador && !sesion.esTecnico;
 
     async function seleccionarTodosProfesionales() {
         actualizarCantidadProfesionales(null);
@@ -80,7 +104,8 @@ export default function Profesionales() {
             }
 
             const profesionales = Array.isArray(respuestaBackend) ? respuestaBackend : [];
-            setListaProfesionales(profesionales);
+            // En modo de prueba se superpone lo registrado en el backend simulado.
+            setListaProfesionales(MODO_MOCK ? aplicarEstadoMock(profesionales) : profesionales);
             actualizarCantidadProfesionales(profesionales.length);
         } catch (error) {
             return toast.error('Error al cargar los profesionales, por favor intente nuevamente.');
@@ -129,10 +154,30 @@ export default function Profesionales() {
         return () => actualizarCantidadProfesionales(null);
     }, []);
 
+    // /dashboard/profesionales?completar=firma|registro (aviso de la campana): abre
+    // la tarjeta del propio profesional con la sección pendiente desplegada. Se lee
+    // de window y no con useSearchParams para no exigir un Suspense en esta página.
+    const completarAtendido = useRef(false);
+    useEffect(() => {
+        if (completarAtendido.current || cargando || !sesion.cargado || !sesion.idProfesional) return;
+        const seccion = new URLSearchParams(window.location.search).get("completar");
+        if (seccion !== "firma" && seccion !== "registro") return;
+        const propio = listaProfesionales.find((p) => sesion.esDueno(p.id_profesional));
+        if (!propio) return;
+        completarAtendido.current = true;
+        window.history.replaceState(null, "", window.location.pathname);
+        abrirEdicion(propio, seccion);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cargando, sesion, listaProfesionales]);
+
     const profesionalesFiltrados = useMemo(() => {
         const termino = busqueda.trim().toLowerCase();
 
-        const ordenados = [...listaProfesionales].sort((a, b) =>
+        const visibles = soloPropia
+            ? listaProfesionales.filter((p) => sesion.esDueno(p.id_profesional))
+            : listaProfesionales;
+
+        const ordenados = [...visibles].sort((a, b) =>
             String(a.nombreProfesional ?? "").localeCompare(String(b.nombreProfesional ?? ""))
         );
 
@@ -149,7 +194,7 @@ export default function Profesionales() {
                 .filter(Boolean)
                 .some((campo) => String(campo).toLowerCase().includes(termino))
         );
-    }, [listaProfesionales, busqueda]);
+    }, [listaProfesionales, busqueda, soloPropia, sesion]);
 
     function abrirNuevo() {
         setEnEdicion(null);
@@ -183,7 +228,8 @@ export default function Profesionales() {
         }
     }
 
-    async function abrirEdicion(profesional) {
+    async function abrirEdicion(profesional, seccion = null) {
+        setSeccionInicial(seccion);
         // Se abre de inmediato con lo que ya tenemos para que no haya espera, y se
         // refresca con lo que responda el backend.
         setEnEdicion(profesional);
@@ -208,6 +254,8 @@ export default function Profesionales() {
                         <p className="mt-1 text-[13px] text-slate-500">
                             {cargando
                                 ? "Cargando equipo profesional..."
+                                : soloPropia
+                                ? "Tus datos profesionales, firma electrónica y registro de la Superintendencia"
                                 : `${listaProfesionales.length} ${listaProfesionales.length === 1 ? "profesional registrado" : "profesionales registrados"}`}
                         </p>
                     </div>
@@ -217,6 +265,7 @@ export default function Profesionales() {
                             className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                             claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
                         />
+                        {!soloPropia && (
                         <button
                             onClick={abrirNuevo}
                             data-tour="profesional-nuevo"
@@ -227,6 +276,7 @@ export default function Profesionales() {
                             </svg>
                             Nuevo Profesional
                         </button>
+                        )}
                     </div>
                 </div>
 
@@ -284,23 +334,34 @@ export default function Profesionales() {
                                 <article
                                     key={profesional.id_profesional}
                                     data-tour={indice === 0 ? "profesional-lista" : undefined}
-                                    className="flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md"
+                                    className="font-system-apple group flex flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_28px_-14px_rgba(0,40,120,0.22)] ring-1 ring-black/[0.05] transition-all duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)] hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(0,0,0,0.04),0_18px_40px_-16px_rgba(0,64,200,0.32)]"
                                 >
-                                    <div className="flex items-start gap-3 px-5 pt-5">
-                                        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold ${acentoDe(profesional.nombreProfesional)}`}>
-                                            {inicialesDe(profesional.nombreProfesional)}
+                                    <div className="flex items-center gap-3.5 px-5 pt-5">
+                                        {/* Foto del profesional o, si no tiene, la silueta de profesional de salud */}
+                                        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full ring-2 ring-white shadow-[0_4px_12px_-4px_rgba(0,122,255,0.45)]">
+                                            {profesional.imagenProfesional ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img
+                                                    src={cfImageUrl(profesional.imagenProfesional, "card")}
+                                                    alt={`Foto de ${profesional.nombreProfesional}`}
+                                                    className="h-full w-full object-cover object-[50%_20%]"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <SiluetaProfesional className="h-full w-full" etiqueta={profesional.nombreProfesional} />
+                                            )}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h2 className="truncate text-[15px] font-bold text-slate-900">
+                                            <h2 className="truncate text-[16px] font-semibold tracking-tight text-[#1D1D1F]">
                                                 {profesional.nombreProfesional}
                                             </h2>
-                                            <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-slate-500">
+                                            <p className="mt-0.5 line-clamp-2 text-[13px] font-medium leading-snug text-[#007AFF]">
                                                 {profesional.descripcionProfesional || "Sin especialidad registrada"}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 space-y-2 px-5">
+                                    <div className="mx-4 mt-4 divide-y divide-black/[0.06] overflow-hidden rounded-2xl bg-[#F5F5F7]">
                                         <FilaDato
                                             icono={
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -330,23 +391,29 @@ export default function Profesionales() {
                                         </FilaDato>
                                     </div>
 
+                                    <EstadoDocumentosFirmados
+                                        profesional={profesional}
+                                        esPropio={sesion.esDueno(profesional.id_profesional)}
+                                        onCompletar={(seccion) => abrirEdicion(profesional, seccion)}
+                                    />
+
                                     <div className="mt-auto px-5 pb-5 pt-4">
-                                        <div className="border-t border-slate-100 pt-4">
+                                        <div>
                                             {confirmando ? (
                                                 <div className="flex items-center justify-between gap-2">
-                                                    <span className="text-[12px] font-medium text-slate-500">¿Eliminar?</span>
+                                                    <span className="text-[13px] font-medium text-[#636366]">¿Eliminar?</span>
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={() => setConfirmandoId(null)}
                                                             disabled={eliminando}
-                                                            className="h-10 rounded-xl px-4 text-[12px] font-semibold text-slate-500 transition-colors hover:bg-slate-100 disabled:opacity-50"
+                                                            className="h-9 rounded-full px-4 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/10 disabled:opacity-50"
                                                         >
                                                             Cancelar
                                                         </button>
                                                         <button
                                                             onClick={() => eliminarProfesional(profesional.id_profesional)}
                                                             disabled={eliminando}
-                                                            className="h-10 rounded-xl bg-red-600 px-4 text-[12px] font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+                                                            className="h-9 rounded-full bg-[#FF3B30] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#E0352B] disabled:opacity-60"
                                                         >
                                                             {eliminando ? "Eliminando..." : "Sí, eliminar"}
                                                         </button>
@@ -356,7 +423,7 @@ export default function Profesionales() {
                                                 <div className="flex items-center justify-between gap-2">
                                                     <button
                                                         onClick={() => abrirEdicion(profesional)}
-                                                        className="inline-flex h-10 items-center gap-2 rounded-xl px-4 text-[12px] font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                                                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-semibold text-[#007AFF] transition-colors hover:bg-[#007AFF]/15"
                                                         aria-label={`Editar ${profesional.nombreProfesional}`}
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -364,9 +431,10 @@ export default function Profesionales() {
                                                         </svg>
                                                         Editar
                                                     </button>
+                                                    {!soloPropia && (
                                                     <button
                                                         onClick={() => setConfirmandoId(profesional.id_profesional)}
-                                                        className="inline-flex h-10 items-center gap-2 rounded-xl border border-red-100 bg-red-50 px-4 text-[12px] font-bold text-red-600 transition-colors hover:bg-red-100"
+                                                        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#FF3B30]/10 px-4 text-[13px] font-semibold text-[#FF3B30] transition-colors hover:bg-[#FF3B30]/15"
                                                         aria-label={`Eliminar ${profesional.nombreProfesional}`}
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -374,6 +442,7 @@ export default function Profesionales() {
                                                         </svg>
                                                         Eliminar
                                                     </button>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -388,7 +457,8 @@ export default function Profesionales() {
             <ProfesionalModal
                 abierto={modalAbierto}
                 profesional={enEdicion}
-                onCerrar={() => { setModalAbierto(false); setEnEdicion(null); }}
+                seccionInicial={seccionInicial}
+                onCerrar={() => { setModalAbierto(false); setEnEdicion(null); setSeccionInicial(null); }}
                 onGuardado={seleccionarTodosProfesionales}
             />
         </div>

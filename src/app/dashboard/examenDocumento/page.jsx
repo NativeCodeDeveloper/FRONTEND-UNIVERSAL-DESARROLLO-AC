@@ -12,7 +12,11 @@ import ToasterClient from "@/Componentes/ToasterClient";
 import ShadcnInput from "@/Componentes/shadcnInput2";
 import {useEmpresaNombre} from "@/hooks/useEmpresaNombre";
 import {useProfesionales} from "@/hooks/useProfesionales";
-import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional, datosProfesionalParaDocumento} from "@/lib/profesional";
+import EmisionDocumento from "@/Componentes/documentos/EmisionDocumento";
+import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
+import { generarOrdenExamenPdf } from "@/lib/documentos/generadores/ordenExamen";
+import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
 import {buscarPacientePorRut} from "@/lib/buscarPaciente";
 import {
     Select,
@@ -38,6 +42,9 @@ export default function ExamenDocumento() {
     const [listaExamenesSolicitados, setListaExamenesSolicitados] = useState([]);
     const [busquedaExamen, setBusquedaExamen] = useState("");
     const rutBuscadoRef = useRef("");
+    // Paciente registrado encontrado por RUT: vincula el documento firmado a su carpeta.
+    const [pacienteVinculado, setPacienteVinculado] = useState(null);
+    const datosEmpresa = useDatosEmpresa();
 
     const especialidadProfesional = useMemo(() => {
         const profesional = listaProfesionales.find(p => String(p.id_profesional) === String(idProfesional));
@@ -58,6 +65,7 @@ export default function ExamenDocumento() {
         try {
             const paciente = await buscarPacientePorRut(rutConsultado);
             if (rutBuscadoRef.current !== rutConsultado) return;
+            setPacienteVinculado(paciente || null);
             if (paciente) {
                 setNombrePaciente(`${paciente.nombre || ""} ${paciente.apellido || ""}`.trim());
                 toast.success("Datos del paciente completados automáticamente.");
@@ -130,6 +138,7 @@ export default function ExamenDocumento() {
         setBuscandoPaciente(false);
         setNombrePaciente("");
         setRutPaciente("");
+        setPacienteVinculado(null);
         setIdProfesional("");
         setNombreProfesional("");
         setRutProfesional("");
@@ -154,6 +163,40 @@ export default function ExamenDocumento() {
 
     const totalExamenes = listaExamenesSolicitados.length;
     const totalReferencia = listaExamenesSolicitados.reduce((acc, examen) => acc + Number(examen.valor_examen || 0), 0);
+
+    // ── Emisión con firma electrónica ──────────────────────────────────
+    const profesionalSeleccionado = profesionalPorId(listaProfesionales, idProfesional);
+    const profesionalDocumento = profesionalSeleccionado
+        ? {
+            id_profesional: profesionalSeleccionado.id_profesional,
+            ...datosProfesionalParaDocumento(profesionalSeleccionado),
+            rut: rutProfesional.trim() || datosProfesionalParaDocumento(profesionalSeleccionado).rut,
+        }
+        : null;
+
+    async function generarCuerpoOrden({ modo, borrador }) {
+        return generarOrdenExamenPdf({
+            modo,
+            borrador,
+            empresa: { empresaNombre, ...datosEmpresa },
+            paciente: { nombre: nombrePaciente.trim(), rut: rutPaciente.trim() },
+            profesional: profesionalDocumento || { nombre: nombreProfesional.trim() },
+            examenes: listaExamenesSolicitados,
+            fechaEmisionTexto: fechaSolicitud
+                ? new Date(`${fechaSolicitud}T00:00:00`).toLocaleDateString("es-CL", { day: "2-digit", month: "long", year: "numeric" })
+                : "",
+        });
+    }
+
+    const motivoOrdenIncompleta = !nombrePaciente.trim() || !rutPaciente.trim()
+        ? "Completa los datos del paciente."
+        : !profesionalDocumento
+        ? "Selecciona el profesional solicitante."
+        : !fechaSolicitud
+        ? "Selecciona la fecha del documento."
+        : listaExamenesSolicitados.length === 0
+        ? "Agrega al menos un examen."
+        : "";
 
     async function generarDocumentoPDF() {
         if (!nombrePaciente.trim()) {
@@ -432,7 +475,7 @@ export default function ExamenDocumento() {
                                     <ShadcnInput
                                         value={rutPaciente}
                                         placeholder="Ej: 12.345.678-9"
-                                        onChange={(e) => setRutPaciente(e.target.value)}
+                                        onChange={(e) => { setRutPaciente(e.target.value); setPacienteVinculado(null); }}
                                         onBlur={autocompletarPaciente}
                                         className="w-full"
                                     />
@@ -496,7 +539,7 @@ export default function ExamenDocumento() {
                                 </div>
 
                                 <div className="flex flex-wrap gap-2 pt-1">
-                                    <button
+                                    {!FIRMA_HABILITADA && <button
                                         type="button"
                                         onClick={generarDocumentoPDF}
                                         className="inline-flex items-center gap-2 rounded-xl bg-black hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
@@ -505,7 +548,7 @@ export default function ExamenDocumento() {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-8m0 8l-3-3m3 3l3-3M4 19h16"/>
                                         </svg>
                                         Generar PDF
-                                    </button>
+                                    </button>}
                                     <button
                                         type="button"
                                         onClick={limpiarDocumento}
@@ -673,14 +716,34 @@ export default function ExamenDocumento() {
                                     ))
                                 )}
 
+                                {FIRMA_HABILITADA ? (
+                                    <div className="border-t border-slate-100 pt-4">
+                                        <EmisionDocumento
+                                            tipoDocumento="orden_examen"
+                                            titulo={`Orden de exámenes · ${nombrePaciente.trim() || "paciente"}`}
+                                            referencia={{ tabla: "examenes_clinicos" }}
+                                            paciente={{
+                                                id_paciente: pacienteVinculado?.id_paciente,
+                                                nombre: nombrePaciente.trim(),
+                                                correo: pacienteVinculado?.correo,
+                                            }}
+                                            profesional={profesionalDocumento}
+                                            generarCuerpoPdf={generarCuerpoOrden}
+                                            metadatos={{ resumen: `Orden de exámenes · ${listaExamenesSolicitados.length} exámenes` }}
+                                            nombreArchivo={`orden-examenes-${(nombrePaciente || "paciente").trim().replace(/\s+/g, "-").toLowerCase()}`}
+                                            deshabilitado={Boolean(motivoOrdenIncompleta)}
+                                            motivoDeshabilitado={motivoOrdenIncompleta}
+                                        />
+                                    </div>
+                                ) : null}
                                 <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-4">
-                                    <button
+                                    {!FIRMA_HABILITADA && <button
                                         type="button"
                                         onClick={generarDocumentoPDF}
                                         className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
                                     >
                                         Generar documento PDF
-                                    </button>
+                                    </button>}
                                     <button
                                         type="button"
                                         onClick={() => setListaExamenesSolicitados([])}

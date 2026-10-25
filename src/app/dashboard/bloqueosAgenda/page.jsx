@@ -1,4 +1,5 @@
 'use client'
+import { agendaRestringidaDe } from "@/lib/dashboard-access";
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
@@ -29,7 +30,8 @@ export default function BloqueosAgendas() {
     const { continuarTourTrasGuardarBloqueo } = useTour();
     const API = process.env.NEXT_PUBLIC_API_URL;
     const { user, isLoaded: usuarioCargado } = useUser();
-    const idProfesionalAgendaAsignada = String(user?.publicMetadata?.idProfesionalAgenda || "").trim();
+    // Solo el profesional que no administra la clínica queda restringido a su agenda.
+    const idProfesionalAgendaAsignada = agendaRestringidaDe(user);
     const [listaProfesionales, setListaProfesionales] = useState([]);
     const [id_profesional, setId_profesional] = useState("");
     const agendaAsignadaDisponible = Boolean(

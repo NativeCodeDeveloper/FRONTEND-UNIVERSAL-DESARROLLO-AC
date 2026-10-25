@@ -19,8 +19,12 @@ import {Textarea} from "@/components/ui/textarea";
 import { RutInput } from "@/Componentes/RutInput";
 import { PhoneInput } from "@/Componentes/PhoneInput";
 import { formatRut } from "@/lib/designTokens";
+import { TIPOS_DOCUMENTO, validarDocumento } from "@/lib/rut";
 import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
 import {RecordatorioPaciente} from "@/Componentes/RecordatorioPaciente";
+import ListaDocumentosPaciente from "@/Componentes/documentos/ListaDocumentosPaciente";
+import ConsentimientoInformadoPanel from "@/Componentes/documentos/ConsentimientoInformadoPanel";
+import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
 
 
 
@@ -54,6 +58,8 @@ export default function Paciente(){
     const [nombre, setNombre] = useState("");
     const [apellido, setApellido] = useState("");
     const [rut, setRut] = useState("");
+    const [rutOriginal, setRutOriginal] = useState("");
+    const [tipoDocumento, setTipoDocumento] = useState(TIPOS_DOCUMENTO.RUT);
     const [nacimiento, setNacimiento] = useState("");
     const [sexo, setSexo] = useState("");
     const [prevision, setPrevision] = useState("");
@@ -107,6 +113,13 @@ export default function Paciente(){
                 return toast.error("Debe llenar todos los campos para proceder con la actualziacion")
             }
 
+            // Solo se exige un documento válido si cambió: hay pacientes antiguos con RUT
+            // mal cargado y no se debe bloquear la edición del resto de sus datos.
+            if (rut !== rutOriginal) {
+                const errorDocumento = validarDocumento({ tipo: tipoDocumento, valor: rut });
+                if (errorDocumento) return toast.error(errorDocumento);
+            }
+
             const res = await fetch(`${API}/pacientes/pacientesActualizar`, {
                 method: "POST",
                 headers: {Accept: "application/json",
@@ -116,6 +129,7 @@ export default function Paciente(){
                     nombre,
                     apellido,
                     rut,
+                    tipo_documento: tipoDocumento,
                     nacimiento : convertirFecha(nacimiento),
                     sexo,
                     prevision_id,
@@ -210,6 +224,8 @@ export default function Paciente(){
             setNombre(paciente.nombre);
             setApellido(paciente.apellido);
             setRut(paciente.rut);
+            setRutOriginal(paciente.rut ?? "");
+            setTipoDocumento(paciente.tipo_documento === TIPOS_DOCUMENTO.PASAPORTE ? TIPOS_DOCUMENTO.PASAPORTE : TIPOS_DOCUMENTO.RUT);
             setNacimiento(paciente.nacimiento);
             setSexo(paciente.sexo);
             setPrevision(previsionDesdeId(paciente.prevision_id));
@@ -437,6 +453,9 @@ export default function Paciente(){
                             </div>
                         </div>
 
+                        {/* Contenido clínico: solo perfiles clínicos (Ley 20.584 art. 13; administración y recepción no lo ven) */}
+                        {canSeeFichasClinicas ? (
+                        <>
                         {/* ── Observación (texto largo, ancho completo) ── */}
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                             <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
@@ -451,10 +470,22 @@ export default function Paciente(){
                                 <p className="text-[13px] font-medium text-slate-800 leading-relaxed break-words">{paciente.observacion1 || "---"}</p>
                             </div>
                         </div>
+                        </>
+                        ) : null}
 
                         {/* ── Recordatorio (correo / WhatsApp) ── */}
                         <RecordatorioPaciente key={id_paciente} email={paciente.correo} telefono={paciente.telefono} />
 
+                        {/* ── Consentimiento informado de un procedimiento ── */}
+                        {canSeeFichasClinicas ? (
+                            <ConsentimientoInformadoPanel paciente={{ ...paciente, id_paciente: Number(id_paciente) }} />
+                        ) : null}
+
+                        {/* ── Documentos firmados y consentimientos ── */}
+                        {FIRMA_HABILITADA ? <ListaDocumentosPaciente idPaciente={id_paciente} correoPaciente={paciente.correo} puedeVerContenido={canSeeFichasClinicas} /> : null}
+
+                        {canSeeFichasClinicas ? (
+                        <>
                         {/* ── Antecedentes clínicos ── */}
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                             <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
@@ -480,6 +511,8 @@ export default function Paciente(){
                                 ))}
                             </div>
                         </div>
+                        </>
+                        ) : null}
                     </div>
                 )}
 
@@ -492,7 +525,7 @@ export default function Paciente(){
                             <div>
                                 <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Edición</p>
                                 <h2 className="mt-0.5 text-lg font-bold text-slate-900">Actualizar Datos del Paciente</h2>
-                                <p className="mt-0.5 text-sm text-slate-500">Modifica los datos demográficos y clínicos.</p>
+                                <p className="mt-0.5 text-sm text-slate-500">{canSeeFichasClinicas ? "Modifica los datos demográficos y clínicos." : "Modifica los datos demográficos y de contacto."}</p>
                             </div>
                             <button
                                 type="button"
@@ -522,8 +555,8 @@ export default function Paciente(){
                                         <ShadcnInput value={apellido} placeholder="Ej: González Garrido" onChange={(e) => setApellido(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">RUT</label>
-                                        <RutInput value={rut} onChange={(clean) => setRut(clean)} />
+                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Documento</label>
+                                        <RutInput permitirExtranjero tipoDocumento={tipoDocumento} onTipoDocumentoChange={setTipoDocumento} value={rut} onChange={(clean) => setRut(clean)} />
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Sexo</label>
@@ -574,6 +607,8 @@ export default function Paciente(){
                                     </div>
                                 </div>
 
+                                {/* Solo perfiles clínicos. Para los demás los valores se conservan y se reenvían sin cambios. */}
+                                {canSeeFichasClinicas ? (
                                 <div className="rounded-[24px] border border-violet-100 bg-violet-50/30 p-5">
                                     <p className="mb-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Resumen clínico</p>
                                     <h3 className="mb-5 text-sm font-semibold text-slate-900">Observaciones y antecedentes</h3>
@@ -591,6 +626,7 @@ export default function Paciente(){
                                         ))}
                                     </div>
                                 </div>
+                                ) : null}
                             </section>
 
                             {/* Botón guardar */}

@@ -26,7 +26,7 @@ import BotonAyuda from "@/Componentes/BotonAyuda";
 import TutorialGuiadoCalendario from "@/Componentes/TutorialGuiadoCalendario";
 import { useTour } from "@/ContextosGlobales/TourContext";
 import { marcarReservaDeTour } from "@/lib/tourReserva";
-import { canAccessFichasClinicas, getDashboardRoleFromUser } from "@/lib/dashboard-access";
+import { canAccessFichasClinicas, getDashboardRoleFromUser, agendaRestringidaDe } from "@/lib/dashboard-access";
 import { hoyCivil } from "@/lib/fechas";
 
 dayjs.locale("es");
@@ -69,9 +69,8 @@ function CalendarioContent() {
     // del tour, un agendamiento normal no debe quedar marcado ni terminar
     // resaltando una fila cualquiera la proxima vez que alguien abra el tutorial.
     const { isRunning: tourEnCurso, continuarTourTrasGuardarReserva } = useTour();
-    const idProfesionalAgendaAsignada = normalizarIdProfesional(
-        user?.publicMetadata?.idProfesionalAgenda
-    );
+    // Solo el profesional que no administra la clínica queda restringido a su agenda.
+    const idProfesionalAgendaAsignada = normalizarIdProfesional(agendaRestringidaDe(user));
     const popupRef = useRef(null);
     const popupDragStateRef = useRef({ dragging: false, offsetX: 0, offsetY: 0 });
     const selectionGuardRef = useRef({ missingProfessional: false, overlap: false, past: false, outOfHours: false });

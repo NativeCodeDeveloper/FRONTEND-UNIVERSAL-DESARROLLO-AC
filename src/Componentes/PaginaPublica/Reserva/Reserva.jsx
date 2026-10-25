@@ -11,6 +11,10 @@ import Avatar from "@/Componentes/PaginaPublica/Comunes/Avatar";
 import { IconoCheck } from "@/Componentes/PaginaPublica/Comunes/Iconos";
 import Selector from "@/Componentes/PaginaPublica/Comunes/Selector";
 import Calendario from "@/Componentes/PaginaPublica/Reserva/Calendario";
+import ConsentimientosReserva from "@/Componentes/PaginaPublica/Reserva/ConsentimientosReserva";
+import { TIPOS_DOCUMENTO, limpiarPasaporte, validarDocumento } from "@/lib/rut";
+import { registrarAceptacion, seleccionarVigentes } from "@/lib/consentimientos/apiConsentimientos";
+import { esObligatorio } from "@/lib/consentimientos/textosLegales";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LOTE_VALIDACION = 6;
@@ -109,6 +113,14 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
   const [enviando, setEnviando] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState("");
   const [confirmada, setConfirmada] = useState(false);
+  /* Pacientes extranjeros reservan con pasaporte (sin dígito verificador). */
+  const [tipoDocumento, setTipoDocumento] = useState(TIPOS_DOCUMENTO.RUT);
+  /* Consentimientos (Ley 21.719 y Ley 20.584): dos aceptaciones separadas, ninguna premarcada. */
+  const [plantillas, setPlantillas] = useState([]);
+  const [cargandoPlantillas, setCargandoPlantillas] = useState(true);
+  const [errorPlantillas, setErrorPlantillas] = useState(false);
+  const [consentimientos, setConsentimientos] = useState({});
+  const [mostrarErroresConsentimiento, setMostrarErroresConsentimiento] = useState(false);
 
   const [bloqueos, setBloqueos] = useState([]);
   const [cargandoBloqueos, setCargandoBloqueos] = useState(true);
@@ -172,14 +184,37 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
     { titulo: "Noche", lista: bloques.filter((b) => b.inicio >= "18:00") },
   ].filter((g) => g.lista.length);
 
-  const erroresActuales = Object.fromEntries(Object.keys(errores).map((k) => [k, errores[k](datos[k])]));
+  const erroresActuales = Object.fromEntries(
+    Object.keys(errores).map((k) => [
+      k,
+      k === "rut"
+        ? validarDocumento({ tipo: tipoDocumento, valor: datos.rut })
+          ? tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? "Revisa tu pasaporte" : "Revisa tu RUT"
+          : ""
+        : errores[k](datos[k]),
+    ])
+  );
   const datosListos = Object.values(erroresActuales).every((e) => !e);
+  // Solo la política de privacidad es obligatoria; derechos y deberes es de lectura.
+  const obligatorias = plantillas.filter((p) => esObligatorio(p.codigo));
+  const consentimientosListos = obligatorias.length > 0 && obligatorias.every((p) => consentimientos[p.codigo]);
 
   /* Igual que el formulario anterior: $0 agenda directo; con pasarela activa se paga en Mercado Pago */
   const tienePrecio = !!servicio && Number(servicio.precio) > 0;
   const conPago = tienePrecio && estadoPasarela === true;
   const pasarelaDesconocida = tienePrecio && estadoPasarela === null;
-  const listo = !!servicio && !!fecha && !!bloqueVigente && datosListos && !pasarelaDesconocida;
+  const listo = !!servicio && !!fecha && !!bloqueVigente && datosListos && consentimientosListos && !pasarelaDesconocida;
+
+  useEffect(() => {
+    let vigente = true;
+    seleccionarVigentes()
+      .then((lista) => vigente && setPlantillas(lista))
+      .catch(() => vigente && setErrorPlantillas(true))
+      .finally(() => vigente && setCargandoPlantillas(false));
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
   function irA(ref) {
     requestAnimationFrame(() => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -206,7 +241,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
   }
 
   function cambiar(campo, valor) {
-    if (campo === "rut") valor = formatearRut(valor);
+    if (campo === "rut") valor = tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? limpiarPasaporte(valor) : formatearRut(valor);
     if (campo === "telefono")
       valor = valor
         .replace(/\D/g, "")
@@ -219,6 +254,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
     if (enviando) return;
     if (!listo) {
       setTocados({ nombre: true, apellido: true, rut: true, correo: true, telefono: true });
+      setMostrarErroresConsentimiento(true);
       if (!servicio) irA(refFecha);
       else if (!fecha || !bloqueVigente) irA(refHora);
       else irA(refDatos);
@@ -228,7 +264,8 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
     const paciente = {
       nombrePaciente: datos.nombre.trim(),
       apellidoPaciente: datos.apellido.trim(),
-      rut: limpiarRut(datos.rut),
+      rut: tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? limpiarPasaporte(datos.rut) : limpiarRut(datos.rut),
+      tipo_documento: tipoDocumento,
       telefono: `+569${datos.telefono.replace(/\D/g, "")}`,
       email: datos.correo.trim(),
       fechaInicio: fecha,
@@ -241,6 +278,34 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
     setEnviando(true);
     setErrorEnvio("");
     try {
+      // Primero se registran los consentimientos: la reserva viaja con el token
+      // que los vincula. Sin aceptación registrada no se agenda.
+      {
+        try {
+          const { token_aceptacion } = await registrarAceptacion({
+            plantillas,
+            paciente: {
+              nombre: paciente.nombrePaciente,
+              apellido: paciente.apellidoPaciente,
+              tipo_documento: tipoDocumento,
+              documento: paciente.rut,
+              correo: paciente.email,
+              telefono: paciente.telefono,
+            },
+            id_profesional: profesional.id_profesional,
+          });
+          if (token_aceptacion) paciente.token_aceptacion = token_aceptacion;
+        } catch (error) {
+          if (error?.codigo === "actaDesactualizada") {
+            // Cambió el texto mientras el paciente leía: se recarga y debe volver a aceptar.
+            setConsentimientos({});
+            setPlantillas(await seleccionarVigentes().catch(() => []));
+            throw new Error("Los términos se actualizaron. Revísalos y vuelve a aceptarlos.");
+          }
+          throw new Error("No pudimos registrar tu aceptación. Intenta nuevamente.");
+        }
+      }
+
       if (conPago) {
         const res = await postJson("/pagosMercadoPago/create-order", {
           ...paciente,
@@ -476,11 +541,37 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
           bloqueado={!bloqueVigente}
           aviso="Elige un horario para completar tu reserva."
         >
+          <div role="radiogroup" aria-label="Documento de identidad" className="mb-4 inline-flex rounded-full bg-niebla p-1">
+            {[
+              [TIPOS_DOCUMENTO.RUT, "Tengo RUT"],
+              [TIPOS_DOCUMENTO.PASAPORTE, "Soy extranjero/a"],
+            ].map(([valor, etiqueta]) => (
+              <button
+                key={valor}
+                type="button"
+                role="radio"
+                aria-checked={tipoDocumento === valor}
+                onClick={() => {
+                  if (valor === tipoDocumento) return;
+                  setTipoDocumento(valor);
+                  setDatos((d) => ({ ...d, rut: "" }));
+                  setTocados((t) => ({ ...t, rut: false }));
+                }}
+                className={`h-9 rounded-full px-4 text-[14px] font-medium transition-all ${
+                  tipoDocumento === valor ? "bg-papel text-tinta shadow-caja" : "text-tinta-2 hover:text-tinta"
+                }`}
+              >
+                {etiqueta}
+              </button>
+            ))}
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { campo: "nombre", etiqueta: "Nombre", tipo: "text", auto: "given-name", placeholder: "Ana" },
               { campo: "apellido", etiqueta: "Apellido", tipo: "text", auto: "family-name", placeholder: "Pérez" },
-              { campo: "rut", etiqueta: "RUT", tipo: "text", auto: "off", placeholder: "12.345.678-9" },
+              tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE
+                ? { campo: "rut", etiqueta: "N° de pasaporte", tipo: "text", auto: "off", placeholder: "AB1234567" }
+                : { campo: "rut", etiqueta: "RUT", tipo: "text", auto: "off", placeholder: "12.345.678-9" },
               { campo: "correo", etiqueta: "Correo electrónico", tipo: "email", auto: "email", placeholder: "ana@correo.cl" },
             ].map((c) => {
               const error = tocados[c.campo] ? erroresActuales[c.campo] : "";
@@ -526,6 +617,16 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
               )}
             </label>
           </div>
+                      <ConsentimientosReserva
+              plantillas={plantillas}
+              valores={consentimientos}
+              onCambio={(codigo, valor) => setConsentimientos((c) => ({ ...c, [codigo]: valor }))}
+              mostrarErrores={mostrarErroresConsentimiento}
+              empresa={datosEmpresa}
+              profesional={profesional}
+              cargando={cargandoPlantillas}
+              errorCarga={errorPlantillas}
+            />
         </Paso>
       </div>
 

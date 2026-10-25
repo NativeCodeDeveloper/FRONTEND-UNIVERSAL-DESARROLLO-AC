@@ -1,243 +1,233 @@
 "use client";
 
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Check, ChevronDown, Eye, EyeOff, KeyRound, Minus, RefreshCw, Search, Trash2, UserPlus, UsersRound } from "lucide-react";
 import {
-  CheckCircle2,
-  ChevronDown,
-  CircleMinus,
-  Eye,
-  EyeOff,
-  KeyRound,
-  Lock,
-  RefreshCw,
-  Trash2,
-  UserPlus,
-  UsersRound,
-} from "lucide-react";
-import {
+  GRUPOS_PERFIL,
   getCreatableDashboardRoles,
   getDashboardRoleLabel,
+  normalizeDashboardRole,
 } from "@/lib/dashboard-access";
+import { ZONA_CLINICA } from "@/lib/fechas";
 
-const initialForm = {
+/*
+ * Usuarios y perfiles (solo técnico NativeCode). Los usuarios no se registran
+ * solos: se crean aquí con nombre de usuario, contraseña y perfil. A los
+ * profesionales se les asigna su agenda, que define qué ven y con qué identidad
+ * firman. Reglas de perfiles: src/lib/dashboard-access.js.
+ */
+
+const PERFILES = getCreatableDashboardRoles();
+const PERFIL_POR_VALOR = new Map(PERFILES.map((p) => [p.value, p]));
+const ORDEN_GRUPOS = ["nativecode", "administracion", "profesionales", "operacion"];
+
+const FORMULARIO_INICIAL = {
   nombre: "",
   apellido: "",
   nombreUsuario: "",
-  idProfesionalAgenda: "",
   password: "",
   confirmPassword: "",
   role: "",
+  idProfesionalAgenda: "",
+  administraClinica: false,
 };
 
-const CREATABLE_ROLE_OPTIONS = getCreatableDashboardRoles();
-const CREATABLE_ROLE_OPTIONS_BY_VALUE = new Map(
-  CREATABLE_ROLE_OPTIONS.map((option) => [option.value, option])
-);
-const EDITABLE_ROLE_OPTIONS = getCreatableDashboardRoles();
-const EDITABLE_ROLE_OPTIONS_BY_VALUE = new Map(
-  EDITABLE_ROLE_OPTIONS.map((option) => [option.value, option])
-);
-
 async function leerRespuesta(response) {
-  const rawResponse = await response.text();
-
+  const texto = await response.text();
   try {
-    return rawResponse ? JSON.parse(rawResponse) : null;
+    return texto ? JSON.parse(texto) : null;
   } catch {
-    return { error: rawResponse };
+    return { error: texto };
   }
 }
 
-function formatearFecha(fecha) {
-  if (!fecha) {
-    return "Sin registro";
-  }
-
-  return new Intl.DateTimeFormat("es-CL", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  // fecha-ok: createdAt de Clerk, instante real con hora.
-  }).format(new Date(fecha));
+function formatearUltimoIngreso(valor) {
+  if (!valor) return "Nunca ha ingresado";
+  // fecha-ok: lastSignInAt de Clerk es un instante real; se muestra en la zona de la clínica.
+  return new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short", timeZone: ZONA_CLINICA }).format(new Date(valor));
 }
 
-function Field({ label, hint, children }) {
+// ── Piezas visuales ─────────────────────────────────────────────────────────
+
+const campoClase =
+  "h-11 w-full rounded-xl border border-black/[0.08] bg-white px-3.5 text-[14px] text-[#1D1D1F] outline-none transition placeholder:text-[#AEAEB2] focus:border-[#007AFF] focus:ring-4 focus:ring-[#007AFF]/15 disabled:bg-[#F5F5F7]";
+
+function Campo({ etiqueta, ayuda, children, className = "" }) {
   return (
-    <div className="space-y-2">
-      <div>
-        <p className="text-[12px] font-semibold text-slate-800">{label}</p>
-        {hint ? <p className="mt-0.5 text-[11px] text-slate-400">{hint}</p> : null}
-      </div>
-      {children}
-    </div>
+    <label className={`block ${className}`}>
+      <span className="block text-[13px] font-medium text-[#1D1D1F]">{etiqueta}</span>
+      {ayuda ? <span className="mt-0.5 block text-[12px] text-[#86868B]">{ayuda}</span> : null}
+      <span className="mt-2 block">{children}</span>
+    </label>
   );
 }
 
-function Input({ icon: Icon, ...props }) {
+function CampoContrasena(props) {
+  const [visible, setVisible] = useState(false);
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-slate-400 focus-within:ring-4 focus-within:ring-slate-100">
-      {Icon ? <Icon className="h-4 w-4 text-slate-400" /> : null}
-      <input
-        {...props}
-        className="w-full bg-transparent text-[14px] text-slate-900 outline-none placeholder:text-slate-400"
-      />
-    </div>
-  );
-}
-
-function PasswordInput({ ...props }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition-all focus-within:border-slate-400 focus-within:ring-4 focus-within:ring-slate-100">
-      <Lock className="h-4 w-4 shrink-0 text-slate-400" />
-      <input
-        {...props}
-        type={show ? "text" : "password"}
-        className="w-full bg-transparent text-[14px] text-slate-900 outline-none placeholder:text-slate-400"
-      />
+    <div className="relative">
+      <input {...props} type={visible ? "text" : "password"} className={`${campoClase} pr-11`} />
       <button
         type="button"
-        onClick={() => setShow(prev => !prev)}
-        className="shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868B] hover:text-[#1D1D1F]"
         tabIndex={-1}
       >
-        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>
     </div>
   );
 }
 
-function RolePermissionDetails({ role }) {
-  if (!role) {
-    return null;
-  }
-
+function SelectorPerfil({ value, onChange, disabled = false, incluirVacio = true, valorAntiguo }) {
   return (
-    <section
-      aria-live="polite"
-      className="mt-3 overflow-hidden rounded-[24px] border border-violet-200 bg-white shadow-[0_16px_40px_rgba(110,86,207,0.10)]"
-    >
-      <div className="border-b border-slate-100 bg-slate-50 px-5 py-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#6E56CF] text-white shadow-lg shadow-violet-200">
-              <UsersRound className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6E56CF]">
-                Perfil seleccionado
-              </p>
-              <h3 className="mt-0.5 text-[16px] font-bold text-slate-900">{role.label}</h3>
-              <p className="mt-1 text-[12px] leading-5 text-slate-600">{role.description}</p>
-            </div>
-          </div>
-          <span className="rounded-full border border-violet-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6E56CF]">
-            {role.value}
-          </span>
-        </div>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className={`${campoClase} appearance-none pr-10 font-medium`}
+      >
+        {incluirVacio ? <option value="" disabled>Selecciona un perfil</option> : null}
+        {valorAntiguo ? <option value={valorAntiguo} disabled>{getDashboardRoleLabel(valorAntiguo)} (valor anterior)</option> : null}
+        {ORDEN_GRUPOS.map((grupo) => (
+          <optgroup key={grupo} label={GRUPOS_PERFIL[grupo]}>
+            {PERFILES.filter((p) => p.grupo === grupo).map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+      <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#86868B]" />
+    </div>
+  );
+}
 
-        {role.recommendedFor ? (
-          <div className="mt-4 rounded-2xl border border-violet-100 bg-white/80 px-4 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Recomendado para
-            </p>
-            <p className="mt-1 text-[12px] leading-5 text-slate-700">{role.recommendedFor}</p>
-          </div>
-        ) : null}
+function SelectorAgenda({ value, onChange, profesionales, disabled = false, requerida = false }) {
+  return (
+    <div className="relative">
+      <select value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} className={`${campoClase} appearance-none pr-10`}>
+        <option value="">{requerida ? "Selecciona la agenda del profesional" : "Sin agenda asignada"}</option>
+        {profesionales.map((p) => (
+          <option key={p.id_profesional} value={String(p.id_profesional)}>{p.nombreProfesional}</option>
+        ))}
+      </select>
+      <ChevronDown aria-hidden="true" className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#86868B]" />
+    </div>
+  );
+}
+
+/** Interruptor estilo iOS. */
+function Interruptor({ activo, onCambio, etiqueta, descripcion, disabled = false }) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-2xl bg-[#F5F5F7] px-4 py-3.5">
+      <div className="min-w-0">
+        <p className="text-[14px] font-medium text-[#1D1D1F]">{etiqueta}</p>
+        {descripcion ? <p className="mt-0.5 text-[12px] leading-snug text-[#86868B]">{descripcion}</p> : null}
       </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={activo}
+        aria-label={etiqueta}
+        disabled={disabled}
+        onClick={() => onCambio(!activo)}
+        className={`relative mt-0.5 h-[31px] w-[51px] shrink-0 rounded-full transition-colors duration-200 disabled:opacity-50 ${activo ? "bg-[#34C759]" : "bg-[#E9E9EB]"}`}
+      >
+        <span
+          className={`absolute top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.15),0_1px_1px_rgba(0,0,0,0.16)] transition-transform duration-200 ${activo ? "translate-x-[22px]" : "translate-x-[2px]"}`}
+        />
+      </button>
+    </div>
+  );
+}
 
-      <div className="grid gap-5 p-5 lg:grid-cols-2">
-        <div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-              Todos los accesos de este perfil
-            </h4>
-          </div>
-          <ul className="mt-3 space-y-2.5">
-            {role.access.map((permission) => (
-              <li key={permission} className="flex items-start gap-2.5 text-[12px] leading-5 text-slate-600">
-                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
-                <span>{permission}</span>
+function DetallePerfil({ perfil }) {
+  if (!perfil) {
+    return (
+      <div className="rounded-2xl border border-dashed border-black/[0.1] px-5 py-7 text-center">
+        <UsersRound className="mx-auto h-6 w-6 text-[#C7C7CC]" />
+        <p className="mt-2 text-[13px] font-medium text-[#1D1D1F]">Elige un perfil</p>
+        <p className="mt-0.5 text-[12px] text-[#86868B]">Aquí verás todo lo que puede y no puede hacer.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="overflow-hidden rounded-2xl bg-[#F5F5F7]" aria-live="polite">
+      <div className="px-4 py-3.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#007AFF]">{perfil.grupoLabel}</p>
+        <p className="mt-0.5 text-[15px] font-semibold text-[#1D1D1F]">{perfil.label}</p>
+        <p className="mt-0.5 text-[13px] text-[#6E6E73]">{perfil.description}</p>
+      </div>
+      <div className="grid gap-px bg-black/[0.06] sm:grid-cols-2">
+        <div className="bg-white px-4 py-3.5">
+          <p className="text-[12px] font-semibold text-[#1D1D1F]">Puede</p>
+          <ul className="mt-2 space-y-1.5">
+            {perfil.access.map((a) => (
+              <li key={a} className="flex items-start gap-2 text-[13px] leading-snug text-[#3A3A3C]">
+                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#34C759]" strokeWidth={3} />
+                {a}
               </li>
             ))}
           </ul>
         </div>
-
-        <div className="border-t border-slate-100 pt-5 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
-          <div className="flex items-center gap-2">
-            <CircleMinus className="h-4 w-4 text-amber-600" />
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
-              Restricciones importantes
-            </h4>
-          </div>
-          {role.restrictions.length > 0 ? (
-            <ul className="mt-3 space-y-2.5">
-              {role.restrictions.map((restriction) => (
-                <li key={restriction} className="flex items-start gap-2.5 text-[12px] leading-5 text-slate-600">
-                  <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
-                  <span>{restriction}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-3 text-[12px] leading-5 text-slate-500">
-              Este perfil no tiene restricciones específicas configuradas.
-            </p>
-          )}
+        <div className="bg-white px-4 py-3.5">
+          <p className="text-[12px] font-semibold text-[#1D1D1F]">No puede</p>
+          <ul className="mt-2 space-y-1.5">
+            {perfil.restrictions.map((r) => (
+              <li key={r} className="flex items-start gap-2 text-[13px] leading-snug text-[#6E6E73]">
+                <Minus className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#AEAEB2]" strokeWidth={3} />
+                {r}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-export default function CreateUserPage() {
+function Aviso({ tono = "error", children }) {
+  const clases = tono === "ok" ? "bg-[#34C759]/12 text-[#1E7B34]" : "bg-[#FF3B30]/10 text-[#C4291D]";
+  return <div className={`rounded-xl px-4 py-3 text-[13px] ${clases}`}>{children}</div>;
+}
+
+// ── Página ──────────────────────────────────────────────────────────────────
+
+export default function CrearUsuarioPage() {
   const API = process.env.NEXT_PUBLIC_API_URL;
-  const [form, setForm] = useState(initialForm);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState(FORMULARIO_INICIAL);
+  const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
-  const [createdUser, setCreatedUser] = useState(null);
+  const [creado, setCreado] = useState(null);
+
   const [usuarios, setUsuarios] = useState([]);
   const [cargandoUsuarios, setCargandoUsuarios] = useState(true);
   const [errorUsuarios, setErrorUsuarios] = useState("");
-  const [contrasenasNuevas, setContrasenasNuevas] = useState({});
-  const [agendasProfesionales, setAgendasProfesionales] = useState({});
-  const [rolesUsuarios, setRolesUsuarios] = useState({});
-  const [accionEnCurso, setAccionEnCurso] = useState("");
   const [mensajeUsuarios, setMensajeUsuarios] = useState("");
-  const [listaProfesionales, setListaProfesionales] = useState([]);
+  const [profesionales, setProfesionales] = useState([]);
   const [errorProfesionales, setErrorProfesionales] = useState("");
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroGrupo, setFiltroGrupo] = useState("todos");
 
-  const selectedRoleMeta = CREATABLE_ROLE_OPTIONS_BY_VALUE.get(form.role) || null;
+  const perfil = PERFIL_POR_VALOR.get(form.role) || null;
+  const nombreAgenda = useMemo(
+    () => Object.fromEntries(profesionales.map((p) => [String(p.id_profesional), p.nombreProfesional])),
+    [profesionales]
+  );
 
   const cargarUsuarios = useCallback(async () => {
     setCargandoUsuarios(true);
     setErrorUsuarios("");
-
     try {
       const response = await fetch("/api/dashboard/users", { cache: "no-store" });
       const data = await leerRespuesta(response);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "No se pudieron cargar los usuarios.");
-      }
-
-      const usuariosCargados = Array.isArray(data?.users) ? data.users : [];
-      setUsuarios(usuariosCargados);
-      setAgendasProfesionales(
-        usuariosCargados.reduce((agendas, usuario) => ({
-          ...agendas,
-          [usuario.id]: String(usuario.idProfesionalAgenda || ""),
-        }), {})
-      );
-      setRolesUsuarios(
-        usuariosCargados.reduce((roles, usuario) => ({
-          ...roles,
-          [usuario.id]: String(usuario.role || ""),
-        }), {})
-      );
-    } catch (loadError) {
-      setErrorUsuarios(loadError.message || "No se pudieron cargar los usuarios.");
+      if (!response.ok) throw new Error(data?.error || "No se pudieron cargar los usuarios.");
+      setUsuarios(Array.isArray(data?.users) ? data.users : []);
+    } catch (e) {
+      setErrorUsuarios(e.message || "No se pudieron cargar los usuarios.");
     } finally {
       setCargandoUsuarios(false);
     }
@@ -248,640 +238,498 @@ export default function CreateUserPage() {
       setErrorProfesionales("No se configuró la conexión para cargar las agendas.");
       return;
     }
-
     try {
-      const response = await fetch(`${API}/profesionales/seleccionarTodosProfesionales`, {
-        headers: { Accept: "application/json" },
-      });
-
-      if (!response.ok) {
-        throw new Error("No se pudieron cargar las agendas profesionales.");
-      }
-
-      const profesionales = await response.json();
-      setListaProfesionales(Array.isArray(profesionales) ? profesionales : []);
-    } catch (loadError) {
-      setErrorProfesionales(loadError.message || "No se pudieron cargar las agendas profesionales.");
+      const response = await fetch(`${API}/profesionales/seleccionarTodosProfesionales`, { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error("No se pudieron cargar las agendas profesionales.");
+      const lista = await response.json();
+      setProfesionales(Array.isArray(lista) ? lista : []);
+    } catch (e) {
+      setErrorProfesionales(e.message || "No se pudieron cargar las agendas profesionales.");
     }
   }, [API]);
 
   useEffect(() => {
     cargarUsuarios();
     cargarProfesionales();
-  }, [cargarProfesionales, cargarUsuarios]);
+  }, [cargarUsuarios, cargarProfesionales]);
 
-  function updateField(field, value) {
-    setForm((current) => ({ ...current, [field]: value }));
+  function actualizar(campo, valor) {
+    setForm((f) => ({ ...f, [campo]: valor }));
+    setError("");
   }
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  function cambiarPerfil(valor) {
+    const esProfesional = PERFIL_POR_VALOR.get(valor)?.esProfesional;
+    // Agenda e interruptor solo existen en perfiles profesionales.
+    setForm((f) => ({
+      ...f,
+      role: valor,
+      idProfesionalAgenda: esProfesional ? f.idProfesionalAgenda : "",
+      administraClinica: esProfesional ? f.administraClinica : false,
+    }));
     setError("");
-    setCreatedUser(null);
+  }
 
-    if (!form.nombre.trim()) {
-      setError("Completa el nombre.");
-      return;
+  async function crear(e) {
+    e.preventDefault();
+    setError("");
+    setCreado(null);
+
+    if (!form.nombre.trim()) return setError("Completa el nombre.");
+    if (!form.nombreUsuario.trim()) return setError("Completa el nombre de usuario.");
+    if (!form.password) return setError("Completa la contraseña.");
+    if (form.password !== form.confirmPassword) return setError("Las contraseñas no coinciden.");
+    if (!perfil) return setError("Selecciona un perfil.");
+    if (perfil.esProfesional && !form.idProfesionalAgenda) {
+      return setError("Asigna la agenda del profesional: define qué ve y con qué identidad firma.");
     }
 
-    if (!form.nombreUsuario.trim()) {
-      setError("Completa el nombre de usuario.");
-      return;
-    }
-
-    if (!form.password) {
-      setError("Completa la contrasena.");
-      return;
-    }
-
-    if (form.password !== form.confirmPassword) {
-      setError("La confirmacion de contrasena no coincide.");
-      return;
-    }
-
-    if (!selectedRoleMeta) {
-      setError("Selecciona un perfil para revisar y asignar sus accesos.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
+    setEnviando(true);
     try {
       const response = await fetch("/api/dashboard/users", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nombre: form.nombre,
           apellido: form.apellido,
           nombreUsuario: form.nombreUsuario,
-          idProfesionalAgenda: form.idProfesionalAgenda,
           password: form.password,
           role: form.role,
+          idProfesionalAgenda: form.idProfesionalAgenda,
+          administraClinica: form.administraClinica,
         }),
       });
-
       const data = await leerRespuesta(response);
-
-      if (!response.ok) {
-        throw new Error(
-          data?.error ||
-          data?.message ||
-          `No se pudo crear el usuario. HTTP ${response.status}`
-        );
-      }
-
-      setCreatedUser(data?.user || null);
-      setForm({ ...initialForm, role: form.role });
+      if (!response.ok) throw new Error(data?.error || `No se pudo crear el usuario (HTTP ${response.status}).`);
+      setCreado(data?.user || null);
+      setForm({ ...FORMULARIO_INICIAL, role: form.role });
       await cargarUsuarios();
-    } catch (submitError) {
-      setError(submitError.message || "No se pudo crear el usuario.");
+    } catch (err) {
+      setError(err.message || "No se pudo crear el usuario.");
     } finally {
-      setIsSubmitting(false);
+      setEnviando(false);
     }
   }
 
-  async function actualizarContrasena(usuarioId) {
-    const password = contrasenasNuevas[usuarioId] || "";
-
-    if (!password) {
-      setErrorUsuarios("Ingresa la nueva contrasena.");
-      return;
-    }
-
-    setAccionEnCurso(`password-${usuarioId}`);
-    setErrorUsuarios("");
-    setMensajeUsuarios("");
-
-    try {
-      const response = await fetch(`/api/dashboard/users/${usuarioId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      const data = await leerRespuesta(response);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "No se pudo actualizar la contrasena.");
-      }
-
-      setContrasenasNuevas((current) => ({ ...current, [usuarioId]: "" }));
-      setMensajeUsuarios("Contrasena actualizada correctamente.");
-    } catch (updateError) {
-      setErrorUsuarios(updateError.message || "No se pudo actualizar la contrasena.");
-    } finally {
-      setAccionEnCurso("");
-    }
-  }
-
-  async function actualizarAgendaProfesional(usuarioId) {
-    const idProfesionalAgenda = String(agendasProfesionales[usuarioId] || "");
-
-    setAccionEnCurso(`agenda-${usuarioId}`);
-    setErrorUsuarios("");
-    setMensajeUsuarios("");
-
-    try {
-      const response = await fetch(`/api/dashboard/users/${usuarioId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idProfesionalAgenda }),
-      });
-      const data = await leerRespuesta(response);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "No se pudo actualizar la agenda asignada.");
-      }
-
-      setUsuarios((current) => current.map((usuario) => (
-        usuario.id === usuarioId
-          ? { ...usuario, idProfesionalAgenda }
-          : usuario
-      )));
-      setMensajeUsuarios(idProfesionalAgenda ? "Agenda asignada correctamente." : "La agenda asignada fue eliminada.");
-    } catch (updateError) {
-      setErrorUsuarios(updateError.message || "No se pudo actualizar la agenda asignada.");
-    } finally {
-      setAccionEnCurso("");
-    }
-  }
-
-  async function actualizarRolUsuario(usuarioId) {
-    const role = String(rolesUsuarios[usuarioId] || "");
-
-    if (!EDITABLE_ROLE_OPTIONS_BY_VALUE.has(role)) {
-      setErrorUsuarios("Selecciona un perfil válido para el usuario.");
-      return;
-    }
-
-    setAccionEnCurso(`role-${usuarioId}`);
-    setErrorUsuarios("");
-    setMensajeUsuarios("");
-
-    try {
-      const response = await fetch(`/api/dashboard/users/${usuarioId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      });
-      const data = await leerRespuesta(response);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "No se pudo actualizar el perfil.");
-      }
-
-      setUsuarios((current) => current.map((usuario) => (
-        usuario.id === usuarioId
-          ? { ...usuario, role: data?.role || role }
-          : usuario
-      )));
-      setMensajeUsuarios("Perfil actualizado correctamente.");
-    } catch (updateError) {
-      setErrorUsuarios(updateError.message || "No se pudo actualizar el perfil.");
-    } finally {
-      setAccionEnCurso("");
-    }
-  }
-
-  async function eliminarUsuario(usuario) {
-    const confirmarEliminacion = window.confirm(
-      `Eliminar permanentemente a ${usuario.nombreUsuario || usuario.nombre || "este usuario"} de Clerk?`
-    );
-
-    if (!confirmarEliminacion) {
-      return;
-    }
-
-    setAccionEnCurso(`delete-${usuario.id}`);
-    setErrorUsuarios("");
-    setMensajeUsuarios("");
-
-    try {
-      const response = await fetch(`/api/dashboard/users/${usuario.id}`, {
-        method: "DELETE",
-      });
-      const data = await leerRespuesta(response);
-
-      if (!response.ok) {
-        throw new Error(data?.error || "No se pudo eliminar el usuario.");
-      }
-
-      setUsuarios((current) => current.filter((item) => item.id !== usuario.id));
-      setMensajeUsuarios("Usuario eliminado correctamente.");
-    } catch (deleteError) {
-      setErrorUsuarios(deleteError.message || "No se pudo eliminar el usuario.");
-    } finally {
-      setAccionEnCurso("");
-    }
-  }
+  const usuariosFiltrados = useMemo(() => {
+    const termino = busqueda.trim().toLowerCase();
+    return usuarios.filter((u) => {
+      const grupo = PERFIL_POR_VALOR.get(normalizeDashboardRole(u.perfil || u.role).replace("+admin", ""))?.grupo;
+      if (filtroGrupo !== "todos" && grupo !== filtroGrupo) return false;
+      if (!termino) return true;
+      return [u.nombre, u.nombreUsuario, getDashboardRoleLabel(u.perfil || u.role), nombreAgenda[u.idProfesionalAgenda]]
+        .filter(Boolean)
+        .some((t) => String(t).toLowerCase().includes(termino));
+    });
+  }, [usuarios, busqueda, filtroGrupo, nombreAgenda]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
-      <div className="flex-1 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-10 2xl:max-w-none">
-
-        {/* ── Header ── */}
-        <div className="mb-10">
-          <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
-            Crear Usuario
-          </h1>
-          <p className="mt-2 text-[13px] text-slate-500 max-w-2xl">
-            Crea un usuario en Clerk con nombre de usuario, contraseña y perfil. Puedes vincularlo a una agenda para que al ingresar vea solamente sus reservas.
+    <div className="font-system-apple min-h-screen bg-[#FAFAFB]">
+      <div className="mx-auto w-full max-w-[1280px] px-4 py-6 md:px-8 md:py-10">
+        <header className="mb-8">
+          <h1 className="text-[26px] font-semibold tracking-tight text-[#1D1D1F]">Usuarios y perfiles</h1>
+          <p className="mt-1 max-w-2xl text-[14px] text-[#6E6E73]">
+            Crea los accesos de cada clínica. A los profesionales se les asigna su agenda: define qué ven y con qué identidad firman.
           </p>
-        </div>
+        </header>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_360px] items-start">
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+          {/* ── Nuevo usuario ── */}
+          <form onSubmit={crear} className="rounded-[22px] bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_28px_-14px_rgba(0,40,120,0.18)] ring-1 ring-black/[0.05] md:p-7">
+            <h2 className="text-[17px] font-semibold text-[#1D1D1F]">Nuevo usuario</h2>
 
-          {/* ── Formulario principal ── */}
-          <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-              <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Datos del nuevo usuario</h2>
-              <div className="h-9 px-4 rounded-xl border border-slate-200 bg-white flex items-center gap-2 shadow-sm">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Perfil:</span>
-                <span className="text-[12px] font-bold text-[#6E56CF]">
-                  {selectedRoleMeta?.label || "Sin seleccionar"}
-                </span>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6">
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Nombre" hint="Se mostrará en la lista de usuarios">
-                  <Input
-                    value={form.nombre}
-                    onChange={(event) => updateField("nombre", event.target.value)}
-                    placeholder="Ej.: María"
-                  />
-                </Field>
-                <Field label="Apellido" hint="Opcional">
-                  <Input
-                    value={form.apellido}
-                    onChange={(event) => updateField("apellido", event.target.value)}
-                    placeholder="Ej.: González"
-                  />
-                </Field>
-              </div>
-
-              <Field label="Nombre de usuario" hint="Será el identificador para iniciar sesión">
-                <Input
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <Campo etiqueta="Nombre">
+                <input value={form.nombre} onChange={(e) => actualizar("nombre", e.target.value)} placeholder="María" className={campoClase} />
+              </Campo>
+              <Campo etiqueta="Apellido" ayuda="Opcional">
+                <input value={form.apellido} onChange={(e) => actualizar("apellido", e.target.value)} placeholder="González" className={campoClase} />
+              </Campo>
+              <Campo etiqueta="Nombre de usuario" ayuda="Con él inicia sesión" className="md:col-span-2">
+                <input
                   value={form.nombreUsuario}
-                  onChange={(event) => updateField("nombreUsuario", event.target.value)}
-                  placeholder="Ej.: maria.gonzalez"
+                  onChange={(e) => actualizar("nombreUsuario", e.target.value.replace(/\s+/g, "").toLowerCase())}
+                  placeholder="maria.gonzalez"
+                  autoCapitalize="none"
+                  className={campoClase}
                 />
-              </Field>
+              </Campo>
+              <Campo etiqueta="Contraseña">
+                <CampoContrasena value={form.password} onChange={(e) => actualizar("password", e.target.value)} placeholder="Contraseña segura" />
+              </Campo>
+              <Campo etiqueta="Confirmar contraseña">
+                <CampoContrasena value={form.confirmPassword} onChange={(e) => actualizar("confirmPassword", e.target.value)} placeholder="Repite la contraseña" />
+              </Campo>
+            </div>
 
-              <Field label="Agenda asignada" hint="El usuario verá solamente esta agenda al entrar a Calendario">
-                <select
-                  value={form.idProfesionalAgenda}
-                  onChange={(event) => updateField("idProfesionalAgenda", event.target.value)}
-                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-[14px] text-slate-900 outline-none transition-all hover:border-slate-300 focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100"
-                >
-                  <option value="">Sin agenda asignada</option>
-                  {listaProfesionales.map((profesional) => (
-                    <option key={profesional.id_profesional} value={String(profesional.id_profesional)}>
-                      {profesional.nombreProfesional}
-                    </option>
-                  ))}
-                </select>
-                {errorProfesionales ? (
-                  <p className="text-[11px] text-rose-600">{errorProfesionales}</p>
-                ) : null}
-              </Field>
+            <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6">
+              <Campo etiqueta="Perfil" ayuda="Según su cargo y, si es profesional, su especialidad">
+                <SelectorPerfil value={form.role} onChange={cambiarPerfil} />
+              </Campo>
 
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Contrasena" hint="Usa una contraseña que el usuario pueda recordar">
-                  <PasswordInput
-                    value={form.password}
-                    onChange={(event) => updateField("password", event.target.value)}
-                    placeholder="Ingresa una contrasena segura"
-                  />
-                </Field>
-                <Field label="Confirmar contrasena" hint="Debe coincidir con la anterior">
-                  <PasswordInput
-                    value={form.confirmPassword}
-                    onChange={(event) => updateField("confirmPassword", event.target.value)}
-                    placeholder="Repite la contrasena"
-                  />
-                </Field>
-              </div>
-
-              <Field
-                label="Perfil del sistema"
-                hint="Selecciona un perfil para desplegar todos sus accesos antes de crear el usuario"
-              >
-                <div className="rounded-[28px] border border-slate-200 bg-slate-50/80 p-3 md:p-4">
-                  <div className="relative">
-                    <select
-                      id="dashboard-role"
-                      aria-label="Seleccionar perfil del sistema"
-                      value={form.role}
-                      onChange={(event) => {
-                        updateField("role", event.target.value);
-                        setError("");
-                      }}
-                      className="h-14 w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 pr-12 text-[14px] font-semibold text-slate-800 shadow-sm outline-none transition-all hover:border-violet-300 focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100"
-                    >
-                      <option value="" disabled>
-                        Selecciona un perfil de acceso
-                      </option>
-                      {CREATABLE_ROLE_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      aria-hidden="true"
-                      className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#6E56CF]"
+              {perfil?.esProfesional ? (
+                <>
+                  <Campo etiqueta="Agenda del profesional" ayuda="Obligatoria: verá solo esta agenda y firmará como este profesional">
+                    <SelectorAgenda
+                      value={form.idProfesionalAgenda}
+                      onChange={(v) => actualizar("idProfesionalAgenda", v)}
+                      profesionales={profesionales}
+                      requerida
                     />
-                  </div>
-
-                  {selectedRoleMeta ? (
-                    <RolePermissionDetails role={selectedRoleMeta} />
-                  ) : (
-                    <div className="mt-3 rounded-2xl border border-dashed border-violet-200 bg-white px-5 py-6 text-center">
-                      <UsersRound className="mx-auto h-6 w-6 text-violet-300" />
-                      <p className="mt-2 text-[13px] font-semibold text-slate-700">
-                        Aún no has seleccionado un perfil
-                      </p>
-                      <p className="mt-1 text-[11px] leading-5 text-slate-500">
-                        Al elegirlo se desplegará aquí la lista completa de accesos y restricciones.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </Field>
-
-              {error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">{error}</div>
+                    {errorProfesionales ? <span className="mt-1 block text-[12px] text-[#C4291D]">{errorProfesionales}</span> : null}
+                  </Campo>
+                  <Interruptor
+                    activo={form.administraClinica}
+                    onCambio={(v) => actualizar("administraClinica", v)}
+                    etiqueta="También administra la clínica"
+                    descripcion={`Para el dueño que atiende: suma los módulos de ${perfil.administradorAsociado} y ve todas las agendas.`}
+                  />
+                </>
               ) : null}
 
-              {createdUser ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-[13px] text-emerald-800">
-                  <p className="font-semibold">Usuario creado correctamente.</p>
-                  <p className="mt-1">
-                    @{createdUser.nombreUsuario || createdUser.nombre} fue creado con el perfil{" "}
-                    <span className="font-semibold">{getDashboardRoleLabel(createdUser.role)}</span>.
-                  </p>
-                </div>
+              <DetallePerfil perfil={perfil} />
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {error ? <Aviso>{error}</Aviso> : null}
+              {creado ? (
+                <Aviso tono="ok">
+                  <span className="font-semibold">@{creado.nombreUsuario}</span> quedó creado como{" "}
+                  <span className="font-semibold">{getDashboardRoleLabel(creado.perfil || creado.role)}{creado.administraClinica ? " · administra la clínica" : ""}</span>.
+                </Aviso>
               ) : null}
+              <button
+                type="submit"
+                disabled={enviando || !perfil}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#007AFF] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0062CC] disabled:bg-[#007AFF]/40 sm:w-auto"
+              >
+                <UserPlus className="h-4 w-4" />
+                {enviando ? "Creando…" : "Crear usuario"}
+              </button>
+            </div>
+          </form>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !selectedRoleMeta}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-black px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {isSubmitting
-                    ? "Creando usuario..."
-                    : selectedRoleMeta
-                      ? "Crear usuario"
-                      : "Selecciona un perfil"}
-                </button>
-                <p className="text-[12px] text-slate-500">
-                  El acceso final del usuario quedara determinado por el rol seleccionado.
-                </p>
-              </div>
-            </form>
-          </div>
-
-          {/* ── Panel lateral ── */}
-          <aside className="space-y-6">
-            <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/30">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Metadata aplicada</p>
-              </div>
-              <div className="p-6 space-y-3">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">publicMetadata.role</p>
-                  <p className="mt-1.5 text-[15px] font-bold text-[#6E56CF]">
-                    {form.role || "Pendiente de selección"}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Resumen del perfil</p>
-                  <p className="mt-1.5 text-[13px] font-bold text-slate-800">
-                    {selectedRoleMeta?.label || "Sin perfil seleccionado"}
-                  </p>
-                  <p className="mt-1 text-[12px] leading-5 text-slate-500">
-                    {selectedRoleMeta?.description || "Selecciona un perfil para revisar el alcance de sus permisos."}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
-                      {selectedRoleMeta?.access.length || 0} capacidades
-                    </span>
-                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">
-                      {selectedRoleMeta?.restrictions.length || 0} restricciones
-                    </span>
+          {/* ── Cómo funciona ── */}
+          <aside className="rounded-[22px] bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_28px_-14px_rgba(0,40,120,0.18)] ring-1 ring-black/[0.05] md:p-6">
+            <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Cómo funcionan los perfiles</h2>
+            <ol className="mt-4 space-y-4">
+              {[
+                ["Por cargo y especialidad", "Cada perfil ve solo lo que su trabajo necesita. Un médico no hace lo mismo que un psicólogo ni que un odontólogo."],
+                ["Administración por categoría", "El administrador gestiona la clínica (agenda, finanzas, configuración) sin ver el contenido de las fichas clínicas."],
+                ["Profesional dueño", "Con «También administra la clínica», un profesional suma lo administrativo de su categoría."],
+                ["Soporte NativeCode", "El técnico ve todo para dar soporte, con autorización de la clínica y quedando registrado."],
+              ].map(([titulo, texto], i) => (
+                <li key={titulo} className="flex gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#007AFF] text-[12px] font-semibold text-white">{i + 1}</span>
+                  <div>
+                    <p className="text-[13px] font-semibold text-[#1D1D1F]">{titulo}</p>
+                    <p className="mt-0.5 text-[12px] leading-snug text-[#6E6E73]">{texto}</p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/30">
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Como funciona</p>
-              </div>
-              <div className="p-6 space-y-3">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[13px] font-bold text-slate-900">1. Clerk crea el usuario</p>
-                  <p className="mt-1 text-[12px] leading-5 text-slate-500">Se registran nombre de usuario y contraseña usando el Backend SDK.</p>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[13px] font-bold text-slate-900">2. Se asigna el perfil</p>
-                  <p className="mt-1 text-[12px] leading-5 text-slate-500">
-                    El rol queda guardado en <span className="font-semibold text-slate-700">publicMetadata.role</span> y{" "}
-                    <span className="font-semibold text-slate-700">publicMetadata.rol</span>.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[13px] font-bold text-slate-900">3. El sistema restringe accesos</p>
-                  <p className="mt-1 text-[12px] leading-5 text-slate-500">Middleware, sidebar y menu movil usan la misma tabla de permisos del dashboard.</p>
-                </div>
-              </div>
-            </div>
+                </li>
+              ))}
+            </ol>
           </aside>
         </div>
 
-        <section className="mt-8 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-          <div className="flex flex-col gap-4 border-b border-slate-100 bg-slate-50/30 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-8 md:py-5">
+        {/* ── Usuarios ── */}
+        <section className="mt-8 rounded-[22px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_10px_28px_-14px_rgba(0,40,120,0.18)] ring-1 ring-black/[0.05]">
+          <div className="flex flex-col gap-4 border-b border-black/[0.06] px-5 py-4 md:flex-row md:items-center md:justify-between md:px-7">
             <div>
-              <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
-                Usuarios creados en Clerk
-              </h2>
-              <p className="mt-1 text-[12px] text-slate-500">
-                Gestiona el acceso, asigna una nueva contrasena o elimina usuarios que ya no deben acceder.
-              </p>
+              <h2 className="text-[17px] font-semibold text-[#1D1D1F]">Usuarios de esta clínica</h2>
+              <p className="text-[13px] text-[#86868B]">{usuarios.length} {usuarios.length === 1 ? "usuario" : "usuarios"}</p>
             </div>
-            <button
-              type="button"
-              onClick={cargarUsuarios}
-              disabled={cargandoUsuarios}
-              className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 text-[12px] font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 md:self-auto"
-            >
-              <RefreshCw className={`h-4 w-4 ${cargandoUsuarios ? "animate-spin" : ""}`} />
-              Actualizar lista
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#86868B]" />
+                <input
+                  type="search"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  placeholder="Buscar usuario, perfil o agenda"
+                  aria-label="Buscar usuario"
+                  className="h-10 w-full rounded-full bg-[#F5F5F7] pl-9 pr-4 text-[14px] text-[#1D1D1F] outline-none placeholder:text-[#86868B] focus:ring-4 focus:ring-[#007AFF]/15 sm:w-64"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={cargarUsuarios}
+                disabled={cargandoUsuarios}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-semibold text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 disabled:opacity-50"
+              >
+                <RefreshCw className={`h-4 w-4 ${cargandoUsuarios ? "animate-spin" : ""}`} />
+                Actualizar
+              </button>
+            </div>
           </div>
 
-          <div className="p-4 md:p-8">
-            {errorUsuarios ? (
-              <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">
-                {errorUsuarios}
-              </div>
-            ) : null}
+          <div className="sin-barra overflow-x-auto px-5 pt-4 md:px-7">
+            <div role="tablist" className="inline-flex rounded-full bg-[#F5F5F7] p-1">
+              {[["todos", "Todos"], ...ORDEN_GRUPOS.map((g) => [g, GRUPOS_PERFIL[g]])].map(([valor, etiqueta]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  role="tab"
+                  aria-selected={filtroGrupo === valor}
+                  onClick={() => setFiltroGrupo(valor)}
+                  className={`h-8 whitespace-nowrap rounded-full px-3.5 text-[12px] font-medium transition-all ${
+                    filtroGrupo === valor ? "bg-white text-[#1D1D1F] shadow-[0_1px_3px_rgba(0,0,0,0.12)]" : "text-[#6E6E73]"
+                  }`}
+                >
+                  {etiqueta}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            {mensajeUsuarios ? (
-              <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-800">
-                {mensajeUsuarios}
-              </div>
-            ) : null}
+          <div className="space-y-3 p-5 md:p-7">
+            {errorUsuarios ? <Aviso>{errorUsuarios}</Aviso> : null}
+            {mensajeUsuarios ? <Aviso tono="ok">{mensajeUsuarios}</Aviso> : null}
 
             {cargandoUsuarios ? (
-              <div className="flex min-h-40 items-center justify-center gap-3 text-[13px] font-medium text-slate-500">
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                Cargando usuarios de Clerk...
+              <div className="space-y-2">
+                {[0, 1, 2].map((i) => <div key={i} className="h-[72px] animate-pulse rounded-2xl bg-[#F5F5F7]" />)}
               </div>
-            ) : usuarios.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-10 text-center">
-                <UsersRound className="mx-auto h-7 w-7 text-slate-300" />
-                <p className="mt-3 text-[13px] font-semibold text-slate-700">No hay usuarios para mostrar.</p>
+            ) : usuariosFiltrados.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-black/[0.1] px-5 py-10 text-center">
+                <UsersRound className="mx-auto h-7 w-7 text-[#C7C7CC]" />
+                <p className="mt-2 text-[14px] font-medium text-[#1D1D1F]">
+                  {usuarios.length === 0 ? "Aún no hay usuarios." : "Ningún usuario coincide con la búsqueda."}
+                </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[900px] border-collapse text-left">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/70">
-                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Usuario</th>
-                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Perfil</th>
-                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Agenda asignada</th>
-                      <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Nueva contrasena</th>
-                      <th className="px-4 py-3 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {usuarios.map((usuario) => {
-                      const actualizandoContrasena = accionEnCurso === `password-${usuario.id}`;
-                      const actualizandoAgenda = accionEnCurso === `agenda-${usuario.id}`;
-                      const actualizandoRol = accionEnCurso === `role-${usuario.id}`;
-                      const eliminandoUsuario = accionEnCurso === `delete-${usuario.id}`;
-
-                      return (
-                        <tr key={usuario.id} className="align-top transition-colors hover:bg-slate-50/60">
-                          <td className="px-4 py-4">
-                            <p className="max-w-56 break-words text-[13px] font-bold text-slate-800">
-                              {usuario.nombre || "Sin nombre registrado"}
-                            </p>
-                            <p className="mt-1 max-w-56 break-all text-[11px] font-medium text-violet-700">
-                              {usuario.nombreUsuario ? `@${usuario.nombreUsuario}` : "Sin nombre de usuario"}
-                            </p>
-                            <p className="mt-1 font-mono text-[10px] text-slate-400">{usuario.id}</p>
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex min-w-[220px] items-center gap-2">
-                              <select
-                                value={rolesUsuarios[usuario.id] ?? String(usuario.role || "")}
-                                onChange={(event) => setRolesUsuarios((current) => ({
-                                  ...current,
-                                  [usuario.id]: event.target.value,
-                                }))}
-                                disabled={Boolean(accionEnCurso)}
-                                className="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-800 outline-none transition-colors focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-50"
-                              >
-                                {!EDITABLE_ROLE_OPTIONS_BY_VALUE.has(usuario.role) ? (
-                                  <option value={usuario.role} disabled>
-                                    {getDashboardRoleLabel(usuario.role) || usuario.role || "Sin perfil"}
-                                  </option>
-                                ) : null}
-                                {EDITABLE_ROLE_OPTIONS.map((option) => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                type="button"
-                                onClick={() => actualizarRolUsuario(usuario.id)}
-                                disabled={Boolean(accionEnCurso) || !EDITABLE_ROLE_OPTIONS_BY_VALUE.has(rolesUsuarios[usuario.id] ?? usuario.role)}
-                                className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-white px-3 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                {actualizandoRol ? "Guardando..." : "Guardar"}
-                              </button>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex min-w-[240px] items-center gap-2">
-                              <select
-                                value={agendasProfesionales[usuario.id] ?? String(usuario.idProfesionalAgenda || "")}
-                                onChange={(event) => setAgendasProfesionales((current) => ({
-                                  ...current,
-                                  [usuario.id]: event.target.value,
-                                }))}
-                                disabled={Boolean(accionEnCurso)}
-                                className="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-800 outline-none transition-colors focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100 disabled:cursor-not-allowed disabled:bg-slate-50"
-                              >
-                                <option value="">Sin agenda asignada</option>
-                                {listaProfesionales.map((profesional) => (
-                                  <option key={profesional.id_profesional} value={String(profesional.id_profesional)}>
-                                    {profesional.nombreProfesional}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                type="button"
-                                onClick={() => actualizarAgendaProfesional(usuario.id)}
-                                disabled={Boolean(accionEnCurso)}
-                                className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-violet-200 bg-white px-3 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                {actualizandoAgenda ? "Guardando..." : "Guardar"}
-                              </button>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4">
-                            <input
-                              type="password"
-                              value={contrasenasNuevas[usuario.id] || ""}
-                              onChange={(event) => setContrasenasNuevas((current) => ({
-                                ...current,
-                                [usuario.id]: event.target.value,
-                              }))}
-                              placeholder="Nueva contraseña"
-                              className="h-10 w-48 rounded-xl border border-slate-200 bg-white px-3 text-[12px] text-slate-800 outline-none placeholder:text-slate-400 focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-100"
-                            />
-                          </td>
-                          <td className="px-4 py-4">
-                            <div className="flex justify-end gap-2">
-                              <button
-                                type="button"
-                                onClick={() => actualizarContrasena(usuario.id)}
-                                disabled={Boolean(accionEnCurso)}
-                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-white px-3 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                <KeyRound className="h-3.5 w-3.5" />
-                                {actualizandoContrasena ? "Guardando..." : "Cambiar"}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => eliminarUsuario(usuario)}
-                                disabled={Boolean(accionEnCurso)}
-                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-3 text-[11px] font-bold text-rose-600 shadow-sm transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                                {eliminandoUsuario ? "Eliminando..." : "Eliminar"}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <ul className="divide-y divide-black/[0.06] overflow-hidden rounded-2xl ring-1 ring-black/[0.06]">
+                {usuariosFiltrados.map((usuario) => (
+                  <FilaUsuario
+                    key={usuario.id}
+                    usuario={usuario}
+                    profesionales={profesionales}
+                    nombreAgenda={nombreAgenda}
+                    onActualizado={(datos) => {
+                      setUsuarios((lista) => lista.map((u) => (u.id === usuario.id ? { ...u, ...datos } : u)));
+                    }}
+                    onEliminado={() => setUsuarios((lista) => lista.filter((u) => u.id !== usuario.id))}
+                    onMensaje={(m) => {
+                      setMensajeUsuarios(m);
+                      setErrorUsuarios("");
+                    }}
+                    onError={(m) => {
+                      setErrorUsuarios(m);
+                      setMensajeUsuarios("");
+                    }}
+                  />
+                ))}
+              </ul>
             )}
           </div>
         </section>
       </div>
     </div>
+  );
+}
+
+// ── Fila de usuario con edición en línea ───────────────────────────────────
+
+function FilaUsuario({ usuario, profesionales, nombreAgenda, onActualizado, onEliminado, onMensaje, onError }) {
+  const perfilActual = normalizeDashboardRole(usuario.perfil || usuario.role).replace("+admin", "");
+  const valorAntiguo = usuario.role && usuario.role !== perfilActual ? usuario.role : "";
+  const [abierta, setAbierta] = useState(false);
+  const [role, setRole] = useState(PERFIL_POR_VALOR.has(perfilActual) ? perfilActual : "");
+  const [agenda, setAgenda] = useState(String(usuario.idProfesionalAgenda || ""));
+  const [administra, setAdministra] = useState(Boolean(usuario.administraClinica));
+  const [contrasena, setContrasena] = useState("");
+  const [confirmandoEliminar, setConfirmandoEliminar] = useState(false);
+  const [accion, setAccion] = useState("");
+
+  const perfil = PERFIL_POR_VALOR.get(role) || null;
+  const etiqueta = getDashboardRoleLabel(perfilActual);
+  const sinPerfil = !PERFIL_POR_VALOR.has(perfilActual);
+
+  async function patch(cuerpo, mensaje) {
+    const response = await fetch(`/api/dashboard/users/${usuario.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cuerpo),
+    });
+    const data = await leerRespuesta(response);
+    if (!response.ok) throw new Error(data?.error || "No se pudo actualizar el usuario.");
+    onMensaje(mensaje);
+    return data;
+  }
+
+  async function guardarPerfil() {
+    if (!perfil) return onError("Selecciona un perfil válido.");
+    if (perfil.esProfesional && !agenda) return onError("Asigna la agenda del profesional antes de guardar.");
+    setAccion("perfil");
+    try {
+      const data = await patch(
+        { role, idProfesionalAgenda: perfil.esProfesional ? agenda : "", administraClinica: perfil.esProfesional && administra },
+        `Perfil de @${usuario.nombreUsuario} actualizado.`
+      );
+      onActualizado({
+        role: data.role,
+        perfil: data.perfil,
+        idProfesionalAgenda: data.idProfesionalAgenda,
+        administraClinica: data.administraClinica,
+      });
+      setAbierta(false);
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setAccion("");
+    }
+  }
+
+  async function cambiarContrasena() {
+    if (!contrasena) return onError("Ingresa la nueva contraseña.");
+    setAccion("contrasena");
+    try {
+      await patch({ password: contrasena }, `Contraseña de @${usuario.nombreUsuario} actualizada.`);
+      setContrasena("");
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setAccion("");
+    }
+  }
+
+  async function eliminar() {
+    setAccion("eliminar");
+    try {
+      const response = await fetch(`/api/dashboard/users/${usuario.id}`, { method: "DELETE" });
+      const data = await leerRespuesta(response);
+      if (!response.ok) throw new Error(data?.error || "No se pudo eliminar el usuario.");
+      onMensaje(`@${usuario.nombreUsuario} fue eliminado.`);
+      onEliminado();
+    } catch (e) {
+      onError(e.message);
+      setConfirmandoEliminar(false);
+    } finally {
+      setAccion("");
+    }
+  }
+
+  return (
+    <li className="bg-white">
+      <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="min-w-0">
+          <p className="truncate text-[15px] font-semibold text-[#1D1D1F]">{usuario.nombre || "Sin nombre"}</p>
+          <p className="truncate text-[13px] text-[#86868B]">
+            @{usuario.nombreUsuario || "sin-usuario"} · {formatearUltimoIngreso(usuario.lastSignInAt)}
+          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${sinPerfil ? "bg-[#FF3B30]/10 text-[#C4291D]" : "bg-[#007AFF]/10 text-[#0062CC]"}`}>
+              {sinPerfil ? "Sin perfil · sin acceso" : etiqueta}
+            </span>
+            {usuario.administraClinica && PERFIL_POR_VALOR.get(perfilActual)?.esProfesional ? (
+              <span className="rounded-full bg-[#34C759]/15 px-2.5 py-0.5 text-[11px] font-semibold text-[#1E7B34]">Administra la clínica</span>
+            ) : null}
+            {usuario.idProfesionalAgenda && PERFIL_POR_VALOR.get(perfilActual)?.esProfesional ? (
+              <span className="rounded-full bg-[#F2F2F7] px-2.5 py-0.5 text-[11px] font-medium text-[#636366]">
+                Agenda: {nombreAgenda[usuario.idProfesionalAgenda] || `#${usuario.idProfesionalAgenda}`}
+              </span>
+            ) : null}
+            {valorAntiguo ? (
+              <span title="Se actualiza al nombre nuevo cuando guardes el perfil" className="rounded-full bg-[#F2F2F7] px-2.5 py-0.5 text-[11px] text-[#8E8E93]">
+                valor anterior: {valorAntiguo}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setAbierta((a) => !a)}
+          aria-expanded={abierta}
+          className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-semibold text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 sm:self-auto"
+        >
+          {abierta ? "Cerrar" : "Editar"}
+          <ChevronDown className={`h-4 w-4 transition-transform ${abierta ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+
+      {abierta ? (
+        <div className="space-y-4 border-t border-black/[0.06] bg-[#FBFBFD] px-4 py-4 sm:px-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Campo etiqueta="Perfil">
+              <SelectorPerfil
+                value={role}
+                onChange={(v) => {
+                  setRole(v);
+                  if (!PERFIL_POR_VALOR.get(v)?.esProfesional) setAdministra(false);
+                }}
+                disabled={Boolean(accion)}
+                incluirVacio={!role}
+              />
+            </Campo>
+            {perfil?.esProfesional ? (
+              <Campo etiqueta="Agenda del profesional">
+                <SelectorAgenda value={agenda} onChange={setAgenda} profesionales={profesionales} disabled={Boolean(accion)} requerida />
+              </Campo>
+            ) : null}
+          </div>
+          {perfil?.esProfesional ? (
+            <Interruptor
+              activo={administra}
+              onCambio={setAdministra}
+              disabled={Boolean(accion)}
+              etiqueta="También administra la clínica"
+              descripcion={`Suma los módulos de ${perfil.administradorAsociado} y ve todas las agendas.`}
+            />
+          ) : null}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={guardarPerfil}
+              disabled={Boolean(accion)}
+              className="h-10 rounded-full bg-[#007AFF] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC] disabled:opacity-50"
+            >
+              {accion === "perfil" ? "Guardando…" : "Guardar cambios"}
+            </button>
+          </div>
+
+          <div className="grid gap-4 border-t border-black/[0.06] pt-4 md:grid-cols-2">
+            <Campo etiqueta="Nueva contraseña">
+              <div className="flex gap-2">
+                <CampoContrasena value={contrasena} onChange={(e) => setContrasena(e.target.value)} placeholder="Nueva contraseña" disabled={Boolean(accion)} />
+                <button
+                  type="button"
+                  onClick={cambiarContrasena}
+                  disabled={Boolean(accion) || !contrasena}
+                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-semibold text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 disabled:opacity-50"
+                >
+                  <KeyRound className="h-4 w-4" />
+                  {accion === "contrasena" ? "…" : "Cambiar"}
+                </button>
+              </div>
+            </Campo>
+
+            <div className="flex items-end justify-end">
+              {confirmandoEliminar ? (
+                <div className="flex w-full flex-col gap-2 rounded-2xl bg-[#FF3B30]/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="text-[13px] text-[#C4291D]">¿Eliminar a @{usuario.nombreUsuario} de forma permanente?</span>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setConfirmandoEliminar(false)} disabled={Boolean(accion)} className="h-9 rounded-full px-4 text-[13px] font-medium text-[#007AFF] hover:bg-white/60">
+                      Cancelar
+                    </button>
+                    <button type="button" onClick={eliminar} disabled={Boolean(accion)} className="h-9 rounded-full bg-[#FF3B30] px-4 text-[13px] font-semibold text-white hover:bg-[#E0352B] disabled:opacity-50">
+                      {accion === "eliminar" ? "Eliminando…" : "Eliminar"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmandoEliminar(true)}
+                  disabled={Boolean(accion)}
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#FF3B30]/10 px-4 text-[13px] font-semibold text-[#FF3B30] transition-colors hover:bg-[#FF3B30]/15 disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar usuario
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </li>
   );
 }

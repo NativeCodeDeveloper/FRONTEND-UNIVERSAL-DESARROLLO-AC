@@ -1,56 +1,21 @@
 import { NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import {
-  canAccessDashboardPath,
-  getCreatableDashboardRoles,
-  getDashboardRoleFromClaims,
-  normalizeDashboardRole,
-} from "@/lib/dashboard-access";
-
-const CREATABLE_ROLE_SET = new Set(getCreatableDashboardRoles().map((role) => role.value));
+  autorizarGestionUsuarios,
+  limpiarMetadata,
+  metadataDePerfil,
+  perfilAsignable,
+  resumirUsuario,
+} from "@/lib/usuariosClerkServidor";
 
 function badRequest(message, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-function resumirUsuario(user) {
-  const role = String(user.publicMetadata?.role || user.publicMetadata?.rol || "");
-  const nombre = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
-
-  return {
-    id: user.id,
-    nombre,
-    nombreUsuario: user.username || "",
-    idProfesionalAgenda: String(user.publicMetadata?.idProfesionalAgenda || ""),
-    role,
-    createdAt: user.createdAt,
-    lastSignInAt: user.lastSignInAt,
-  };
-}
-
-async function autorizarGestionUsuarios() {
-  const { userId, sessionClaims } = await auth();
-
-  if (!userId) {
-    return { error: badRequest("Debes iniciar sesion para gestionar usuarios.", 401) };
-  }
-
-  const requesterRole = getDashboardRoleFromClaims(sessionClaims);
-
-  if (!canAccessDashboardPath(requesterRole, "/dashboard/createUser")) {
-    return { error: badRequest("No tienes permisos para gestionar usuarios.", 403) };
-  }
-
-  return { userId };
-}
-
 export async function GET() {
   try {
-    const authorization = await autorizarGestionUsuarios();
-
-    if (authorization.error) {
-      return authorization.error;
-    }
+    const autorizacion = await autorizarGestionUsuarios();
+    if (autorizacion.error) return badRequest(autorizacion.error.mensaje, autorizacion.error.status);
 
     const client = await clerkClient();
     const response = await client.users.getUserList({
@@ -68,16 +33,10 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const authorization = await autorizarGestionUsuarios();
-
-    if (authorization.error) {
-      return authorization.error;
-    }
-
-    const userId = authorization.userId;
+    const autorizacion = await autorizarGestionUsuarios();
+    if (autorizacion.error) return badRequest(autorizacion.error.mensaje, autorizacion.error.status);
 
     let body;
-
     try {
       body = await req.json();
     } catch {
@@ -88,24 +47,19 @@ export async function POST(req) {
     const nombre = String(body?.nombre || "").trim();
     const apellido = String(body?.apellido || "").trim();
     const nombreUsuario = String(body?.nombreUsuario || "").trim();
-    const idProfesionalAgenda = String(body?.idProfesionalAgenda || "").trim();
-    const role = normalizeDashboardRole(body?.role);
+    const perfil = perfilAsignable(body?.role);
 
-    if (!nombre) {
-      return badRequest("Debes ingresar el nombre del usuario.");
-    }
+    if (!nombre) return badRequest("Debes ingresar el nombre del usuario.");
+    if (!nombreUsuario) return badRequest("Debes ingresar un nombre de usuario.");
+    if (!password) return badRequest("Debes ingresar una contraseña.");
+    if (!perfil) return badRequest("El perfil seleccionado no es válido.");
 
-    if (!nombreUsuario) {
-      return badRequest("Debes ingresar un nombre de usuario.");
-    }
-
-    if (!password) {
-      return badRequest("Debes ingresar una contrasena.");
-    }
-
-    if (!CREATABLE_ROLE_SET.has(role)) {
-      return badRequest("El perfil seleccionado no es valido.");
-    }
+    const { error: errorPerfil, metadata } = metadataDePerfil({
+      perfil,
+      idProfesionalAgenda: body?.idProfesionalAgenda,
+      administraClinica: body?.administraClinica === true,
+    });
+    if (errorPerfil) return badRequest(errorPerfil);
 
     const client = await clerkClient();
     const user = await client.users.createUser({
@@ -113,25 +67,15 @@ export async function POST(req) {
       firstName: nombre || undefined,
       lastName: apellido || undefined,
       username: nombreUsuario || undefined,
-      publicMetadata: {
-        role,
-        rol: role,
-        ...(idProfesionalAgenda ? { idProfesionalAgenda } : {}),
-        createdByNativeCodeUserId: userId,
+      publicMetadata: limpiarMetadata({
+        ...metadata,
+        createdByNativeCodeUserId: autorizacion.userId,
+        // fecha-ok: instante de creación del usuario (auditoría), no un día del calendario.
         createdAtNativeCode: new Date().toISOString(),
-      },
+      }),
     });
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        nombre: [user.firstName, user.lastName].filter(Boolean).join(" ").trim(),
-        nombreUsuario: user.username || "",
-        idProfesionalAgenda: String(user.publicMetadata?.idProfesionalAgenda || ""),
-        role,
-      },
-    });
+    return NextResponse.json({ success: true, user: resumirUsuario(user) });
   } catch (error) {
     console.error("POST /api/dashboard/users failed", error);
 
@@ -144,10 +88,7 @@ export async function POST(req) {
     const status = Number(error?.status) || 500;
 
     return NextResponse.json(
-      {
-        error: clerkMessage,
-        details: error?.errors || null,
-      },
+      { error: clerkMessage, details: error?.errors || null },
       { status: status >= 400 && status < 600 ? status : 500 }
     );
   }

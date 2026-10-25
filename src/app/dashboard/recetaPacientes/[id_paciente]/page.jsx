@@ -3,11 +3,12 @@
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import {useEffect, useState} from "react";
 import { previsionDesdeId } from "@/lib/previsiones";
-import { profesionalPorId, rutDeProfesional } from "@/lib/profesional";
+import { profesionalPorId, rutDeProfesional, registroSisDeProfesional } from "@/lib/profesional";
+import ImpresionManuscrita from "@/Componentes/documentos/ImpresionManuscrita";
 import {useParams, useRouter} from "next/navigation";
 import {toast} from "react-hot-toast";
-import jsPDF from "jspdf";
-import { dibujarBloqueFirma } from "@/lib/pdfFirma";
+import { generarRecetaPdf } from "@/lib/documentos/generadores/receta";
+import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
 import ToasterClient from "@/Componentes/ToasterClient";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales";
 import {InfoButton} from "@/Componentes/InfoButton";
@@ -23,13 +24,14 @@ import {Textarea} from "@/components/ui/textarea";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import { formatRut } from "@/lib/designTokens";
 import { useEmpresaNombre } from "@/hooks/useEmpresaNombre";
-import { edadCivil } from "@/lib/fechas";
+import { edadCivil, formatearFechaCivil, hoyCivil } from "@/lib/fechas";
 
 export default function ReecetasPacientes() {
 
     const router = useRouter();
     const API = process.env.NEXT_PUBLIC_API_URL;
     const empresaNombre = useEmpresaNombre();
+    const datosEmpresa = useDatosEmpresa();
 
     const [detallePaciente, setDetallePaciente] = useState([]);
     const [cargando, setCargando] = useState(true);
@@ -115,261 +117,49 @@ export default function ReecetasPacientes() {
         (profesional) => String(profesional.id_profesional) === String(uiOnlyProfesionalSeleccionado || id_profesional || "")
     );
 
-    function normalizarTextoPDF(valor, fallback = "-") {
-        return String(valor ?? "").trim() || fallback;
-    }
-
-    function truncarTextoPDF(valor, maxLargo) {
-        const texto = String(valor ?? "").trim();
-        if (texto.length <= maxLargo) return texto;
-        return `${texto.slice(0, maxLargo - 1).trimEnd()}…`;
-    }
-
-    function formatearFechaDocumento(fecha = new Date()) {
-        return fecha.toLocaleDateString("es-CL", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        });
-    }
-
-    function formatearFechaHoraDocumento(fecha = new Date()) {
-        const hora = fecha.toLocaleTimeString("es-CL", {hour: "2-digit", minute: "2-digit", hour12: false});
-        return `${formatearFechaDocumento(fecha)} ${hora}`;
-    }
-
-    function sanitizarNombreArchivo(valor) {
-        return String(valor ?? "")
-            .trim()
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9]+/g, "_")
-            .replace(/^_+|_+$/g, "");
-    }
-
+    // Devuelve el PDF como Blob para imprimirlo sin descargarlo (ImpresionManuscrita):
+    // las recetas se firman de puño y letra, nunca con firma electrónica.
     function generarPDFReceta() {
         if (!paciente) {
-            return toast.error("Debe existir un paciente cargado para generar la receta.");
+            { toast.error("Debe existir un paciente cargado para generar la receta."); return null; }
         }
 
         if (!profesional_responsable.trim()) {
-            return toast.error("Debe seleccionar un profesional para generar la receta.");
+            { toast.error("Debe seleccionar un profesional para generar la receta."); return null; }
         }
 
         if (!descripcion_receta.trim()) {
-            return toast.error("Debe ingresar la descripción de la receta para generar el PDF.");
+            { toast.error("Debe ingresar la descripción de la receta para generar el PDF."); return null; }
         }
 
-        const doc = new jsPDF("p", "mm", "letter");
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
-        const margin = 18;
-        const rightX = pageW - margin;
-        const anchoContenido = rightX - margin;
-        const fechaEmision = new Date();
-        const rutPacienteArchivo = sanitizarNombreArchivo(rut_paciente || paciente?.rut || id_paciente || "paciente");
-        const nombreProfesionalPDF = normalizarTextoPDF(profesional_responsable);
-        const especialidadProfesionalCompleta = normalizarTextoPDF(
-            profesionalSeleccionado?.descripcionProfesional || profesionalSeleccionado?.especialidad,
-            "Profesional tratante"
-        );
-        // Truncados a un largo seguro: jsPDF no recorta ni pagina el texto que se
-        // desborda de estas cajas de ancho/alto fijo, así que una descripción muy
-        // larga del profesional superpone el resto de la receta si no se limita aquí.
-        const especialidadProfesionalPDF = truncarTextoPDF(especialidadProfesionalCompleta, 90);
-        const especialidadProfesionalFirmaPDF = truncarTextoPDF(especialidadProfesionalCompleta, 48);
-        const rutProfesionalPDF = normalizarTextoPDF(
-            rut_profesional_manual || profesionalSeleccionado?.rutProfesional || profesionalSeleccionado?.rut_profesional
-        );
-        const diagnosticoPDF = diagnostico_pdf.trim();
-
         try {
-            const footerY = pageH - 12;
-            const limiteContenidoY = pageH - 34;
-            const lineHeight = 6.6;
-
-            const dibujarEncabezado = () => {
-                doc.setDrawColor(15, 23, 42);
-                doc.setLineWidth(0.6);
-                doc.line(margin, 18, rightX, 18);
-
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(18);
-                doc.setTextColor(20, 30, 48);
-                doc.text(empresaNombre, margin, 27);
-
-                doc.setFont("helvetica", "italic");
-                doc.setFontSize(8.5);
-                doc.setTextColor(92, 108, 128);
-                doc.text("AgendaClínica — Healthcare Information System", margin, 32);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.setTextColor(100, 116, 139);
-                doc.text("Receta médica", margin, 36.5);
-                doc.text(`Fecha de emisión: ${formatearFechaHoraDocumento(fechaEmision)}`, rightX, 27, {align: "right"});
-                doc.text("Documento clínico", rightX, 32, {align: "right"});
-            };
-
-            const dibujarPie = () => {
-                doc.setDrawColor(203, 213, 225);
-                doc.setLineWidth(0.3);
-                doc.line(margin, footerY - 6, rightX, footerY - 6);
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(7.5);
-                doc.setTextColor(148, 163, 184);
-                doc.text(`Generado por AgendaClínica | ${empresaNombre}`, margin, footerY - 1);
-                doc.text(`Paciente: ${normalizarTextoPDF(rut_paciente)}`, rightX, footerY - 1, {align: "right"});
-            };
-
-            dibujarEncabezado();
-
-            let y = 51;
-
-            const altoBoxClinico = diagnosticoPDF ? 67 : 54;
-
-            doc.setDrawColor(203, 213, 225);
-            doc.setLineWidth(0.35);
-            doc.roundedRect(margin, y, anchoContenido, altoBoxClinico, 1.8, 1.8);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(8.5);
-            doc.setTextColor(15, 23, 42);
-            doc.text("Identificación clínica", margin + 4, y + 7);
-
-            doc.setDrawColor(226, 232, 240);
-            doc.setLineWidth(0.25);
-            doc.line(margin + 4, y + 11, rightX - 4, y + 11);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(7.2);
-            doc.setTextColor(100, 116, 139);
-            doc.text("PACIENTE", margin + 4, y + 18);
-            doc.text("RUT PACIENTE", margin + 74, y + 18);
-            doc.text("PROFESIONAL", margin + 4, y + 31);
-            doc.text("RUT PROFESIONAL", margin + 74, y + 31);
-            doc.text("ESPECIALIDAD / CARGO", margin + 130, y + 31);
-            doc.text("NACIMIENTO", margin + 4, y + 44);
-            doc.text("EDAD", margin + 74, y + 44);
-            doc.text("PREVISIÓN", margin + 130, y + 44);
-
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9.4);
-            doc.setTextColor(15, 23, 42);
-            // Cada valor acotado al ancho de SU columna. Sin esto, un nombre
-            // largo se seguia dibujando hacia la derecha y se montaba sobre el
-            // RUT de la columna de al lado.
-            const anchoCol1 = 66;  // de margin+4 hasta margin+74
-            const anchoCol2 = 52;  // de margin+74 hasta margin+130
-            doc.text(doc.splitTextToSize(normalizarTextoPDF(`${nombre_paciente} ${apellido_paciente}`), anchoCol1), margin + 4, y + 23);
-            doc.text(doc.splitTextToSize(normalizarTextoPDF(rut_paciente), anchoCol2), margin + 74, y + 23);
-            doc.text(doc.splitTextToSize(nombreProfesionalPDF, anchoCol1), margin + 4, y + 36);
-            doc.text(doc.splitTextToSize(rutProfesionalPDF, anchoCol2), margin + 74, y + 36);
-            doc.text(doc.splitTextToSize(especialidadProfesionalPDF, 58), margin + 130, y + 36, {lineHeightFactor: 1.3});
-            doc.text(normalizarTextoPDF(formatearFecha(paciente?.nacimiento)), margin + 4, y + 49);
-            doc.text(`${calcularEdad(paciente?.nacimiento)} años`, margin + 74, y + 49);
-            doc.text(normalizarTextoPDF(previsionDesdeId(paciente?.prevision_id)), margin + 130, y + 49);
-
-            if (diagnosticoPDF) {
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(7.2);
-                doc.setTextColor(100, 116, 139);
-                doc.text("DIAGNÓSTICO", margin + 4, y + 57);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9.4);
-                doc.setTextColor(15, 23, 42);
-                doc.text(doc.splitTextToSize(diagnosticoPDF, anchoContenido - 12), margin + 4, y + 62);
-            }
-
-            y += altoBoxClinico + 7;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(9);
-            doc.setTextColor(15, 23, 42);
-            doc.text("Indicaciones médicas", margin, y);
-
-            y += 6;
-
-            const lineasReceta = doc.splitTextToSize(descripcion_receta.trim(), anchoContenido - 10);
-            let indiceLinea = 0;
-            let primeraPaginaTexto = true;
-
-            while (indiceLinea < lineasReceta.length) {
-                const alturaDisponible = limiteContenidoY - y;
-                const lineasPorPagina = Math.max(1, Math.floor((alturaDisponible - 10) / lineHeight));
-                const bloque = lineasReceta.slice(indiceLinea, indiceLinea + lineasPorPagina);
-                const altoBloque = Math.max(20, (bloque.length * lineHeight) + 8);
-
-                doc.setDrawColor(203, 213, 225);
-                doc.setLineWidth(0.35);
-                doc.roundedRect(margin, y, anchoContenido, altoBloque, 1.8, 1.8);
-
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(9);
-                doc.setTextColor(15, 23, 42);
-                doc.text(bloque, margin + 5, y + 6, {
-                    maxWidth: anchoContenido - 10,
-                    lineHeightFactor: 1.5
-                });
-
-                indiceLinea += bloque.length;
-                y += altoBloque + 10;
-
-                if (indiceLinea < lineasReceta.length) {
-                    dibujarPie();
-                    doc.addPage();
-                    dibujarEncabezado();
-                    y = 48;
-
-                    if (primeraPaginaTexto) {
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(9);
-                        doc.setTextColor(15, 23, 42);
-                        doc.text("Indicaciones médicas (continuación)", margin, y);
-                        y += 6;
-                        primeraPaginaTexto = false;
-                    } else {
-                        doc.setFont("helvetica", "bold");
-                        doc.setFontSize(9);
-                        doc.setTextColor(15, 23, 42);
-                        doc.text("Continuación de receta", margin, y);
-                        y += 6;
-                    }
-                }
-            }
-
-            if (y + 31 > limiteContenidoY) {
-                dibujarPie();
-                doc.addPage();
-                dibujarEncabezado();
-                y = 48;
-            }
-
-            doc.setDrawColor(148, 163, 184);
-            doc.setLineWidth(0.35);
-            const anchoFirma = 62; // el mismo largo de la raya de firma
-            doc.line(rightX - anchoFirma, y + 10, rightX, y + 10);
-
-            dibujarBloqueFirma(doc, {
-                x: rightX,
-                y: y + 16,
-                anchoMax: anchoFirma,
-                align: "right",
-                nombre: nombreProfesionalPDF,
-                rut: rutProfesionalPDF,
-                especialidad: especialidadProfesionalFirmaPDF,
-                empresa: empresaNombre,
+            const rutProfesional = String(
+                rut_profesional_manual || profesionalSeleccionado?.rutProfesional || profesionalSeleccionado?.rut_profesional || ""
+            ).trim();
+            const { blob } = generarRecetaPdf({
+                empresa: { ...datosEmpresa, empresaNombre: datosEmpresa.empresaNombre || empresaNombre },
+                paciente: {
+                    nombre: `${nombre_paciente} ${apellido_paciente}`.trim(),
+                    documento: formatRut(String(rut_paciente ?? "").trim()) || rut_paciente,
+                    nacimiento: paciente?.nacimiento ? formatearFecha(paciente.nacimiento) : "",
+                    edad: paciente?.nacimiento ? `${calcularEdad(paciente.nacimiento)} años` : "",
+                    prevision: previsionDesdeId(paciente?.prevision_id),
+                },
+                profesional: {
+                    nombre: profesional_responsable.trim(),
+                    rut: rutProfesional,
+                    especialidad: profesionalSeleccionado?.descripcionProfesional || profesionalSeleccionado?.especialidad || "",
+                    registroSis: registroSisDeProfesional(profesionalSeleccionado),
+                },
+                fechaEmisionTexto: formatearFechaCivil(hoyCivil()),
+                diagnostico: diagnostico_pdf,
+                indicaciones: descripcion_receta,
             });
-
-            dibujarPie();
-
-            doc.save(`receta_medica_${rutPacienteArchivo || "paciente"}.pdf`);
-            toast.success("PDF de receta generado correctamente.");
+            return blob;
         } catch (error) {
-            console.log(error);
-            return toast.error("No fue posible generar la receta en PDF.");
+            console.error(error);
+            toast.error("No fue posible generar la receta en PDF.");
+            return null;
         }
     }
 
@@ -882,13 +672,6 @@ export default function ReecetasPacientes() {
                                     Guardar receta
                                 </button>
                                 <button
-                                    onClick={generarPDFReceta}
-                                    type="button"
-                                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-900 transition-all"
-                                >
-                                    Descargar PDF
-                                </button>
-                                <button
                                     onClick={() => actualizarReceta_especifica_paciente(nombre_paciente, apellido_paciente, rut_paciente, id_paciente, id_profesional, profesional_responsable, descripcion_receta, id_receta)}
                                     type="button"
                                     className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-all"
@@ -908,6 +691,9 @@ export default function ReecetasPacientes() {
                                 >
                                     Volver al historial
                                 </button>
+                            </div>
+                            <div className="border-t border-slate-100 px-6 py-4">
+                                <ImpresionManuscrita generarPdf={generarPDFReceta} titulo="Receta médica" />
                             </div>
                         </div>
 

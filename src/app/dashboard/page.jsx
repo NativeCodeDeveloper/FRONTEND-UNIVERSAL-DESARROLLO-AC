@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {useUser} from "@clerk/nextjs";
 import {Calendar28} from "@/Componentes/shadcnCalendarSelector";
-import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
+import { canAccessFichasClinicas, getDashboardRoleFromUser, agendaRestringidaDe, canSeeReservationAmounts as puedeVerMontos } from "@/lib/dashboard-access";
 import {getStateTokens} from "@/lib/designTokens";
 import {useTour} from "@/ContextosGlobales/TourContext";
 import {obtenerRutReservaDeTour} from "@/lib/tourReserva";
@@ -46,16 +46,20 @@ export default function AgendaCitas() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
     const {user, isLoaded} = useUser();
-    const idProfesionalAgendaAsignada = String(user?.publicMetadata?.idProfesionalAgenda || "");
+    // Solo el profesional que no administra la clínica queda restringido a su agenda.
+    const idProfesionalAgendaAsignada = agendaRestringidaDe(user);
     const dashboardRole = getDashboardRoleFromUser(user);
     const canSeeFichasClinicas = isLoaded && canAccessFichasClinicas(dashboardRole);
-    const canSeeReservationAmounts = isLoaded && dashboardRole !== "operador-clinico";
+    const canSeeReservationAmounts = isLoaded && puedeVerMontos(dashboardRole);
     const {isRunning: tourEnCurso} = useTour();
     // RUT de la reserva de prueba creada durante el tour. Se lee al montar y cada
     // vez que el tour arranca; lo dejó marcado el paso anterior (el "Agendar" del
     // calendario) justo antes de navegar hasta aquí.
     const [rutReservaTour, setRutReservaTour] = useState("");
-    const [dataLista, setdataLista] = useState([]);
+    const [dataListaCruda, setdataLista] = useState([]);
+    // Siempre una lista: si el backend responde un error ({ message }) o algo
+    // inesperado, la agenda queda vacía en vez de romper la pantalla.
+    const dataLista = Array.isArray(dataListaCruda) ? dataListaCruda : [];
     const [dataListaBase, setDataListaBase] = useState([]);
     const [nombrePaciente, setnombrePaciente] = useState("");
     const [rut, setrut] = useState("");
@@ -375,6 +379,8 @@ export default function AgendaCitas() {
     }
 
     function aplicarFiltrosCombinados(reservas = []) {
+        // El backend responde un objeto ({ message }) cuando falla: nunca se filtra eso como lista.
+        if (!Array.isArray(reservas)) return [];
         return reservas.filter((reserva) => {
             // Solo mostrar reservas con estadoPeticion === 1
             const esEstadoCorrecto = Number(reserva?.estadoPeticion) === 1;
@@ -574,11 +580,14 @@ export default function AgendaCitas() {
                 mode: "cors"
             });
 
-            const respuestaBackend = await res.json();
-            if (respuestaBackend) {
-                setDataListaBase(respuestaBackend);
-                setdataLista(aplicarFiltrosCombinados(respuestaBackend));
+            const respuestaBackend = await res.json().catch(() => null);
+            // Solo una lista es válida; un error del backend ({ message }) deja la agenda vacía.
+            const reservas = Array.isArray(respuestaBackend) ? respuestaBackend : [];
+            if (!res.ok || !Array.isArray(respuestaBackend)) {
+                console.error("[Agenda] seleccionarReservados respondió", res.status, respuestaBackend);
             }
+            setDataListaBase(reservas);
+            setdataLista(aplicarFiltrosCombinados(reservas));
         } catch (err) {
             console.log(err);
             return toast.error(err.message);
@@ -592,7 +601,7 @@ export default function AgendaCitas() {
 
     useEffect(() => {
         if (!Array.isArray(dataListaBase) || dataListaBase.length === 0) {
-            setdataLista(dataListaBase);
+            setdataLista([]);
             return;
         }
         setdataLista(aplicarFiltrosCombinados(dataListaBase));
@@ -652,7 +661,7 @@ export default function AgendaCitas() {
             if (!res.ok) return toast.error("No se ha podido enviar la informacion para actualizar el estado.");
             const respuestaBackend = await res.json();
             if (respuestaBackend.message === true) {
-                setdataLista((prev) => prev.map((item) => (item.id_reserva === id_reserva ? {...item, estadoReserva: nuevoEstado} : item)));
+                setdataLista((prev) => (Array.isArray(prev) ? prev : []).map((item) => (item.id_reserva === id_reserva ? {...item, estadoReserva: nuevoEstado} : item)));
                 setMenuEstadoAbiertoId(null);
                 return toast.success("Se ha actualizado el estado con exito");
             }

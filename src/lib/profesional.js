@@ -37,7 +37,7 @@ export function profesionalPorRut(profesionales, rut) {
  */
 export function datosProfesionalParaDocumento(profesional) {
   if (!profesional) {
-    return { nombre: "", rut: "", rutEtiquetado: "", especialidad: "" };
+    return { nombre: "", rut: "", rutEtiquetado: "", especialidad: "", registroSis: "" };
   }
 
   const rut = formatRut(profesional.rutProfesional) || profesional.rutProfesional || "";
@@ -49,7 +49,18 @@ export function datosProfesionalParaDocumento(profesional) {
     // para no imprimir un "RUT:" suelto.
     rutEtiquetado: rut ? `RUT: ${rut}` : "",
     especialidad: (profesional.descripcionProfesional || profesional.especialidad || "").trim(),
+    registroSis: registroSisDeProfesional(profesional),
   };
+}
+
+/**
+ * N° de registro en la Superintendencia de Salud para imprimir en el pie de
+ * firma. Vacío si no lo tiene o si un administrador lo rechazó al verificarlo:
+ * un número rechazado no debe aparecer en un documento.
+ */
+export function registroSisDeProfesional(profesional) {
+  if (!profesional || profesional.registro_sis_estado === "rechazado") return "";
+  return String(profesional.registro_sis_numero ?? "").trim();
 }
 
 /** RUT formateado de un profesional, o "" si no lo tiene. */

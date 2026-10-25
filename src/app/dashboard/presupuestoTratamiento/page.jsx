@@ -22,7 +22,12 @@ import {SelectDinamic} from "@/Componentes/SelectDinamic";
 import {InputTextDinamic} from "@/Componentes/InputTextDinamic";
 import { useEmpresaNombre } from "@/hooks/useEmpresaNombre";
 import { useProfesionales } from "@/hooks/useProfesionales";
-import {profesionalPorId, profesionalPorRut, rutDeProfesional} from "@/lib/profesional";
+import {profesionalPorId, profesionalPorRut, rutDeProfesional, datosProfesionalParaDocumento} from "@/lib/profesional";
+import EmisionDocumento from "@/Componentes/documentos/EmisionDocumento";
+import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
+import { generarDocumentoValorizadoPdf } from "@/lib/documentos/generadores/cotizacion";
+import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
+import { formatearFechaLargaCivil, hoyCivil } from "@/lib/fechas";
 
 
 
@@ -93,6 +98,36 @@ export default function PresupuestoTratamiento() {
 
 
 
+
+    // ── Emisión con firma electrónica ──────────────────────────────────
+    const datosEmpresa = useDatosEmpresa();
+    const profesionalSeleccionado = profesionalPorId(listaProfesionales, nombreProfesional);
+    const profesionalDocumento = profesionalSeleccionado
+        ? {
+            id_profesional: profesionalSeleccionado.id_profesional,
+            ...datosProfesionalParaDocumento(profesionalSeleccionado),
+            // El RUT puede haberse corregido a mano en el formulario.
+            rut: rutProfesionalManual.trim() || datosProfesionalParaDocumento(profesionalSeleccionado).rut,
+        }
+        : null;
+
+    async function generarCuerpoPresupuesto({ modo, borrador }) {
+        // "Hoy" en la zona de la clínica, no según el reloj del equipo (CLAUDE.md).
+        const fechaEmisionTexto = formatearFechaLargaCivil(hoyCivil());
+        return generarDocumentoValorizadoPdf({
+            modo,
+            borrador,
+            rotulo: "Presupuesto de tratamiento",
+            folio: "",
+            empresa: { empresaNombre, ...datosEmpresa },
+            paciente: { nombre: nombrePaciente, rut: rutaPaciente },
+            items: listaPresupuesto.map((srv) => ({ servicio: srv.tituloProducto, observacion: srv.observacionCotizacion, valor: srv.valorProducto })),
+            totales: { total: totalPresupuesto },
+            profesional: profesionalDocumento || { nombre: "" },
+            fechaEmisionTexto,
+            vigencia: "Este presupuesto tiene vigencia de 30 días desde la fecha de emisión.",
+        });
+    }
 
     async function descargarPresupuestoPDF() {
         const doc = new jsPDF("p", "mm", "letter");
@@ -455,7 +490,29 @@ export default function PresupuestoTratamiento() {
                                 <span className="text-xl font-bold text-slate-900">{formatoCLP.format(totalPresupuesto)}</span>
                             </div>
 
-                            {/* Boton descargar PDF */}
+                            {/* Emisión: firma electrónica o impresión para firmar a mano */}
+                            {FIRMA_HABILITADA ? (
+                                <div className="border-t border-slate-100 p-3">
+                                    <EmisionDocumento
+                                        compacto
+                                        tipoDocumento="presupuesto"
+                                        titulo={`Presupuesto · ${nombrePaciente || "paciente"}`}
+                                        paciente={{ nombre: nombrePaciente }}
+                                        profesional={profesionalDocumento}
+                                        generarCuerpoPdf={generarCuerpoPresupuesto}
+                                        metadatos={{ resumen: `Presupuesto · ${listaPresupuesto.length} ítems` }}
+                                        nombreArchivo={`presupuesto-${(nombrePaciente || "paciente").toLowerCase().replace(/\s+/g, "-")}`}
+                                        deshabilitado={listaPresupuesto.length === 0 || !profesionalDocumento || !nombrePaciente.trim()}
+                                        motivoDeshabilitado={
+                                            listaPresupuesto.length === 0
+                                                ? "Agrega al menos un tratamiento."
+                                                : !profesionalDocumento
+                                                ? "Selecciona el profesional responsable."
+                                                : "Ingresa el nombre del paciente."
+                                        }
+                                    />
+                                </div>
+                            ) : (
                             <div className="px-5 py-3 border-t border-slate-100">
                                 <button
                                     type="button"
@@ -470,6 +527,7 @@ export default function PresupuestoTratamiento() {
                                     Descargar PDF
                                 </button>
                             </div>
+                            )}
                         </div>
                     </div>
 

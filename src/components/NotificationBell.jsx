@@ -2,8 +2,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { Bell, BellOff, CalendarCheck, CalendarX, Clock, Activity, X, CheckCheck } from 'lucide-react';
+import { Bell, BellOff, CalendarCheck, CalendarX, Clock, Activity, X, CheckCheck, PenLine, ChevronRight } from 'lucide-react';
 import { useNotificaciones } from '@/hooks/useNotificaciones';
+import { usePendientesProfesional } from '@/hooks/usePendientesProfesional';
 
 function getNotifStyle(tipo) {
     if (tipo === 'cita_nueva')     return { Icon: CalendarCheck, bg: 'bg-emerald-50',  color: 'text-emerald-600' };
@@ -30,6 +31,9 @@ export default function NotificationBell() {
     const btnRef = useRef(null);
     const router = useRouter();
     const { notifs, permiso, pedirPermiso, marcarLeida, marcarTodasLeidas } = useNotificaciones();
+    // Avisos de firma electrónica del profesional: fijos hasta que se resuelven.
+    const avisosFirma = usePendientesProfesional();
+    const totalAvisos = notifs.length + avisosFirma.length;
 
     function irACitaDeNotificacion(notif) {
         if (notif.tipo !== 'recordatorio' || !notif.id_reserva) return;
@@ -105,9 +109,9 @@ export default function NotificationBell() {
             <div className="flex items-center justify-between px-4 py-3.5 shrink-0">
                 <div className="flex items-center gap-2">
                     <span className="text-[13.5px] font-semibold tracking-tight text-slate-900">Notificaciones</span>
-                    {notifs.length > 0 && (
+                    {totalAvisos > 0 && (
                         <span className="text-[10px] bg-[#EDE9FE] text-[#6E56CF] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center font-bold">
-                            {notifs.length}
+                            {totalAvisos}
                         </span>
                     )}
                 </div>
@@ -146,7 +150,21 @@ export default function NotificationBell() {
 
             {/* Lista — tarjetas apiladas, sin separadores duros */}
             <div className="overflow-y-auto px-2 pb-2 space-y-1" style={{ maxHeight: (pos.maxH || 400) - 60 }}>
-                {notifs.length === 0 ? (
+                {avisosFirma.map(aviso => (
+                    <button key={aviso.id} type="button"
+                        onClick={() => { setOpen(false); router.push(aviso.href); }}
+                        className="font-system-apple flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors duration-150 hover:bg-slate-50">
+                        <div className="w-9 h-9 rounded-[13px] bg-[#007AFF]/10 flex items-center justify-center shrink-0">
+                            <PenLine size={15} className="text-[#007AFF]" strokeWidth={2} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[12.5px] font-semibold text-slate-800 leading-tight">{aviso.titulo}</p>
+                            <p className="text-[11.5px] text-slate-500 mt-1 leading-snug">{aviso.descripcion}</p>
+                        </div>
+                        <ChevronRight size={14} className="mt-2.5 text-slate-300 shrink-0" strokeWidth={2} />
+                    </button>
+                ))}
+                {notifs.length === 0 && avisosFirma.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-2.5">
                         <div className="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center">
                             <Bell size={17} className="text-slate-300" strokeWidth={1.8} />
@@ -201,9 +219,9 @@ export default function NotificationBell() {
                         : 'bg-slate-100 text-slate-400 hover:bg-[#F3F0FF] hover:text-[#6E56CF] hover:shadow-[0_4px_10px_-4px_rgba(15,23,42,0.25)] active:scale-[0.94]'
                 }`}>
                 <Bell size={15} strokeWidth={1.8} />
-                {notifs.length > 0 && (
+                {totalAvisos > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 bg-[#6E56CF] rounded-full flex items-center justify-center text-[9px] font-bold text-white leading-none ring-2 ring-white shadow-[0_2px_6px_-1px_rgba(110,86,207,0.55)]">
-                        {notifs.length > 9 ? '9+' : notifs.length}
+                        {totalAvisos > 9 ? '9+' : totalAvisos}
                     </span>
                 )}
             </button>

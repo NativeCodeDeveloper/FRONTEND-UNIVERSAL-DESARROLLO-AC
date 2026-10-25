@@ -206,3 +206,53 @@ export function formatearFechaAuto(valor, vacio = "-") {
   const v = (tipo) => partes.find((p) => p.type === tipo)?.value ?? "";
   return `${v("day")}-${v("month")}-${v("year")}`;
 }
+
+// ── Instantes con desfase explícito ─────────────────────────────────────────
+// Para marcas de tiempo con valor probatorio (firma electrónica, aceptación de
+// consentimientos): se muestran con segundos y con el desfase de Chile a la
+// vista, para que nadie tenga que adivinar si es horario de verano o invierno.
+
+/**
+ * Desfase de la zona en ese instante: "UTC-03:00" en verano, "UTC-04:00" en
+ * invierno. Lo calcula Intl con las reglas de la zona; nunca se escribe a mano.
+ */
+export function desfaseZona(instante, zona = ZONA_CLINICA) {
+  const nombre = new Intl.DateTimeFormat("en-US", { timeZone: zona, timeZoneName: "longOffset" })
+    .formatToParts(instante)
+    .find((p) => p.type === "timeZoneName")?.value ?? "GMT";
+  // "GMT" a secas significa desfase cero.
+  return nombre === "GMT" ? "UTC+00:00" : nombre.replace("GMT", "UTC");
+}
+
+/**
+ * Instante del backend (ISO UTC) → "22-10-2026 22:25:57 (UTC-03:00)", en la
+ * zona de la clínica. Da lo mismo la zona del equipo que lo muestra.
+ */
+export function formatearInstanteConOffset(valor, vacio = "-") {
+  if (!valor) return vacio;
+  // fecha-ok: es un instante real (firmado_at, aceptado_at), no un día del calendario.
+  const instante = valor instanceof Date ? valor : new Date(valor);
+  if (Number.isNaN(instante.getTime())) return vacio;
+
+  const partes = new Intl.DateTimeFormat("en-US", {
+    timeZone: ZONA_CLINICA,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(instante);
+
+  const v = (tipo) => partes.find((p) => p.type === tipo)?.value ?? "";
+  return `${v("day")}-${v("month")}-${v("year")} ${v("hour")}:${v("minute")}:${v("second")} (${desfaseZona(instante)})`;
+}
+
+/** "2026-10-23" (o un valor civil del backend) → "23 de octubre de 2026". Sin convertir zona. */
+export function formatearFechaLargaCivil(valor, vacio = "") {
+  const p = partesFechaCivil(valor);
+  if (!p) return vacio;
+  const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  return `${p.dia} de ${meses[p.mes - 1]} de ${p.anio}`;
+}

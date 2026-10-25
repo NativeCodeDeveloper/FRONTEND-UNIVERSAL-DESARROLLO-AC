@@ -1,5 +1,5 @@
 import GrillaProfesionales from "@/Componentes/PaginaPublica/Profesionales/GrillaProfesionales";
-import { obtenerCategorias, obtenerDatosEmpresa, obtenerPreciosDesde, obtenerProfesionales } from "@/lib/paginaPublica/api";
+import { obtenerDatosEmpresa, obtenerPreciosDesde, obtenerProfesionales } from "@/lib/paginaPublica/api";
 import { crearEnlaces } from "@/lib/paginaPublica/enlaces";
 
 export async function generateMetadata() {
@@ -10,9 +10,9 @@ export async function generateMetadata() {
   };
 }
 
-/* Equipo del centro con filtro por categoría (si el centro las tiene) y precio "desde" de cada profesional */
+/* Equipo del centro con el precio "desde" de cada profesional */
 export default async function AgendaProfesionales() {
-  const [datosEmpresa, profesionales, categorias] = await Promise.all([obtenerDatosEmpresa(), obtenerProfesionales(), obtenerCategorias()]);
+  const [datosEmpresa, profesionales] = await Promise.all([obtenerDatosEmpresa(), obtenerProfesionales()]);
   const preciosDesde = await obtenerPreciosDesde(profesionales);
   const enlaces = crearEnlaces(datosEmpresa);
   const whatsapp = enlaces.whatsapp(enlaces.mensajes.whatsappOrientacion);
@@ -26,7 +26,7 @@ export default async function AgendaProfesionales() {
         </header>
 
         {profesionales.length > 0 ? (
-          <GrillaProfesionales profesionales={profesionales} categorias={categorias} preciosDesde={preciosDesde} />
+          <GrillaProfesionales profesionales={profesionales} preciosDesde={preciosDesde} />
         ) : (
           <p className="text-tinta-2">Pronto podrás agendar en línea con nuestro equipo.</p>
         )}

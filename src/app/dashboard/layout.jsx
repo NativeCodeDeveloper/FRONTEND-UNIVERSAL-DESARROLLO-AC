@@ -15,6 +15,7 @@ import DashboardPageTransition from "@/components/DashboardPageTransition";
 import CortexAssistant from "@/Componentes/CortexAssistant";
 import { TourProvider } from "@/ContextosGlobales/TourContext";
 import SecretariaRouteGuard from "./SecretariaRouteGuard";
+import FranjaModoSoporte from "./FranjaModoSoporte";
 
 export const metadata = {
     title: "Dashboard — Agenda Clínica",
@@ -42,6 +43,8 @@ export default function DashboardLayout({ children }) {
 
                         {/* ═══════════════ CONTENT ═══════════════ */}
                         <div className="flex-1 min-w-0 h-full overflow-y-auto">
+                            {/* Aviso de soporte: solo lo ve el técnico NativeCode */}
+                            <FranjaModoSoporte />
                             <MobileNav />
                             <main className="min-w-0">
                                 <DashboardPageTransition>

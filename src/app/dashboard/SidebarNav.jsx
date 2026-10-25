@@ -575,11 +575,11 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
   // El rail se dibuja aparte: no es el mismo arbol con clases distintas, porque
   // los acordeones (que se despliegan hacia abajo) no tienen equivalente en
   // 64px — ahi las opciones salen de lado, en un flyout.
-  if (colapsado && role !== "cancelado") {
+  if (colapsado && role !== "suspendido") {
     return <NavRail sections={sections} pathname={pathname} modo={modo} onCambiarModo={onCambiarModo} urlSoporte={urlSoporte} />;
   }
 
-  if (role === "cancelado") {
+  if (role === "suspendido") {
     return (
       <>
         <UserMenu />

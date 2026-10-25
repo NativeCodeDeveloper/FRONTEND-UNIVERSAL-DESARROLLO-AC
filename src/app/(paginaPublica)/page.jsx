@@ -7,7 +7,6 @@ import Publicaciones from "@/Componentes/PaginaPublica/Inicio/Publicaciones";
 import Revelar from "@/Componentes/PaginaPublica/Comunes/Revelar";
 import Testimonios from "@/Componentes/PaginaPublica/Inicio/Testimonios";
 import {
-  obtenerCategorias,
   obtenerDatosEmpresa,
   obtenerPortadas,
   obtenerProfesionales,
@@ -29,14 +28,13 @@ export async function generateMetadata() {
 
 /* Inicio del centro: cada sección se muestra solo si el centro cargó su contenido en el dashboard */
 export default async function Inicio() {
-  const [datosEmpresa, portadas, servicios, publicaciones, resenas, profesionales, categorias] = await Promise.all([
+  const [datosEmpresa, portadas, servicios, publicaciones, resenas, profesionales] = await Promise.all([
     obtenerDatosEmpresa(),
     obtenerPortadas(),
     obtenerServicios(),
     obtenerPublicaciones(),
     obtenerResenas(),
     obtenerProfesionales(),
-    obtenerCategorias(),
   ]);
 
   const enlaces = crearEnlaces(datosEmpresa);
@@ -61,7 +59,7 @@ export default async function Inicio() {
           <Portada slides={portadas} datosEmpresa={datosEmpresa} />
         </div>
         <div className="mx-auto mt-16 w-full max-w-[1120px] px-5 md:mt-20 md:px-6 lg:mt-12">
-          <DatosRapidos datosEmpresa={datosEmpresa} categorias={categorias} profesionales={profesionales} />
+          <DatosRapidos datosEmpresa={datosEmpresa} />
         </div>
       </section>
 

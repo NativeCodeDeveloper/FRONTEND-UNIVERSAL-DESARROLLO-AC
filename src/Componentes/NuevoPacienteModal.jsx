@@ -10,6 +10,7 @@ import ShadcnDatePicker from "@/Componentes/shadcnDatePicker";
 import { Textarea } from "@/components/ui/textarea";
 import { RutInput } from "@/Componentes/RutInput";
 import { PhoneInput } from "@/Componentes/PhoneInput";
+import { TIPOS_DOCUMENTO, validarDocumento } from "@/lib/rut";
 import { NOMBRES_PREVISION, previsionIdDesdeNombre } from "@/lib/previsiones";
 
 
@@ -17,6 +18,7 @@ const ESTADO_INICIAL = {
   nombre: "",
   apellido: "",
   rut: "",
+  tipo_documento: TIPOS_DOCUMENTO.RUT,
   nacimiento: "",
   sexo: "",
   prevision: "FONASA",
@@ -73,8 +75,9 @@ export function validarPaciente(datos) {
     errores.correo = "Ingrese un correo electrónico válido.";
   }
 
-  if (!errores.rut && datos.rut.replace(/[^0-9kK]/g, "").length < 7) {
-    errores.rut = "El RUT ingresado no es válido.";
+  if (!errores.rut) {
+    const errorDocumento = validarDocumento({ tipo: datos.tipo_documento, valor: datos.rut });
+    if (errorDocumento) errores.rut = errorDocumento;
   }
 
   return errores;
@@ -218,6 +221,7 @@ export default function NuevoPacienteModal({ abierto, onCerrar, onCreado }) {
           nombre: datos.nombre.trim(),
           apellido: datos.apellido.trim(),
           rut: datos.rut,
+          tipo_documento: datos.tipo_documento,
           nacimiento: datos.nacimiento,
           sexo: datos.sexo.trim(),
           prevision_id: previsionIdDesdeNombre(datos.prevision),
@@ -337,10 +341,12 @@ export default function NuevoPacienteModal({ abierto, onCerrar, onCreado }) {
             </div>
 
             <div data-campo="rut">
-              <Campo etiqueta="RUT" requerido error={errores.rut}>
+              <Campo etiqueta="Documento de identidad" requerido error={errores.rut}>
                 <RutInput
+                  permitirExtranjero
+                  tipoDocumento={datos.tipo_documento}
+                  onTipoDocumentoChange={(tipo) => actualizar("tipo_documento", tipo)}
                   value={datos.rut}
-                  placeholder="12.345.678-9"
                   className="h-11"
                   onChange={(limpio) => actualizar("rut", limpio)}
                 />

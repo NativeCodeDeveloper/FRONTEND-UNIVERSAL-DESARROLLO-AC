@@ -67,7 +67,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="nav-configuracion"]',
     title: "Configuración inicial",
-    description: "Esta es la sección de Configuración Clínica — la abrimos automáticamente para ti. Aquí vas a crear a tu profesional, tus servicios, y a unirlos. Presiona \"Siguiente\" para empezar.",
+    description: "Esta es la sección de Configuración Clínica — la abrimos automáticamente para ti. Aquí están los datos de tu clínica (nombre, dirección, teléfono y correo, que se usan en toda la plataforma) y aquí vas a crear a tu profesional, tus servicios, y a unirlos. Presiona \"Siguiente\" para empezar.",
     side: "right",
     autoExpand: true,
   },
@@ -250,7 +250,7 @@ export const TOUR_STEPS = [
     route: null,
     selector: '[data-tour="nav-contenido"]',
     title: "Configuración inicial",
-    description: "Por último, aquí administras lo que tus pacientes ven en el sitio público: datos de tu clínica, banners y tratamientos destacados. No es obligatorio para empezar a agendar, pero le da un mejor aspecto a tu página.",
+    description: "Por último, aquí administras lo que tus pacientes ven en el sitio público: banners, tratamientos destacados, publicaciones y testimonios. No es obligatorio para empezar a agendar, pero le da un mejor aspecto a tu página.",
     side: "right",
   },
 

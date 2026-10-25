@@ -146,6 +146,29 @@ export default function RootLayout({ children }) {
             `}
             </Script>
         )}
+        {/* En desarrollo NO debe haber service worker: el registro de producción queda
+            guardado en el navegador para el mismo origen (localhost:3000) y, como sw.js
+            sirve /_next/static/ "cache first", entregaría JavaScript viejo aunque se
+            recargue (Turbopack reutiliza los nombres de archivo en desarrollo). Aquí se da
+            de baja cualquier registro y se borran sus cachés. */}
+        {process.env.NODE_ENV !== "production" && (
+            <Script id="baja-service-worker-desarrollo" strategy="afterInteractive">
+                {`
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (registros) {
+                  if (!registros.length) return;
+                  Promise.all(registros.map(function (r) { return r.unregister(); }))
+                    .then(function () { return window.caches ? caches.keys() : []; })
+                    .then(function (claves) { return Promise.all(claves.map(function (c) { return caches.delete(c); })); })
+                    .then(function () {
+                      console.info('[desarrollo] Service worker de producción dado de baja; recargando con el código actual.');
+                      window.location.reload();
+                    });
+                });
+              }
+            `}
+            </Script>
+        )}
         </body>
         </html>
     );

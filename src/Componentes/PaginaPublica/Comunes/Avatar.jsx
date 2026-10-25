@@ -1,13 +1,14 @@
 import Image from "next/image";
-import { iniciales, nombrePropio } from "@/lib/paginaPublica/formatos";
+import { nombrePropio } from "@/lib/paginaPublica/formatos";
+import SiluetaProfesional from "@/Componentes/SiluetaProfesional";
 import { cfImageUrl } from "@/lib/cloudflare";
 
-/* Foto del profesional (subida desde el dashboard) o, si no tiene, sus iniciales sobre el color del centro */
+/* Foto del profesional (subida desde el dashboard) o, si no tiene, la silueta de profesional de salud */
 export default function Avatar({ profesional, tamano, className = "", sizes, prioridad = false }) {
   const nombre = nombrePropio(profesional.nombreProfesional);
   /*
-   * imagenProfesional (columna propuesta) guarda el imageId de Cloudflare. Mientras la columna no exista
-   * viene undefined y se muestran las iniciales. Se usa la variante "full" (la de mayor resolución) para que se vea en HD.
+   * imagenProfesional guarda el imageId de Cloudflare (se sube desde Profesionales en el dashboard). Sin foto
+   * se muestra la silueta. Se usa la variante "full" (la de mayor resolución) para que se vea en HD.
    */
   const imagen = cfImageUrl(profesional.imagenProfesional, "full");
 
@@ -26,13 +27,5 @@ export default function Avatar({ profesional, tamano, className = "", sizes, pri
     );
   }
 
-  return (
-    <div
-      className={`flex items-center justify-center bg-acento-suave font-semibold text-acento-hondo ${className}`}
-      aria-label={nombre}
-      role="img"
-    >
-      <span className={tamano === "circulo" ? "text-xl" : "text-5xl tracking-tight"}>{iniciales(nombre)}</span>
-    </div>
-  );
+  return <SiluetaProfesional className={className} etiqueta={nombre} />;
 }

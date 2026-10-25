@@ -3,7 +3,7 @@
  * (layouts y páginas de app/(paginaPublica)), así el HTML llega con el contenido ya puesto.
  *
  * Cada función devuelve un valor seguro si el endpoint falla, tarda demasiado o todavía no
- * existe (por ejemplo categoriasProfesionales): la sección correspondiente simplemente no se
+ * existe: la sección correspondiente simplemente no se
  * muestra y el resto de la página funciona igual.
  *
  * Sin caché: lo que el centro edita en el dashboard se ve en la siguiente visita.
@@ -96,14 +96,6 @@ export async function obtenerPreciosDesde(profesionales) {
     }),
   );
   return Object.fromEntries(pares);
-}
-
-/*
- * GET /categoriasProfesionales/seleccionarCategorias (propuesta en PROPUESTA_CATEGORIAS_PROFESIONALES.md).
- * Mientras el endpoint no exista devuelve [] y el filtro de categorías no aparece.
- */
-export async function obtenerCategorias() {
-  return comoLista(await pedir("/categoriasProfesionales/seleccionarCategorias", { respaldo: [] }));
 }
 
 /*

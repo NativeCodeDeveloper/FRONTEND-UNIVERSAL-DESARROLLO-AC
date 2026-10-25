@@ -1,19 +1,11 @@
 import Link from "next/link";
-import { categoriasConProfesionales } from "@/lib/paginaPublica/categorias";
 import { crearEnlaces } from "@/lib/paginaPublica/enlaces";
 
-/* "Kinesiología, Matronería y 4 más" */
-function resumirCategorias(nombres) {
-  if (nombres.length <= 2) return nombres.join(" y ");
-  return `${nombres.slice(0, 2).join(", ")} y ${nombres.length - 2} más`;
-}
-
 /*
- * Franja bajo la portada: correo, dirección y categorías disponibles.
- * Cada celda aparece solo si el dato existe (datosempresa y seleccionarCategorias).
+ * Franja bajo la portada: correo y dirección.
+ * Cada celda aparece solo si el dato existe en datosempresa.
  */
-export default function DatosRapidos({ datosEmpresa, categorias: todasLasCategorias, profesionales }) {
-  const categorias = categoriasConProfesionales(todasLasCategorias, profesionales);
+export default function DatosRapidos({ datosEmpresa }) {
   const enlaces = crearEnlaces(datosEmpresa);
   const correo = enlaces.correo(enlaces.mensajes.correoAsunto, enlaces.mensajes.correoCuerpo);
   const mapa = enlaces.mapa();
@@ -24,15 +16,6 @@ export default function DatosRapidos({ datosEmpresa, categorias: todasLasCategor
       : null,
     datosEmpresa.contactoDireccion && mapa
       ? { titulo: "Dirección", valor: datosEmpresa.contactoDireccion, href: mapa, externo: true }
-      : null,
-    categorias.length > 0
-      ? {
-          titulo: `${categorias.length} ${categorias.length === 1 ? "especialidad disponible" : "especialidades disponibles"}`,
-          valor: resumirCategorias(categorias.map((c) => c.nombreCategoria)),
-          href: "/agendaProfesionales",
-          externo: false,
-          interno: true,
-        }
       : null,
   ].filter((c) => c !== null);
 

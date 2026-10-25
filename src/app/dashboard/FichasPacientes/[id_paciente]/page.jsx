@@ -36,6 +36,10 @@ import {
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import BotonAyuda from "@/Componentes/BotonAyuda";
 import TutorialGuiadoFichas from "@/Componentes/TutorialGuiadoFichas";
+import EmisionDocumento from "@/Componentes/documentos/EmisionDocumento";
+import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
+import { generarFichaClinicaPdf } from "@/lib/documentos/generadores/fichaClinica";
+import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
 
 
 function parsearDatosDinamicos(datos) {
@@ -264,6 +268,7 @@ export default function Paciente() {
     // escribia a mano en el panel "Filtros y firma PDF", asi que casi siempre
     // faltaban.
     const listaProfesionales = useProfesionales();
+    const datosEmpresa = useDatosEmpresa();
     const [fichasExpandidas, setFichasExpandidas] = useState(new Set());
     const [ultimaAtencion, setUltimaAtencion] = useState(null);
     const pacienteAtencionRef = useRef(null);
@@ -745,6 +750,89 @@ export default function Paciente() {
 
     function irADocumentos() {
         router.push(`/dashboard/archivosPacientes/${id_paciente}`);
+    }
+
+    // ── Emisión con firma electrónica ──────────────────────────────────
+    // Mismos datos que el PDF clásico, en la forma que espera generarFichaClinicaPdf.
+    function datosFichaParaDocumento(ficha) {
+        const datos = parsearDatosDinamicos(ficha.datosDinamicos);
+        const plantillaNombre = datos?._plantillaNombre;
+        const titulo = plantillaNombre || ficha.tipoAtencion || "Consulta General";
+        const { nombre: nombreProfesionalFicha, rut: rutEnNombre } = separarNombreYRut(ficha.observaciones);
+        const registrado = profesionalPorNombre(listaProfesionales, nombreProfesionalFicha);
+        const datosRegistrado = datosProfesionalParaDocumento(registrado);
+        const edad = calcularEdad(pacienteActual?.nacimiento);
+
+        const contenido = [];
+        if (datos && plantillaNombre) {
+            agruparPorCategoria(datos).forEach((categoria) => {
+                contenido.push({ rotulo: normalizarTextoPDF(categoria.nombre), categoria: true });
+                categoria.campos
+                    .filter((campo) => esDatoVisible(campo.valor))
+                    .forEach((campo) => contenido.push({ rotulo: normalizarTextoPDF(campo.nombre), valor: normalizarTextoPDF(campo.valor) }));
+            });
+        }
+        [
+            ["Tipo de atención", ficha.tipoAtencion],
+            ["Motivo consulta", ficha.motivoConsulta],
+            ["Signos vitales", ficha.signosVitales],
+            ["Anotación consulta", ficha.anotacionConsulta],
+            ["Anamnesis", ficha.anamnesis],
+            ["Diagnóstico", ficha.diagnostico],
+            ["Indicaciones", ficha.indicaciones],
+            ["Archivos adjuntos", ficha.archivosAdjuntos],
+            ["Consentimiento firmado", ficha.consentimientoFirmado],
+        ]
+            .filter(([, valor]) => esDatoVisible(valor))
+            .forEach(([rotulo, valor]) => contenido.push({ rotulo, valor: normalizarTextoPDF(valor) }));
+
+        return {
+            titulo,
+            profesional: registrado
+                ? {
+                    id_profesional: registrado.id_profesional,
+                    ...datosRegistrado,
+                    rut: datosRegistrado.rut || rutEnNombre,
+                }
+                : null,
+            nombreProfesional: nombreProfesionalFicha,
+            identificacion: [
+                { rotulo: "Paciente", valor: `${pacienteActual?.nombre || ""} ${pacienteActual?.apellido || ""}`.trim(), completo: true },
+                { rotulo: "RUT", valor: formatRut(pacienteActual?.rut) || pacienteActual?.rut },
+                { rotulo: "Previsión", valor: previsionDesdeId(pacienteActual?.prevision_id) },
+                { rotulo: "Nacimiento", valor: formatearFecha(pacienteActual?.nacimiento) },
+                { rotulo: "Edad", valor: edad === "-" ? "-" : `${edad} años` },
+                { rotulo: "Profesional", valor: nombreProfesionalFicha || "No informado", completo: true },
+                { rotulo: "Fecha consulta", valor: formatearFecha(ficha.fechaConsulta) },
+                { rotulo: "Tipo de ficha", valor: titulo },
+            ],
+            contacto: [
+                ["Teléfono", pacienteActual?.telefono],
+                ["Correo", pacienteActual?.correo],
+                ["Dirección", pacienteActual?.direccion],
+                ["País", pacienteActual?.pais],
+                ["Sexo", pacienteActual?.sexo],
+            ].filter(([, valor]) => esDatoVisible(valor)).map(([r, v]) => [r, normalizarTextoPDF(v)]),
+            contenido,
+        };
+    }
+
+    function generadorFicha(ficha) {
+        return async ({ modo, borrador }) => {
+            const d = datosFichaParaDocumento(ficha);
+            return generarFichaClinicaPdf({
+                modo,
+                borrador,
+                empresa: { empresaNombre, ...datosEmpresa },
+                titulo: d.titulo,
+                idFicha: ficha.id_ficha,
+                identificacion: d.identificacion,
+                contacto: d.contacto,
+                contenido: d.contenido,
+                profesional: d.profesional || { nombre: d.nombreProfesional },
+                fechaEmisionTexto: formatearFecha(ficha.fechaConsulta),
+            });
+        };
     }
 
     function descargarFichaPDF(ficha) {
@@ -1676,7 +1764,30 @@ export default function Paciente() {
                                                     <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-800 bg-black px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-700 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
                                                         {expandida ? "Ocultar" : "Ver detalle"}
                                                     </button>
+                                                    {FIRMA_HABILITADA ? (() => {
+                                                        const profesionalFicha = datosFichaParaDocumento(ficha).profesional;
+                                                        return (
+                                                            <EmisionDocumento
+                                                                variante="acciones"
+                                                                tipoDocumento="ficha_clinica"
+                                                                titulo={`Ficha clínica N° ${ficha.id_ficha}`}
+                                                                referencia={{ tabla: "fichaClinica", id: Number(ficha.id_ficha) }}
+                                                                paciente={{
+                                                                    id_paciente: Number(id_paciente),
+                                                                    nombre: `${pacienteActual?.nombre || ""} ${pacienteActual?.apellido || ""}`.trim(),
+                                                                    correo: pacienteActual?.correo,
+                                                                }}
+                                                                profesional={profesionalFicha}
+                                                                generarCuerpoPdf={generadorFicha(ficha)}
+                                                                metadatos={{ resumen: `Ficha clínica N° ${ficha.id_ficha}` }}
+                                                                nombreArchivo={`ficha-clinica-${ficha.id_ficha}`}
+                                                                deshabilitado={!pacienteActual || !profesionalFicha}
+                                                                motivoDeshabilitado="El profesional de la ficha no coincide con un profesional registrado."
+                                                            />
+                                                        );
+                                                    })() : (
                                                     <button onClick={() => descargarFichaPDF(ficha)} className="h-10 rounded-xl border border-slate-200 bg-slate-100 px-4 text-[11px] font-bold text-slate-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">PDF</button>
+                                                    )}
                                                     <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[11px] font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">Editar</button>
                                                 </div>
                                             </div>
