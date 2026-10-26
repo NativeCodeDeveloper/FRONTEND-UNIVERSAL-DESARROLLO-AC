@@ -91,6 +91,14 @@ test("recepción: agenda y pacientes, sin fichas ni configuración", () => {
   assert.equal(puede("suspendido", "/dashboard/suscripcion-cancelada"), true);
 });
 
+test("el consentimiento de la ficha queda disponible solo para perfiles clínicos", () => {
+  assert.equal(puede("profesional-medico", "/dashboard/consentimiento"), true);
+  assert.equal(puede("profesional-odontologo", "/dashboard/consentimiento"), true);
+  assert.equal(puede("tecnico-nativecode", "/dashboard/consentimiento"), true);
+  assert.equal(puede("recepcion", "/dashboard/consentimiento"), false);
+  assert.equal(puede("admin-clinica", "/dashboard/consentimiento"), false);
+});
+
 test("profesional que también administra la clínica", () => {
   const dueno = { publicMetadata: { role: "profesional-odontologo", administraClinica: true, idProfesionalAgenda: "46" } };
   const rol = getDashboardRoleFromUser(dueno);

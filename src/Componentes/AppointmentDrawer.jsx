@@ -39,6 +39,7 @@ import { PhoneInput } from "@/Componentes/PhoneInput";
 import { RutDisplay } from "@/Componentes/RutDisplay";
 import { RecordatorioPaciente } from "@/Componentes/RecordatorioPaciente";
 import { getStateTokens } from "@/lib/designTokens";
+import { PREVISIONES } from "@/lib/previsiones";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { canAccessFichasClinicas, getDashboardRoleFromUser } from "@/lib/dashboard-access";
@@ -53,6 +54,9 @@ const ACCIONES_ESTADO = [
   { valor: "finalizado", etiqueta: "Finalizar" },
   { valor: "anulada", etiqueta: "Anular" },
 ];
+
+// Mismo límite que el comentario editable desde el Panel de Reservaciones.
+const MAX_CARACTERES_COMENTARIO_RESERVA = 100;
 
 function getEstadoActionStyle(estado) {
   const token = getStateTokens(estado);
@@ -922,6 +926,51 @@ function FormSection({
               Monto: <span className="font-semibold text-slate-700">${Number(popupForm.monto_reserva).toLocaleString("es-CL")}</span>
             </p>
           )}
+        </div>
+      )}
+
+      {/* ── Previsión + Comentario ── PENDIENTE BD ──
+          Campos aún no persistidos: viajan en el POST de la reserva y el backend
+          los ignorará hasta aplicar la migración (ver guía en calendario/page.jsx).
+          La previsión usa la fuente única @/lib/previsiones (la misma de fichas). */}
+      {mode !== "bloqueo" && (
+        <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
+            Previsión y comentarios
+          </p>
+          <div>
+            <label className={labelClass}>Previsión de salud</label>
+            <select
+              value={popupForm.prevision ?? ""}
+              onChange={(e) => onPopupFormChange("prevision", e.target.value)}
+              className={selectClass}
+              style={estiloSelect}
+            >
+              <option value="">— Sin indicar —</option>
+              {PREVISIONES.map((p) => (
+                <option key={p.id} value={p.nombre}>
+                  {p.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>Comentario (opcional)</label>
+            <textarea
+              value={popupForm.comentario ?? ""}
+              onChange={(e) => onPopupFormChange("comentario", e.target.value.slice(0, MAX_CARACTERES_COMENTARIO_RESERVA))}
+              maxLength={MAX_CARACTERES_COMENTARIO_RESERVA}
+              rows={2}
+              placeholder="Nota breve sobre esta cita..."
+              className={`${inputClass} resize-none`}
+              style={{ colorScheme: "light" }}
+            />
+            {(popupForm.comentario ?? "").length > 0 && (
+              <p className="mt-1 text-right text-[10px] font-semibold text-slate-400">
+                {popupForm.comentario.length}/{MAX_CARACTERES_COMENTARIO_RESERVA}
+              </p>
+            )}
+          </div>
         </div>
       )}
 

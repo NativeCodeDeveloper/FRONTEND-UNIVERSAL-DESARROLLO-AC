@@ -154,6 +154,18 @@ function CalendarioContent() {
                 overflow: hidden !important;
                 border: none !important;
             }
+            /* ── Reservas con toque de vidrio (misma receta que .vidrio-toque en
+               globals.css): brillo interior superior + aro blanco + sombra difusa,
+               SIN fondo propio para no tapar el color del estado. El !important es
+               para ganarle al box-shadow forzado de .rbc-event de arriba. ── */
+            .reserva-vidrio {
+                backdrop-filter: blur(6px) !important;
+                -webkit-backdrop-filter: blur(6px) !important;
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+                    0 2px 10px -4px rgba(15, 23, 42, 0.16) !important;
+            }
             /* Número de día hoy en mes — círculo violeta */
             .rbc-date-cell.rbc-now > a,
             .rbc-date-cell.rbc-now > button,
@@ -385,6 +397,14 @@ function CalendarioContent() {
     //   SELECT ..., nombre_prestacion, modalidad FROM reservaciones ...
     //   en: seleccionarReservados, seleccionarPorProfesional, seleccionarEspecifica
     //
+    // El formulario ya envía además "prevision" (nombre de @/lib/previsiones) y
+    // "comentario" (texto de hasta 100 caracteres, el mismo límite del comentario
+    // editable desde el Panel de Reservaciones). Para persistirlos conviene:
+    //   ALTER TABLE reservaciones
+    //     ADD COLUMN prevision VARCHAR(20) NULL COMMENT 'Nombre de la previsión de salud',
+    //     ADD COLUMN comentario VARCHAR(100) NULL COMMENT 'Comentario breve de la cita';
+    // y retornarlos también en los SELECTs de consulta.
+    //
     // Una vez hecha la migración, eliminar este comentario o moverlo a la documentación.
     // ══════════════════════════════════════════════════════════════════════════
 
@@ -399,6 +419,8 @@ function CalendarioContent() {
         modalidad: "presencial", // 'presencial' | 'online'
         monto_reserva: "",
         motivo_reserva: "",
+        prevision: "",      // Previsión de salud (nombre de @/lib/previsiones) — PENDIENTE BD
+        comentario: "",     // Comentario breve de la cita (máx. 100) — PENDIENTE BD
         fechasRepeticion: [], // Date[] — fechas adicionales para agendar al mismo paciente en el mismo horario
         confirmacionFechasRepeticion: false, // debe marcarse tras revisar la lista antes de poder agendar
     });
@@ -847,6 +869,8 @@ function CalendarioContent() {
             modalidad: "presencial",
             monto_reserva: "",
             motivo_reserva: "",
+            prevision: "",
+            comentario: "",
             fechasRepeticion: [],
             confirmacionFechasRepeticion: false,
         });
@@ -882,6 +906,8 @@ function CalendarioContent() {
             modalidad: "presencial", // Modalidad por defecto
             monto_reserva: "",
             motivo_reserva: "",
+            prevision: "",
+            comentario: "",
             fechasRepeticion: [],
             confirmacionFechasRepeticion: false,
         });
@@ -946,6 +972,9 @@ function CalendarioContent() {
             modalidad: reserva.modalidad ?? "presencial",
             monto_reserva: reserva.monto_reserva ?? "",
             motivo_reserva: reserva.motivo_reserva ?? "",
+            // Si la reserva ya tiene previsión/comentario en BD, se recuperan aquí
+            prevision: reserva.prevision ?? "",
+            comentario: reserva.comentario ?? "",
         });
 
         setFloatingDraft(null);
@@ -1256,8 +1285,9 @@ function CalendarioContent() {
     }, [draggingPopup]);
 
 
-    // prestacion y modalidad vienen del popupForm — se envían al backend cuando esté migrado
-    async function insertarNuevaReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, id_profesional, prestacion = "", modalidad = "presencial", monto_reserva = "", motivo_reserva = "") {
+    // prestacion, modalidad, prevision y comentario vienen del popupForm — se envían
+    // al backend cuando esté migrado (ver guía de migración más arriba)
+    async function insertarNuevaReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, id_profesional, prestacion = "", modalidad = "presencial", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "") {
         try {
             const rutLimpio = normalizarRut(rut);
             if (
@@ -1313,9 +1343,10 @@ function CalendarioContent() {
                     method: "POST",
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     mode: "cors",
-                    // NOTA: nombre_prestacion y modalidad se envían pero el backend
-                    // debe tener la migración de BD aplicada para persistirlos.
-                    body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", origen: "dashboard" })
+                    // NOTA: nombre_prestacion, modalidad, prevision y comentario se
+                    // envían pero el backend debe tener la migración de BD aplicada
+                    // para persistirlos.
+                    body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
                 });
                 const respuestaBackend = await res.json();
                 if (!res.ok && respuestaBackend.message === "conflicto") {
@@ -1353,13 +1384,13 @@ function CalendarioContent() {
     // POST crudo para una fecha específica del agendamiento múltiple (paciente en varios días).
     // No valida horario/campos ni muestra toasts: eso ya se hizo una sola vez antes de iterar,
     // porque el horario y los datos del paciente son iguales en todas las fechas seleccionadas.
-    async function crearReservaEnFecha({ nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado, fecha, horaInicio, horaFinalizacion, id_profesional, nombreProfesional, prestacion, modalidad, monto_reserva, motivo_reserva }) {
+    async function crearReservaEnFecha({ nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado, fecha, horaInicio, horaFinalizacion, id_profesional, nombreProfesional, prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario }) {
         try {
             const res = await fetch(`${API}/reservaPacientes/insertarReservasMultiples`, {
                 method: "POST",
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
                 mode: "cors",
-                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", origen: "dashboard" })
+                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
             });
             const respuestaBackend = await res.json().catch(() => ({}));
             if (respuestaBackend.message === true) return { ok: true };
@@ -1382,7 +1413,7 @@ function CalendarioContent() {
         const {
             nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado,
             horaInicioStr, horaFinalizacionStr, id_profesional: idProfesionalEnvio, nombreProfesional,
-            prestacion, modalidad, monto_reserva, motivo_reserva, fechaPrimaria,
+            prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario, fechaPrimaria,
         } = datosBase;
 
         let exitosos = 0;
@@ -1421,7 +1452,7 @@ function CalendarioContent() {
                 nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado,
                 fecha, horaInicio: horaInicioStr, horaFinalizacion: horaFinalizacionStr,
                 id_profesional: idProfesionalEnvio, nombreProfesional,
-                prestacion, modalidad, monto_reserva, motivo_reserva,
+                prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario,
             });
 
             if (resultado.ok) exitosos++;
@@ -1541,7 +1572,9 @@ function CalendarioContent() {
             reservaOriginal.id_reserva,
             reservaOriginal._nombreProfesional || obtenerNombreProfesionalParaEnvio(reservaOriginal.id_profesional),
             reservaOriginal.monto_reserva || "",
-            reservaOriginal.motivo_reserva || ""
+            reservaOriginal.motivo_reserva || "",
+            reservaOriginal.prevision ?? "",
+            reservaOriginal.comentario ?? ""
         );
     }
 
@@ -1811,6 +1844,9 @@ function CalendarioContent() {
         }
 
         return {
+            // Toque de vidrio solo en las RESERVAS (no bloqueos ni pago en curso);
+            // la selección ya tiene su propio estilo violeta.
+            className: esSeleccion ? undefined : "reserva-vidrio",
             style: {
                 display: 'flex',
                 alignItems: 'stretch',
@@ -1892,7 +1928,7 @@ function CalendarioContent() {
         </div>
     );
 
-    async function actualizarInformacionReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, estadoReserva, id_profesional, id_reserva, nombreProfesional = "", monto_reserva = "", motivo_reserva = "") {
+    async function actualizarInformacionReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, estadoReserva, id_profesional, id_reserva, nombreProfesional = "", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "") {
         try {
             const rutLimpio = normalizarRut(rut);
             if (!nombrePaciente || !apellidoPaciente || !rutLimpio || !telefono || !fechaInicio || !horaInicio || !fechaFinalizacion || !horaFinalizacion || !estadoReserva || !id_profesional || !id_reserva) {
@@ -1909,7 +1945,7 @@ function CalendarioContent() {
                 method: "POST",
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
                 mode: "cors",
-                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional: nombreProfesionalEnvio, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva, id_profesional, id_reserva })
+                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional: nombreProfesionalEnvio, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva, id_profesional, id_reserva, prevision: prevision || null, comentario: comentario || "" })
             });
             const respuestaBackend = await res.json();
             if (!res.ok && respuestaBackend.message === "conflicto") {
@@ -2044,7 +2080,9 @@ function CalendarioContent() {
             popupForm.prestacion ?? "",
             popupForm.modalidad ?? "presencial",
             popupForm.monto_reserva ?? "",
-            popupForm.motivo_reserva ?? ""
+            popupForm.motivo_reserva ?? "",
+            popupForm.prevision ?? "",
+            popupForm.comentario ?? ""
         );
         if (created) {
             // Defensa adicional: aunque el botón "Agendar" ya queda deshabilitado en el
@@ -2070,6 +2108,8 @@ function CalendarioContent() {
                     modalidad: popupForm.modalidad ?? "presencial",
                     monto_reserva: popupForm.monto_reserva ?? "",
                     motivo_reserva: popupForm.motivo_reserva ?? "",
+                    prevision: popupForm.prevision ?? "",
+                    comentario: popupForm.comentario ?? "",
                     fechaPrimaria: formatearFechaLocal(selectionDraft.start),
                 });
             }
@@ -2100,7 +2140,9 @@ function CalendarioContent() {
             selectionDraft.id_reserva,
             obtenerNombreProfesionalParaEnvio(id_profesional),
             popupForm.monto_reserva ?? "",
-            popupForm.motivo_reserva ?? ""
+            popupForm.motivo_reserva ?? "",
+            popupForm.prevision ?? "",
+            popupForm.comentario ?? ""
         );
 
         if (actualizado) {

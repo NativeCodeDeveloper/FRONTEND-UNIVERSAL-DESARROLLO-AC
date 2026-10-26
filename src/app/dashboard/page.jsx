@@ -42,6 +42,9 @@ const STORAGE_KEYS = {
     estado: "dashboard_reservas_estado",
 };
 
+// Límite del comentario por cita, compartido por el textarea y el contador.
+const MAX_CARACTERES_COMENTARIO = 100;
+
 export default function AgendaCitas() {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const router = useRouter();
@@ -81,6 +84,11 @@ export default function AgendaCitas() {
     const [menuEstadoAbiertoId, setMenuEstadoAbiertoId] = useState(null);
     const [monto_reserva, setMontoReserva] = useState("");
     const [motivo_reserva, setMotivoReserva] = useState("");
+    // Comentarios por reserva. El campo aún no existe en la base de datos:
+    // mientras tanto vive solo en el cliente (se pierde al recargar la página).
+    const [comentariosReservas, setComentariosReservas] = useState({});
+    const [idReservaComentario, setIdReservaComentario] = useState(null);
+    const [comentarioBorrador, setComentarioBorrador] = useState("");
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -716,6 +724,25 @@ export default function AgendaCitas() {
         }
     }
 
+    function abrirModalComentario(reserva) {
+        setIdReservaComentario(reserva.id_reserva);
+        setComentarioBorrador(comentariosReservas[reserva.id_reserva] || "");
+    }
+
+    function cerrarModalComentario() {
+        setIdReservaComentario(null);
+        setComentarioBorrador("");
+    }
+
+    function guardarComentarioReserva() {
+        if (!idReservaComentario) return;
+        // El textarea ya corta en 100, pero se recorta igual por si el valor
+        // llega por otro camino. Texto vacío = volver a "Sin Comentarios".
+        const texto = comentarioBorrador.trim().slice(0, MAX_CARACTERES_COMENTARIO);
+        setComentariosReservas((prev) => ({...prev, [idReservaComentario]: texto}));
+        cerrarModalComentario();
+    }
+
     function exportarAExcel() {
         if (!dataLista || dataLista.length === 0) {
             return toast.error("No hay datos para exportar.");
@@ -761,7 +788,7 @@ export default function AgendaCitas() {
             <div className="relative">
                 <button
                     onClick={() => setMenuEstadoAbiertoId(menuEstadoAbiertoId === data.id_reserva ? null : data.id_reserva)}
-                    className={`${claseBoton} rounded-full flex items-center justify-between gap-2 transition-all hover:brightness-95 disabled:opacity-50`}
+                    className={`${claseBoton} vidrio-toque rounded-full flex items-center justify-between gap-2 transition-all hover:brightness-95 disabled:opacity-50`}
                     style={estiloBoton || obtenerEstiloBotonEstado(data.estadoReserva)}
                     disabled={actualizandoReservaId === data.id_reserva}
                 >
@@ -850,6 +877,28 @@ export default function AgendaCitas() {
         );
     }
 
+    // Mismo porte y estilo que el botón "Ver ficha": forman un par de acciones.
+    // Se tiñe violeta cuando la cita ya tiene comentario guardado.
+    function renderBotonComentarioReserva(reserva) {
+        return (
+            <button
+                type="button"
+                onClick={() => abrirModalComentario(reserva)}
+                title="Comentario"
+                aria-label="Editar comentario"
+                className={`h-10 w-10 rounded-xl border transition-all flex items-center justify-center shadow-sm disabled:cursor-not-allowed disabled:opacity-60 ${
+                    comentariosReservas[reserva.id_reserva]
+                        ? "border-[#EDE9FE] bg-[#F3F0FF] text-[#6E56CF] hover:brightness-95"
+                        : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100"
+                }`}
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+            </button>
+        );
+    }
+
     // Fila que el tour resalta en el paso "abre la ficha clínica desde la cita".
     // Se prefiere la reserva de prueba que el propio usuario acaba de crear —
     // misma identidad = mismo RUT, que es además la llave con la que se busca o
@@ -866,6 +915,11 @@ export default function AgendaCitas() {
 
         return (coincidencia ?? dataLista[0])?.id_reserva ?? null;
     })();
+
+    // Reserva cuyo comentario está siendo editado en el modal (para el encabezado).
+    const reservaComentarioModal = idReservaComentario
+        ? dataLista.find((item) => item.id_reserva === idReservaComentario)
+        : null;
 
     const resumenEstados = dataLista.reduce((acc, item) => {
         const estado = normalizarEstadoReserva(item?.estadoReserva);
@@ -1173,25 +1227,30 @@ export default function AgendaCitas() {
                             )}
                         </div>
 
-                        {/* Vista desktop: tabla */}
+                        {/* Vista desktop: tabla. `table-fixed` + anchos por columna:
+                            la tabla SIEMPRE cabe en el ancho disponible (con el
+                            sidebar fijado quedan ~930px) y se compacta recortando
+                            texto, sin desplazarse ni desbordar la tarjeta. */}
                         <div className="hidden overflow-visible [&_[data-slot=table-container]]:overflow-visible xl:block">
-                            <Table className="min-w-[800px]">
+                            <Table className="table-fixed">
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                                        <TableHead className="w-[120px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pl-8">Horario</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Identidad Paciente</TableHead>
-                                        <TableHead className="w-[260px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Profesional</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Motivo</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Control de Estado</TableHead>
+                                        <TableHead className="w-[112px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pl-8">Horario</TableHead>
+                                        <TableHead className="w-[17%] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Identidad Paciente</TableHead>
+                                        <TableHead className="w-[136px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Profesional</TableHead>
+                                        <TableHead className="w-[13%] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Motivo</TableHead>
+                                        <TableHead className="w-[84px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Previsión</TableHead>
+                                        <TableHead className="w-[11%] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Comentario</TableHead>
+                                        <TableHead className="w-[150px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Control de Estado</TableHead>
                                         {canSeeFichasClinicas && (
-                                            <TableHead className="w-[100px] text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pr-8">Ficha</TableHead>
+                                            <TableHead className="w-[128px] text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pr-6">Ficha</TableHead>
                                         )}
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {dataLista.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={canSeeFichasClinicas ? 6 : 5} className="py-32 text-center">
+                                            <TableCell colSpan={canSeeFichasClinicas ? 8 : 7} className="py-32 text-center">
                                                 <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                                 </div>
@@ -1209,29 +1268,57 @@ export default function AgendaCitas() {
                                                 </TableCell>
                                                 <TableCell className="py-6">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[13px] font-bold text-slate-800">{reserva.nombrePaciente} {reserva.apellidoPaciente}</span>
-                                                        <span className="text-[11px] text-slate-400 font-medium mt-0.5">{formatearRutVisible(reserva.rut)}</span>
+                                                        <span className="truncate text-[13px] font-bold text-slate-800">{reserva.nombrePaciente} {reserva.apellidoPaciente}</span>
+                                                        <span className="mt-0.5 truncate text-[11px] text-slate-400 font-medium">{formatearRutVisible(reserva.rut)}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="w-[260px] py-6">
-                                                    <span className="block max-w-[260px] truncate text-[13px] font-semibold text-slate-600">{obtenerNombreProfesionalReserva(reserva)}</span>
+                                                <TableCell className="py-6">
+                                                    <span className="block truncate text-[13px] font-semibold text-slate-600">{obtenerNombreProfesionalReserva(reserva)}</span>
                                                 </TableCell>
                                                 <TableCell className="py-6">
-                                                    <div className="flex flex-col max-w-[180px]">
+                                                    <div className="flex flex-col">
                                                         <span className="text-[13px] font-semibold text-slate-700 truncate">{reserva.motivo_reserva}</span>
                                                         {canSeeReservationAmounts ? (
                                                             <span className="text-[13px] font-bold text-[#6E56CF] mt-0.5">${reserva.monto_reserva}</span>
                                                         ) : null}
                                                     </div>
                                                 </TableCell>
+                                                {/* Previsión y Comentario aún no existen en la base de
+                                                    datos: se muestran valores fijos hasta que lleguen. */}
+                                                <TableCell className="py-6">
+                                                    <span className="block truncate text-[13px] font-semibold text-slate-400">NO INDICADA</span>
+                                                </TableCell>
+                                                <TableCell className="py-6">
+                                                    {comentariosReservas[reserva.id_reserva] ? (
+                                                        <span
+                                                            className="block truncate text-[13px] font-semibold text-slate-700"
+                                                            title={comentariosReservas[reserva.id_reserva]}
+                                                        >
+                                                            {comentariosReservas[reserva.id_reserva]}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[13px] font-medium text-slate-400">Sin Comentarios</span>
+                                                    )}
+                                                </TableCell>
                                                 <TableCell className="py-6 overflow-visible">
-                                                    {renderMenuAccionesReserva(reserva)}
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        {/* Ancho FIJO: la pastilla mide lo mismo con el
+                                                            sidebar fijado que en rail (con `w-full` seguía
+                                                            el ancho de la columna y cambiaba de porte). */}
+                                                        {renderMenuAccionesReserva(reserva, { claseBoton: "h-9 w-[120px] px-3" })}
+                                                        {/* Sin acceso a fichas, el lápiz del comentario
+                                                            vuelve aquí para no perder la función. */}
+                                                        {!canSeeFichasClinicas && renderBotonComentarioReserva(reserva)}
+                                                    </div>
                                                 </TableCell>
                                                 {canSeeFichasClinicas && (
-                                                    <TableCell className="py-6 pr-8 text-center">
-                                                        {renderBotonFichaReserva(reserva, {
-                                                            esAnclaTour: reserva.id_reserva === idReservaAnclaTour,
-                                                        })}
+                                                    <TableCell className="py-6 pr-6">
+                                                        <div className="flex items-center justify-center gap-1.5">
+                                                            {renderBotonFichaReserva(reserva, {
+                                                                esAnclaTour: reserva.id_reserva === idReservaAnclaTour,
+                                                            })}
+                                                            {renderBotonComentarioReserva(reserva)}
+                                                        </div>
                                                     </TableCell>
                                                 )}
                                             </TableRow>
@@ -1242,6 +1329,60 @@ export default function AgendaCitas() {
                         </div>
                     </div>
                 </div>
+
+                {/* Modal: editar el comentario de una cita (máx. 100 caracteres). */}
+                {idReservaComentario && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={cerrarModalComentario} />
+                        <div className="relative w-full max-w-md overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
+                            <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-5">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F3F0FF] text-[#6E56CF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="text-[15px] font-bold text-slate-900">Comentario de la cita</h3>
+                                    {reservaComentarioModal && (
+                                        <p className="mt-0.5 truncate text-[12px] font-medium text-slate-400">
+                                            {reservaComentarioModal.nombrePaciente} {reservaComentarioModal.apellidoPaciente} · {formatearFechaDashboard(reservaComentarioModal.fechaInicio)}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="space-y-2 px-6 py-5">
+                                <textarea
+                                    value={comentarioBorrador}
+                                    onChange={(e) => setComentarioBorrador(e.target.value.slice(0, MAX_CARACTERES_COMENTARIO))}
+                                    maxLength={MAX_CARACTERES_COMENTARIO}
+                                    rows={4}
+                                    autoFocus
+                                    placeholder="Escribe un comentario para esta cita..."
+                                    className="w-full resize-none rounded-xl border border-slate-200 px-3.5 py-3 text-[13px] font-medium text-slate-700 placeholder:font-normal placeholder:text-slate-300 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-[#6E56CF]/20"
+                                />
+                                <p className="text-right text-[11px] font-bold text-slate-400">
+                                    {comentarioBorrador.length}/{MAX_CARACTERES_COMENTARIO}
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-end gap-2 border-t border-slate-100 bg-slate-50/30 px-6 py-4">
+                                <button
+                                    type="button"
+                                    onClick={cerrarModalComentario}
+                                    className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-bold text-slate-500 transition-all hover:bg-slate-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={guardarComentarioReserva}
+                                    className="h-10 rounded-xl bg-black px-5 text-[13px] font-bold text-white transition-all hover:bg-slate-800"
+                                >
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

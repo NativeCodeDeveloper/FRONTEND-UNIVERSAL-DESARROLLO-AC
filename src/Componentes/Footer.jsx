@@ -273,6 +273,7 @@ export default function Footer() {
                     referrerPolicy="no-referrer-when-downgrade"
                     className="h-56 w-full"
                     title={`Ubicacion de ${publicContact.companyName}`}
+                    suppressHydrationWarning
                   />
                 </div>
               )}

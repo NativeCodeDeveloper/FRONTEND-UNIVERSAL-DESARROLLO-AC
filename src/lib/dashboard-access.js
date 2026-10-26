@@ -102,6 +102,7 @@ const R = {
     /^\/dashboard\/FichasPacientes\/[^/]+$/,
     /^\/dashboard\/NuevaFicha\/[^/]+$/,
     /^\/dashboard\/archivosPacientes\/[^/]+$/,
+    /^\/dashboard\/consentimiento$/,
   ],
   firma: [/^\/dashboard\/documentosPorFirmar$/],
   // Procedimientos del consentimiento informado: los profesionales consultan, los administradores crean y editan.

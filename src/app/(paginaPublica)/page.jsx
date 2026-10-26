@@ -161,6 +161,9 @@ export default async function Inicio() {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   className="absolute inset-0 h-full w-full border-0 grayscale-[35%]"
+                  /* Las extensiones del navegador (p. ej. react-grab) inyectan
+                     atributos en el iframe antes de la hidratación. */
+                  suppressHydrationWarning
                 />
               </div>
             )}

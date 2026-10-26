@@ -380,7 +380,7 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
      *    `firmaPaciente`: true (línea simple) o {nombre, documento, rotulo}; va a
      *    la izquierda y la del profesional a la derecha.
      */
-    zonaFirma({ modo, profesional = {}, firmaPaciente = false, leyendaManuscrita = "Firma y timbre del profesional" }) {
+    zonaFirma({ modo, profesional = {}, firmaPaciente = false, imagenPaciente = null, imagenProfesional = null, leyendaManuscrita = "Firma y timbre del profesional" }) {
       if (modo === MODOS_FIRMA.FES) {
         y += 4;
         asegurar(ZONA_FIRMA.alto);
@@ -415,6 +415,14 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
       doc.setDrawColor(...PALETA.oscuro);
       doc.setLineWidth(0.35);
       doc.line(xProfesional, yLinea, xProfesional + anchoFirma, yLinea);
+      const dibujarImagen = (imagen, xFirma) => {
+        if (!imagen?.datos || !imagen.ancho || !imagen.alto) return;
+        const altoMaximo = espacioFirma - 2;
+        const ancho = Math.min(anchoFirma - 4, altoMaximo * imagen.ancho / imagen.alto);
+        const alto = ancho * imagen.alto / imagen.ancho;
+        doc.addImage(imagen.datos, "PNG", xFirma + (anchoFirma - ancho) / 2, yLinea - alto - 0.5, ancho, alto);
+      };
+      dibujarImagen(imagenProfesional, xProfesional);
       fuente("bold", datos.tamanoNombre, PALETA.negro);
       dibujarBloqueFirma(doc, {
         ...datos,
@@ -431,6 +439,7 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
         const centro = m + anchoFirma / 2;
         doc.setDrawColor(...PALETA.oscuro);
         doc.line(m, yLinea, m + anchoFirma, yLinea);
+        dibujarImagen(imagenPaciente, m);
         let cursor = yLinea + 4.6;
         if (paciente.nombre) {
           fuente("normal", datos.tamanoNombre, PALETA.oscuro);

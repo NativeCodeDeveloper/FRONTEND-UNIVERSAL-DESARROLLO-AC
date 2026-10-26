@@ -25,7 +25,7 @@ import { bloquesDeTexto } from "@/lib/consentimientos/textosLegales";
  * @param {{nombre,rut,especialidad,registroSis}} p.profesional
  * @param {string} p.fechaEmisionTexto
  */
-export function generarConsentimientoInformadoPdf({ modo, borrador, empresa, texto, procedimiento, paciente, profesional, fechaEmisionTexto }) {
+export function generarConsentimientoInformadoPdf({ modo, borrador, empresa, texto, procedimiento, paciente, profesional, fechaEmisionTexto, consulta = null, firmas = null }) {
   const motor = crearDocumento({ empresa, tipoDocumento: "Consentimiento informado", fechaEmision: fechaEmisionTexto, borrador });
   const representante = paciente.representante?.nombre ? paciente.representante : null;
 
@@ -48,6 +48,20 @@ export function generarConsentimientoInformadoPdf({ modo, borrador, empresa, tex
     ],
   ]);
 
+  if (consulta) {
+    motor.cajaDatos([
+      [
+        { rotulo: "Fecha de atención", valor: consulta.fecha || fechaEmisionTexto },
+        { rotulo: "Hora", valor: consulta.hora },
+        { rotulo: "Centro / sede", valor: consulta.centro, completo: true },
+      ],
+      [
+        { rotulo: "Motivo de consulta", valor: consulta.motivo, completo: true },
+        { rotulo: "Procedimiento", valor: procedimiento, completo: true },
+      ],
+    ]);
+  }
+
   let numero = 0;
   for (const bloque of bloquesDeTexto(texto)) {
     if (bloque.tipo === "titulo") motor.seccion(bloque.texto, { numero: ++numero });
@@ -65,6 +79,8 @@ export function generarConsentimientoInformadoPdf({ modo, borrador, empresa, tex
     motor.zonaFirma({
       modo,
       profesional,
+      imagenPaciente: firmas?.paciente,
+      imagenProfesional: firmas?.profesional,
       firmaPaciente: {
         nombre: firmante.nombre,
         documento: firmante.documento,
