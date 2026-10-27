@@ -2,7 +2,7 @@
  * docs/firma/02-contrato-endpoints.md §7.8. Rutas del dashboard con sesión de Clerk.
  *
  * Mientras el backend de firma no esté activo (modo de prueba), responde con un
- * almacén en memoria sembrado con los 14 anexos de ejemplo: la pantalla se puede
+ * almacén en memoria sembrado con los anexos disponibles: la pantalla se puede
  * usar y probar completa, pero lo creado se pierde al recargar. */
 
 import { fetchConCarga } from "@/lib/fetchConCarga";

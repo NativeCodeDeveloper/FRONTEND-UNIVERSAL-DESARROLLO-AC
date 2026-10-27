@@ -2,7 +2,7 @@
  *
  * Cada procedimiento es un ANEXO de la plantilla base (plantillasProcedimiento.js)
  * y se guarda en la tabla documento_plantilla (categoría "anexo_procedimiento"),
- * la misma de los 14 anexos de ejemplo: no hay tabla nueva.
+ * la misma de los anexos de ejemplo: no hay tabla nueva.
  *
  * La clínica no escribe el texto libre: llena CAMPOS FIJOS y el sistema arma el
  * anexo con el formato de siempre ("## " subtítulo, "- " ítem). Así ningún
@@ -81,6 +81,10 @@ export const ESPECIALIDADES_SUGERIDAS = [
   "Oftalmología",
   "Estética",
   "Kinesiología",
+  "Psicología",
+  "Terapia ocupacional",
+  "Estética facial",
+  "Depilación",
   "Nutrición",
 ];
 
@@ -121,7 +125,7 @@ export function construirCuerpoAnexo(campos) {
   return secciones.join("\n\n");
 }
 
-/** Cuerpo del anexo → campos (para editar una versión existente, incluidos los 14 de ejemplo). */
+/** Cuerpo del anexo → campos (para editar una versión existente, incluidos los ejemplos). */
 export function camposDesdeCuerpo(cuerpo) {
   const campos = Object.fromEntries(CAMPOS_ANEXO.map((d) => [d.clave, ""]));
   const porTitulo = new Map(CAMPOS_ANEXO.map((d) => [d.titulo.toLowerCase(), d]));

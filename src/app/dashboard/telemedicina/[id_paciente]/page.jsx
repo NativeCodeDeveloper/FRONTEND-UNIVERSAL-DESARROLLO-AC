@@ -1,26 +1,16 @@
-"use client"
-
-// Sala de telemedicina del paciente. Por ahora solo muestra la cámara local
-// (vista previa): sin audio ni conexión remota — la señal WebRTC con el
-// paciente vendrá después.
-//
-// Abajo del escenario va el mismo historial de fichas clínicas de la carpeta
-// del paciente (mismo endpoint, mismo popup de nueva ficha), para que el
-// profesional registre la consulta sin salir de la sala. El popup es el
-// FichaClinicaModal compartido del repo; el resto de la pantalla sigue siendo
-// un único componente a propósito.
+"use client";
 
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { formatRut } from "@/lib/designTokens";
 import { claveFechaCivil, formatearFechaCivil } from "@/lib/fechas";
 import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
 import ToasterClient from "@/Componentes/ToasterClient";
+import TelemedicinaSala from "@/Componentes/TelemedicinaSala";
 
 export default function Telemedicina() {
-
     const { id_paciente } = useParams();
     const router = useRouter();
     const API = process.env.NEXT_PUBLIC_API_URL;
@@ -28,15 +18,6 @@ export default function Telemedicina() {
 
     const [paciente, setPaciente] = useState(null);
     const [pacienteCargando, setPacienteCargando] = useState(true);
-
-    // "inactiva" | "solicitando" | "activa" | "error"
-    const [estadoCamara, setEstadoCamara] = useState("inactiva");
-    const [errorCamara, setErrorCamara] = useState("");
-
-    const videoRef = useRef(null);
-    // El stream vive en un ref, no en estado: React no debe re-renderizar por
-    // cada track, y así el cleanup de desmontaje tiene siempre el valor actual.
-    const streamRef = useRef(null);
 
     // ── Historial de fichas (el mismo de la carpeta del paciente) ──
     const [listaFichas, setListaFichas] = useState([]);
@@ -173,73 +154,8 @@ export default function Telemedicina() {
         listarFichas();
     }, [id_paciente]);
 
-    function detenerStream() {
-        streamRef.current?.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-    }
-
-    async function activarCamara() {
-        if (estadoCamara === "solicitando") return;
-        detenerStream();
-        setErrorCamara("");
-        setEstadoCamara("solicitando");
-
-        // Sin contexto seguro (HTTPS o localhost) el navegador ni siquiera
-        // expone getUserMedia: mejor explicarlo que fallar con un error críptico.
-        if (!navigator.mediaDevices?.getUserMedia) {
-            setEstadoCamara("error");
-            setErrorCamara("Este navegador no permite acceder a la cámara. Verifica que la conexión sea segura (HTTPS) y que el navegador esté actualizado.");
-            return;
-        }
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
-                audio: false, // por ahora solo video
-            });
-            streamRef.current = stream;
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                await videoRef.current.play().catch(() => {});
-            }
-            setEstadoCamara("activa");
-        } catch (error) {
-            setEstadoCamara("error");
-            const nombre = error?.name || "";
-            if (nombre === "NotAllowedError" || nombre === "PermissionDeniedError") {
-                setErrorCamara("Permiso de cámara denegado. Habilítalo en tu navegador e intenta nuevamente.");
-            } else if (nombre === "NotFoundError" || nombre === "DevicesNotFoundError") {
-                setErrorCamara("No se detectó ninguna cámara conectada a este equipo.");
-            } else if (nombre === "NotReadableError" || nombre === "TrackStartError") {
-                setErrorCamara("La cámara está siendo usada por otra aplicación. Ciérrala e intenta de nuevo.");
-            } else if (nombre === "SecurityError") {
-                setErrorCamara("El navegador bloqueó el acceso a la cámara. Se requiere conexión segura (HTTPS).");
-            } else {
-                setErrorCamara("No se pudo acceder a la cámara. Intenta nuevamente.");
-            }
-        }
-    }
-
-    function apagarCamara() {
-        detenerStream();
-        if (videoRef.current) videoRef.current.srcObject = null;
-        setEstadoCamara("inactiva");
-    }
-
-    // Al salir de la sala hay que liberar la cámara: sin esto el indicador de
-    // uso queda encendido aunque nadie esté viendo el video.
-    useEffect(() => () => detenerStream(), []);
-
-    const camaraActiva = estadoCamara === "activa";
     const nombreCompleto = paciente ? `${paciente.nombre || ""} ${paciente.apellido || ""}`.trim() : "";
     const iniciales = `${paciente?.nombre?.charAt(0) || ""}${paciente?.apellido?.charAt(0) || ""}`.toUpperCase();
-
-    const estadoChip = {
-        inactiva: { punto: "bg-slate-400", texto: "Cámara apagada" },
-        solicitando: { punto: "bg-amber-400 animate-pulse", texto: "Conectando cámara…" },
-        activa: { punto: "bg-emerald-400", texto: "Cámara activa" },
-        error: { punto: "bg-red-400", texto: "Error de cámara" },
-    }[estadoCamara];
 
     // Se ordenan como texto "AAAA-MM-DD" para no pasar por Date, que desplaza
     // el día según la zona horaria. Más recientes primero.
@@ -249,6 +165,13 @@ export default function Telemedicina() {
         if (fechaA !== fechaB) return fechaB.localeCompare(fechaA);
         return Number(b.id_ficha) - Number(a.id_ficha);
     });
+
+
+
+
+
+
+
 
     return (
         <div className="min-h-screen bg-[#FAFAFB] flex flex-col">
@@ -293,95 +216,8 @@ export default function Telemedicina() {
                     )}
                 </div>
 
-                {/* ── Escenario de video ── */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950 shadow-xl shadow-slate-200/60">
-                    {/* Siempre montado: activarCamara necesita el ref para asignar
-                        el stream. Cuando está apagada queda invisible con opacity. */}
-                    <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className={`h-full w-full -scale-x-100 object-cover transition-opacity duration-500 ${camaraActiva ? "opacity-100" : "opacity-0"}`}
-                    />
+                <TelemedicinaSala modo="profesional" identidad={user?.id} />
 
-                    {/* Chip de estado */}
-                    <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/70 px-3.5 py-1.5 backdrop-blur-sm">
-                        <span className={`h-2 w-2 shrink-0 rounded-full ${estadoChip.punto}`} />
-                        <span className="text-[11px] font-semibold text-white">{estadoChip.texto}</span>
-                    </div>
-
-                    {/* Overlay central: inactivo, solicitando o error */}
-                    {!camaraActiva && (
-                        <div aria-live="polite" className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 pb-16 text-center">
-                            {estadoCamara === "error" ? (
-                                <>
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-red-400/20 bg-red-400/10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                                        </svg>
-                                    </div>
-                                    <p className="max-w-md text-sm font-medium leading-relaxed text-slate-200">{errorCamara}</p>
-                                    <p className="text-[12px] text-slate-500">Usa el botón de abajo para intentar nuevamente.</p>
-                                </>
-                            ) : estadoCamara === "solicitando" ? (
-                                <>
-                                    <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
-                                    <p className="text-sm font-semibold text-white">Solicitando permiso de cámara…</p>
-                                    <p className="text-[12px] text-slate-400">Acepta el permiso en la ventana de tu navegador.</p>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <p className="text-sm font-semibold text-white">Cámara apagada</p>
-                                    <p className="text-[12px] text-slate-400">Activa tu cámara para comenzar la consulta.</p>
-                                </>
-                            )}
-                        </div>
-                    )}
-
-                    {/* ── Control de cámara ── */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                        <button
-                            onClick={camaraActiva ? apagarCamara : activarCamara}
-                            disabled={estadoCamara === "solicitando"}
-                            className={`flex h-11 items-center gap-2.5 rounded-full px-5 text-[12px] font-bold shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-wait disabled:opacity-70 ${
-                                camaraActiva
-                                    ? "bg-red-500 text-white hover:bg-red-400 focus-visible:ring-red-300"
-                                    : "bg-white text-slate-900 hover:bg-slate-100 focus-visible:ring-white/60"
-                            }`}
-                        >
-                            {estadoCamara === "solicitando" ? (
-                                <>
-                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
-                                    Conectando…
-                                </>
-                            ) : camaraActiva ? (
-                                <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2zM4 4l16 16" />
-                                    </svg>
-                                    Apagar cámara
-                                </>
-                            ) : (
-                                <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    Activar cámara
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
-
-                <p className="mt-4 text-center text-[12px] text-slate-400">
-                    Vista previa local — solo tú puedes verte. La conexión con el paciente estará disponible próximamente.
-                </p>
 
                 {/* ── Historial de fichas clínicas (el mismo de la carpeta del paciente) ── */}
                 <div className="mt-10">

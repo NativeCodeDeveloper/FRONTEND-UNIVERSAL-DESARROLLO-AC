@@ -158,6 +158,7 @@ function ModuloConsentimiento() {
         if (archivoFirmado) return;
         setDocumentoRevisado(false);
         setVistaPrevia(null);
+        setEnlaceImpresion("");
         setAceptacion(false);
         firmaPacienteRef.current?.limpiar();
         firmaProfesionalRef.current?.limpiar();
@@ -166,6 +167,7 @@ function ModuloConsentimiento() {
     function cambiar(actualizar, valor) {
         actualizar(valor);
         setVistaPrevia(null);
+        setEnlaceImpresion("");
         setDocumentoRevisado(false);
         setAceptacion(false);
         firmaPacienteRef.current?.limpiar();
@@ -202,11 +204,34 @@ function ModuloConsentimiento() {
         }).blob;
     }
 
-    function previsualizar() {
+    async function generarPdfConFirmasCapturadas(requerirAmbas = false) {
+        const [salidaPaciente, salidaProfesional] = await Promise.all([
+            firmaPacienteRef.current?.trazos().length ? firmaPacienteRef.current.exportar() : null,
+            firmaProfesionalRef.current?.trazos().length ? firmaProfesionalRef.current.exportar() : null,
+        ]);
+        try {
+            if (requerirAmbas && (!salidaPaciente || !salidaProfesional)) {
+                throw new Error("No se pudieron leer ambas firmas. Vuelve a firmar antes de guardar.");
+            }
+            const [datosPacienteFirma, datosProfesionalFirma] = await Promise.all([
+                salidaPaciente?.blob.arrayBuffer(),
+                salidaProfesional?.blob.arrayBuffer(),
+            ]);
+            return generarPdf({
+                paciente: salidaPaciente ? { datos: new Uint8Array(datosPacienteFirma), ancho: salidaPaciente.ancho, alto: salidaPaciente.alto } : null,
+                profesional: salidaProfesional ? { datos: new Uint8Array(datosProfesionalFirma), ancho: salidaProfesional.ancho, alto: salidaProfesional.alto } : null,
+            });
+        } finally {
+            if (salidaPaciente) URL.revokeObjectURL(salidaPaciente.url);
+            if (salidaProfesional) URL.revokeObjectURL(salidaProfesional.url);
+        }
+    }
+
+    async function previsualizar() {
         const falta = archivoFirmado ? "" : validarDatos();
         if (falta) { setError(falta); return; }
         try {
-            setVistaPrevia(archivoFirmado?.blob || generarPdf());
+            setVistaPrevia(archivoFirmado?.blob || await generarPdfConFirmasCapturadas());
             setDocumentoRevisado(true);
             setError("");
         } catch {
@@ -220,7 +245,7 @@ function ModuloConsentimiento() {
         setImprimiendo(true);
         setError("");
         try {
-            const resultado = await imprimirPdf(archivoFirmado?.blob || generarPdf());
+            const resultado = await imprimirPdf(archivoFirmado?.blob || await generarPdfConFirmasCapturadas());
             setEnlaceImpresion(resultado.modo === "bloqueado" ? resultado.url : "");
         } catch {
             setError("No se pudo abrir la impresión.");
@@ -245,21 +270,7 @@ function ModuloConsentimiento() {
         setGuardando(true);
         setError("");
         try {
-            const [salidaPaciente, salidaProfesional] = await Promise.all([
-                firmaPacienteRef.current.exportar(),
-                firmaProfesionalRef.current.exportar(),
-            ]);
-            if (!salidaPaciente || !salidaProfesional) throw new Error("No se pudieron leer las firmas.");
-            const [datosFirmaPaciente, datosFirmaProfesional] = await Promise.all([
-                salidaPaciente.blob.arrayBuffer(),
-                salidaProfesional.blob.arrayBuffer(),
-            ]);
-            URL.revokeObjectURL(salidaPaciente.url);
-            URL.revokeObjectURL(salidaProfesional.url);
-            const blob = generarPdf({
-                paciente: { datos: new Uint8Array(datosFirmaPaciente), ancho: salidaPaciente.ancho, alto: salidaPaciente.alto },
-                profesional: { datos: new Uint8Array(datosFirmaProfesional), ancho: salidaProfesional.ancho, alto: salidaProfesional.alto },
-            });
+            const blob = await generarPdfConFirmasCapturadas(true);
             const nombre = "consentimiento_" + idPaciente + "_" + fecha + "_" + Date.now() + ".pdf";
             const formulario = new FormData();
             formulario.append("archivo", new File([blob], nombre, { type: "application/pdf" }));
@@ -397,10 +408,11 @@ function ModuloConsentimiento() {
                                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 sm:px-6">
                                     <div><h2 className="text-sm font-semibold">Documento para revisión</h2><p className="mt-1 text-xs text-slate-500">Texto específico del procedimiento y PDF imprimible.</p></div>
                                     <div className="flex flex-wrap gap-2">
-                                        <button type="button" onClick={previsualizar} className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold hover:bg-slate-50">Vista previa PDF</button>
-                                        <button type="button" onClick={imprimir} disabled={imprimiendo} className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50">{imprimiendo ? "Preparando…" : archivoFirmado ? "Imprimir PDF firmado" : "Imprimir para firmar en papel"}</button>
+                                        <button type="button" onClick={previsualizar} className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold hover:bg-slate-50">{firmaPacienteVacia && firmaProfesionalVacia ? "Vista previa PDF" : "Ver PDF con firmas"}</button>
+                                        <button type="button" onClick={imprimir} disabled={imprimiendo} className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50">{imprimiendo ? "Preparando…" : archivoFirmado ? "Imprimir PDF firmado" : firmaPacienteVacia && firmaProfesionalVacia ? "Imprimir para firmar en papel" : "Imprimir PDF con firmas"}</button>
                                     </div>
                                 </div>
+                                {!firmaPacienteVacia || !firmaProfesionalVacia || archivoFirmado ? <p className="px-5 pb-3 text-xs text-slate-500 sm:px-6">Las firmas aparecen al final del PDF. Revisa la última página.</p> : null}
                                 {enlaceImpresion ? <a href={enlaceImpresion} target="_blank" rel="noreferrer" className="block px-5 py-2 text-xs font-semibold text-[#6E56CF]">Abrir PDF para imprimir</a> : null}
                                 {vistaPrevia ? <div className="bg-slate-100 p-3 sm:p-5"><VisorPdf blob={vistaPrevia} titulo="Consentimiento informado" alto="68dvh" /></div> : (
                                     <div className="max-h-[540px] overflow-y-auto px-5 py-6 sm:px-8">
@@ -418,8 +430,8 @@ function ModuloConsentimiento() {
                             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                                 <div className="mb-5"><h2 className="text-sm font-semibold">Firmas con lápiz o dedo</h2><p className="mt-1 text-xs leading-5 text-slate-500">El paciente y el profesional deben revisar el PDF antes de firmar. La firma dibujada queda incorporada al PDF; el flujo de firma electrónica con verificación de identidad está disponible en la carpeta del paciente.</p></div>
                                 <div className="space-y-6">
-                                    <div><p className="mb-2 text-xs font-semibold text-slate-700">Firma del {conRepresentante ? "representante legal" : "paciente"} {firmaPacienteVacia ? "" : "· Capturada"}</p><PadFirma ref={firmaPacienteRef} tinta={tintaPaciente} onCambioTinta={setTintaPaciente} onCambio={({ vacio }) => { setFirmaPacienteVacia(vacio); setAceptacion(false); setError(""); }} deshabilitado={bloqueado || guardando} /></div>
-                                    <div><p className="mb-2 text-xs font-semibold text-slate-700">Firma del profesional {firmaProfesionalVacia ? "" : "· Capturada"}</p><PadFirma ref={firmaProfesionalRef} tinta={tintaProfesional} onCambioTinta={setTintaProfesional} onCambio={({ vacio }) => { setFirmaProfesionalVacia(vacio); setAceptacion(false); setError(""); }} deshabilitado={bloqueado || guardando} /></div>
+                                <div><p className="mb-2 text-xs font-semibold text-slate-700">Firma del {conRepresentante ? "representante legal" : "paciente"} {firmaPacienteVacia ? "" : "· Capturada"}</p><PadFirma ref={firmaPacienteRef} tinta={tintaPaciente} onCambioTinta={(tinta) => { setTintaPaciente(tinta); setVistaPrevia(null); setEnlaceImpresion(""); setAceptacion(false); }} onCambio={({ vacio }) => { setFirmaPacienteVacia(vacio); setVistaPrevia(null); setEnlaceImpresion(""); setAceptacion(false); setError(""); }} deshabilitado={bloqueado || guardando} /></div>
+                                <div><p className="mb-2 text-xs font-semibold text-slate-700">Firma del profesional {firmaProfesionalVacia ? "" : "· Capturada"}</p><PadFirma ref={firmaProfesionalRef} tinta={tintaProfesional} onCambioTinta={(tinta) => { setTintaProfesional(tinta); setVistaPrevia(null); setEnlaceImpresion(""); setAceptacion(false); }} onCambio={({ vacio }) => { setFirmaProfesionalVacia(vacio); setVistaPrevia(null); setEnlaceImpresion(""); setAceptacion(false); setError(""); }} deshabilitado={bloqueado || guardando} /></div>
                                 </div>
                                 <label className="mt-6 flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-xs leading-5 text-slate-700">
                                     <input type="checkbox" checked={aceptacion} disabled={bloqueado || guardando} onChange={(e) => setAceptacion(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#6E56CF]" />

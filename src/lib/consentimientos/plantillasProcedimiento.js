@@ -22,9 +22,11 @@
  * "- " ítem).
  */
 
+import { ANEXOS_AVANZADOS } from "./plantillasAvanzadas.js";
+
 export const PLANTILLA_BASE = {
   codigo: "consentimiento_base",
-  version: 1,
+  version: 2,
   titulo: "Consentimiento informado",
   cuerpo: `Yo, {{paciente.nombre}}, {{paciente.documento}}{{paciente.representacion}}, declaro que {{profesional.nombre}}{{profesional.rut}}, {{profesional.profesion}}{{profesional.registro}}, de {{empresa.nombre}}, me ha informado en forma clara, comprensible y suficiente sobre el procedimiento {{procedimiento.nombre}}, cuya información se detalla en este documento.
 
@@ -34,17 +36,14 @@ Declaro que:
 - Se me informaron sus riesgos frecuentes y poco frecuentes, las alternativas disponibles y las consecuencias de no realizarlo, conforme al artículo 14 de la Ley N° 20.584.
 - Tuve la oportunidad de hacer preguntas y todas fueron respondidas de forma satisfactoria.
 - Informé de manera veraz mis antecedentes de salud, alergias, medicamentos que uso, embarazo o lactancia y tratamientos previos. Entiendo que ocultar información puede aumentar los riesgos.
-- Comprendo que la medicina y la odontología no son ciencias exactas y que no se me ha garantizado un resultado determinado.
-- Si durante el procedimiento surge una situación imprevista que lo requiera, autorizo al profesional a adoptar las medidas necesarias para resguardar mi salud.
-
-## Anestesia local
-Cuando el procedimiento lo requiera, se usará anestesia local. Puede producir adormecimiento temporal, hematoma o dolor en el sitio de punción, palpitaciones transitorias y, en forma excepcional, reacciones alérgicas o alteración prolongada de la sensibilidad.
+- Comprendo que la respuesta a la atención puede variar entre personas y que no se me ha garantizado un resultado determinado.
+- Entiendo que cualquier intervención adicional relevante requiere una explicación y una decisión informada, salvo las medidas urgentes que permita la ley para proteger mi salud.
 
 ## Revocación
-Sé que puedo revocar este consentimiento en cualquier momento antes de realizar el procedimiento, sin expresión de causa, y que esa decisión no afectará mi atención futura en el centro.
+Sé que puedo rechazar o revocar este consentimiento antes o durante la atención, comunicar que deseo detenerla y recibir información sobre las consecuencias clínicas de mi decisión. Ello no implica perder mi derecho a recibir atención posterior.
 
 ## Protección de datos personales
-Los datos de este documento y de mi ficha clínica son datos sensibles y serán tratados con reserva, solo para mi atención y para cumplir las obligaciones legales del centro, conforme a la Ley N° 19.628 sobre Protección de la Vida Privada, modificada por la Ley N° 21.719, y a la Ley N° 20.584. Puedo ejercer mis derechos escribiendo a {{empresa.correo}}.
+Los datos de este documento y de mi ficha clínica son datos sensibles y serán tratados con reserva para mi atención y las obligaciones legales aplicables, conforme a la Ley N° 19.628 sobre Protección de la Vida Privada y a la Ley N° 20.584. Puedo consultar sobre el tratamiento de mis datos escribiendo a {{empresa.correo}}.
 
 ## Autorización
 Por lo anterior, en forma libre, voluntaria e informada, autorizo la realización del procedimiento indicado.`,
@@ -273,7 +272,7 @@ Frío local, analgesia según indicación y control para evaluar una nueva sesi�
   {
     codigo: "anexo_exodoncia",
     grupo: ODONTOLOGIA,
-    version: 1,
+    version: 2,
     nombre: "Extracción dental (exodoncia)",
     cuerpo: `## En qué consiste
 Retiro de una o más piezas dentarias bajo anestesia local. Puede requerir separar la pieza, retirar hueso o suturar. Incluye la extracción de terceros molares (muelas del juicio) cuando corresponda.
@@ -290,6 +289,7 @@ Retiro de una o más piezas dentarias bajo anestesia local. Puede requerir separ
 - Fractura de raíz o de la pieza, que puede dejar un fragmento.
 - Comunicación con el seno maxilar en piezas superiores.
 - Daño a piezas vecinas o restauraciones.
+- Reacción al anestésico local, palpitaciones transitorias, hematoma o alteración prolongada de la sensibilidad.
 
 ## Alternativas
 Según el caso: endodoncia, tratamiento periodontal, restauración, controles periódicos o no realizar el tratamiento.
@@ -303,7 +303,7 @@ Morder la gasa 30 minutos, no escupir ni enjuagar con fuerza ni usar bombilla po
   {
     codigo: "anexo_endodoncia",
     grupo: ODONTOLOGIA,
-    version: 1,
+    version: 2,
     nombre: "Tratamiento de conducto (endodoncia)",
     cuerpo: `## En qué consiste
 Retiro de la pulpa (nervio) dañada o infectada del interior del diente, limpieza y desinfección de los conductos y su sellado, bajo anestesia local. Puede requerir una o más sesiones y, después, una restauración definitiva o corona.
@@ -318,6 +318,7 @@ Retiro de la pulpa (nervio) dañada o infectada del interior del diente, limpiez
 - Imposibilidad de tratar conductos muy curvos o calcificados.
 - Fractura del diente, más probable si no se restaura a tiempo.
 - Fracaso del tratamiento, que puede requerir retratamiento, cirugía o extracción.
+- Reacción al anestésico local, palpitaciones transitorias, hematoma o alteración prolongada de la sensibilidad.
 
 ## Alternativas
 Extracción de la pieza (y luego su reemplazo con implante, puente o prótesis) o no realizar el tratamiento.
@@ -331,7 +332,7 @@ No masticar con la pieza hasta su restauración definitiva, tomar la medicación
   {
     codigo: "anexo_implante_dental",
     grupo: ODONTOLOGIA,
-    version: 1,
+    version: 2,
     nombre: "Implante dental",
     cuerpo: `## En qué consiste
 Colocación quirúrgica, bajo anestesia local, de un tornillo de titanio u otro material biocompatible en el hueso maxilar o mandibular para reemplazar la raíz de un diente perdido. Tras un período de integración (habitualmente de 3 a 6 meses) se instala la corona o prótesis. Puede requerir injerto de hueso o elevación del seno maxilar.
@@ -346,6 +347,7 @@ Colocación quirúrgica, bajo anestesia local, de un tornillo de titanio u otro 
 - Alteración de la sensibilidad del labio o mentón por cercanía al nervio.
 - Comunicación con el seno maxilar o con la cavidad nasal.
 - Fractura del implante o de sus componentes a largo plazo.
+- Reacción al anestésico local, palpitaciones transitorias, hematoma o alteración prolongada de la sensibilidad.
 
 ## Alternativas
 Puente fijo, prótesis removible o no reemplazar la pieza.
@@ -419,7 +421,7 @@ Higiene rigurosa, evitar alimentos duros o pegajosos, asistir a todos los contro
   {
     codigo: "anexo_periodoncia",
     grupo: ODONTOLOGIA,
-    version: 1,
+    version: 2,
     nombre: "Tratamiento periodontal (destartraje y pulido radicular)",
     cuerpo: `## En qué consiste
 Retiro del sarro y la placa bacteriana sobre y bajo la encía, y alisado de las raíces, generalmente bajo anestesia local y en una o más sesiones, para tratar la enfermedad de las encías.
@@ -432,6 +434,7 @@ Retiro del sarro y la placa bacteriana sobre y bajo la encía, y alisado de las 
 ## Riesgos poco frecuentes
 - Movilidad dentaria transitoria.
 - Necesidad de cirugía periodontal si la enfermedad no se controla.
+- Reacción al anestésico local, palpitaciones transitorias, hematoma o alteración prolongada de la sensibilidad.
 
 ## Alternativas
 Cirugía periodontal en casos avanzados o no realizar el tratamiento.
@@ -468,9 +471,18 @@ Puede haber fractura o pérdida de dientes debilitados, desplazamiento de piezas
 ## Cuidados posteriores
 Higiene cuidadosa, evitar morder objetos duros y controles periódicos.`,
   },
+  ...ANEXOS_AVANZADOS,
 ];
 
-export const GRUPOS_PROCEDIMIENTO = [ARMONIZACION, ODONTOLOGIA];
+export const GRUPOS_PROCEDIMIENTO = [
+  ARMONIZACION,
+  ODONTOLOGIA,
+  "Kinesiología",
+  "Psicología",
+  "Terapia ocupacional",
+  "Estética facial",
+  "Depilación",
+];
 
 export function anexoPorCodigo(codigo) {
   return ANEXOS_PROCEDIMIENTO.find((a) => a.codigo === codigo) || null;

@@ -21,6 +21,18 @@ const nextConfig = {
         ],
       },
       {
+        source: "/telemedicina/:path*",
+        headers: [
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=()" },
+        ],
+      },
+      {
+        source: "/dashboard/telemedicina/:path*",
+        headers: [
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=()" },
+        ],
+      },
+      {
         source: "/dashboard/periodontogramaPaciente",
         headers: [
           { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
