@@ -4,6 +4,15 @@ import Video from "twilio-video";
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useEffect, useRef, useState } from "react";
 
+// Espera máxima por el paciente antes de cerrar la sala automáticamente.
+const MINUTOS_ESPERA = 15;
+
+function formatearMinutos(segundos) {
+    const min = Math.floor(segundos / 60);
+    const seg = segundos % 60;
+    return `${min}:${String(seg).padStart(2, "0")}`;
+}
+
 function PistaMultimedia({ pista, local = false }) {
     const contenedorRef = useRef(null);
 
@@ -33,6 +42,7 @@ function PistaMultimedia({ pista, local = false }) {
 export default function TelemedicinaSala({
     modo = "profesional",
     identidad,
+    nombreProfesional = "",
     nombreSalaInicial = "",
     invitacionInicial = "",
 }) {
@@ -50,6 +60,30 @@ export default function TelemedicinaSala({
     const [pistasRemotas, setPistasRemotas] = useState([]);
     const [error, setError] = useState("");
     const [enlaceCopiado, setEnlaceCopiado] = useState(false);
+    // Cuenta regresiva visible mientras el profesional espera al paciente.
+    // null = temporizador inactivo.
+    const [segundosEspera, setSegundosEspera] = useState(null);
+    const [avisoEspera, setAvisoEspera] = useState("");
+
+    // Tictac: un efecto por segundo; al llegar a cero, el efecto de abajo cierra todo.
+    useEffect(() => {
+        if (segundosEspera === null || segundosEspera === 0) return undefined;
+        const id = window.setTimeout(() => setSegundosEspera((s) => s - 1), 1000);
+        return () => window.clearTimeout(id);
+    }, [segundosEspera]);
+
+    // Se acabó la espera: cerrar la sala y dejar todo listo para una llamada nueva
+    // (salaDatos en null hace que el próximo intento genere sala e invitación nuevas).
+    useEffect(() => {
+        if (segundosEspera !== 0) return;
+        salaRef.current?.disconnect();
+        salaRef.current = null;
+        setConectado(false);
+        setPistasLocales([]);
+        setPistasRemotas([]);
+        setSalaDatos(null);
+        setAvisoEspera(`El paciente no se conectó en ${MINUTOS_ESPERA} minutos. La sala se cerró; puedes iniciar una nueva videollamada cuando quieras reintentar.`);
+    }, [segundosEspera]);
 
     useEffect(() => () => {
         salaRef.current?.disconnect();
@@ -117,11 +151,16 @@ export default function TelemedicinaSala({
             });
         };
 
-        sala.on("participantConnected", registrarParticipante);
+        sala.on("participantConnected", (participante) => {
+            // El paciente llegó: se cancela la espera.
+            setSegundosEspera(null);
+            registrarParticipante(participante);
+        });
         sala.on("participantDisconnected", (participante) => {
             setPistasRemotas((actuales) => actuales.filter((item) => item.participanteSid !== participante.sid));
         });
         sala.on("disconnected", () => {
+            setSegundosEspera(null);
             salaRef.current = null;
             setConectado(false);
             setPistasLocales([]);
@@ -129,12 +168,19 @@ export default function TelemedicinaSala({
         });
         sala.participants.forEach(registrarParticipante);
         setConectado(true);
+
+        // Solo se espera al paciente si la sala está vacía; si ya está adentro,
+        // no hay temporizador que correr.
+        if (modo === "profesional" && sala.participants.size === 0) {
+            setSegundosEspera(MINUTOS_ESPERA * 60);
+        }
     }
 
     async function iniciarLlamada() {
         if (conectando || conectado) return;
         setConectando(true);
         setError("");
+        setAvisoEspera("");
 
         try {
             let datosSala = salaDatos;
@@ -144,6 +190,9 @@ export default function TelemedicinaSala({
                 const respuestaSala = await fetch(`${API}/telemedicina/nuevaSala`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
+                    // Viaja dentro de la invitación firmada y así llega al
+                    // encabezado que ve el paciente.
+                    body: JSON.stringify({ nombreProfesional }),
                 });
                 const resultadoSala = await respuestaSala.json();
                 if (!respuestaSala.ok || !resultadoSala.success) {
@@ -173,6 +222,7 @@ export default function TelemedicinaSala({
     function desconectar() {
         const sala = salaRef.current;
         if (!sala) return;
+        setSegundosEspera(null);
         sala.disconnect();
         salaRef.current = null;
         setConectado(false);
@@ -223,7 +273,9 @@ export default function TelemedicinaSala({
                         </p>
                         <p className="max-w-sm text-sm text-slate-400">
                             {conectado
-                                ? "Cuando se una, su video aparecerá aquí."
+                                ? segundosEspera !== null
+                                    ? `Si no se conecta en los próximos ${formatearMinutos(segundosEspera)}, la llamada se cerrará automáticamente.`
+                                    : "Cuando se una, su video aparecerá aquí."
                                 : "Al iniciar, el navegador solicitará acceso a cámara y micrófono."}
                         </p>
                     </div>
@@ -245,7 +297,9 @@ export default function TelemedicinaSala({
                 </div>
 
                 <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-slate-950/70 px-3.5 py-1.5 text-[11px] font-semibold text-white backdrop-blur-sm">
-                    {conectado ? "En llamada" : "Sala lista"}
+                    {segundosEspera !== null
+                        ? `Esperando al paciente · ${formatearMinutos(segundosEspera)}`
+                        : conectado ? "En llamada" : "Sala lista"}
                 </div>
             </div>
 
@@ -297,6 +351,12 @@ export default function TelemedicinaSala({
             {error && (
                 <p role="alert" className="mx-auto mt-4 max-w-xl rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-center text-sm text-rose-700">
                     {error}
+                </p>
+            )}
+
+            {avisoEspera && (
+                <p role="status" className="mx-auto mt-4 max-w-xl rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-center text-sm text-violet-700">
+                    {avisoEspera}
                 </p>
             )}
         </section>

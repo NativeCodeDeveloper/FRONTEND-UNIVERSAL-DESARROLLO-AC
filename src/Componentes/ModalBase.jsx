@@ -20,9 +20,10 @@ import { createPortal } from "react-dom";
  *   ancho        clase de ancho maximo (default max-w-2xl)
  *   bloquearCierre  impide cerrar mientras hay una operacion en curso
  *   lateral      cajon anclado a la derecha en vez de dialogo centrado. Sin
- *                fondo oscuro: lo de detras queda visible e interactuable
- *                (p. ej. la videoconsulta sigue viendose mientras se llena
- *                la ficha). Cierra con Escape o con el boton, no al hacer
+ *                fondo oscuro y sin bloquear el scroll: lo de detras queda
+ *                visible y navegable (p. ej. la videoconsulta sigue viendose
+ *                y el historial se puede scrollear mientras se llena la
+ *                ficha). Cierra con Escape o con el boton, no al hacer
  *                click afuera, para no perder el formulario por un toque
  *                accidental. En movil ocupa todo el ancho.
  *   anchoLateral clase de ancho del cajon (default sm:w-[480px]); reemplaza
@@ -62,7 +63,9 @@ export default function ModalBase({
     focoPrevioRef.current = document.activeElement;
 
     const overflowPrevio = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // En lateral el fondo sigue navegable (scrollear el historial, ver la
+    // videoconsulta): aca no se bloquea el scroll de la pagina.
+    if (!lateral) document.body.style.overflow = "hidden";
 
     const raf = requestAnimationFrame(() => {
       setVisible(true);
@@ -80,7 +83,7 @@ export default function ModalBase({
         focoPrevioRef.current.focus();
       }
     };
-  }, [abierto]);
+  }, [abierto, lateral]);
 
   useEffect(() => {
     if (!abierto) return undefined;
@@ -121,7 +124,12 @@ export default function ModalBase({
   return createPortal(
     <div
       data-tour-modal
-      className={`fixed inset-0 z-50 ${lateral ? "flex justify-end" : "flex items-end justify-center sm:items-center sm:p-6"}`}
+      className={`fixed inset-0 z-50 ${lateral
+        ? // Sin el velo, la capa que cubre la pantalla igual capturaria el
+          // scroll y los clics de la zona izquierda: con pointer-events-none
+          // el fondo queda verdaderamente interactuable.
+          "pointer-events-none flex justify-end"
+        : "flex items-end justify-center sm:items-center sm:p-6"}`}
     >
       {/* En lateral no hay velo: la gracia es ver lo de detras (la sala). */}
       {!lateral && (
@@ -140,7 +148,7 @@ export default function ModalBase({
         aria-label={typeof titulo === "string" ? titulo : undefined}
         className={
           lateral
-            ? `relative flex h-[100dvh] w-full ${anchoLateral} flex-col overflow-hidden rounded-l-[24px] border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-out ${
+            ? `pointer-events-auto relative flex h-[100dvh] w-full ${anchoLateral} flex-col overflow-hidden rounded-l-[24px] border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-out ${
                 visible ? "translate-x-0" : "translate-x-full"
               }`
             : `relative flex max-h-[92dvh] w-full ${ancho} flex-col overflow-hidden rounded-t-[24px] bg-white shadow-2xl transition-all duration-300 ease-out sm:max-h-[90dvh] sm:rounded-[24px] ${

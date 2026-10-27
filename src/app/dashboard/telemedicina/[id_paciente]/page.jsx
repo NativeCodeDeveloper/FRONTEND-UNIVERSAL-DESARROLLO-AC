@@ -216,7 +216,11 @@ export default function Telemedicina() {
                     )}
                 </div>
 
-                <TelemedicinaSala modo="profesional" identidad={user?.id} />
+                <TelemedicinaSala
+                    modo="profesional"
+                    identidad={user?.id}
+                    nombreProfesional={user?.fullName || user?.firstName || ""}
+                />
 
 
                 {/* ── Historial de fichas clínicas (el mismo de la carpeta del paciente) ── */}
