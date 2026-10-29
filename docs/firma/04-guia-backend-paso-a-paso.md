@@ -131,6 +131,23 @@ Probado contra el dump en MySQL 9.6 aislado: 34 comprobaciones de punta a punta
 los campos, comentario desde el panel, reservas antiguas, Mercado Pago, estadística
 contra un `COUNT(*)` directo en 3 períodos, rangos inválidos, inyección y sin sesión).
 
+### A.3 Estado y pendientes del sprint
+
+**Cerrado el 29-10-2026** y publicado en desarrollo: front en Vercel
+(`desarrollo.agendaclinicas.cl`, `main` b5f4b03) y backend en el servidor `desarrollo`
+(`main` 82e6c0e, ambas migraciones aplicadas con respaldo). Pruebas sobre el servidor:
+17/17 endpoints, 9/9 lógica con datos reales, sin bucles de peticiones, pm2 estable.
+
+Pendientes para el próximo sprint:
+
+| # | Pendiente | Dónde | Prioridad |
+|---|---|---|---|
+| 1 | Quitar o enmascarar `console.log(req.body)`: `out.log` guarda RUT, teléfono y nombre del paciente en texto plano | Backend, controladores de reservas y pagos | **Alta** (SENS / Ley 21.719) |
+| 2 | Reservar con un profesional inactivo guarda la reserva pero responde 500 (`correoEnArray[0]` es `undefined`) | `controller/ReservaPacienteController.js` | Media |
+| 3 | Capturas del dashboard (Finanzas "Reservas por previsión" y Panel de Reservaciones) a 390 px y escritorio | Front | Media |
+| 4 | `validar` responde 404 cuando la hora está ocupada (ruido en consola); evaluar 200 con `{ message: false }` coordinando con el front | Backend + `Reserva.jsx` | Baja |
+| 5 | pm2 del servidor con la versión en memoria desactualizada (`pm2 update`) | Servidor `desarrollo` | Baja |
+
 ---
 
 ## Fase 0 · Preparación
