@@ -34,8 +34,10 @@ import {
     FileDown,
     FileSpreadsheet,
     Percent,
+    ShieldCheck,
     Users,
 } from "lucide-react";
+import { esNoIndicado } from "@/lib/camposReserva";
 
 const PERIODOS_EVOLUCION = [
     { label: "Últimos 6 meses", points: 6 },
@@ -43,6 +45,10 @@ const PERIODOS_EVOLUCION = [
 ];
 
 dayjs.locale("es");
+
+function formatearPorcentaje(valor) {
+    return `${Number(valor || 0).toLocaleString("es-CL", { maximumFractionDigits: 1 })}%`;
+}
 
 /**
  * Modelo financiero V1 — ver AUDITORIA_FINANZAS.md para el detalle completo.
@@ -191,6 +197,40 @@ export default function Finanzas() {
         }
         return rangoMesCivil(mesDeHoy);
     }, [periodo, fechaDesdeCustom, fechaHastaCustom]);
+
+    // Distribución por previsión: la calcula el backend con un GROUP BY sobre el
+    // mismo universo del KPI "reservas del período" (estadoPeticion = 1 y
+    // fechaInicio dentro del rango), así los porcentajes calzan con ese total.
+    const [estadisticaPrevision, setEstadisticaPrevision] = useState({ cargando: true, error: false, total: 0, distribucion: [] });
+
+    useEffect(() => {
+        let vigente = true; // descarta respuestas de un período que ya se cambió
+        async function cargarEstadisticaPrevision() {
+            setEstadisticaPrevision((prev) => ({ ...prev, cargando: true, error: false }));
+            try {
+                const res = await fetch(`${API}/reservaPacientes/estadisticaPorPrevision`, {
+                    method: "POST",
+                    headers: { Accept: "application/json", "Content-Type": "application/json" },
+                    mode: "cors",
+                    body: JSON.stringify({ fechaInicio: rangoPeriodo.desde, fechaFinalizacion: rangoPeriodo.hasta }),
+                });
+                const data = await res.json().catch(() => null);
+                if (!vigente) return;
+                if (!res.ok || !Array.isArray(data?.distribucion)) {
+                    setEstadisticaPrevision({ cargando: false, error: true, total: 0, distribucion: [] });
+                    return;
+                }
+                setEstadisticaPrevision({ cargando: false, error: false, total: Number(data.total) || 0, distribucion: data.distribucion });
+            } catch (error) {
+                console.log("No se pudo cargar la distribución por previsión:", error);
+                if (vigente) setEstadisticaPrevision({ cargando: false, error: true, total: 0, distribucion: [] });
+            }
+        }
+        cargarEstadisticaPrevision();
+        return () => {
+            vigente = false;
+        };
+    }, [API, rangoPeriodo]);
 
     const reservasValidas = useMemo(
         () => reservas.filter((r) => Number(r?.estadoPeticion) === 1),
@@ -791,6 +831,64 @@ export default function Finanzas() {
             }
         }
 
+        if (estadisticaPrevision.distribucion.length > 0) {
+            finalY = documento.lastAutoTable.finalY + 14;
+
+            const altoPrevision =
+                4 + altoEstimadoTabla(estadisticaPrevision.distribucion.length, { altoFila: 9.5, altoHeader: 10, conPie: true });
+            if (finalY + altoPrevision > altoPagina - 30) {
+                documento.addPage();
+                dibujarEncabezado();
+                finalY = 42;
+            }
+
+            documento.setFont("helvetica", "bold");
+            documento.setFontSize(10);
+            documento.setTextColor(...BLACK);
+            documento.text("Reservas por previsión", margen, finalY);
+            finalY += 4;
+
+            autoTable(documento, {
+                head: [["Previsión", "Reservas", "Porcentaje"]],
+                body: estadisticaPrevision.distribucion.map((d) => [
+                    limpiarTextoPDF(d.prevision),
+                    String(d.cantidad),
+                    formatearPorcentaje(d.porcentaje),
+                ]),
+                foot: [["Total del período", String(estadisticaPrevision.total), "100%"]],
+                startY: finalY,
+                margin: { left: margen, right: margen, top: 40, bottom: 26 },
+                theme: "plain",
+                headStyles: {
+                    fillColor: DARK,
+                    textColor: [255, 255, 255],
+                    fontStyle: "bold",
+                    fontSize: 7.5,
+                    cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+                    halign: "left",
+                },
+                footStyles: {
+                    fillColor: BGMID,
+                    textColor: BLACK,
+                    fontStyle: "bold",
+                    fontSize: 8,
+                    cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 },
+                },
+                columnStyles: {
+                    0: { cellWidth: 70 },
+                    1: { cellWidth: 30, halign: "center", textColor: MID },
+                    2: { cellWidth: "auto", halign: "right", fontStyle: "bold" },
+                },
+                bodyStyles: { fontSize: 8.5, cellPadding: { top: 3, bottom: 3, left: 5, right: 5 }, textColor: BLACK },
+                alternateRowStyles: { fillColor: BGLIGHT },
+                styles: { lineWidth: 0.15, lineColor: BORDE, overflow: "linebreak" },
+                didDrawPage: (data) => {
+                    if (data.pageNumber > 1) dibujarEncabezado();
+                    dibujarPiePagina();
+                },
+            });
+        }
+
         const sufijoArchivo = periodo === "personalizado" ? `${fechaDesdeCustom}_a_${fechaHastaCustom}` : periodo;
         documento.save(`informe-financiero-${sufijoArchivo}.pdf`);
     }
@@ -859,11 +957,22 @@ export default function Finanzas() {
         ]);
         hojaLiquidacion["!cols"] = [{ wch: 32 }, { wch: 14 }, { wch: 12 }, { wch: 20 }, { wch: 18 }];
 
+        const hojaPrevision = XLSX.utils.json_to_sheet([
+            ...estadisticaPrevision.distribucion.map((d) => ({
+                Previsión: d.prevision,
+                Reservas: d.cantidad,
+                "Porcentaje (%)": d.porcentaje,
+            })),
+            { Previsión: "TOTAL", Reservas: estadisticaPrevision.total, "Porcentaje (%)": estadisticaPrevision.total > 0 ? 100 : 0 },
+        ]);
+        hojaPrevision["!cols"] = [{ wch: 20 }, { wch: 12 }, { wch: 16 }];
+
         const libro = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen");
         XLSX.utils.book_append_sheet(libro, hojaProfesionales, "Por profesional");
         XLSX.utils.book_append_sheet(libro, hojaServicios, "Detalle por servicio");
         XLSX.utils.book_append_sheet(libro, hojaLiquidacion, "Liquidación");
+        XLSX.utils.book_append_sheet(libro, hojaPrevision, "Por previsión");
 
         const sufijoArchivo = periodo === "personalizado" ? `${fechaDesdeCustom}_a_${fechaHastaCustom}` : periodo;
         XLSX.writeFile(libro, `finanzas-${sufijoArchivo}.xlsx`);
@@ -1056,6 +1165,67 @@ export default function Finanzas() {
                                         </AccordionItem>
                                     ))}
                                 </Accordion>
+                            )}
+                        </section>
+
+                        {/* ── Reservas por previsión ── */}
+                        <section className="mb-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white" data-tour="finanzas-prevision">
+                            <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                <div className="flex min-w-0 items-center gap-2.5">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                        <ShieldCheck className="h-4 w-4" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <h2 className="text-sm font-bold text-slate-900">Reservas por previsión</h2>
+                                        <p className="text-[11px] text-slate-400">
+                                            {estadisticaPrevision.cargando
+                                                ? "Calculando…"
+                                                : `Sobre ${estadisticaPrevision.total} ${estadisticaPrevision.total === 1 ? "reserva" : "reservas"} del período.`}
+                                        </p>
+                                    </div>
+                                </div>
+                                {!estadisticaPrevision.cargando && !estadisticaPrevision.error && estadisticaPrevision.total > 0 && (
+                                    <span className={`shrink-0 text-[10px] font-semibold ${estadisticaPrevision.total === resumen.totalReservasPeriodo ? "text-emerald-600" : "text-rose-600"}`}>
+                                        {estadisticaPrevision.total === resumen.totalReservasPeriodo ? "✓ Cuadra con el total" : "⚠ No cuadra con el total"}
+                                    </span>
+                                )}
+                            </div>
+
+                            {estadisticaPrevision.error ? (
+                                <p className="px-5 py-8 text-center text-[13px] text-slate-400 sm:px-6">
+                                    No se pudo cargar la distribución por previsión.
+                                </p>
+                            ) : !estadisticaPrevision.cargando && estadisticaPrevision.distribucion.length === 0 ? (
+                                <p className="px-5 py-8 text-center text-[13px] text-slate-400 sm:px-6">
+                                    No hay reservas en este período.
+                                </p>
+                            ) : (
+                                <ul className={`divide-y divide-slate-100 transition-opacity ${estadisticaPrevision.cargando ? "opacity-50" : ""}`}>
+                                    {estadisticaPrevision.distribucion.map((d) => {
+                                        const sinIndicar = esNoIndicado(d.prevision);
+                                        return (
+                                            <li key={d.prevision} className="px-5 py-3.5 sm:px-6">
+                                                <div className="flex items-baseline justify-between gap-3">
+                                                    <span className={`min-w-0 truncate text-[13px] font-semibold ${sinIndicar ? "text-slate-400" : "text-slate-800"}`}>
+                                                        {d.prevision}
+                                                    </span>
+                                                    <span className="shrink-0 text-[12px] tabular-nums text-slate-500">
+                                                        <span className="font-bold text-slate-900">{d.cantidad}</span>
+                                                        {" "}{d.cantidad === 1 ? "reserva" : "reservas"}
+                                                        <span className="mx-1.5 text-slate-300">·</span>
+                                                        <span className="font-semibold text-slate-700">{formatearPorcentaje(d.porcentaje)}</span>
+                                                    </span>
+                                                </div>
+                                                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                                                    <div
+                                                        className={`h-full rounded-full ${sinIndicar ? "bg-slate-300" : "bg-slate-900"}`}
+                                                        style={{ width: `${Math.min(100, Math.max(0, Number(d.porcentaje) || 0))}%` }}
+                                                    />
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
                             )}
                         </section>
 

@@ -15,6 +15,7 @@ import ConsentimientosReserva from "@/Componentes/PaginaPublica/Reserva/Consenti
 import { TIPOS_DOCUMENTO, limpiarPasaporte, validarDocumento } from "@/lib/rut";
 import { registrarAceptacion, seleccionarVigentes } from "@/lib/consentimientos/apiConsentimientos";
 import { esObligatorio } from "@/lib/consentimientos/textosLegales";
+import { PREVISIONES } from "@/lib/previsiones";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LOTE_VALIDACION = 6;
@@ -24,6 +25,16 @@ const LOTE_VALIDACION = 6;
  * Al backend van como nombrePaciente, apellidoPaciente, rut (limpio), telefono (+569…) y email.
  */
 const datosVacios = { nombre: "", apellido: "", rut: "", correo: "", telefono: "" };
+
+/*
+ * Previsión de salud: opcional. Sin elegir (o "Prefiero no indicarla") viaja null y
+ * el backend guarda "No indicado". Se envía el "nombre" del catálogo, que es lo
+ * único que el backend acepta.
+ */
+const OPCIONES_PREVISION = [
+  ...PREVISIONES.map((p) => ({ valor: p.nombre, etiqueta: p.etiqueta })),
+  { valor: "", etiqueta: "Prefiero no indicarla" },
+];
 
 const errores = {
   nombre: (v) => (v.trim().length < 2 ? "Ingresa tu nombre" : ""),
@@ -115,6 +126,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
   const [confirmada, setConfirmada] = useState(false);
   /* Pacientes extranjeros reservan con pasaporte (sin dígito verificador). */
   const [tipoDocumento, setTipoDocumento] = useState(TIPOS_DOCUMENTO.RUT);
+  const [prevision, setPrevision] = useState(null);
   /* Consentimientos (Ley 21.719 y Ley 20.584): dos aceptaciones separadas, ninguna premarcada. */
   const [plantillas, setPlantillas] = useState([]);
   const [cargandoPlantillas, setCargandoPlantillas] = useState(true);
@@ -273,6 +285,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
       fechaFinalizacion: fecha,
       horaFinalizacion: bloqueVigente.fin,
       id_profesional: profesional.id_profesional,
+      prevision: prevision || null,
     };
 
     setEnviando(true);
@@ -616,6 +629,21 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
                 <span className="mt-1.5 block text-[13px] text-[#e30000]">{erroresActuales.telefono}</span>
               )}
             </label>
+
+            <div className="sm:col-span-2">
+              <span className="mb-1.5 block text-[13px] font-medium text-tinta-2">
+                Previsión de salud <span className="font-normal text-tinta-3">(opcional)</span>
+              </span>
+              <Selector
+                etiqueta="Previsión de salud"
+                placeholder="Elige tu previsión"
+                valor={prevision}
+                alCambiar={setPrevision}
+                opciones={OPCIONES_PREVISION}
+                compacto
+                conBuscador={false}
+              />
+            </div>
           </div>
                       <ConsentimientosReserva
               plantillas={plantillas}

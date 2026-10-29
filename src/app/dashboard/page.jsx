@@ -11,6 +11,7 @@ import { canAccessFichasClinicas, getDashboardRoleFromUser, agendaRestringidaDe,
 import {getStateTokens} from "@/lib/designTokens";
 import {useTour} from "@/ContextosGlobales/TourContext";
 import {obtenerRutReservaDeTour} from "@/lib/tourReserva";
+import {MAX_CARACTERES_COMENTARIO_RESERVA as MAX_CARACTERES_COMENTARIO, esNoIndicado, valorEditableReserva} from "@/lib/camposReserva";
 
 import {
     Table,
@@ -41,9 +42,6 @@ const STORAGE_KEYS = {
     fechaFinalizacion: "dashboard_reservas_fecha_finalizacion",
     estado: "dashboard_reservas_estado",
 };
-
-// Límite del comentario por cita, compartido por el textarea y el contador.
-const MAX_CARACTERES_COMENTARIO = 100;
 
 export default function AgendaCitas() {
     const API = process.env.NEXT_PUBLIC_API_URL;
@@ -84,11 +82,10 @@ export default function AgendaCitas() {
     const [menuEstadoAbiertoId, setMenuEstadoAbiertoId] = useState(null);
     const [monto_reserva, setMontoReserva] = useState("");
     const [motivo_reserva, setMotivoReserva] = useState("");
-    // Comentarios por reserva. El campo aún no existe en la base de datos:
-    // mientras tanto vive solo en el cliente (se pierde al recargar la página).
-    const [comentariosReservas, setComentariosReservas] = useState({});
+    // Comentario por reserva (columna comentario, máx. 100). Vacío = "No indicado".
     const [idReservaComentario, setIdReservaComentario] = useState(null);
     const [comentarioBorrador, setComentarioBorrador] = useState("");
+    const [guardandoComentario, setGuardandoComentario] = useState(false);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -726,21 +723,50 @@ export default function AgendaCitas() {
 
     function abrirModalComentario(reserva) {
         setIdReservaComentario(reserva.id_reserva);
-        setComentarioBorrador(comentariosReservas[reserva.id_reserva] || "");
+        setComentarioBorrador(valorEditableReserva(reserva.comentario));
     }
 
     function cerrarModalComentario() {
+        if (guardandoComentario) return;
         setIdReservaComentario(null);
         setComentarioBorrador("");
     }
 
-    function guardarComentarioReserva() {
-        if (!idReservaComentario) return;
-        // El textarea ya corta en 100, pero se recorta igual por si el valor
-        // llega por otro camino. Texto vacío = volver a "Sin Comentarios".
+    async function guardarComentarioReserva() {
+        if (!idReservaComentario || guardandoComentario) return;
+        // El textarea ya corta en 100; el backend valida igual. Texto vacío =
+        // el backend guarda "No indicado" y la celda vuelve a "Sin Comentarios".
         const texto = comentarioBorrador.trim().slice(0, MAX_CARACTERES_COMENTARIO);
-        setComentariosReservas((prev) => ({...prev, [idReservaComentario]: texto}));
-        cerrarModalComentario();
+        try {
+            setGuardandoComentario(true);
+            const res = await fetch(`${API}/reservaPacientes/actualizarComentario`, {
+                method: "POST",
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({id_reserva: idReservaComentario, comentario: texto}),
+                mode: "cors"
+            });
+            const respuestaBackend = await res.json().catch(() => null);
+            if (res.ok && respuestaBackend?.message === true) {
+                // También en la lista base: los filtros se recalculan desde ella.
+                const conComentario = (lista) => (Array.isArray(lista) ? lista : []).map((item) => (
+                    item.id_reserva === idReservaComentario ? {...item, comentario: respuestaBackend.comentario} : item
+                ));
+                setdataLista(conComentario);
+                setDataListaBase(conComentario);
+                setIdReservaComentario(null);
+                setComentarioBorrador("");
+                return toast.success("Comentario guardado.");
+            }
+            if (respuestaBackend?.message === "comentario-invalido") {
+                return toast.error(`El comentario no puede superar los ${MAX_CARACTERES_COMENTARIO} caracteres.`);
+            }
+            return toast.error("No se pudo guardar el comentario. Intente nuevamente.");
+        } catch (error) {
+            console.log(error);
+            return toast.error("No hay conexion con el servidor por favor contacte a Soporte");
+        } finally {
+            setGuardandoComentario(false);
+        }
     }
 
     function exportarAExcel() {
@@ -757,6 +783,8 @@ export default function AgendaCitas() {
                 "RUT": reserva.rut || "",
                 "Profesional": obtenerNombreProfesionalReserva(reserva),
                 "Motivo": reserva.motivo_reserva || "",
+                "Previsión": reserva.prevision || "No indicado",
+                "Comentario": reserva.comentario || "No indicado",
                 "Estado": reserva.estadoReserva || "",
             };
 
@@ -887,7 +915,7 @@ export default function AgendaCitas() {
                 title="Comentario"
                 aria-label="Editar comentario"
                 className={`h-10 w-10 rounded-xl border transition-all flex items-center justify-center shadow-sm disabled:cursor-not-allowed disabled:opacity-60 ${
-                    comentariosReservas[reserva.id_reserva]
+                    !esNoIndicado(reserva.comentario)
                         ? "border-[#EDE9FE] bg-[#F3F0FF] text-[#6E56CF] hover:brightness-95"
                         : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100"
                 }`}
@@ -1207,6 +1235,24 @@ export default function AgendaCitas() {
                                                         </span>
                                                         <p className="min-w-0 truncate text-[14px] font-medium text-slate-500">Con {obtenerNombreProfesionalReserva(data)}</p>
                                                     </div>
+
+                                                    {/* Previsión y comentario, con el lápiz para editar el comentario. */}
+                                                    <div className="flex items-center gap-2.5">
+                                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-500">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                            </svg>
+                                                        </span>
+                                                        <div className="min-w-0 flex-1 leading-tight">
+                                                            <p className={`truncate text-[14px] font-semibold ${esNoIndicado(data.prevision) ? "text-slate-400" : "text-slate-700"}`}>
+                                                                {esNoIndicado(data.prevision) ? "Previsión no indicada" : data.prevision}
+                                                            </p>
+                                                            <p className="mt-0.5 truncate text-[13px] font-medium text-slate-400" title={esNoIndicado(data.comentario) ? undefined : data.comentario}>
+                                                                {esNoIndicado(data.comentario) ? "Sin Comentarios" : data.comentario}
+                                                            </p>
+                                                        </div>
+                                                        {renderBotonComentarioReserva(data)}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="mt-4 flex items-center gap-3">
@@ -1283,18 +1329,22 @@ export default function AgendaCitas() {
                                                         ) : null}
                                                     </div>
                                                 </TableCell>
-                                                {/* Previsión y Comentario aún no existen en la base de
-                                                    datos: se muestran valores fijos hasta que lleguen. */}
                                                 <TableCell className="py-6">
-                                                    <span className="block truncate text-[13px] font-semibold text-slate-400">NO INDICADA</span>
+                                                    {esNoIndicado(reserva.prevision) ? (
+                                                        <span className="block truncate text-[13px] font-semibold text-slate-400">NO INDICADA</span>
+                                                    ) : (
+                                                        <span className="block truncate text-[13px] font-semibold text-slate-700" title={reserva.prevision}>
+                                                            {reserva.prevision}
+                                                        </span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="py-6">
-                                                    {comentariosReservas[reserva.id_reserva] ? (
+                                                    {!esNoIndicado(reserva.comentario) ? (
                                                         <span
                                                             className="block truncate text-[13px] font-semibold text-slate-700"
-                                                            title={comentariosReservas[reserva.id_reserva]}
+                                                            title={reserva.comentario}
                                                         >
-                                                            {comentariosReservas[reserva.id_reserva]}
+                                                            {reserva.comentario}
                                                         </span>
                                                     ) : (
                                                         <span className="text-[13px] font-medium text-slate-400">Sin Comentarios</span>
@@ -1368,16 +1418,18 @@ export default function AgendaCitas() {
                                 <button
                                     type="button"
                                     onClick={cerrarModalComentario}
-                                    className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-bold text-slate-500 transition-all hover:bg-slate-50"
+                                    disabled={guardandoComentario}
+                                    className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-bold text-slate-500 transition-all hover:bg-slate-50 disabled:opacity-60"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="button"
                                     onClick={guardarComentarioReserva}
-                                    className="h-10 rounded-xl bg-black px-5 text-[13px] font-bold text-white transition-all hover:bg-slate-800"
+                                    disabled={guardandoComentario}
+                                    className="h-10 rounded-xl bg-black px-5 text-[13px] font-bold text-white transition-all hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60"
                                 >
-                                    Guardar
+                                    {guardandoComentario ? "Guardando..." : "Guardar"}
                                 </button>
                             </div>
                         </div>

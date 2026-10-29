@@ -2,6 +2,7 @@
 
 import { PantallaCarga } from "@/components/ui/pantalla-anillos";
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
+import { valorEditableReserva } from "@/lib/camposReserva";
 import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -397,13 +398,8 @@ function CalendarioContent() {
     //   SELECT ..., nombre_prestacion, modalidad FROM reservaciones ...
     //   en: seleccionarReservados, seleccionarPorProfesional, seleccionarEspecifica
     //
-    // El formulario ya envía además "prevision" (nombre de @/lib/previsiones) y
-    // "comentario" (texto de hasta 100 caracteres, el mismo límite del comentario
-    // editable desde el Panel de Reservaciones). Para persistirlos conviene:
-    //   ALTER TABLE reservaciones
-    //     ADD COLUMN prevision VARCHAR(20) NULL COMMENT 'Nombre de la previsión de salud',
-    //     ADD COLUMN comentario VARCHAR(100) NULL COMMENT 'Comentario breve de la cita';
-    // y retornarlos también en los SELECTs de consulta.
+    // "prevision" y "comentario" ya se guardan (migración 2026-10-28 del backend):
+    // vacíos o ausentes quedan como "No indicado".
     //
     // Una vez hecha la migración, eliminar este comentario o moverlo a la documentación.
     // ══════════════════════════════════════════════════════════════════════════
@@ -419,8 +415,8 @@ function CalendarioContent() {
         modalidad: "presencial", // 'presencial' | 'online'
         monto_reserva: "",
         motivo_reserva: "",
-        prevision: "",      // Previsión de salud (nombre de @/lib/previsiones) — PENDIENTE BD
-        comentario: "",     // Comentario breve de la cita (máx. 100) — PENDIENTE BD
+        prevision: "",      // Previsión de salud (nombre de @/lib/previsiones)
+        comentario: "",     // Comentario breve de la cita (máx. 100)
         fechasRepeticion: [], // Date[] — fechas adicionales para agendar al mismo paciente en el mismo horario
         confirmacionFechasRepeticion: false, // debe marcarse tras revisar la lista antes de poder agendar
     });
@@ -972,9 +968,9 @@ function CalendarioContent() {
             modalidad: reserva.modalidad ?? "presencial",
             monto_reserva: reserva.monto_reserva ?? "",
             motivo_reserva: reserva.motivo_reserva ?? "",
-            // Si la reserva ya tiene previsión/comentario en BD, se recuperan aquí
-            prevision: reserva.prevision ?? "",
-            comentario: reserva.comentario ?? "",
+            // "No indicado" es el relleno del backend: en el formulario se ve vacío.
+            prevision: valorEditableReserva(reserva.prevision),
+            comentario: valorEditableReserva(reserva.comentario),
         });
 
         setFloatingDraft(null);
@@ -1285,8 +1281,8 @@ function CalendarioContent() {
     }, [draggingPopup]);
 
 
-    // prestacion, modalidad, prevision y comentario vienen del popupForm — se envían
-    // al backend cuando esté migrado (ver guía de migración más arriba)
+    // prestacion, modalidad, prevision y comentario vienen del popupForm. prestacion
+    // y modalidad esperan su migración (ver guía más arriba); prevision y comentario ya se guardan.
     async function insertarNuevaReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, id_profesional, prestacion = "", modalidad = "presencial", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "") {
         try {
             const rutLimpio = normalizarRut(rut);
@@ -1343,9 +1339,8 @@ function CalendarioContent() {
                     method: "POST",
                     headers: { Accept: "application/json", "Content-Type": "application/json" },
                     mode: "cors",
-                    // NOTA: nombre_prestacion, modalidad, prevision y comentario se
-                    // envían pero el backend debe tener la migración de BD aplicada
-                    // para persistirlos.
+                    // NOTA: nombre_prestacion y modalidad se envían pero el backend
+                    // aún no los persiste (falta su migración).
                     body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
                 });
                 const respuestaBackend = await res.json();
@@ -1573,8 +1568,8 @@ function CalendarioContent() {
             reservaOriginal._nombreProfesional || obtenerNombreProfesionalParaEnvio(reservaOriginal.id_profesional),
             reservaOriginal.monto_reserva || "",
             reservaOriginal.motivo_reserva || "",
-            reservaOriginal.prevision ?? "",
-            reservaOriginal.comentario ?? ""
+            valorEditableReserva(reservaOriginal.prevision),
+            valorEditableReserva(reservaOriginal.comentario)
         );
     }
 

@@ -40,6 +40,7 @@ import { RutDisplay } from "@/Componentes/RutDisplay";
 import { RecordatorioPaciente } from "@/Componentes/RecordatorioPaciente";
 import { getStateTokens } from "@/lib/designTokens";
 import { PREVISIONES } from "@/lib/previsiones";
+import { MAX_CARACTERES_COMENTARIO_RESERVA } from "@/lib/camposReserva";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { canAccessFichasClinicas, getDashboardRoleFromUser } from "@/lib/dashboard-access";
@@ -54,9 +55,6 @@ const ACCIONES_ESTADO = [
   { valor: "finalizado", etiqueta: "Finalizar" },
   { valor: "anulada", etiqueta: "Anular" },
 ];
-
-// Mismo límite que el comentario editable desde el Panel de Reservaciones.
-const MAX_CARACTERES_COMENTARIO_RESERVA = 100;
 
 function getEstadoActionStyle(estado) {
   const token = getStateTokens(estado);
@@ -929,9 +927,8 @@ function FormSection({
         </div>
       )}
 
-      {/* ── Previsión + Comentario ── PENDIENTE BD ──
-          Campos aún no persistidos: viajan en el POST de la reserva y el backend
-          los ignorará hasta aplicar la migración (ver guía en calendario/page.jsx).
+      {/* ── Previsión + Comentario ──
+          Opcionales: si quedan vacíos el backend guarda "No indicado".
           La previsión usa la fuente única @/lib/previsiones (la misma de fichas). */}
       {mode !== "bloqueo" && (
         <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">

@@ -9,13 +9,20 @@
  * Los ids se envian tal cual al backend en el campo prevision_id.
  */
 
+/*
+ * "nombre" es el valor que se guarda (prevision de la reserva) y se muestra en el
+ * dashboard; "etiqueta" es como se le muestra al paciente en la pagina publica.
+ * Al agregar una prevision aqui, agregarla tambien en el backend
+ * (services/camposReserva.js, PREVISIONES_PERMITIDAS) o la reserva se rechaza.
+ */
 const PREVISIONES = [
-  { id: 1, nombre: "FONASA" },
-  { id: 2, nombre: "ISAPRE" },
-  { id: 3, nombre: "CONVENIO" },
-  { id: 4, nombre: "SIN PREVISION" },
-  { id: 5, nombre: "CAPREDENA" },
-  { id: 6, nombre: "DIPRECA" },
+  { id: 1, nombre: "FONASA", etiqueta: "Fonasa" },
+  { id: 2, nombre: "ISAPRE", etiqueta: "Isapre" },
+  { id: 3, nombre: "CONVENIO", etiqueta: "Convenio" },
+  { id: 4, nombre: "SIN PREVISION", etiqueta: "Sin previsión" },
+  { id: 5, nombre: "CAPREDENA", etiqueta: "Capredena" },
+  { id: 6, nombre: "DIPRECA", etiqueta: "Dipreca" },
+  { id: 7, nombre: "PARTICULAR", etiqueta: "Particular" },
 ];
 
 const NOMBRES_PREVISION = PREVISIONES.map((p) => p.nombre);

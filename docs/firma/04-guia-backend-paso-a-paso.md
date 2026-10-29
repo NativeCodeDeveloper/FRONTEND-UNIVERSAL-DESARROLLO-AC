@@ -19,6 +19,7 @@ y se puede activar sin esperar a las siguientes.
 
 | Fase | Qué queda funcionando | Dificultad | Se activa en el front con |
 |---|---|---|---|
+| **A** | **Previsión y comentario de la reserva + estadística por previsión en Finanzas** (requerimiento 28-10-2026, ya implementado en la rama `feat/prevision-reserva`) | Muy fácil | (automático) |
 | 0 | Rama, respaldo, dependencias y variables | Muy fácil | — |
 | 1 | Tablas nuevas y textos legales en la base | Fácil | — |
 | 2 | **Política de privacidad en la reserva pública** (una casilla), con constancia en PDF | Fácil | `NEXT_PUBLIC_CONSENTIMIENTOS_HABILITADOS=1` |
@@ -32,6 +33,96 @@ y se puede activar sin esperar a las siguientes.
 
 > **Las recetas no pasan por el backend de firma** (se imprimen para firmar a mano).
 > Los otros 5 documentos sí llevan firma electrónica.
+
+---
+
+## Fase A · Previsión y comentario de la reserva (primera integración)
+
+Requerimiento del 28-10-2026, plazo viernes 30-10-2026. Es la integración más
+fácil y **ya está hecha** en la rama `feat/prevision-reserva` de ambos repos: aquí
+queda qué se cambió, cómo aplicarlo y cómo comprobarlo. No depende de la firma.
+
+**Qué hace**
+
+- Cada reserva guarda **previsión** y **comentario**, ambos opcionales. Vacíos o
+  ausentes se guardan como `No indicado`.
+- La previsión solo acepta el catálogo de `src/lib/previsiones.js` (FONASA, ISAPRE,
+  CONVENIO, SIN PREVISION, CAPREDENA, DIPRECA, **PARTICULAR**). Cualquier otro valor →
+  `400 prevision-invalida`. "Particular" (id 7) también queda disponible en las fichas.
+- El paciente puede indicar su previsión en la **página pública**
+  (`/agendaEspecificaProfersional/[id]`, paso "Tus datos", opcional). Viaja igual por
+  la reserva directa y por el pago con **Mercado Pago** (se guarda al crear la orden,
+  y se valida antes de crear la preferencia de pago).
+- El comentario se limpia (sin saltos de línea ni caracteres de control) y no puede
+  pasar de 100 caracteres → si no, `400 comentario-invalido`. Nada se corrige en silencio.
+- Finanzas muestra **Reservas por previsión**: cantidad y porcentaje por previsión,
+  calculados en la base con `GROUP BY`, con el mismo filtro de período del panel y
+  el mismo universo del total de reservas (`estadoPeticion = 1`). Los porcentajes
+  siempre suman exactamente 100 % (método del mayor resto).
+
+**Archivos del backend**
+
+| Archivo | Cambio |
+|---|---|
+| `migraciones/2026-10-28_prevision_comentario_reserva.sql` | **Nuevo.** 2 columnas `NOT NULL DEFAULT 'No indicado'` + índice. Aditiva, trae reversión. |
+| `services/camposReserva.js` | **Nuevo.** Reglas puras: catálogo, limpieza, límite, fechas civiles y porcentajes. |
+| `model/ReservaPacientes.js` | INSERT y UPDATE con los 2 campos; `actualizarComentario`; `contarReservasPorPrevision`. |
+| `controller/ReservaPacienteController.js` | Valida antes de guardar; 2 controladores nuevos; errores 400 claros. |
+| `controller/MercadoPagoController.js` | `create-order` valida y guarda previsión/comentario en la reserva pendiente de pago. |
+| `view/reservaPacienteRoutes.js` | 2 rutas nuevas **después** del gate de Clerk. |
+| `middleware/exigirSesionClerk.js` | Guarda la sesión verificada en `req.sesionClerk` para la bitácora. |
+| `pruebas/reservas/camposReserva.test.mjs` | **Nuevo.** 13 pruebas (`npm run test:reservas`). |
+| `.gitignore` | `!migraciones/*.sql`: las migraciones se versionan (adelanta el paso 0.4). |
+
+**Endpoints**
+
+| Ruta | Sesión | Recibe | Responde |
+|---|---|---|---|
+| `POST /reservaPacientes/insertar`, `/insertarReservasMultiples`, `/insertarReservaPacienteFicha` | (como antes) | además `prevision?`, `comentario?` | igual que antes |
+| `POST /reservaPacientes/actualizarReservacion` | Clerk | además `prevision?`, `comentario?` | igual. **Si el campo no viene, se conserva lo guardado** (el calendario general no los envía). |
+| `POST /reservaPacientes/actualizarComentario` | Clerk | `{ id_reserva, comentario }` | `{ message: true, comentario }` · 400 · 404 |
+| `POST /reservaPacientes/estadisticaPorPrevision` | Clerk | `{ fechaInicio, fechaFinalizacion }` (`AAAA-MM-DD`) | `{ total, distribucion: [{ prevision, cantidad, porcentaje }] }` |
+
+Las consultas existentes (`SELECT *` / `reservaPacientes.*`) ya devuelven los dos campos
+sin cambios. `POST /pagosMercadoPago/create-order` también acepta `prevision?`.
+
+**Seguridad y auditoría**
+
+- Todo con consultas parametrizadas; la previsión es lista blanca; el comentario
+  pasa por límite real de caracteres (igual que `VARCHAR(100)`).
+- Las 2 rutas nuevas exigen sesión de Clerk (quedan bajo `router.use(exigirSesionClerk)`).
+- Editar un comentario deja en el log `[AUDITORIA] reserva.comentario.actualizado`
+  con `id_reserva`, usuario de Clerk y fecha. **El texto no se registra**: puede
+  contener datos de salud.
+
+### A.1 Aplicar
+
+```bash
+cd ~/NativeCode_Proyectos/Back_Proyect/BACKEND-DESARROLLO-UNIVERSAL-AC
+git checkout feat/prevision-reserva
+mysqldump -u <usuario> -p AGENDA_CLINICA_DESARROLLO reservaPacientes > ~/respaldo-reservas-$(date +%F).sql
+mysql -u <usuario> -p AGENDA_CLINICA_DESARROLLO < migraciones/2026-10-28_prevision_comentario_reserva.sql
+npm run test:reservas        # 13/13
+pm2 restart <backend>        # o reiniciar node app.js
+```
+
+El orden importa: **primero la migración, después el código**. Con el código nuevo y
+sin las columnas, los INSERT fallan.
+
+### A.2 Comprobar
+
+1. Agendar desde el calendario con previsión y comentario → la reserva los muestra al editarla.
+2. Agendar sin completarlos → en el Panel de Reservaciones se ven "NO INDICADA" y "Sin Comentarios".
+3. Editar el comentario con el lápiz del Panel y recargar → sigue ahí.
+4. Mover una reserva en el calendario general → la previsión y el comentario no se pierden.
+5. Página pública: agendar eligiendo "Particular" → el panel muestra PARTICULAR en esa cita.
+6. Finanzas → "Reservas por previsión" muestra "✓ Cuadra con el total"; cambiar a
+   Mes anterior y a un rango personalizado → la lista cambia con el período.
+
+Probado contra el dump en MySQL 9.6 aislado: 34 comprobaciones de punta a punta
+(crear con y sin campos, valores inválidos que no se guardan, actualizar sin enviar
+los campos, comentario desde el panel, reservas antiguas, Mercado Pago, estadística
+contra un `COUNT(*)` directo en 3 períodos, rangos inválidos, inyección y sin sesión).
 
 ---
 

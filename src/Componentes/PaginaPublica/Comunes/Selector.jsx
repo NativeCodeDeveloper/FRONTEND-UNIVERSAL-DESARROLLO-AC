@@ -9,8 +9,20 @@ const normalizar = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "
 /*
  * Lista desplegable con buscador (aparece desde 8 opciones) y navegación por teclado.
  * El panel va en un portal con position fixed: así ningún contenedor con overflow lo recorta.
+ *
+ * compacto: el disparador mide y se ve igual que un input .campo (para usarlo dentro de
+ *           un formulario junto a otros campos).
+ * conBuscador: fuerza mostrar u ocultar el buscador; por defecto, desde 8 opciones.
  */
-export default function Selector({ opciones, valor, alCambiar, placeholder, etiqueta, invalido = false }) {
+
+/* Barra fija inferior de la reserva (solo en celular): el panel no debe quedar debajo de ella. */
+function limiteInferiorVisible() {
+  const barra = document.querySelector(".barra-reserva");
+  const r = barra?.getBoundingClientRect();
+  return r && r.height > 0 ? Math.min(r.top, window.innerHeight) : window.innerHeight;
+}
+
+export default function Selector({ opciones, valor, alCambiar, placeholder, etiqueta, invalido = false, compacto = false, conBuscador }) {
   const id = useId();
   const disparador = useRef(null);
   const panel = useRef(null);
@@ -20,7 +32,7 @@ export default function Selector({ opciones, valor, alCambiar, placeholder, etiq
   const [resaltado, setResaltado] = useState(0);
   const [posicion, setPosicion] = useState(null);
 
-  const buscable = opciones.length >= 8;
+  const buscable = conBuscador ?? opciones.length >= 8;
   const seleccionada = opciones.find((o) => o.valor === valor) ?? null;
   const filtradas = useMemo(() => {
     const q = normalizar(busqueda.trim());
@@ -31,7 +43,7 @@ export default function Selector({ opciones, valor, alCambiar, placeholder, etiq
     const r = disparador.current?.getBoundingClientRect();
     if (!r) return;
     const margen = 12;
-    const abajo = window.innerHeight - r.bottom - margen;
+    const abajo = limiteInferiorVisible() - r.bottom - margen;
     const encima = r.top - margen;
     const arriba = abajo < 280 && encima > abajo;
     setPosicion({
@@ -134,7 +146,11 @@ export default function Selector({ opciones, valor, alCambiar, placeholder, etiq
         aria-expanded={abierto}
         aria-controls={`${id}-lista`}
         aria-label={seleccionada ? `${etiqueta}: ${seleccionada.etiqueta}` : etiqueta}
-        className={`flex min-h-[56px] w-full items-center justify-between gap-4 rounded-[14px] bg-white px-5 py-3 text-left transition-shadow duration-200 ${
+        className={`flex w-full items-center justify-between gap-4 bg-white text-left transition-shadow duration-200 ${
+          compacto
+            ? "min-h-[48px] rounded-[12px] px-4 py-3 outline-none focus-visible:shadow-[inset_0_0_0_2px_var(--pp-acento),0_0_0_4px_var(--pp-acento-suave)]"
+            : "min-h-[56px] rounded-[14px] px-5 py-3"
+        } ${
           abierto
             ? "shadow-[inset_0_0_0_2px_var(--pp-acento),0_0_0_4px_var(--pp-acento-suave)]"
             : invalido
@@ -144,7 +160,7 @@ export default function Selector({ opciones, valor, alCambiar, placeholder, etiq
       >
         {seleccionada ? (
           <span className="min-w-0">
-            <span className="block truncate text-[17px] font-medium">{seleccionada.etiqueta}</span>
+            <span className={`block truncate text-[17px] ${compacto ? "" : "font-medium"}`}>{seleccionada.etiqueta}</span>
             {seleccionada.descripcion && <span className="block text-[14px] text-tinta-2">{seleccionada.descripcion}</span>}
           </span>
         ) : (
