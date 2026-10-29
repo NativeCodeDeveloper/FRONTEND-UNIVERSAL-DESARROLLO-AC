@@ -106,6 +106,13 @@ npm run test:reservas        # 13/13
 pm2 restart <backend>        # o reiniciar node app.js
 ```
 
+Si la base no tiene `reservaPacientes.fechaExpiracionPago` (la usa el pago con Mercado
+Pago desde agosto), aplicar también `migraciones/2026-10-29_fecha_expiracion_pago.sql`:
+sin ella el pago no crea la reserva y el cron de expiración falla cada minuto.
+
+**Aplicado en el servidor de desarrollo el 29-10-2026** (rama `feat/prevision-reserva`,
+ambas migraciones, con respaldo previo en `/root/respaldos/`).
+
 El orden importa: **primero la migración, después el código**. Con el código nuevo y
 sin las columnas, los INSERT fallan.
 
