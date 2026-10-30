@@ -1,4 +1,4 @@
-import GrillaProfesionales from "@/Componentes/PaginaPublica/Profesionales/GrillaProfesionales";
+import SelectorAtencion from "@/Componentes/PaginaPublica/Profesionales/SelectorAtencion";
 import { obtenerDatosEmpresa, obtenerPreciosDesde, obtenerProfesionales } from "@/lib/paginaPublica/api";
 import { crearEnlaces } from "@/lib/paginaPublica/enlaces";
 
@@ -22,11 +22,11 @@ export default async function AgendaProfesionales() {
       <div className="mx-auto max-w-[1120px] px-5 md:px-6">
         <header className="mb-10 md:mb-12">
           <h1 className="titular-2">Elige a tu profesional</h1>
-          <p className="bajada mt-4">Revisa la disponibilidad de cada especialista y reserva tu hora en tiempo real.</p>
+          <p className="bajada mt-4">Elige la sucursal y el tipo de atención que necesitas; te mostramos los especialistas disponibles para reservar tu hora en línea.</p>
         </header>
 
         {profesionales.length > 0 ? (
-          <GrillaProfesionales profesionales={profesionales} preciosDesde={preciosDesde} />
+          <SelectorAtencion profesionales={profesionales} preciosDesde={preciosDesde} />
         ) : (
           <p className="text-tinta-2">Pronto podrás agendar en línea con nuestro equipo.</p>
         )}
