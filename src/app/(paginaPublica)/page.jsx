@@ -55,10 +55,10 @@ export default async function Inicio() {
         className="flex flex-col rounded-b-[36px] bg-linear-to-br from-[#f5fbfc] via-[#e3f5f6] to-[#f5fbfc] pb-8 pt-24 md:rounded-b-[48px] md:pb-10 md:pt-28 lg:min-h-svh lg:justify-center lg:pb-12 lg:pt-32"
       >
         {/* En escritorio la portada se centra en el espacio libre y la franja se asienta al pie de la pantalla */}
-        <div className="mx-auto w-full max-w-[1376px] px-4 sm:px-6">
+        <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6">
           <Portada slides={portadas} datosEmpresa={datosEmpresa} />
         </div>
-        <div className="mx-auto mt-5 w-full max-w-[1376px] px-4 sm:px-6 md:mt-6">
+        <div className="mx-auto mt-5 w-full max-w-[1180px] px-4 sm:px-6 md:mt-6">
           <DatosRapidos datosEmpresa={datosEmpresa} />
         </div>
       </section>

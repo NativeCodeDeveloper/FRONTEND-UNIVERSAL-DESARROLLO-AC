@@ -128,7 +128,7 @@ export default function Portada({ slides, datosEmpresa }) {
 
       {conImagen && (
       <div className="relative order-1 min-w-0 bg-[#dbe9eb] lg:order-2">
-        <div className={`relative ${PROPORCION.portada} overflow-hidden lg:aspect-auto lg:h-full lg:min-h-[480px]`}>
+        <div className={`relative ${PROPORCION.portada} overflow-hidden lg:aspect-auto lg:h-full lg:min-h-[430px]`}>
           {activos.map((s, i) => {
             const src = imagenHD(s.imagenPortada);
             if (!src) return null;
@@ -141,7 +141,7 @@ export default function Portada({ slides, datosEmpresa }) {
                 }`}
                 aria-hidden={!visible}
               >
-                <ImagenTarjeta src={src} alt={s.tituloPortadaCarrusel || datosEmpresa.empresaNombre} sizes="(min-width: 1376px) 664px, (min-width: 1024px) 50vw, 100vw" prioridad={i === 0} zoom={false} className="object-top" />
+                <ImagenTarjeta src={src} alt={s.tituloPortadaCarrusel || datosEmpresa.empresaNombre} sizes="(min-width: 1180px) 578px, (min-width: 1024px) 50vw, 100vw" prioridad={i === 0} zoom={false} className="object-top" />
               </div>
             );
           })}

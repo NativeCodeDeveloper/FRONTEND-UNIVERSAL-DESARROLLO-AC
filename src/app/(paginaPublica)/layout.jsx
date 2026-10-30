@@ -16,7 +16,7 @@ export default async function LayoutPaginaPublica({ children }) {
 
   return (
     <div className="pagina-publica flex min-h-screen flex-col">
-      <Navegacion nombreEmpresa={datosEmpresa.empresaNombre} />
+      <Navegacion />
       <main className="flex-1 md:[&>section:first-child]:pt-48">{children}</main>
       <Pie datosEmpresa={datosEmpresa} />
     </div>

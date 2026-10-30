@@ -1,10 +1,14 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { Mail as Correo, MapPin as Ubicacion } from "lucide-react";
 import { crearEnlaces } from "@/lib/paginaPublica/enlaces";
 
+const ICONOS = { Correo, Dirección: Ubicacion };
+
 /*
- * Franja bajo la portada: correo y dirección.
- * Cada celda aparece solo si el dato existe en datosempresa.
+ * Detalle bajo la portada: una píldora discreta con el correo y la dirección.
+ * Cada dato aparece solo si existe en datosempresa; el ícono ya lo identifica,
+ * así que el título queda solo para lectores de pantalla.
  */
 export default function DatosRapidos({ datosEmpresa }) {
   const enlaces = crearEnlaces(datosEmpresa);
@@ -22,33 +26,38 @@ export default function DatosRapidos({ datosEmpresa }) {
 
   if (celdas.length === 0) return null;
 
-  const columnas = { 1: "sm:grid-cols-1", 2: "sm:grid-cols-2", 3: "sm:grid-cols-3" }[celdas.length];
-
   return (
-    <dl className={`grid overflow-hidden rounded-[28px] bg-white/85 p-2 sm:rounded-[32px] sm:p-3 ${columnas}`}>
-      {celdas.map((c) => {
+    <dl className="mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-full border border-[#d4e9eb]/80 bg-white/80 px-5 py-2.5 shadow-[0_1px_10px_rgb(0_0_0/0.03)] backdrop-blur-sm sm:px-7">
+      {celdas.map((c, i) => {
+        const Icono = ICONOS[c.titulo];
         const contenido = (
           <>
-            <span aria-hidden="true" className="row-span-2 flex size-12 items-center justify-center self-center rounded-full bg-[#e0f0f1] text-[#007f89] sm:size-14">
-              {c.titulo === "Correo" ? <Correo className="size-6" /> : <Ubicacion className="size-6" />}
-            </span>
-            <dt className="col-start-2 self-end text-[14px] text-slate-500 sm:text-[16px]">{c.titulo}</dt>
-            <dd className="col-start-2 min-w-0 text-[15px] leading-relaxed font-medium text-[#30373a] [overflow-wrap:anywhere] transition-colors group-hover:text-[#007f89] sm:text-[17px] lg:text-[18px]">{c.valor}</dd>
+            <Icono aria-hidden="true" className="size-4 shrink-0 text-acento" strokeWidth={1.8} />
+            <dt className="sr-only">{c.titulo}</dt>
+            <dd className="min-w-0 text-[13.5px] font-medium text-tinta-2 [overflow-wrap:anywhere] transition-colors duration-200 group-hover:text-acento sm:text-[14px]">
+              {c.valor}
+            </dd>
           </>
         );
-        const clase = "group grid h-full grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 rounded-[22px] px-3 py-4 transition-colors duration-300 hover:bg-[#edf7f8] sm:gap-x-5 sm:px-5 lg:px-7";
         return (
-          <div key={c.titulo} className="min-w-0 border-[#d4e3e6] not-first:border-t sm:not-first:border-t-0 sm:not-first:border-l">
-            {"interno" in c ? (
-              <Link href={c.href} className={clase}>
-                {contenido}
-              </Link>
-            ) : (
-              <a href={c.href} className={clase} {...(c.externo ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-                {contenido}
-              </a>
-            )}
-          </div>
+          <Fragment key={c.titulo}>
+            {i > 0 && <span aria-hidden="true" className="size-1 shrink-0 rounded-full bg-linea" />}
+            <div className="group flex min-w-0 items-center gap-2">
+              {"interno" in c ? (
+                <Link href={c.href} className="min-w-0">
+                  {contenido}
+                </Link>
+              ) : (
+                <a
+                  href={c.href}
+                  className="min-w-0"
+                  {...(c.externo ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                >
+                  {contenido}
+                </a>
+              )}
+            </div>
+          </Fragment>
         );
       })}
     </dl>
