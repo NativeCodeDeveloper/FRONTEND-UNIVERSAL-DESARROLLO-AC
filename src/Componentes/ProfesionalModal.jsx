@@ -19,7 +19,7 @@ import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
 import { ESTADOS_FIRMA, ESTADOS_REGISTRO_SIS } from "@/lib/firma/constantes";
 import { MODO_MOCK } from "@/lib/firma/apiFirma";
 import { rutValido } from "@/lib/rut";
-import { CAMPO_CATEGORIA, CATEGORIA_MAX_LARGO, CATEGORIAS_SUGERIDAS, normalizarCategoria } from "@/lib/categoriasAtencion";
+import { CAMPO_CATEGORIA, CATEGORIA_MAX_LARGO, CATEGORIAS_SUGERIDAS, errorCategoria, normalizarCategoria } from "@/lib/categoriasAtencion";
 
 // El campo es un ROTULO de profesion/especialidad ("Cirujano dentista",
 // "Ortodoncista"), no una biografia. Con los 500 caracteres anteriores la gente
@@ -84,6 +84,9 @@ export function validarProfesional(datos) {
   if (datos.descripcionProfesional.length > ESPECIALIDAD_MAX_LARGO) {
     errores.descripcionProfesional = `Máximo ${ESPECIALIDAD_MAX_LARGO} caracteres.`;
   }
+
+  const problemaCategoria = errorCategoria(datos[CAMPO_CATEGORIA]);
+  if (problemaCategoria) errores[CAMPO_CATEGORIA] = problemaCategoria;
 
   return errores;
 }
@@ -277,7 +280,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
 
     if (Object.keys(erroresDetectados).length > 0) {
       setErrores(erroresDetectados);
-      const primerError = [...CAMPOS, "registro_sis_numero"].find((campo) => erroresDetectados[campo]);
+      const primerError = [...CAMPOS, CAMPO_CATEGORIA, "registro_sis_numero"].find((campo) => erroresDetectados[campo]);
       panelRef.current
         ?.querySelector(`[data-campo="${primerError}"]`)
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -331,6 +334,12 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
       });
 
       if (!res.ok) {
+        const motivo = await res.clone().json().catch(() => null);
+        if (motivo?.message === "categoria-invalida") {
+          setErrores((prev) => ({ ...prev, [CAMPO_CATEGORIA]: "Usa solo letras, números y . , - / ( ) & +" }));
+          toast.error("Revisa la categoría de atención.");
+          return;
+        }
         toast.error(
           editando
             ? "Error al actualizar el profesional, por favor intente nuevamente."
@@ -491,7 +500,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
             </div>
 
             <div data-campo={CAMPO_CATEGORIA} className="sm:col-span-2">
-              <Campo etiqueta="Categoría de atención" opcional htmlFor="pr-categoria">
+              <Campo etiqueta="Categoría de atención" opcional error={errores[CAMPO_CATEGORIA]} htmlFor="pr-categoria">
                 {/* Texto libre con sugerencias: cada centro tiene las suyas. La
                     reserva en línea agrupa por categoría ignorando tildes y
                     mayúsculas, pero las sugerencias evitan duplicados visibles. */}

@@ -37,3 +37,20 @@ test("avisos suaves: baja resolución y logo alargado", () => {
   assert.match(avisoArchivoLogo({ ancho: 2000, alto: 600 }), /alargado/);
   assert.equal(avisoArchivoLogo(null), "");
 });
+
+import { idLogoValido, mensajeErrorLogo } from "../src/lib/logoEmpresa.js";
+
+test("idLogoValido: solo ids de Cloudflare arman URL (nunca http, javascript: ni rutas)", () => {
+  assert.equal(idLogoValido("a4cc5051-963b-4d3d-89b8-cd0416c6cf00"), "a4cc5051-963b-4d3d-89b8-cd0416c6cf00");
+  for (const malo of ["https://malo.com/x.png", "http://x", "javascript:alert(1)", "//malo.com/x", "../x", "a b", "", null, undefined, 42, {}, "x".repeat(101)]) {
+    assert.equal(idLogoValido(malo), "", String(malo));
+  }
+});
+
+test("mensajeErrorLogo explica cada rechazo del backend", () => {
+  assert.match(mensajeErrorLogo("SIN-PERMISO"), /perfil no puede/);
+  assert.match(mensajeErrorLogo("USUARIO-SIN-AUTENTICACION"), /sesión/);
+  assert.match(mensajeErrorLogo("imagen-muy-pesada"), /pesada/);
+  assert.match(mensajeErrorLogo("tipo-no-permitido"), /no es una imagen/);
+  assert.match(mensajeErrorLogo("otra-cosa"), /No se pudo guardar/);
+});

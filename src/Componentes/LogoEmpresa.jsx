@@ -14,6 +14,8 @@ import {
   LOGO_TIPOS,
   avisoArchivoLogo,
   errorArchivoLogo,
+  idLogoValido,
+  mensajeErrorLogo,
 } from "@/lib/logoEmpresa";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
@@ -100,7 +102,7 @@ export default function LogoEmpresa({ idEmpresa, logoId, nombre, onCambio }) {
       toast.success("Logo actualizado. Ya se ve en tu página web.");
     } catch (error) {
       console.error("[LogoEmpresa] subir:", error?.message ?? error);
-      toast.error("No se pudo guardar el logo. Intenta nuevamente.");
+      toast.error(mensajeErrorLogo(error?.message));
     } finally {
       setOcupado(false);
       setAviso("");
@@ -116,14 +118,16 @@ export default function LogoEmpresa({ idEmpresa, logoId, nombre, onCambio }) {
       toast.success("Logo quitado. La página web muestra solo el nombre.");
     } catch (error) {
       console.error("[LogoEmpresa] quitar:", error?.message ?? error);
-      toast.error("No se pudo quitar el logo. Intenta nuevamente.");
+      toast.error(error?.message === "SIN-PERMISO" || error?.message === "USUARIO-SIN-AUTENTICACION"
+        ? mensajeErrorLogo(error.message)
+        : "No se pudo quitar el logo. Intenta nuevamente.");
     } finally {
       setOcupado(false);
       setConfirmandoQuitar(false);
     }
   }
 
-  const url = cfImageUrl(logoId, "card");
+  const url = cfImageUrl(idLogoValido(logoId), "card");
 
   return (
     <div className="flex items-start gap-4">

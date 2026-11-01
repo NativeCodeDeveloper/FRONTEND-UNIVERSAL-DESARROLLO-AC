@@ -45,3 +45,29 @@ export function avisoArchivoLogo(lados) {
   }
   return "";
 }
+
+/*
+ * Segunda barrera (la primera es el backend): solo un id de Cloudflare Images arma URL.
+ * cfImageUrl devuelve tal cual cualquier valor que empiece con "http"; para el logo
+ * eso no se permite: así un valor raro en la base nunca termina como src de la página.
+ */
+const PATRON_ID_LOGO = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
+export function idLogoValido(valor) {
+  return typeof valor === "string" && PATRON_ID_LOGO.test(valor) ? valor : "";
+}
+
+/* Mensaje para el usuario según lo que respondió el backend */
+export function mensajeErrorLogo(codigo) {
+  switch (codigo) {
+    case "SIN-PERMISO":
+      return "Tu perfil no puede cambiar el logo. Pídeselo a quien administra la clínica.";
+    case "USUARIO-SIN-AUTENTICACION":
+      return "Tu sesión expiró. Vuelve a iniciar sesión e inténtalo de nuevo.";
+    case "imagen-muy-pesada":
+      return "La imagen es demasiado pesada para subirla.";
+    case "tipo-no-permitido":
+      return "El archivo no es una imagen válida. Usa PNG, JPG o WebP.";
+    default:
+      return "No se pudo guardar el logo. Intenta nuevamente.";
+  }
+}

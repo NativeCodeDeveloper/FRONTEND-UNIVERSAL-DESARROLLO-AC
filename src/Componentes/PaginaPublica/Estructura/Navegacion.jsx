@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IconoCerrar, IconoLupa, IconoMenu } from "@/Componentes/PaginaPublica/Comunes/Iconos";
 import { cfImageUrl } from "@/lib/cloudflare";
+import { idLogoValido } from "@/lib/logoEmpresa";
 
 const enlaces = [
   { href: "/#inicio", texto: "Inicio" },
@@ -16,7 +17,7 @@ const enlaces = [
 
 /* `nombre` y `logo` (id de Cloudflare) vienen de datosempresa; los pasa el layout */
 export default function Navegacion({ nombre, logo }) {
-  const urlLogo = cfImageUrl(logo, "card");
+  const urlLogo = cfImageUrl(idLogoValido(logo), "card");
   const [abierto, setAbierto] = useState(false);
   const [conFondo, setConFondo] = useState(false);
 

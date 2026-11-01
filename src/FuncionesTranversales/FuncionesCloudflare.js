@@ -14,7 +14,10 @@ export async function subirImagenCloudflare(file) {
     });
 
     if (!res.ok) {
-        throw new Error("Error subiendo imagen a Cloudflare");
+        // El backend responde { message } con el motivo (imagen-muy-pesada, tipo-no-permitido,
+        // USUARIO-SIN-AUTENTICACION…): se propaga para que cada pantalla lo explique.
+        const cuerpo = await res.json().catch(() => null);
+        throw new Error(cuerpo?.message || "Error subiendo imagen a Cloudflare");
     }
 
     const data = await res.json();

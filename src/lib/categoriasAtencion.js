@@ -10,30 +10,120 @@
  * categoría ("Odontología", " odontologia ") se agrupan por su clave: sin tildes,
  * minúsculas y espacios simples.
  *
- * Mientras el backend no guarde el campo, ningún profesional trae categoría y la
- * reserva muestra la grilla directa, como antes. Ver docs/firma/04, Fase B.
+ * Backend: columna profesionales.categoriaProfesional (VARCHAR 60, NULL), validada en
+ * services/categoriaProfesional.js con los mismos caracteres que errorCategoria().
+ * Con menos de dos categorías distintas la reserva muestra la grilla directa.
  */
 
 export const CAMPO_CATEGORIA = "categoriaProfesional";
 export const CATEGORIA_MAX_LARGO = 60;
 
-/* Sugerencias para el dashboard; el centro puede escribir cualquier otra */
+/*
+ * Sugerencias para el dashboard, con los nombres que se usan en Chile (Superintendencia
+ * de Salud, FONASA, isapres y la forma en que los pacientes las buscan). Cubren centros
+ * médicos, dentales, de salud mental, rehabilitación, estética, laboratorio e imágenes.
+ * El centro puede escribir cualquier otra; se ordenan alfabéticamente al mostrarlas.
+ */
 export const CATEGORIAS_SUGERIDAS = [
+  // Medicina
   "Medicina general",
-  "Odontología",
-  "Psicología",
-  "Psiquiatría",
-  "Kinesiología",
-  "Nutrición",
-  "Fonoaudiología",
-  "Matronería",
-  "Ginecología",
+  "Medicina familiar",
+  "Medicina interna",
   "Pediatría",
-  "Terapia ocupacional",
-  "Enfermería",
+  "Ginecología y obstetricia",
+  "Matrona",
+  "Cardiología",
+  "Broncopulmonar",
+  "Endocrinología",
+  "Diabetología",
+  "Gastroenterología",
+  "Nefrología",
+  "Urología",
+  "Neurología",
+  "Neurología infantil",
+  "Reumatología",
   "Dermatología",
   "Traumatología",
+  "Otorrinolaringología",
+  "Oftalmología",
+  "Geriatría",
+  "Hematología",
+  "Infectología",
+  "Inmunología y alergias",
+  "Oncología",
+  "Cirugía general",
+  "Cirugía plástica",
+  "Cirugía vascular",
+  "Coloproctología",
+  "Medicina deportiva",
+  "Medicina del trabajo",
+  "Medicina estética",
+  "Fertilidad",
+  "Sexología",
+  // Odontología
+  "Odontología general",
+  "Ortodoncia",
+  "Endodoncia",
+  "Periodoncia",
+  "Implantología",
+  "Odontopediatría",
+  "Rehabilitación oral",
+  "Cirugía maxilofacial",
+  "Estética dental",
+  "Trastornos temporomandibulares",
+  // Salud mental
+  "Psicología",
+  "Psicología infantojuvenil",
+  "Psiquiatría",
+  "Psiquiatría infantojuvenil",
+  "Terapia de pareja y familia",
+  "Psicopedagogía",
+  // Rehabilitación y otras profesiones de la salud
+  "Kinesiología",
+  "Kinesiología respiratoria",
+  "Kinesiología deportiva",
+  "Kinesiología de piso pélvico",
+  "Terapia ocupacional",
+  "Fonoaudiología",
+  "Nutrición y dietética",
+  "Enfermería",
+  "Técnico en enfermería (TENS)",
+  "Podología",
+  "Tecnología médica",
+  "Optometría",
+  "Masoterapia",
+  "Acupuntura",
+  "Quiropraxia",
+  // Estética
+  "Cosmetología",
+  "Estética facial",
+  "Estética corporal",
+  "Depilación láser",
+  // Apoyo diagnóstico y otros servicios
+  "Laboratorio clínico",
+  "Toma de muestras",
+  "Toma de muestras a domicilio",
+  "Imagenología",
+  "Ecografía",
+  "Radiología",
+  "Vacunatorio",
+  "Procedimientos de enfermería",
+  "Atención domiciliaria",
 ];
+
+/* Mismos caracteres que acepta el backend (services/categoriaProfesional.js) */
+const CATEGORIA_PERMITIDA = /^[\p{L}\p{M}0-9 .,\-/()&+]+$/u;
+
+/* Mensaje de error para el dashboard, o "" si sirve (vacío también sirve: es opcional) */
+export function errorCategoria(texto) {
+  const limpio = normalizarCategoria(texto);
+  if (!limpio) return "";
+  if (String(texto ?? "").replace(/\s+/g, " ").trim().length > CATEGORIA_MAX_LARGO) {
+    return `Máximo ${CATEGORIA_MAX_LARGO} caracteres.`;
+  }
+  if (!CATEGORIA_PERMITIDA.test(limpio)) return "Usa solo letras, números y . , - / ( ) & +";
+  return "";
+}
 
 /* Texto listo para guardar: sin saltos de línea, espacios simples y con tope de largo */
 export function normalizarCategoria(texto) {
@@ -102,5 +192,6 @@ export function filtrarPorCategoria(profesionales, clave) {
 export function sugerenciasCategoria(profesionales) {
   const propias = agruparCategorias(profesionales).map((c) => c.nombre);
   const usadas = new Set(propias.map(claveCategoria));
-  return [...propias, ...CATEGORIAS_SUGERIDAS.filter((c) => !usadas.has(claveCategoria(c)))];
+  const comunes = CATEGORIAS_SUGERIDAS.filter((c) => !usadas.has(claveCategoria(c))).sort((a, b) => a.localeCompare(b, "es"));
+  return [...propias, ...comunes];
 }

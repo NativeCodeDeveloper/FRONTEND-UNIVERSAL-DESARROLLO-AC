@@ -66,3 +66,28 @@ test("sugerenciasCategoria pone primero las del centro y no repite", () => {
   assert.equal(s.filter((x) => claveCategoria(x) === "odontologia").length, 1);
   assert.ok(s.includes("Psicología"));
 });
+
+import { CATEGORIAS_SUGERIDAS, errorCategoria } from "../src/lib/categoriasAtencion.js";
+
+test("sugerencias chilenas: amplias, sin duplicados y todas válidas para el backend", () => {
+  assert.ok(CATEGORIAS_SUGERIDAS.length >= 60);
+  assert.equal(new Set(CATEGORIAS_SUGERIDAS.map(claveCategoria)).size, CATEGORIAS_SUGERIDAS.length);
+  for (const c of CATEGORIAS_SUGERIDAS) assert.equal(errorCategoria(c), "", c);
+  for (const c of ["Matrona", "Broncopulmonar", "Técnico en enfermería (TENS)", "Odontopediatría", "Kinesiología"]) {
+    assert.ok(CATEGORIAS_SUGERIDAS.includes(c), c);
+  }
+});
+
+test("errorCategoria: misma regla que el backend", () => {
+  assert.equal(errorCategoria(""), "");
+  assert.equal(errorCategoria("  Ñuñoa & Kine / Piso pélvico (adultos)  "), "");
+  assert.match(errorCategoria("<script>alert(1)</script>"), /Usa solo/);
+  assert.match(errorCategoria("Odonto; DROP TABLE"), /Usa solo/);
+  assert.match(errorCategoria("a".repeat(61)), /Máximo 60/);
+});
+
+test("sugerenciasCategoria: comunes en orden alfabético", () => {
+  const s = sugerenciasCategoria([]);
+  const ordenadas = [...s].sort((a, b) => a.localeCompare(b, "es"));
+  assert.deepEqual(s, ordenadas);
+});

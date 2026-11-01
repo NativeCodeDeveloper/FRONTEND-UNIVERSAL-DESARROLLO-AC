@@ -214,7 +214,7 @@ relleno). Flujo nuevo en `/agendaProfesionales`:
 Mientras no exista B.5, el paso de tipo de atención no se muestra y se ve la grilla
 de profesionales directo, como antes. Nunca se muestran las 9 categorías de relleno.
 
-### B.5 Categorías de atención (fácil) — backend · **lo que falta para conectar**
+### B.5 Categorías de atención — backend ✅ escrito y probado (rama `fix/endurecer-logo-y-subidas`), falta desplegar
 
 Decisión del 01-11-2026: la categoría se escribe **al crear o editar al profesional**
 (Odontología, Psicología… las que el centro quiera). Es **un solo campo en
@@ -238,7 +238,19 @@ ALTER TABLE profesionales
 | `SELECT` de `seleccionarTodosProfesionales` y `seleccionarProfesional` | Nada: ya usan `SELECT *` (`model/Profesionales.js`), la columna sale sola |
 
 Comprobar: crear un profesional con categoría, editarlo, dejarla vacía (→ `NULL`), y
-que `/profesionales/seleccionarTodosProfesionales` la devuelva. Apenas haya **dos o
+que `/profesionales/seleccionarTodosProfesionales` la devuelva.
+
+**Hecho (01-11):** `migraciones/2026-11-01_categoria_profesional.sql` (columna + índice),
+`services/categoriaProfesional.js` (mismos caracteres que el front; `undefined` = no tocar al
+editar, `""` = NULL, inválida → 400 `categoria-invalida`), model y controller de profesionales.
+De paso se quitó el `console.log(req.body)` de ese controlador (RUT, teléfono y correo en el
+log: pendiente #1 de A.3, ahora solo operación y usuario). Pruebas: `pruebas/profesionales/`
+4 unitarias + 7 de punta a punta en MySQL con la tabla real (23 profesionales del dump).
+
+**Sugerencias chilenas (front):** 78 categorías en `CATEGORIAS_SUGERIDAS` (medicina,
+odontología, salud mental, rehabilitación, estética, apoyo diagnóstico), sin duplicados y
+todas válidas para el backend; en el dashboard se ofrecen primero las que ya usa el centro y
+luego las comunes en orden alfabético. Apenas haya **dos o
 más categorías distintas**, la reserva pública muestra el paso solo.
 
 ### B.6 Categorías en el dashboard — front ✅
@@ -268,7 +280,7 @@ bajo la especialidad.
 Encabezado sutil, una sola explicación (hoy el texto repite lo del panel), espacios
 consistentes con el inicio y revisión completa a 390 px / 768 px / escritorio.
 
-### B.9b Logo del centro (01-11-2026) — front ✅ · backend ✅ desplegado en desarrollo
+### B.9b Logo del centro (01-11-2026) — ✅ cerrado y en `main`
 
 **Dashboard → Datos de la clínica → Datos generales**, antes de "Nombre de tu centro o clínica" (opcional, fila compacta con las recomendaciones plegadas). El usuario elige el archivo, lo
 recorta en **círculo** (mismo `ImageCropperModal` de publicaciones, ahora con
@@ -305,8 +317,40 @@ GET público, guardar el resto no borra el logo, 7 valores inválidos, 404, quit
 `feat/logo-empresa` (`ca46f07`) → migración aplicada → `pm2 restart agendaclinica-backend`
 (solo esa app; las otras 7 siguieron arriba). Comprobado en el servidor: el GET público
 devuelve `logoEmpresa`, `actualizarLogo` responde 401 sin token y con token falso, los demás
-endpoints 200 y el log sin errores. **Pendiente:** fusionar la rama a `main` y dejar el
-servidor de vuelta en `main`, como con la Fase A.
+endpoints 200 y el log sin errores. **Probado por el usuario en desarrollo el 01-11 (funcionó).**
+Fusionado a `main` (fast-forward, `ca46f07`) y servidor de vuelta en `main`.
+
+### B.9c Revisión de seguridad de la fase (01-11-2026)
+
+Rama `fix/endurecer-logo-y-subidas` del backend + cambios del front, sin desplegar aún.
+
+| # | Hallazgo | Riesgo | Arreglo | Prueba |
+|---|---|---|---|---|
+| 1 | `actualizarLogo` solo pedía sesión: un profesional o recepción podía cambiar el logo llamando la API | Medio | `middleware/exigirAdministradorClinica.js` + `services/rolesClinica.js` (mismas reglas que `dashboard-access.js`; falla cerrado → 403) | 401/200/403 por perfil, Clerk caído → 403, rol en el token |
+| 2 | Rol como arreglo `["admin-clinica"]` se aceptaba (`String()` lo convertía) | Medio | Solo se acepta texto; alias con `Object.hasOwn` | casos `[…]`, `constructor`, `__proto__` |
+| 3 | `/cloudflare/subirimagenes` sin límite de tamaño ni tipo (multer en memoria: un archivo enorme tumba el proceso de un servidor compartido) | Alto | 10 MB, 1 archivo, solo jpeg/png/webp/gif/avif; errores 413/415 en JSON | 413 con 10 MB + 1, el proceso sigue vivo |
+| 4 | El tipo lo declara el navegador (falseable) | Medio | `services/firmaImagen.js`: verifica los bytes reales | PHP/SVG/PDF disfrazados de PNG → 415 |
+| 5 | El log de subida imprimía el `req.file` completo | Bajo | Solo tipo y tamaño | — |
+| 6 | **`/pedidos` totalmente abierto**: cualquiera podía leer nombre, teléfono, correo, RUT y dirección de los compradores y cambiar el estado de un pedido | **Alto** (afecta a todas las instancias) | Todo exige sesión salvo `ingresarNuevoPedido`; las pantallas ya mandan el token | 6 rutas × sin token / token falso → 401 |
+| 7 | Front: un valor raro de `logoEmpresa` (p. ej. URL) terminaría como `src` | Bajo | `idLogoValido` antes de armar la URL (navbar y dashboard) | `tests/logoEmpresa.test.mjs` |
+| 8 | Front: los rechazos se mostraban como error genérico | Bajo | Mensajes por motivo (sin permiso, sesión, pesada, formato) | idem |
+
+Revisado sin hallazgos: SQL parametrizado; validación del id del logo (sin URL, rutas ni
+inyección); bitácora sin datos personales; sin bucles de peticiones en navbar, selector de
+categorías ni dashboard (efectos con dependencias estables, una carga por pantalla); URL de
+categoría validada contra las existentes; React escapa la categoría y el nombre.
+
+Pruebas: backend 32/32 (seguridad 13, logo 6, reservas 13) + 8 de punta a punta en MySQL
+aislado; front 7 + 5 + 7 + 10 (perfiles); build OK; `npm run fechas` OK.
+
+**Queda fuera de esta fase (anotado para el sprint):**
+- El resto de las pantallas web (`/datosempresa/actualizar`, portada, publicaciones,
+  servicios, testimonios) piden sesión pero no rol: aplicar `exigirAdministradorClinica`.
+- `/cloudflare/api/images/direct-upload` crea URLs de subida para cualquier sesión.
+- `/notificacion/whatsapp/respuesta` (webhook) sin verificación de firma de Twilio a la vista.
+- Sin límite de peticiones (rate limit) en el backend.
+- "Guardar todos los datos" exige en el backend 8 campos y el front solo 3: si falta
+  "Sobre nosotros", falla con un error genérico.
 
 ### B.9 Estado
 
@@ -316,11 +360,11 @@ servidor de vuelta en `main`, como con la Fase A.
 | B.2 | Portada | ✅ Front (01-11) |
 | B.3 | Datos bajo la portada | ✅ Front (01-11) |
 | B.4 | Quitar sucursales | ✅ Front (01-11) |
-| B.5 | Categorías: backend (1 columna) | **Pendiente: lo único que falta para conectar** |
+| B.5 | Categorías: backend (1 columna) | ✅ Escrito y probado (51/51 backend) · falta desplegar |
 | B.6 | Categorías: dashboard | ✅ Front (01-11) |
 | B.7 | Categorías: reserva pública | ✅ Front (01-11) |
 | B.8 | Pulido `/agendaProfesionales` | ✅ Front (01-11) |
-| B.9b | Logo del centro | ✅ Front · ✅ Backend desplegado en desarrollo (14/14) · falta fusionar a `main` |
+| B.9b | Logo del centro | ✅ Cerrado: front `5224b59` y backend `ca46f07` en `main`, probado en desarrollo |
 
 Verificado el 01-11 en una copia aislada (build OK, sin desborde horizontal a 390 / 768 /
 1440 px); el paso de categorías se probó con categorías ficticias inyectadas solo en
