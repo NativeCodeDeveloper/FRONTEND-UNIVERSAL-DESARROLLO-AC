@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }) {
 
                         {/* ═══════════════ CONTENT ═══════════════ */}
                         <div className="flex-1 min-w-0 h-full overflow-y-auto">
-                            {/* Aviso de soporte: solo lo ve el técnico NativeCode */}
+                            {/* Aviso de soporte (cápsula flotante): solo lo ve el técnico NativeCode */}
                             <FranjaModoSoporte />
                             <MobileNav />
                             <main className="min-w-0">

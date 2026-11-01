@@ -7,18 +7,23 @@ import { PeriodSelect, ViewToggle } from "./metric-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 const DEFAULT_PERIODS = [
-  { label: "Past 7 days", points: 4 },
-  { label: "Past 14 days", points: 7 },
-  { label: "Past 30 days" },
+  { label: "Últimos 7 días", points: 4 },
+  { label: "Últimos 14 días", points: 7 },
+  { label: "Últimos 30 días" },
 ];
 
 // Parte de la card (desde la derecha) ocupada por el gráfico.
 const REGION_W = 62; // %
 // Variación bajo este umbral = "estable" -> acento neutro.
 const NEUTRAL_PCT = 0.5;
+// Colores del texto del delta (verde y rojo del sistema, versión legible sobre blanco)
+const DELTA_SUBE = "#248A3D";
+const DELTA_BAJA = "#D70015";
+const DELTA_NEUTRO = "#6E6E73";
 
 const SIZES = {
-  sm: { minH: "min-h-[260px]", pad: "px-6 pt-5", footer: "px-6 py-3", title: "text-[15px]", headline: "text-[46px]" },
+  // En celular el gráfico va en el flujo (entre el monto y el pie), no detrás del monto
+  sm: { minH: "sm:min-h-[260px]", pad: "px-5 pt-5 sm:px-6", footer: "px-5 py-3 sm:px-6", title: "text-[15px]", headline: "text-[38px] sm:text-[46px]" },
   md: { minH: "min-h-[380px]", pad: "px-8 pt-7", footer: "px-8 py-4", title: "text-[17px]", headline: "text-[72px]" },
   lg: { minH: "min-h-[460px]", pad: "px-10 pt-9", footer: "px-10 py-5", title: "text-[19px]", headline: "text-[88px]" },
 };
@@ -57,11 +62,11 @@ export default function ProgressMetricCard({
   title,
   total,
   delta,
-  deltaLabel = "today",
+  deltaLabel = "hoy",
   percent,
   trend,
   unit,
-  period = "Past 30 days",
+  period = "Últimos 30 días",
   periodOptions,
   onPeriodChange,
   defaultView = "curve",
@@ -141,6 +146,10 @@ export default function ProgressMetricCard({
 
   const displayTotal = total ?? fmtCompact(stats.sum);
   const displayDelta = delta ?? sign(stats.step);
+  // El delta del pie es el cambio contra el punto anterior (no contra el inicio del
+  // período): su color sigue a SU signo. Antes tomaba el de la tendencia general y
+  // una baja de un mes podía salir en verde.
+  const colorDelta = delta ? color.text : stats.step > 0 ? DELTA_SUBE : stats.step < 0 ? DELTA_BAJA : DELTA_NEUTRO;
   const displayPercent = percent ?? `${Math.abs(stats.pct).toFixed(1)}%`;
 
   // Color de cada serie: accent definido -> paleta -> color del título.
@@ -182,8 +191,8 @@ export default function ProgressMetricCard({
         <div className={`flex flex-1 flex-col ${sz.pad}`}>
           <h3 className={`${sz.title} font-semibold tracking-tight text-foreground`}>{title}</h3>
           <div className="flex flex-1 flex-col items-center justify-center gap-1 py-10 text-center">
-            <p className="text-sm font-medium text-foreground">No data yet</p>
-            <p className="text-xs text-muted-foreground">Metrics will appear once data is available.</p>
+            <p className="text-sm font-medium text-foreground">Aún no hay datos</p>
+            <p className="text-xs text-muted-foreground">El gráfico aparecerá cuando haya información del período.</p>
           </div>
         </div>
       </div>
@@ -192,8 +201,9 @@ export default function ProgressMetricCard({
 
   return (
     <div className={shell}>
-      {/* Zona del gráfico (a la derecha, detrás del contenido) */}
-      <div className="absolute inset-y-0 right-0 z-0" style={{ width: `${REGION_W}%` }}>
+      {/* Zona del gráfico: en escritorio a la derecha, detrás del contenido; en celular
+          ocupa la mitad inferior a todo el ancho para no pasar por debajo del monto. */}
+      <div className="relative z-0 order-2 h-44 w-full sm:absolute sm:inset-y-0 sm:right-0 sm:order-none sm:h-auto sm:w-[var(--ancho-grafico)]" style={{ "--ancho-grafico": `${REGION_W}%` }}>
         <div
           className="absolute inset-0"
           style={{ background: `linear-gradient(to left, ${color.stroke}1f, transparent 75%)` }}
@@ -219,7 +229,7 @@ export default function ProgressMetricCard({
       </div>
 
       {/* Contenido principal */}
-      <div className={`pointer-events-none relative z-10 flex flex-1 flex-col ${sz.pad}`}>
+      <div className={`pointer-events-none relative z-10 order-1 flex flex-col pb-4 sm:order-none sm:flex-1 sm:pb-0 ${sz.pad}`}>
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="flex items-center gap-3">
             <h3 className={`${sz.title} font-semibold tracking-tight text-foreground`}>{title}</h3>
@@ -256,19 +266,19 @@ export default function ProgressMetricCard({
       </div>
 
       {/* Footer opaco: delta a la izquierda, stats secundarias a la derecha */}
-      <div className={`relative z-10 flex items-center justify-between gap-4 border-t border-foreground/[0.06] bg-card ${sz.footer} text-[14px]`}>
-        <div>
-          <span className="font-medium" style={{ color: color.text }}>
+      <div className={`relative z-10 order-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-t sm:order-none border-foreground/[0.06] bg-card ${sz.footer} text-[14px]`}>
+        <div className="whitespace-nowrap">
+          <span className="font-medium" style={{ color: colorDelta }}>
             {displayDelta}
           </span>{" "}
           <span className="text-muted-foreground">{deltaLabel}</span>
         </div>
         {showStats && (
-          <div className="flex items-center gap-2.5 text-[12px] text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-muted-foreground">
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
-                  <span className="font-medium text-foreground/80">{fmtCompact(stats.peak)}</span> peak
+                  <span className="font-medium text-foreground/80">{fmtCompact(stats.peak)}</span> máx.
                 </span>
               </TooltipTrigger>
               <TooltipContent>El valor más alto registrado en este período.</TooltipContent>
@@ -277,7 +287,7 @@ export default function ProgressMetricCard({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
-                  <span className="font-medium text-foreground/80">{fmtCompact(stats.low)}</span> low
+                  <span className="font-medium text-foreground/80">{fmtCompact(stats.low)}</span> mín.
                 </span>
               </TooltipTrigger>
               <TooltipContent>El valor más bajo registrado en este período.</TooltipContent>
@@ -286,7 +296,7 @@ export default function ProgressMetricCard({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="cursor-help underline decoration-dotted decoration-muted-foreground/50 underline-offset-2">
-                  <span className="font-medium text-foreground/80">{fmtCompact(Math.round(stats.avg))}</span> avg
+                  <span className="font-medium text-foreground/80">{fmtCompact(Math.round(stats.avg))}</span> promedio
                 </span>
               </TooltipTrigger>
               <TooltipContent>El promedio de todos los meses de este período.</TooltipContent>

@@ -214,7 +214,7 @@ relleno). Flujo nuevo en `/agendaProfesionales`:
 Mientras no exista B.5, el paso de tipo de atención no se muestra y se ve la grilla
 de profesionales directo, como antes. Nunca se muestran las 9 categorías de relleno.
 
-### B.5 Categorías de atención — backend ✅ escrito y probado (rama `fix/endurecer-logo-y-subidas`), falta desplegar
+### B.5 Categorías de atención — ✅ cerrado y en `main` (probado por el usuario el 01-11)
 
 Decisión del 01-11-2026: la categoría se escribe **al crear o editar al profesional**
 (Odontología, Psicología… las que el centro quiera). Es **un solo campo en
@@ -322,7 +322,12 @@ Fusionado a `main` (fast-forward, `ca46f07`) y servidor de vuelta en `main`.
 
 ### B.9c Revisión de seguridad de la fase (01-11-2026)
 
-Rama `fix/endurecer-logo-y-subidas` del backend + cambios del front, sin desplegar aún.
+**Desplegado el 01-11-2026:** backend `96167c5` (rama `fix/endurecer-logo-y-subidas`) en el
+servidor `desarrollo` con respaldo `…antes-categoria_20261101-054751.sql`, migración de la
+categoría aplicada (27 profesionales, todos NULL) y solo `agendaclinica-backend` reiniciado;
+front `bbd9313` en `main` (Vercel). Verificado en el servidor: públicos 200, `/pedidos`,
+logo, subida y escritura de profesionales → 401 sin token, `categoriaProfesional` en el
+listado, log sin errores. Probado por el usuario; fusionado a `main` y servidor de vuelta en `main`.
 
 | # | Hallazgo | Riesgo | Arreglo | Prueba |
 |---|---|---|---|---|
@@ -360,7 +365,7 @@ aislado; front 7 + 5 + 7 + 10 (perfiles); build OK; `npm run fechas` OK.
 | B.2 | Portada | ✅ Front (01-11) |
 | B.3 | Datos bajo la portada | ✅ Front (01-11) |
 | B.4 | Quitar sucursales | ✅ Front (01-11) |
-| B.5 | Categorías: backend (1 columna) | ✅ Escrito y probado (51/51 backend) · falta desplegar |
+| B.5 | Categorías: backend (1 columna) | ✅ Cerrado: `96167c5` en `main`, probado por el usuario |
 | B.6 | Categorías: dashboard | ✅ Front (01-11) |
 | B.7 | Categorías: reserva pública | ✅ Front (01-11) |
 | B.8 | Pulido `/agendaProfesionales` | ✅ Front (01-11) |

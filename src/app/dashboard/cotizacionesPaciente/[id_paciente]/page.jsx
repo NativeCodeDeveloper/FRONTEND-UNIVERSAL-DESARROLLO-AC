@@ -46,15 +46,15 @@ const calcularEdadPaciente = (fechaNacimiento) => edadCivil(fechaNacimiento);
 function estadosLetra_interpretacion(estado_backend){
     switch (estado_backend) {
         case 1:
-            return { etiqueta: "Activa", clases: "bg-[#6E56CF] text-white" }
+            return { etiqueta: "Activa", clases: "bg-[#007AFF]/10 text-[#0062CC]" }
         case 2:
-            return { etiqueta: "Tratamiento en Curso", clases: "bg-sky-600 text-white" }
+            return { etiqueta: "Tratamiento en curso", clases: "bg-[#5856D6]/10 text-[#3634A3]" }
         case 3:
-            return { etiqueta: "Tratamiento Finalizado", clases: "bg-emerald-600 text-white" }
+            return { etiqueta: "Tratamiento finalizado", clases: "bg-[#34C759]/12 text-[#248A3D]" }
         case 4:
-            return { etiqueta: "Tratamiento Abandonado", clases: "bg-red-600 text-white" }
+            return { etiqueta: "Tratamiento abandonado", clases: "bg-[#F2F2F7] text-[#6E6E73]" }
         default:
-            return { etiqueta: "Sin estado", clases: "bg-slate-500 text-white" }
+            return { etiqueta: "Sin estado", clases: "bg-[#F2F2F7] text-[#8E8E93]" }
     }
 }
 
@@ -442,7 +442,7 @@ function formatearFechaHora(fechaISO) {
                         <button
                             type="button"
                             onClick={volverACarpetaClinica}
-                            className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-[#6E56CF]"
+                            className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-black/[0.06] text-slate-500 shadow-sm transition-colors hover:border-black/10 hover:bg-[#007AFF]/10 hover:text-[#007AFF]"
                             title="Volver a la carpeta clínica"
                             aria-label="Volver a la carpeta clínica"
                         >
@@ -462,23 +462,23 @@ function formatearFechaHora(fechaISO) {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 pl-[52px] sm:pl-14 xl:pl-0">
-                        <div className="flex h-14 min-w-[122px] flex-col justify-center rounded-lg border border-slate-200 bg-white px-4 shadow-sm">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cotizaciones</span>
+                        <div className="flex h-14 min-w-[122px] flex-col justify-center rounded-lg bg-white ring-1 ring-black/[0.06] px-4 shadow-sm">
+                            <span className="text-[12px] font-medium text-[#86868B]">Cotizaciones</span>
                             <span className="mt-1 text-sm font-bold leading-none text-slate-900">{cotizacionesPaciente.length} registros</span>
                         </div>
 
                         <TutorialGuiadoCotizaciones
                             etiqueta="Tutorial Guiado"
                             ariaLabel="Iniciar el tutorial guiado de las cotizaciones del paciente"
-                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]"
+                            className="flex h-14 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-white ring-1 ring-black/[0.06] px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#007AFF]/10 text-[#007AFF]"
                         />
 
                         <button
                             type="button"
                             data-tour="cotizaciones-boton-nueva"
                             onClick={() => actualizarVisibilidadFormulario((actual) => !actual)}
-                            className="flex h-14 items-center gap-2 rounded-lg bg-slate-900 px-5 text-[13px] font-bold text-white shadow-sm transition-colors hover:bg-slate-800"
+                            className="flex h-14 items-center gap-2 rounded-full bg-[#007AFF] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC]"
                         >
                             {mostrarFormularioCotizacion ? <X className="h-4 w-4"/> : <Plus className="h-4 w-4"/>}
                             {mostrarFormularioCotizacion ? "Cerrar" : "Nueva cotización"}
@@ -487,16 +487,16 @@ function formatearFechaHora(fechaISO) {
                 </header>
 
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)] xl:gap-6">
-                    <aside data-tour="cotizaciones-tarjeta-paciente" className="self-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-6">
+                    <aside data-tour="cotizaciones-tarjeta-paciente" className="self-start overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06] shadow-sm lg:sticky lg:top-6">
                         <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/30 p-4">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#6E56CF] text-base font-bold text-white shadow-md shadow-indigo-100">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#E5E5EA] text-base font-semibold text-[#6E6E73] ">
                                 {paciente[0]?.nombre?.charAt(0) ?? ""}{paciente[0]?.apellido?.charAt(0) ?? ""}
                             </div>
                             <div className="min-w-0">
                                 <h2 className="truncate text-[15px] font-bold leading-tight text-slate-900">
                                     {paciente[0]?.nombre} {paciente[0]?.apellido}
                                 </h2>
-                                <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+                                <p className="mt-0.5 text-[10px] font-medium  text-slate-400">
                                     ID Paciente #{id_paciente}
                                 </p>
                             </div>
@@ -506,19 +506,19 @@ function formatearFechaHora(fechaISO) {
                             <div key={index} className="space-y-4 p-4">
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                                     <div className="space-y-0.5">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Nacimiento</span>
+                                        <span className="text-[12px] font-medium text-[#86868B]">Nacimiento</span>
                                         <p className="text-[12px] font-semibold text-slate-700">{formatearFecha(elemento.nacimiento) || "-"}</p>
                                     </div>
                                     <div className="space-y-0.5">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Edad</span>
+                                        <span className="text-[12px] font-medium text-[#86868B]">Edad</span>
                                         <p className="text-[12px] font-semibold text-slate-700">{calcularEdadPaciente(elemento.nacimiento)} años</p>
                                     </div>
                                     <div className="space-y-0.5">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Previsión</span>
+                                        <span className="text-[12px] font-medium text-[#86868B]">Previsión</span>
                                         <p className="text-[12px] font-semibold text-slate-700">{previsionDesdeId(elemento.prevision_id)}</p>
                                     </div>
                                     <div className="space-y-0.5">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Sexo</span>
+                                        <span className="text-[12px] font-medium text-[#86868B]">Sexo</span>
                                         <p className="text-[12px] font-semibold text-slate-700">{elemento.sexo || "-"}</p>
                                     </div>
                                 </div>
@@ -548,7 +548,7 @@ function formatearFechaHora(fechaISO) {
                                     <button
                                         type="button"
                                         onClick={volverACarpetaClinica}
-                                        className="flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 text-[11px] font-bold text-white transition-all hover:bg-slate-800"
+                                        className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#007AFF]/10 text-[14px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/15"
                                     >
                                         Ver carpeta clínica
                                     </button>
@@ -559,9 +559,9 @@ function formatearFechaHora(fechaISO) {
 
                     <main className="min-w-0 space-y-5">
                         {mostrarFormularioCotizacion && (
-                            <section className="overflow-hidden rounded-lg border border-violet-200 bg-white shadow-sm">
-                                <div className="flex items-center gap-3 border-b border-violet-100 bg-violet-50/60 px-5 py-4">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#6E56CF] shadow-sm">
+                            <section className="overflow-hidden rounded-lg border border-black/[0.06] bg-white shadow-sm">
+                                <div className="flex items-center gap-3 border-b border-black/[0.06] bg-[#007AFF]/[0.06]/60 px-5 py-4">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#007AFF] shadow-sm">
                                         <ClipboardPlus className="h-4 w-4"/>
                                     </div>
                                     <div>
@@ -581,22 +581,22 @@ function formatearFechaHora(fechaISO) {
                                     }}
                                 >
                                     <label className="space-y-1.5">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Nombre de la cotización</span>
+                                        <span className="text-[12px] font-medium text-[#86868B]">Nombre de la cotización</span>
                                         <input
                                             value={nombre_cotizacion}
                                             onChange={(event) => setNombre_cotizacion(event.target.value)}
                                             required
                                             placeholder="Ej: Tratamiento preventivo"
-                                            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-[13px] text-slate-700 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                            className="h-10 w-full rounded-lg bg-white ring-1 ring-black/[0.06] px-3 text-[13px] text-slate-700 outline-none transition focus:border-black/[0.08] focus:ring-2 focus:ring-[#007AFF]/15"
                                         />
                                     </label>
                                     <label className="space-y-1.5">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Profesional</span>
+                                        <span className="text-[12px] font-medium text-[#86868B]">Profesional</span>
                                         <select
                                             value={profesional_solicitante_nombre}
                                             onChange={(event) => setProfesional_solicitante_nombre(event.target.value)}
                                             required
-                                            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-[13px] text-slate-700 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                            className="h-10 w-full rounded-lg bg-white ring-1 ring-black/[0.06] px-3 text-[13px] text-slate-700 outline-none transition focus:border-black/[0.08] focus:ring-2 focus:ring-[#007AFF]/15"
                                         >
                                             {profesionales.map((profesional) => (
                                                 <option key={profesional.id_profesional} value={profesional.nombreProfesional}>
@@ -608,7 +608,7 @@ function formatearFechaHora(fechaISO) {
 
                                     <button
                                         type="submit"
-                                        className="h-10 rounded-lg bg-slate-900 px-5 text-[12px] font-bold text-white transition-colors hover:bg-slate-800"
+                                        className="h-10 rounded-full bg-[#007AFF] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC]"
                                     >
                                         Crear Cotizacion
                                     </button>
@@ -618,8 +618,7 @@ function formatearFechaHora(fechaISO) {
 
                         <section className="flex flex-col gap-4 border-b border-slate-200 pb-5 xl:flex-row xl:items-end xl:justify-between">
                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#6E56CF]">Historial</p>
-                                <h2 className="mt-1 text-xl font-bold text-slate-900">Cotizaciones del paciente</h2>
+                                <h2 className="mt-1 text-xl font-semibold text-[#1D1D1F]">Cotizaciones del paciente</h2>
                                 <p className="mt-1 text-[12px] text-slate-500">
                                     {cotizacionesPaciente.length} cotizaciones registradas
                                 </p>
@@ -627,7 +626,7 @@ function formatearFechaHora(fechaISO) {
 
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                 <label data-tour="cotizaciones-filtro-estado" className="min-w-0 sm:w-52">
-                                    <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Estado</span>
+                                    <span className="mb-1.5 block text-[12px] font-medium text-[#86868B]">Estado</span>
                                     <select
                                         // 1. Usamos e para capturar el valor seleccionado
                                         onChange={(e) => {
@@ -636,7 +635,7 @@ function formatearFechaHora(fechaISO) {
                                         }}
                                         defaultValue="todas"
                                         aria_label="Buscar cotizaciones por estado"
-                                        className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-bold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                        className="h-10 w-full rounded-lg bg-white ring-1 ring-black/[0.06] px-3 text-[11px] font-bold text-slate-600 outline-none transition focus:border-black/[0.08] focus:ring-2 focus:ring-[#007AFF]/15"
                                     >
                                         <option value="todas">Todos los estados</option>
                                         <option value="1">Activa</option>
@@ -646,7 +645,7 @@ function formatearFechaHora(fechaISO) {
                                 </label>
 
                                 <label data-tour="cotizaciones-filtro-profesional" className="min-w-0 sm:w-72">
-                                    <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Profesional</span>
+                                    <span className="mb-1.5 block text-[12px] font-medium text-[#86868B]">Profesional</span>
                                     <div className="relative">
                                         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"/>
                                         <input
@@ -660,7 +659,7 @@ function formatearFechaHora(fechaISO) {
                                             type="search"
                                             placeholder="Buscar por profesional"
                                             aria-label="Buscar cotizaciones por profesional"
-                                            className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-[12px] text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                            className="h-10 w-full rounded-lg bg-white ring-1 ring-black/[0.06] pl-9 pr-3 text-[12px] text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-black/[0.08] focus:ring-2 focus:ring-[#007AFF]/15"
                                         />
                                     </div>
                                 </label>
@@ -675,97 +674,68 @@ function formatearFechaHora(fechaISO) {
                                     <article
                                         key={cotizacion.id_cotizacion_paciente}
                                         data-tour="cotizaciones-tarjeta"
-                                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_16px_-10px_rgba(15,23,42,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-[0_14px_32px_-18px_rgba(79,70,229,0.28)]"
+                                        className="group overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06] shadow-[0_4px_16px_-10px_rgba(15,23,42,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:border-black/10 hover:shadow-[0_14px_32px_-18px_rgba(79,70,229,0.28)]"
                                     >
                                         <div className="p-4 sm:p-5">
                                             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                                 <div className="flex min-w-0 items-start gap-3">
-                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF] transition-colors group-hover:bg-[#6E56CF] group-hover:text-white">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-black/[0.06] bg-[#007AFF]/[0.06] text-[#007AFF] transition-colors group-hover:bg-[#007AFF]/10">
                                                         <FileText className="h-4 w-4"/>
                                                     </div>
 
                                                     <div className="min-w-0">
                                                         <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-                                                            <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wide text-slate-500">
+                                                            <span className="text-[12px] tabular-nums text-[#86868B]">
                                                                 COT-{cotizacion.id_cotizacion_paciente}
                                                             </span>
-                                                            <span className={`rounded-md px-2 py-0.5 text-[9px] font-bold ${estadoActual.clases}`}>
+                                                            <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-medium ${estadoActual.clases}`}>
                                                                 <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-current align-middle"/>
                                                                 {estadoActual.etiqueta}
                                                             </span>
                                                         </div>
-                                                        <h3 className="break-words text-[15px] font-bold leading-snug text-slate-900 sm:text-base">
+                                                        <h3 className="break-words text-[17px] font-semibold leading-snug tracking-tight text-[#1D1D1F]">
                                                             {cotizacion.nombre_cotizacion}
                                                         </h3>
-                                                        <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
-                                                            Propuesta de tratamiento y presupuesto clínico.
-                                                        </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex min-w-[170px] items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2.5 lg:justify-end">
-                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#6E56CF] shadow-sm">
+                                                <div className="flex min-w-[170px] items-center gap-2.5 lg:justify-end">
+                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#007AFF] shadow-sm">
                                                         <CircleDollarSign className="h-4 w-4"/>
                                                     </div>
                                                     <div>
-                                                        <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                                                        <p className="text-[12px] font-medium text-[#86868B]">
                                                             Total cotizado
                                                         </p>
-                                                        <p className="mt-0.5 text-base font-extrabold leading-none text-[#6E56CF]">
+                                                        <p className="mt-0.5 text-[20px] font-semibold leading-none tracking-tight tabular-nums text-[#1D1D1F]">
                                                             {formatearMonto(cotizacion.total_presupuesto_cotizado)}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-3">
-                                                <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-100/90 px-3 py-2.5">
-                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-[#6E56CF] shadow-sm">
-                                                        <Stethoscope className="h-3.5 w-3.5"/>
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
-                                                            Solicitante
-                                                        </p>
-                                                        <p className="mt-0.5 truncate text-[11px] font-bold text-slate-700">
-                                                            {cotizacion.profesional_solicitante_nombre}
-                                                        </p>
-                                                    </div>
+                                            <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1.5 border-t border-black/[0.06] pt-3 text-[13px]">
+                                                <div className="flex min-w-0 items-center gap-1.5">
+                                                    <Stethoscope className="h-3.5 w-3.5 shrink-0 text-[#8E8E93]" aria-hidden="true"/>
+                                                    <dt className="sr-only">Solicitante</dt>
+                                                    <dd className="truncate text-[#3A3A3C]">{cotizacion.profesional_solicitante_nombre}</dd>
                                                 </div>
-
-                                                <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-100/90 px-3 py-2.5">
-                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
-                                                        <CalendarDays className="h-3.5 w-3.5"/>
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
-                                                            Fecha de creación
-                                                        </p>
-                                                        <p className="mt-0.5 text-[11px] font-semibold text-slate-700">
-                                                            {formatearFechaHora(cotizacion.fecha_creacion)}
-                                                        </p>
-                                                    </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#8E8E93]" aria-hidden="true"/>
+                                                    <dt className="text-[#86868B]">Creada</dt>
+                                                    <dd className="tabular-nums text-[#3A3A3C]">{formatearFechaHora(cotizacion.fecha_creacion)}</dd>
                                                 </div>
-
-                                                <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-100/90 px-3 py-2.5">
-                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
-                                                        <Clock3 className="h-3.5 w-3.5"/>
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
-                                                            Última modificación
-                                                        </p>
-                                                        <p className="mt-0.5 text-[11px] font-semibold text-slate-700">
-                                                            {formatearFechaHora(cotizacion.fecha_actualizacion)}
-                                                        </p>
-                                                    </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <Clock3 className="h-3.5 w-3.5 shrink-0 text-[#8E8E93]" aria-hidden="true"/>
+                                                    <dt className="text-[#86868B]">Modificada</dt>
+                                                    <dd className="tabular-nums text-[#3A3A3C]">{formatearFechaHora(cotizacion.fecha_actualizacion)}</dd>
                                                 </div>
-                                            </div>
+                                            </dl>
                                         </div>
 
-                                        <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-3 sm:px-5 xl:flex-row xl:items-center xl:justify-between">
+                                        <div className="flex flex-col gap-3 border-t border-black/[0.06] bg-[#FBFBFD] px-4 py-3 sm:px-5 xl:flex-row xl:items-center xl:justify-between">
                                             <label data-tour="cotizaciones-cambiar-estado" className="block w-full xl:max-w-[340px]">
-                                                <span className="mb-1 block text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                                                <span className="mb-1 block text-[12px] font-medium text-[#86868B]">
                                                     Cambiar estado de la cotización
                                                 </span>
                                                 {/* UI ONLY: conectar onChange con el servicio que actualiza esta cotización. */}
@@ -775,7 +745,7 @@ function formatearFechaHora(fechaISO) {
                                                     onChange={(e) => cambiarEstado( e.target.value ,cotizacion.id_cotizacion_paciente,)}
                                                     data-cotizacion-id={cotizacion.id_cotizacion_paciente}
                                                     aria-label={`Cambiar estado de la cotización ${cotizacion.id_cotizacion_paciente}`}
-                                                    className="h-9 w-full cursor-pointer rounded-lg border border-slate-300 bg-white px-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                                                    className="h-9 w-full cursor-pointer rounded-lg border border-slate-300 bg-white px-3 text-[11px] font-semibold text-slate-700 shadow-sm outline-none transition focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/15"
                                                 >
                                                     <option value="" disabled>Seleccionar estado</option>
                                                     <option value="1">Activa</option>
@@ -789,7 +759,7 @@ function formatearFechaHora(fechaISO) {
                                                 <button
                                                     type="button"
                                                     onClick={() => router.push(`/dashboard/detalleCotizacion/${cotizacion.id_cotizacion_paciente}`)}
-                                                    className="flex h-9 w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-violet-200 bg-white px-4 text-[11px] font-bold text-[#6E56CF] shadow-sm transition-colors hover:border-violet-300 hover:bg-violet-50 sm:w-auto"
+                                                    className="flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 sm:w-auto"
                                                     aria-label={`Ver detalle de la cotización ${cotizacion.id_cotizacion_paciente}`}
                                                 >
                                                     Ver detalle
@@ -799,7 +769,7 @@ function formatearFechaHora(fechaISO) {
                                                     <AlertDialogTrigger asChild>
                                                         <button
                                                             type="button"
-                                                            className="flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-rose-200 bg-white px-4 text-[11px] font-bold text-rose-600 transition-colors hover:border-rose-300 hover:bg-rose-50 sm:w-auto"
+                                                            className="flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 text-[13px] font-medium text-[#FF3B30] transition-colors hover:bg-[#FF3B30]/10 sm:w-auto"
                                                             aria-label={`Eliminar la cotización ${cotizacion.id_cotizacion_paciente}`}
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5 shrink-0"/>

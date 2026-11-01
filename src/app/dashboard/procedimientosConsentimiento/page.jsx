@@ -30,14 +30,7 @@ import { ZONA_CLINICA } from "@/lib/fechas";
  * profesionales consultan. Reglas y formato: src/lib/consentimientos/procedimientos.js.
  */
 
-// Colores del sistema de Apple, uno por especialidad (siempre el mismo para el mismo nombre).
-// Sin el rojo (#FF3B30): en iOS significa error o acción destructiva.
-const COLORES_APPLE = ["#007AFF", "#5856D6", "#AF52DE", "#FF2D55", "#FF9500", "#34C759", "#30B0C7", "#00C7BE", "#5AC8FA", "#A2845E"];
-function colorDe(grupo) {
-  let h = 0;
-  for (const c of String(grupo)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return COLORES_APPLE[h % COLORES_APPLE.length];
-}
+
 
 function formatearFecha(iso) {
   if (!iso) return "";
@@ -114,7 +107,9 @@ function Etiqueta({ children, tono = "gris" }) {
 
 function IconoGrupo({ grupo, tamano = "h-[30px] w-[30px]" }) {
   return (
-    <span className={`flex ${tamano} shrink-0 items-center justify-center rounded-[8px] text-white`} style={{ backgroundColor: colorDe(grupo) }} aria-hidden="true">
+    // Un solo tono suave para todos los grupos (antes uno por especialidad: violeta,
+    // naranjo, café…): la lista se veía desordenada y el nombre del grupo ya los distingue.
+    <span className={`flex ${tamano} shrink-0 items-center justify-center rounded-[8px] bg-[#007AFF]/10 text-[#007AFF]`} aria-hidden="true">
       <FileSignature className="h-4 w-4" strokeWidth={2} />
     </span>
   );

@@ -3,6 +3,7 @@
 import Video from "twilio-video";
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useEffect, useRef, useState } from "react";
+import { Check, Link2, Mic, MicOff, PhoneOff, Video as IconoVideo, VideoOff } from "lucide-react";
 
 // Espera máxima por el paciente antes de cerrar la sala automáticamente.
 const MINUTOS_ESPERA = 15;
@@ -64,6 +65,17 @@ export default function TelemedicinaSala({
     // null = temporizador inactivo.
     const [segundosEspera, setSegundosEspera] = useState(null);
     const [avisoEspera, setAvisoEspera] = useState("");
+    // Duración de la llamada: corre desde que llega el video de la otra persona.
+    const [segundosLlamada, setSegundosLlamada] = useState(0);
+    const hayVideoRemoto = pistasRemotas.some((item) => item.pista.kind === "video");
+    useEffect(() => {
+        if (!hayVideoRemoto) {
+            setSegundosLlamada(0);
+            return undefined;
+        }
+        const id = window.setInterval(() => setSegundosLlamada((s) => s + 1), 1000);
+        return () => window.clearInterval(id);
+    }, [hayVideoRemoto]);
 
     // Tictac: un efecto por segundo; al llegar a cero, el efecto de abajo cierra todo.
     useEffect(() => {
@@ -257,38 +269,77 @@ export default function TelemedicinaSala({
     const pistaLocalVideo = pistasLocales.find((item) => item.pista.kind === "video");
     const pistaRemotaVideo = pistasRemotas.find((item) => item.pista.kind === "video");
     const identidadValida = modo === "paciente" || Boolean(identidad);
+    const otraPersona = modo === "profesional" ? "al paciente" : "al profesional";
 
     return (
         <section className="w-full">
-            <div className="relative aspect-video w-full overflow-hidden rounded-[28px] border border-slate-800 bg-slate-950 shadow-xl shadow-slate-200/60">
+            {/* Escenario de la llamada: todo ocurre aquí dentro, como en FaceTime */}
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px] bg-[#1C1C1E] shadow-[0_30px_60px_-35px_rgba(0,0,0,0.55)] sm:aspect-video">
                 {pistaRemotaVideo ? (
                     <PistaMultimedia pista={pistaRemotaVideo.pista} />
                 ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center text-white">
-                        <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/5 text-2xl">
-                            {modo === "paciente" ? "✦" : "…"}
+                    <div className={`absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white ${conectado ? "pb-32 sm:pb-24" : ""}`}>
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.07),transparent_65%)]" />
+                        <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 sm:h-20 sm:w-20">
+                            {conectado ? (
+                                <span className="absolute inset-0 animate-ping rounded-full bg-white/10 motion-reduce:hidden" aria-hidden="true" />
+                            ) : null}
+                            <IconoVideo className="relative h-8 w-8 text-white/90" strokeWidth={1.5} aria-hidden="true" />
                         </span>
-                        <p className="text-base font-semibold">
-                            {conectado ? "Esperando a la otra persona" : "Tu sala de videollamada"}
+                        <p className="relative mt-5 text-[20px] font-semibold tracking-tight">
+                            {conectado ? `Esperando ${otraPersona}` : "Listo para la videollamada"}
                         </p>
-                        <p className="max-w-sm text-sm text-slate-400">
+                        <p className="relative mt-1.5 max-w-sm text-[14px] leading-relaxed text-white/60">
                             {conectado
                                 ? segundosEspera !== null
-                                    ? `Si no se conecta en los próximos ${formatearMinutos(segundosEspera)}, la llamada se cerrará automáticamente.`
-                                    : "Cuando se una, su video aparecerá aquí."
-                                : "Al iniciar, el navegador solicitará acceso a cámara y micrófono."}
+                                    ? `Si no se conecta en ${formatearMinutos(segundosEspera)}, la sala se cerrará sola.`
+                                    : "Su video aparecerá aquí apenas se una."
+                                : "El navegador te pedirá permiso para usar la cámara y el micrófono."}
                         </p>
+
+                        {!conectado ? (
+                            <button
+                                type="button"
+                                onClick={iniciarLlamada}
+                                disabled={conectando || !identidadValida}
+                                className="relative mt-7 inline-flex h-12 items-center gap-2.5 rounded-full bg-[#34C759] px-7 text-[16px] font-semibold text-white shadow-[0_10px_30px_-12px_rgba(52,199,89,0.8)] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                            >
+                                <IconoVideo className="h-5 w-5" aria-hidden="true" />
+                                {conectando ? "Conectando…" : modo === "paciente" ? "Unirme a la videollamada" : "Iniciar videollamada"}
+                            </button>
+                        ) : null}
                     </div>
                 )}
 
-                {pistaLocalVideo && (
-                    <div className="absolute bottom-4 right-4 h-[24%] min-h-24 w-[30%] min-w-32 overflow-hidden rounded-2xl border border-white/20 bg-slate-900 shadow-xl">
-                        <PistaMultimedia pista={pistaLocalVideo.pista} local />
-                        <span className="absolute bottom-2 left-2 rounded-full bg-slate-950/70 px-2.5 py-1 text-[10px] font-semibold text-white">
-                            Tú
+                {/* Estado arriba a la izquierda */}
+                <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-black/45 px-3.5 py-1.5 text-[12px] font-medium text-white backdrop-blur-xl">
+                    <span
+                        aria-hidden="true"
+                        className={`h-2 w-2 rounded-full ${pistaRemotaVideo ? "bg-[#34C759]" : conectado ? "bg-[#FF9F0A]" : "bg-white/50"}`}
+                    />
+                    {pistaRemotaVideo
+                        ? `En llamada · ${formatearMinutos(segundosLlamada)}`
+                        : segundosEspera !== null
+                            ? `Esperando · ${formatearMinutos(segundosEspera)}`
+                            : conectado ? "Conectado" : "Sala lista"}
+                </div>
+
+                {/* Tu imagen, arriba a la derecha para no chocar con los controles */}
+                {conectado ? (
+                    <div className="absolute right-4 top-4 h-[26%] min-h-24 w-[24%] min-w-[110px] overflow-hidden rounded-2xl bg-[#2C2C2E] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/15">
+                        {pistaLocalVideo && camaraActiva ? (
+                            <PistaMultimedia pista={pistaLocalVideo.pista} local />
+                        ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-white/70">
+                                <VideoOff className="h-5 w-5" aria-hidden="true" />
+                                <span className="text-[11px]">Cámara apagada</span>
+                            </div>
+                        )}
+                        <span className="absolute bottom-2 left-2 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-md">
+                            Tú{!microfonoActivo ? " · silenciado" : ""}
                         </span>
                     </div>
-                )}
+                ) : null}
 
                 <div className="sr-only" aria-hidden="true">
                     {pistasRemotas.filter((item) => item.pista.kind === "audio").map((item) => (
@@ -296,69 +347,86 @@ export default function TelemedicinaSala({
                     ))}
                 </div>
 
-                <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-slate-950/70 px-3.5 py-1.5 text-[11px] font-semibold text-white backdrop-blur-sm">
-                    {segundosEspera !== null
-                        ? `Esperando al paciente · ${formatearMinutos(segundosEspera)}`
-                        : conectado ? "En llamada" : "Sala lista"}
-                </div>
+                {/* Controles circulares flotantes sobre el video */}
+                {conectado ? (
+                    <div className="absolute inset-x-0 bottom-5 flex justify-center px-4">
+                        <div className="flex items-start gap-3 rounded-[32px] bg-black/45 px-4 py-3 backdrop-blur-2xl ring-1 ring-white/10 sm:gap-5 sm:px-6">
+                            <BotonCircular
+                                etiqueta={microfonoActivo ? "Silenciar" : "Activar"}
+                                descripcion={microfonoActivo ? "Silenciar micrófono" : "Activar micrófono"}
+                                activo={!microfonoActivo}
+                                onClick={() => alternarPista("audio", microfonoActivo, setMicrofonoActivo)}
+                            >
+                                {microfonoActivo ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
+                            </BotonCircular>
+                            <BotonCircular
+                                etiqueta={camaraActiva ? "Cámara" : "Encender"}
+                                descripcion={camaraActiva ? "Apagar cámara" : "Encender cámara"}
+                                activo={!camaraActiva}
+                                onClick={() => alternarPista("video", camaraActiva, setCamaraActiva)}
+                            >
+                                {camaraActiva ? <IconoVideo className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
+                            </BotonCircular>
+                            {modo === "profesional" && salaDatos ? (
+                                <BotonCircular
+                                    etiqueta={enlaceCopiado ? "Copiado" : "Enlace"}
+                                    descripcion="Copiar enlace para el paciente"
+                                    activo={enlaceCopiado}
+                                    onClick={copiarEnlace}
+                                >
+                                    {enlaceCopiado ? <Check className="h-6 w-6" /> : <Link2 className="h-6 w-6" />}
+                                </BotonCircular>
+                            ) : null}
+                            <BotonCircular etiqueta="Salir" descripcion="Salir de la llamada" peligro onClick={desconectar}>
+                                <PhoneOff className="h-6 w-6" />
+                            </BotonCircular>
+                        </div>
+                    </div>
+                ) : null}
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-                {conectado && (
-                    <>
-                        <button
-                            type="button"
-                            onClick={() => alternarPista("audio", microfonoActivo, setMicrofonoActivo)}
-                            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-                        >
-                            {microfonoActivo ? "Silenciar micrófono" : "Activar micrófono"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => alternarPista("video", camaraActiva, setCamaraActiva)}
-                            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-                        >
-                            {camaraActiva ? "Apagar cámara" : "Activar cámara"}
-                        </button>
-                    </>
-                )}
-                <button
-                    type="button"
-                    onClick={conectado ? desconectar : iniciarLlamada}
-                    disabled={conectando || !identidadValida}
-                    className={`rounded-xl px-6 py-3 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${conectado ? "bg-rose-600 hover:bg-rose-700" : "bg-violet-600 hover:bg-violet-700"}`}
-                >
-                    {conectando ? "Conectando…" : conectado ? "Salir de la llamada" : modo === "paciente" ? "Unirme a la videollamada" : "Iniciar videollamada"}
-                </button>
-
-                {modo === "profesional" && salaDatos && (
-                    <button
-                        type="button"
-                        onClick={copiarEnlace}
-                        className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-                    >
-                        {enlaceCopiado ? "Enlace copiado" : "Copiar enlace para el paciente"}
-                    </button>
-                )}
-            </div>
-
-            {modo === "profesional" && salaDatos && (
-                <p className="mt-3 text-center text-xs text-slate-500">
-                    El enlace permite entrar durante 4 horas. Compártelo directamente con el paciente.
+            {modo === "profesional" && salaDatos ? (
+                <p className="mt-3 text-center text-[12px] text-[#86868B]">
+                    Comparte el enlace solo con el paciente. Permite entrar durante 4 horas.
                 </p>
-            )}
+            ) : null}
 
-            {error && (
-                <p role="alert" className="mx-auto mt-4 max-w-xl rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-center text-sm text-rose-700">
+            {error ? (
+                <p role="alert" className="mx-auto mt-4 max-w-xl rounded-2xl bg-[#FF3B30]/10 px-4 py-3 text-center text-sm text-[#C4291D]">
                     {error}
                 </p>
-            )}
+            ) : null}
 
-            {avisoEspera && (
-                <p role="status" className="mx-auto mt-4 max-w-xl rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-center text-sm text-violet-700">
+            {avisoEspera ? (
+                <p role="status" className="mx-auto mt-4 max-w-xl rounded-2xl bg-[#F2F2F7] px-4 py-3 text-center text-sm text-[#3A3A3C]">
                     {avisoEspera}
                 </p>
-            )}
+            ) : null}
         </section>
+    );
+}
+
+/* Botón redondo de la barra de llamada. activo = estado "apagado" resaltado en blanco
+   (como el micrófono silenciado en FaceTime); peligro = rojo para salir. */
+function BotonCircular({ etiqueta, descripcion, activo = false, peligro = false, onClick, children }) {
+    const fondo = peligro
+        ? "bg-[#FF3B30] text-white hover:bg-[#E0352B]"
+        : activo
+            ? "bg-white text-[#1D1D1F] hover:bg-white/90"
+            : "bg-white/15 text-white hover:bg-white/25";
+    return (
+        <div className="flex w-14 flex-col items-center gap-1.5">
+            <button
+                type="button"
+                onClick={onClick}
+                aria-label={descripcion}
+                aria-pressed={peligro ? undefined : activo}
+                title={descripcion}
+                className={`flex h-14 w-14 items-center justify-center rounded-full transition-[background-color,transform] duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&_svg]:pointer-events-none ${fondo}`}
+            >
+                {children}
+            </button>
+            <span className="text-[11px] font-medium text-white/80">{etiqueta}</span>
+        </div>
     );
 }

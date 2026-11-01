@@ -189,28 +189,27 @@ export default function Telemedicina() {
                     <button
                         onClick={() => router.push(`/dashboard/FichasPacientes/${id_paciente}`)}
                         aria-label="Volver a la carpeta del paciente"
-                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#007AFF] ring-1 ring-black/[0.06] transition-colors hover:bg-[#007AFF]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                     </button>
                     <div className="min-w-0 flex-1">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6E56CF]">Sala de telemedicina</p>
-                        <h1 className="mt-0.5 truncate text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
+                        <h1 className="truncate text-[24px] font-semibold tracking-tight text-[#1D1D1F]">
                             {pacienteCargando ? "Cargando…" : nombreCompleto || "Paciente"}
                         </h1>
                         {!pacienteCargando && paciente && (
-                            <p className="mt-1 truncate text-[12px] text-slate-400">
-                                RUT <span className="font-mono font-semibold text-slate-600">{formatRut(paciente.rut) || paciente.rut || "—"}</span>
-                                <span className="mx-2 text-slate-300">·</span>
-                                ID #{id_paciente}
+                            <p className="mt-0.5 truncate text-[13px] text-[#86868B]">
+                                Telemedicina
+                                <span className="mx-1.5 text-[#C7C7CC]">·</span>
+                                RUT <span className="tabular-nums text-[#6E6E73]">{formatRut(paciente.rut) || paciente.rut || "—"}</span>
                             </p>
                         )}
                     </div>
                     {/* Avatar con las iniciales, mismo estilo que la carpeta del paciente. */}
                     {paciente && (
-                        <div aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-[#6E56CF] text-base font-bold text-white shadow-lg shadow-indigo-100">
+                        <div aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E5E5EA] text-[15px] font-semibold text-[#6E6E73]">
                             {iniciales}
                         </div>
                     )}
@@ -226,26 +225,20 @@ export default function Telemedicina() {
                 {/* ── Historial de fichas clínicas (el mismo de la carpeta del paciente) ── */}
                 <div className="mt-10">
                     <div className="mb-4 flex flex-wrap items-center gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF]">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M7 4h7l3 3v13H7V4z" />
-                            </svg>
-                        </span>
-                        <h2 className="whitespace-nowrap text-[15px] font-bold tracking-[-0.01em] text-slate-900">Historial de fichas clínicas</h2>
-                        <span aria-hidden="true" className="h-px min-w-[24px] flex-1 bg-slate-200" />
-                        <span className="flex h-6 items-center justify-center rounded-full bg-violet-50 px-2.5 text-[11px] font-bold text-[#6E56CF]">
+                        <h2 className="whitespace-nowrap text-[17px] font-semibold tracking-tight text-[#1D1D1F]">Historial de fichas clínicas</h2>
+                        <span className="flex h-6 items-center justify-center rounded-full bg-[#F2F2F7] px-2.5 text-[12px] font-medium text-[#6E6E73]">
                             {listaFichas.length} registro{listaFichas.length === 1 ? "" : "s"}
                         </span>
                         {/* El mismo botón de "nueva ficha" de la carpeta: abre el mismo
                             popup (FichaClinicaModal) para registrar la consulta de acá mismo. */}
                         <button
                             onClick={() => setModalFichaAbierto(true)}
-                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-xl bg-slate-900 px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            className="ml-auto flex h-10 items-center gap-2 whitespace-nowrap rounded-full bg-[#007AFF] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            Nueva Ficha
+                            Nueva ficha
                         </button>
                     </div>
 
@@ -256,7 +249,7 @@ export default function Telemedicina() {
                     ) : fichasOrdenadas.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center">
                             <p className="text-sm font-medium text-slate-400">Este paciente aún no tiene fichas clínicas.</p>
-                            <p className="mt-1 text-[12px] text-slate-400">Usa "Nueva Ficha" para registrar esta consulta.</p>
+                            <p className="mt-1 text-[12px] text-[#86868B]">Usa «Nueva ficha» para registrar esta consulta.</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -264,45 +257,44 @@ export default function Telemedicina() {
                                 const expandida = fichasExpandidas.has(ficha.id_ficha);
                                 const datos = parsearDatosDinamicos(ficha.datosDinamicos);
                                 return (
-                                    <div key={ficha.id_ficha} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:border-slate-300">
+                                    <div key={ficha.id_ficha} className="overflow-hidden rounded-2xl bg-white ring-1 ring-black/[0.06]">
                                         <div className="flex flex-wrap items-center gap-3 px-5 py-4">
                                             <div className="min-w-0 flex-1">
-                                                <p className="truncate text-[13px] font-bold text-slate-900">
+                                                <p className="truncate text-[15px] font-medium text-[#1D1D1F]">
                                                     {datos?._plantillaNombre || ficha.tipoAtencion || "Consulta General"}
                                                 </p>
-                                                <p className="mt-0.5 truncate text-[11px] text-slate-400">
+                                                <p className="mt-0.5 truncate text-[13px] text-[#86868B]">
                                                     {formatearFechaCivil(ficha.fechaConsulta)}
                                                     <span className="mx-1.5 text-slate-300">·</span>
                                                     Prof. {ficha.observaciones || "No informado"}
                                                 </p>
                                             </div>
-                                            <span className="inline-flex h-6 shrink-0 items-center rounded-lg border border-violet-100 bg-violet-50/80 px-2 text-[9px] font-bold text-[#6E56CF]">
-                                                N° Registro {ficha.id_ficha}
+                                            <span className="shrink-0 text-[12px] tabular-nums text-[#86868B]">
+                                                N° {ficha.id_ficha}
                                             </span>
                                             <button
                                                 onClick={() => toggleFichaExpandida(ficha.id_ficha)}
-                                                className="h-9 shrink-0 rounded-xl border border-slate-800 bg-black px-4 text-[11px] font-bold text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                                                className="h-9 shrink-0 rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40"
                                             >
                                                 {expandida ? "Ocultar" : "Ver detalle"}
                                             </button>
                                         </div>
 
                                         {expandida && (
-                                            <div className="border-t border-slate-100 bg-slate-50/30 p-5">
+                                            <div className="border-t border-black/[0.06] bg-[#FBFBFD] p-5">
                                                 {datos && datos._plantillaNombre ? (
                                                     <div className="space-y-5">
                                                         {agruparPorCategoria(datos).map((cat) => (
                                                             <div key={cat.nombre} className="space-y-3">
                                                                 <div className="flex items-center gap-3">
-                                                                    <span className="h-2 w-2 rounded-full bg-[#6E56CF] shadow-[0_0_0_4px_rgba(110,86,207,0.1)]" />
-                                                                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6E56CF]">{cat.nombre}</span>
-                                                                    <div className="h-px flex-1 bg-slate-200" />
+                                                                    <span className="text-[13px] font-semibold text-[#1D1D1F]">{cat.nombre}</span>
+                                                                    <div className="h-px flex-1 bg-black/[0.06]" />
                                                                 </div>
                                                                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                                                     {cat.campos.map((campo, idx) => (
-                                                                        <div key={idx} className="rounded-xl border border-slate-200 bg-white p-3.5">
-                                                                            <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{campo.nombre}</span>
-                                                                            <p className="mt-1.5 whitespace-pre-wrap text-[13px] font-semibold leading-relaxed text-slate-700">{campo.valor || "-"}</p>
+                                                                        <div key={idx} className="rounded-xl bg-white p-3.5 ring-1 ring-black/[0.06]">
+                                                                            <span className="text-[12px] text-[#86868B]">{campo.nombre}</span>
+                                                                            <p className="mt-1 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1D1D1F]">{campo.valor || "-"}</p>
                                                                         </div>
                                                                     ))}
                                                                 </div>

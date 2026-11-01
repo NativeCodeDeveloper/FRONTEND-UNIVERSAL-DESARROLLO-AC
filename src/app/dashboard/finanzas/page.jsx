@@ -27,8 +27,10 @@ import {
 } from "@/components/ui/accordion";
 import ProgressMetricCard from "@/components/ui/progress-metric-card";
 import {
+    AlertCircle,
     Banknote,
     CalendarCheck2,
+    CheckCircle2,
     CalendarClock,
     ChevronDown,
     FileDown,
@@ -78,19 +80,37 @@ function normalizarEstado(estado = "") {
     return base;
 }
 
+// Tarjeta de resumen. La destacada (ingreso confirmado) lleva un acento azul sutil
+// en vez del bloque negro: resalta sin pesar más que el resto de la pantalla.
 function KpiCard({ icon, label, valor, destacado }) {
     return (
-        <div className={`rounded-2xl border p-4 ${destacado ? "border-slate-900 bg-slate-900" : "border-slate-200 bg-white"}`}>
-            <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${destacado ? "bg-white/10 text-white" : "bg-slate-100 text-slate-500"}`}>
+        <div className={`h-full rounded-2xl p-4 ${destacado ? "bg-[#007AFF]/[0.06] ring-1 ring-[#007AFF]/20" : "bg-white ring-1 ring-black/[0.06]"}`}>
+            <div className={`flex h-9 w-9 items-center justify-center rounded-full ${destacado ? "bg-[#007AFF] text-white" : "bg-[#F2F2F7] text-[#6E6E73]"}`}>
                 {icon}
             </div>
-            <p className={`mt-3 text-[10px] font-bold uppercase tracking-[0.14em] ${destacado ? "text-white/60" : "text-slate-400"}`}>
-                {label}
-            </p>
-            <p className={`mt-1 text-xl font-bold tracking-tight ${destacado ? "text-white" : "text-slate-900"}`}>
+            <p className="mt-3 text-[13px] text-[#6E6E73]">{label}</p>
+            <p className={`mt-0.5 text-[22px] font-semibold tracking-tight tabular-nums ${destacado ? "text-[#0062CC]" : "text-[#1D1D1F]"}`}>
                 {valor}
             </p>
         </div>
+    );
+}
+
+// Estado "cuadra / no cuadra con el total": pastilla sobria con ícono (no solo color)
+function EstadoCuadre({ cuadra }) {
+    return cuadra ? (
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#34C759]/12 px-2.5 py-1 text-[11px] font-medium text-[#248A3D]">
+            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+            Cuadra con el total
+        </span>
+    ) : (
+        <span
+            title="La suma de este bloque no coincide con el total de reservas del período. Puede deberse a reservas sin profesional o sin previsión registrada."
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#F2F2F7] px-2.5 py-1 text-[11px] font-medium text-[#6E6E73]"
+        >
+            <AlertCircle className="h-3.5 w-3.5 text-[#FF9500]" aria-hidden="true" />
+            No cuadra con el total
+        </span>
     );
 }
 
@@ -988,27 +1008,29 @@ export default function Finanzas() {
                 {/* ── Header + selector de período ── */}
                 <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Resumen financiero</h1>
-                        <p className="mt-1 text-[13px] text-slate-500">
+                        <h1 className="text-[26px] font-semibold tracking-tight text-[#1D1D1F]">Resumen financiero</h1>
+                        <p className="mt-1 text-[14px] text-[#6E6E73]">
                             Ingresos generados a partir de tus citas y servicios.
                         </p>
                     </div>
 
                     <div className="flex flex-col gap-2" data-tour="finanzas-periodo">
-                        <div className="inline-flex w-full items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 sm:w-auto">
+                        <div role="tablist" className="inline-flex w-full items-center rounded-full bg-[#E9E9EB]/70 p-1 sm:w-auto">
                             {[
                                 { id: "actual", label: "Mes actual" },
                                 { id: "anterior", label: "Mes anterior" },
-                                { id: "personalizado", label: "Rango personalizado" },
+                                { id: "personalizado", label: "Personalizado" },
                             ].map((opt) => (
                                 <button
                                     key={opt.id}
                                     type="button"
                                     onClick={() => setPeriodo(opt.id)}
-                                    className={`flex-1 rounded-lg px-3 py-2 text-[12px] font-semibold transition-all sm:flex-none ${
+                                    role="tab"
+                                    aria-selected={periodo === opt.id}
+                                    className={`flex-1 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all sm:flex-none ${
                                         periodo === opt.id
-                                            ? "bg-slate-900 text-white"
-                                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+                                            ? "bg-white text-[#1D1D1F] shadow-[0_1px_3px_rgba(0,0,0,0.12)]"
+                                            : "text-[#6E6E73] hover:text-[#1D1D1F]"
                                     }`}
                                 >
                                     {opt.label}
@@ -1017,7 +1039,7 @@ export default function Finanzas() {
                         </div>
 
                         {periodo === "personalizado" && (
-                            <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-200 bg-white p-2 [&_[data-slot=button]]:h-9 [&_[data-slot=label]]:hidden">
+                            <div className="grid grid-cols-2 gap-2 rounded-2xl bg-white p-2 ring-1 ring-black/[0.06] [&_[data-slot=button]]:h-9 [&_[data-slot=label]]:hidden">
                                 <ShadcnDatePicker label="" value={fechaDesdeCustom} onChange={setFechaDesdeCustom} />
                                 <ShadcnDatePicker label="" value={fechaHastaCustom} onChange={setFechaHastaCustom} />
                             </div>
@@ -1028,7 +1050,7 @@ export default function Finanzas() {
                                 type="button"
                                 onClick={descargarInformeFinancieroPDF}
                                 disabled={cargando || porProfesional.length === 0}
-                                className="h-9 flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
+                                className="h-9 flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
                                 title="Descargar informe en PDF"
                             >
                                 <FileDown className="h-3.5 w-3.5" />
@@ -1038,7 +1060,7 @@ export default function Finanzas() {
                                 type="button"
                                 onClick={exportarFinanzasExcel}
                                 disabled={cargando || porProfesional.length === 0}
-                                className="h-9 flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-[11px] font-bold text-slate-600 transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
+                                className="h-9 flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#007AFF]/10 px-4 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/15 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
                                 title="Exportar a Excel"
                             >
                                 <FileSpreadsheet className="h-3.5 w-3.5" />
@@ -1049,7 +1071,7 @@ export default function Finanzas() {
                 </div>
 
                 {cargando ? (
-                    <div className="rounded-[24px] border border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
+                    <div className="rounded-[24px] bg-white ring-1 ring-black/[0.06] p-10 text-center text-sm text-slate-400">
                         Cargando datos financieros...
                     </div>
                 ) : (
@@ -1077,11 +1099,13 @@ export default function Finanzas() {
                                 label="Citas confirmadas"
                                 valor={resumen.citasConfirmadas}
                             />
-                            <KpiCard
-                                icon={<Percent className="h-4 w-4" />}
-                                label="Tasa de confirmación"
-                                valor={`${resumen.tasaConfirmacion}%`}
-                            />
+                            <div className="col-span-2 lg:col-span-1">
+                                <KpiCard
+                                    icon={<Percent className="h-4 w-4" />}
+                                    label="Tasa de confirmación"
+                                    valor={`${resumen.tasaConfirmacion}%`}
+                                />
+                            </div>
                         </section>
 
                         {/* ── Evolución ── */}
@@ -1094,26 +1118,25 @@ export default function Finanzas() {
                                 deltaLabel="vs. mes anterior"
                                 valueFormatter={formatCLP}
                                 dateFormatter={(d) => d}
+                                accent="blue"
                                 size="sm"
                             />
                         </section>
 
                         {/* ── Rendimiento por profesional ── */}
-                        <section className="mb-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white" data-tour="finanzas-rendimiento">
-                            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+                        <section className="mb-8 overflow-hidden rounded-[24px] bg-white ring-1 ring-black/[0.06]" data-tour="finanzas-rendimiento">
+                            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F2F2F7] text-[#6E6E73]">
                                         <Users className="h-4 w-4" />
                                     </div>
                                     <div>
-                                        <h2 className="text-sm font-bold text-slate-900">Rendimiento por profesional</h2>
-                                        <p className="text-[11px] text-slate-400">Toca una fila para ver el detalle por servicio.</p>
+                                        <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Rendimiento por profesional</h2>
+                                        <p className="text-[12px] text-[#86868B]">Toca una fila para ver el detalle por servicio.</p>
                                     </div>
                                 </div>
                                 {porProfesional.length > 0 && (
-                                    <span className={`text-[10px] font-semibold ${totalesCuadran ? "text-emerald-600" : "text-rose-600"}`}>
-                                        {totalesCuadran ? "✓ Cuadra con el total" : "⚠ No cuadra con el total"}
-                                    </span>
+                                    <EstadoCuadre cuadra={totalesCuadran} />
                                 )}
                             </div>
 
@@ -1126,15 +1149,19 @@ export default function Finanzas() {
                                     {porProfesional.map((p) => (
                                         <AccordionItem key={p.id_profesional} value={p.id_profesional} className="border-0">
                                             <AccordionTrigger className="px-5 py-4 no-underline hover:no-underline sm:px-6">
-                                                <div className="grid w-full grid-cols-[1fr_auto_auto_auto] items-center gap-3 pr-2 text-left sm:grid-cols-[2fr_1fr_1fr_1fr]">
-                                                    <span className="truncate text-[13px] font-semibold text-slate-800">
-                                                        {p.nombreProfesional}
+                                                <div className="grid w-full grid-cols-[1fr_auto] items-center gap-3 pr-2 text-left sm:grid-cols-[2fr_1fr_1fr_1fr]">
+                                                    <span className="min-w-0">
+                                                        <span className="block truncate text-[14px] font-medium text-[#1D1D1F]">{p.nombreProfesional}</span>
+                                                        {/* En celular las cifras van bajo el nombre, con su rótulo */}
+                                                        <span className="block text-[12px] text-[#86868B] sm:hidden">
+                                                            {p.reservadas} reservadas · {p.confirmadas} confirmadas
+                                                        </span>
                                                     </span>
-                                                    <span className="text-right text-[12px] text-slate-500 sm:text-center">
-                                                        {p.reservadas} <span className="hidden sm:inline">reservadas</span>
+                                                    <span className="hidden text-center text-[13px] text-[#6E6E73] sm:inline">
+                                                        {p.reservadas} reservadas
                                                     </span>
-                                                    <span className="text-right text-[12px] text-slate-500 sm:text-center">
-                                                        {p.confirmadas} <span className="hidden sm:inline">confirmadas</span>
+                                                    <span className="hidden text-center text-[13px] text-[#6E6E73] sm:inline">
+                                                        {p.confirmadas} confirmadas
                                                     </span>
                                                     <span className="text-right text-[13px] font-bold text-slate-900">
                                                         {formatCLP(p.ingresoConfirmado)}
@@ -1150,13 +1177,13 @@ export default function Finanzas() {
                                                             <div key={s.nombre} className="flex items-center justify-between py-2.5">
                                                                 <div>
                                                                     <p className="text-[12px] font-semibold text-slate-700">{s.nombre}</p>
-                                                                    <p className="text-[11px] text-slate-400">{s.citas} {s.citas === 1 ? "cita" : "citas"}</p>
+                                                                    <p className="text-[12px] text-[#86868B]">{s.citas} {s.citas === 1 ? "cita" : "citas"}</p>
                                                                 </div>
                                                                 <p className="text-[12px] font-bold text-slate-800">{formatCLP(s.total)}</p>
                                                             </div>
                                                         ))}
                                                         <div className="flex items-center justify-between pt-2.5">
-                                                            <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Total</p>
+                                                            <p className="text-[12px] font-medium text-[#6E6E73]">Total</p>
                                                             <p className="text-[13px] font-bold text-slate-900">{formatCLP(p.ingresoConfirmado)}</p>
                                                         </div>
                                                     </div>
@@ -1169,15 +1196,15 @@ export default function Finanzas() {
                         </section>
 
                         {/* ── Reservas por previsión ── */}
-                        <section className="mb-8 overflow-hidden rounded-[24px] border border-slate-200 bg-white" data-tour="finanzas-prevision">
-                            <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+                        <section className="mb-8 overflow-hidden rounded-[24px] bg-white ring-1 ring-black/[0.06]" data-tour="finanzas-prevision">
+                            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
                                 <div className="flex min-w-0 items-center gap-2.5">
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F2F2F7] text-[#6E6E73]">
                                         <ShieldCheck className="h-4 w-4" />
                                     </div>
                                     <div className="min-w-0">
-                                        <h2 className="text-sm font-bold text-slate-900">Reservas por previsión</h2>
-                                        <p className="text-[11px] text-slate-400">
+                                        <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Reservas por previsión</h2>
+                                        <p className="text-[12px] text-[#86868B]">
                                             {estadisticaPrevision.cargando
                                                 ? "Calculando…"
                                                 : `Sobre ${estadisticaPrevision.total} ${estadisticaPrevision.total === 1 ? "reserva" : "reservas"} del período.`}
@@ -1185,9 +1212,7 @@ export default function Finanzas() {
                                     </div>
                                 </div>
                                 {!estadisticaPrevision.cargando && !estadisticaPrevision.error && estadisticaPrevision.total > 0 && (
-                                    <span className={`shrink-0 text-[10px] font-semibold ${estadisticaPrevision.total === resumen.totalReservasPeriodo ? "text-emerald-600" : "text-rose-600"}`}>
-                                        {estadisticaPrevision.total === resumen.totalReservasPeriodo ? "✓ Cuadra con el total" : "⚠ No cuadra con el total"}
-                                    </span>
+                                    <EstadoCuadre cuadra={estadisticaPrevision.total === resumen.totalReservasPeriodo} />
                                 )}
                             </div>
 
@@ -1216,9 +1241,9 @@ export default function Finanzas() {
                                                         <span className="font-semibold text-slate-700">{formatearPorcentaje(d.porcentaje)}</span>
                                                     </span>
                                                 </div>
-                                                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                                                <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#F2F2F7]">
                                                     <div
-                                                        className={`h-full rounded-full ${sinIndicar ? "bg-slate-300" : "bg-slate-900"}`}
+                                                        className={`h-full rounded-full ${sinIndicar ? "bg-[#C7C7CC]" : "bg-[#007AFF]"}`}
                                                         style={{ width: `${Math.min(100, Math.max(0, Number(d.porcentaje) || 0))}%` }}
                                                     />
                                                 </div>
@@ -1230,15 +1255,15 @@ export default function Finanzas() {
                         </section>
 
                         {/* ── Liquidación del período ── */}
-                        <details className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white">
+                        <details className="group overflow-hidden rounded-[24px] bg-white ring-1 ring-black/[0.06]">
                             <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 sm:px-6">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F2F2F7] text-[#6E6E73]">
                                         <Percent className="h-4 w-4" />
                                     </div>
                                     <div>
-                                        <h2 className="text-sm font-bold text-slate-900">Liquidación del período</h2>
-                                        <p className="text-[11px] text-slate-400">Reparto real entre clínica y profesional, según el % configurado para cada uno.</p>
+                                        <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Liquidación del período</h2>
+                                        <p className="text-[12px] text-[#86868B]">Reparto real entre clínica y profesional, según el % configurado para cada uno.</p>
                                     </div>
                                 </div>
                                 <ChevronDown className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" />
@@ -1253,11 +1278,11 @@ export default function Finanzas() {
                                             para no mezclar dinero repartido con dinero que aún no se ha asignado. */}
                                         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                                             <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3.5">
-                                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total para la clínica (período)</p>
+                                                <p className="text-[12px] font-medium text-[#6E6E73]">Total para la clínica (período)</p>
                                                 <p className="mt-1 text-[20px] font-bold text-slate-900">{formatCLP(liquidacionTotales.totalClinica)}</p>
                                             </div>
                                             <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3.5">
-                                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total para profesionales (período)</p>
+                                                <p className="text-[12px] font-medium text-[#6E6E73]">Total para profesionales (período)</p>
                                                 <p className="mt-1 text-[20px] font-bold text-slate-900">{formatCLP(liquidacionTotales.totalProfesionales)}</p>
                                             </div>
                                         </div>

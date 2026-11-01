@@ -9,7 +9,7 @@ export const ACCENTS = {
   emerald: { stroke: "#10B981", text: "#059669" },
   rose: { stroke: "#F43F5E", text: "#E11D48" },
   neutral: { stroke: "#64748B", text: "#475569" },
-  blue: { stroke: "#3B82F6", text: "#2563EB" },
+  blue: { stroke: "#007AFF", text: "#0062CC" }, // azul del sistema (dashboard)
   amber: { stroke: "#F59E0B", text: "#D97706" },
   violet: { stroke: "#8B5CF6", text: "#7C3AED" },
 };
