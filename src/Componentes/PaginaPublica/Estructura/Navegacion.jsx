@@ -61,9 +61,9 @@ export default function Navegacion({ nombre, logo }) {
                 <img
                   src={urlLogo}
                   alt=""
-                  width={40}
-                  height={40}
-                  className="size-9 shrink-0 rounded-full bg-white object-cover ring-1 ring-black/[0.06] md:size-10"
+                  width={52}
+                  height={52}
+                  className="size-11 shrink-0 rounded-full bg-white object-cover ring-1 ring-black/[0.06] md:size-[52px]"
                 />
               ) : null}
               <span className={`truncate font-semibold tracking-[-0.022em] text-tinta transition-colors group-hover:text-acento md:text-[19px] ${urlLogo ? "text-[16px]" : "text-[17px]"}`}>
