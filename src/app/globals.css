@@ -795,8 +795,10 @@ body.driver-active [data-tour-modal] {
  * ───────────────────────────────────────────────────────────────────────────── */
 @theme inline {
   --color-acento: var(--pp-acento);
+  --color-acento-claro: var(--pp-acento-claro);
   --color-acento-hondo: var(--pp-acento-hondo);
   --color-acento-suave: var(--pp-acento-suave);
+  --color-lima: var(--pp-lima);
   --color-tinta: var(--pp-tinta);
   --color-tinta-2: var(--pp-tinta-2);
   --color-tinta-3: var(--pp-tinta-3);

@@ -24,7 +24,7 @@ export default async function AgendaProfesional({ params }) {
   if (!profesional) notFound();
 
   return (
-    <section className="bg-niebla pb-32 pt-20 md:pt-24 lg:pb-28">
+    <section className="bg-niebla pb-32 pt-20 md:pt-36 lg:pb-28">
       <div className="mx-auto max-w-[1120px] px-5 md:px-6">
         <nav aria-label="Ruta" className="mb-6 text-[13px] text-tinta-2">
           <Link href="/agendaProfesionales" className="hover:text-tinta hover:underline">

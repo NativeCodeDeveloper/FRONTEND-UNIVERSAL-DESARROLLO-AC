@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import ToasterClient from "@/Componentes/ToasterClient";
 import toast from 'react-hot-toast';
 import ProfesionalModal from "@/Componentes/ProfesionalModal";
+import { sugerenciasCategoria } from "@/lib/categoriasAtencion";
 import TutorialGuiadoProfesionales from "@/Componentes/TutorialGuiadoProfesionales";
 import { formatRut } from "@/lib/designTokens";
 import { useTour } from "@/ContextosGlobales/TourContext";
@@ -358,6 +359,11 @@ export default function Profesionales() {
                                             <p className="mt-0.5 line-clamp-2 text-[13px] font-medium leading-snug text-[#007AFF]">
                                                 {profesional.descripcionProfesional || "Sin especialidad registrada"}
                                             </p>
+                                            {profesional.categoriaProfesional ? (
+                                                <p className="mt-1 truncate text-[12px] text-[#6E6E73]">
+                                                    {profesional.categoriaProfesional}
+                                                </p>
+                                            ) : null}
                                         </div>
                                     </div>
 
@@ -460,6 +466,7 @@ export default function Profesionales() {
                 seccionInicial={seccionInicial}
                 onCerrar={() => { setModalAbierto(false); setEnEdicion(null); setSeccionInicial(null); }}
                 onGuardado={seleccionarTodosProfesionales}
+                sugerenciasCategoria={sugerenciasCategoria(listaProfesionales)}
             />
         </div>
     );

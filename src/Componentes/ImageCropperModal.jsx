@@ -14,6 +14,12 @@ export default function ImageCropperModal({
     fileName = "imagen.jpg",
     onConfirm,
     onCancel,
+    // Opcionales (el logo los usa): recorte en círculo y PNG para conservar la
+    // transparencia. Por defecto todo queda como antes: rectángulo y JPG.
+    cropShape = "rect",
+    mimeType = "image/jpeg",
+    maxDimension = 1600,
+    description = "Arrastra y haz zoom para elegir el encuadre.",
 }) {
     const [mounted, setMounted] = useState(false);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -51,7 +57,7 @@ export default function ImageCropperModal({
 
         try {
             setIsSaving(true);
-            const croppedFile = await recortarImagenACroppedFile(imageSrc, croppedAreaPixels, { fileName });
+            const croppedFile = await recortarImagenACroppedFile(imageSrc, croppedAreaPixels, { fileName, mimeType, maxDimension });
             onConfirm?.(croppedFile);
         } catch (error) {
             toast.error(error?.message || "No fue posible recortar la imagen.");
@@ -70,7 +76,7 @@ export default function ImageCropperModal({
                 <div className="w-full max-w-lg rounded-[28px] border border-slate-200 bg-white shadow-2xl overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/30">
                         <h2 className="text-sm font-bold text-slate-800">{title}</h2>
-                        <p className="mt-1 text-xs text-slate-500">Arrastra y haz zoom para elegir el encuadre.</p>
+                        <p className="mt-1 text-xs text-slate-500">{description}</p>
                     </div>
 
                     <div className="relative h-[380px] w-full bg-slate-900">
@@ -79,6 +85,8 @@ export default function ImageCropperModal({
                             crop={crop}
                             zoom={zoom}
                             aspect={aspectRatio}
+                            cropShape={cropShape}
+                            showGrid={cropShape !== "round"}
                             onCropChange={setCrop}
                             onZoomChange={setZoom}
                             onCropComplete={(_, areaPixels) => setCroppedAreaPixels(areaPixels)}

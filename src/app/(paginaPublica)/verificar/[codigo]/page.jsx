@@ -53,7 +53,7 @@ export default async function VerificarDocumento({ params }) {
   const esConsentimiento = resultado.tipo === "consentimiento";
 
   return (
-    <section className="pb-24 pt-28 md:pb-32 md:pt-36">
+    <section className="pb-24 pt-28 md:pb-32 md:pt-40">
       <div className="mx-auto max-w-[640px] px-5 md:px-6">
         <header className="mb-8">
           <p className="text-[14px] font-medium text-tinta-2">{empresa.empresaNombre || "Centro de salud"}</p>

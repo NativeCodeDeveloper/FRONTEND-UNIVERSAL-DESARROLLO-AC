@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays as Calendario } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ImagenTarjeta from "@/Componentes/PaginaPublica/Comunes/ImagenTarjeta";
 import { PROPORCION, imagenHD } from "@/lib/paginaPublica/imagenes";
@@ -51,7 +50,7 @@ export default function Portada({ slides, datosEmpresa }) {
 
   return (
     <div
-      className={`mx-auto grid w-full overflow-hidden rounded-[28px] bg-[#007f89] text-white shadow-[0_20px_70px_-45px_#00687366] md:rounded-[40px] ${conImagen ? "lg:grid-cols-2" : ""}`}
+      className={`mx-auto grid w-full overflow-hidden rounded-[28px] bg-acento text-white shadow-[0_24px_60px_-40px_rgb(0_102_110/0.55)] md:rounded-[36px] ${conImagen ? "lg:grid-cols-2" : ""}`}
       onMouseEnter={() => setPausado(true)}
       onMouseLeave={() => setPausado(false)}
       onTouchStart={(e) => (toque.current = e.touches[0]?.clientX ?? null)}
@@ -62,13 +61,12 @@ export default function Portada({ slides, datosEmpresa }) {
         toque.current = null;
       }}
     >
-      <div className="order-2 flex min-w-0 flex-col justify-center bg-linear-to-br from-[#008b94] to-[#00747e] px-6 py-8 sm:px-10 sm:py-10 lg:order-1 lg:px-12 lg:py-12 xl:px-16">
+      <div className="order-2 flex min-w-0 flex-col justify-center bg-linear-to-br from-acento-claro to-acento px-6 py-9 sm:px-10 sm:py-11 lg:order-1 lg:px-12 lg:py-14 xl:px-16">
         {/*
          * Todas las diapositivas en la misma celda: el bloque toma el alto de la más larga y no salta.
          * La saliente se desvanece rápido; la entrante aparece después, subiendo apenas.
          * La primera es el h1 (y el LCP): visible desde el primer render, sin animación de entrada.
          */}
-        <div aria-hidden="true" className="mb-6 h-1 w-20 rounded-full bg-[#c6df76]" />
         <div className="grid">
           {activos.map((s, i) => {
             const visible = i === indice;
@@ -83,10 +81,10 @@ export default function Portada({ slides, datosEmpresa }) {
                     : "pointer-events-none -translate-y-1 opacity-0 blur-[2px] duration-500"
                 }`}
               >
-                <Titulo className="text-[clamp(2rem,3.5vw,3.75rem)] leading-[1.08] font-semibold tracking-[-0.035em] text-balance text-white [overflow-wrap:anywhere]">{s.tituloPortadaCarrusel || datosEmpresa.empresaNombre}</Titulo>
+                <Titulo className="titular-portada text-white [overflow-wrap:anywhere]">{s.tituloPortadaCarrusel || datosEmpresa.empresaNombre}</Titulo>
                 {s.descripcionPublicacionesPortada && (
                   <p
-                    className={`mt-4 whitespace-pre-line text-[18px] leading-relaxed text-pretty text-white/95 [overflow-wrap:anywhere] transition-[opacity,translate] ease-[cubic-bezier(0.28,0.11,0.32,1)] sm:text-[20px] lg:text-[22px] motion-reduce:transition-none ${
+                    className={`mt-4 max-w-[46ch] whitespace-pre-line text-[17px] leading-[1.55] text-pretty text-white/85 [overflow-wrap:anywhere] transition-[opacity,translate] ease-[cubic-bezier(0.28,0.11,0.32,1)] motion-reduce:transition-none ${
                       visible
                         ? "translate-y-0 opacity-100 delay-[420ms] duration-[900ms]"
                         : "translate-y-1 opacity-0 duration-500"
@@ -99,17 +97,16 @@ export default function Portada({ slides, datosEmpresa }) {
             );
           })}
         </div>
-        <div className="mt-7 flex flex-wrap items-center gap-3 lg:mt-8">
-          <Link href="/agendaProfesionales" className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-center text-[16px] font-semibold whitespace-nowrap text-[#007f89] transition-colors hover:bg-[#e6f6f6] focus-visible:outline-white sm:flex-none lg:min-h-14 lg:px-7 lg:text-[17px]">
-            <Calendario aria-hidden="true" className="size-5 shrink-0" />
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link href="/agendaProfesionales" className="boton boton-claro whitespace-nowrap !font-semibold focus-visible:!outline-white">
             Agendar hora
           </Link>
-          <a href="#nosotros" className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border border-white/85 px-6 py-3 text-center text-[16px] font-medium whitespace-nowrap text-white transition-colors hover:bg-white/10 focus-visible:outline-white sm:flex-none lg:min-h-14 lg:px-7 lg:text-[17px]">
-            Conocer el centro
+          <a href="#sobre-nosotros" className="boton boton-contorno-claro whitespace-nowrap focus-visible:!outline-white">
+            Conócenos
           </a>
         </div>
         {redes.length > 0 && (
-          <div className="mt-6 flex items-center gap-3 border-t border-white/30 pt-5">
+          <div className="mt-8 flex items-center gap-2">
             {redes.map(({ href, etiqueta, Icono }) => (
               <a
                 key={etiqueta}
@@ -117,9 +114,9 @@ export default function Portada({ slides, datosEmpresa }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={etiqueta}
-                className="flex size-11 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/25 focus-visible:outline-white sm:size-12"
+                className="flex size-10 items-center justify-center rounded-full bg-white/12 text-white/90 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-white"
               >
-                <Icono className="size-5" />
+                <Icono className="h-[18px] w-[18px]" />
               </a>
             ))}
           </div>
@@ -127,7 +124,7 @@ export default function Portada({ slides, datosEmpresa }) {
       </div>
 
       {conImagen && (
-      <div className="relative order-1 min-w-0 bg-[#dbe9eb] lg:order-2">
+      <div className="relative order-1 min-w-0 bg-acento-suave lg:order-2">
         <div className={`relative ${PROPORCION.portada} overflow-hidden lg:aspect-auto lg:h-full lg:min-h-[430px]`}>
           {activos.map((s, i) => {
             const src = imagenHD(s.imagenPortada);
@@ -157,7 +154,7 @@ export default function Portada({ slides, datosEmpresa }) {
                 aria-selected={i === indice}
                 aria-label={`Portada ${i + 1} de ${total}`}
                 onClick={() => ir(() => i)}
-                className={`h-3 rounded-full border border-[#007f89]/25 shadow-sm transition-all duration-500 ${i === indice ? "w-8 bg-[#007f89]" : "w-3 bg-white/90 hover:bg-white"}`}
+                className={`h-2 rounded-full shadow-sm transition-all duration-500 ${i === indice ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/85"}`}
               />
             ))}
           </div>

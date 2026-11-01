@@ -16,6 +16,7 @@ import { TIPOS_DOCUMENTO, limpiarPasaporte, validarDocumento } from "@/lib/rut";
 import { registrarAceptacion, seleccionarVigentes } from "@/lib/consentimientos/apiConsentimientos";
 import { esObligatorio } from "@/lib/consentimientos/textosLegales";
 import { PREVISIONES } from "@/lib/previsiones";
+import { celularParaBackend, errorCelular, formatearCelular } from "@/lib/paginaPublica/celular";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LOTE_VALIDACION = 6;
@@ -41,7 +42,7 @@ const errores = {
   apellido: (v) => (v.trim().length < 2 ? "Ingresa tu apellido" : ""),
   rut: (v) => (!rutValido(v) ? "Revisa tu RUT" : ""),
   correo: (v) => (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "Revisa tu correo" : ""),
-  telefono: (v) => (v.replace(/\D/g, "").length !== 8 ? "Ingresa los 8 dígitos de tu celular" : ""),
+  telefono: errorCelular,
 };
 
 const postJson = (ruta, cuerpo) =>
@@ -254,11 +255,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
 
   function cambiar(campo, valor) {
     if (campo === "rut") valor = tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? limpiarPasaporte(valor) : formatearRut(valor);
-    if (campo === "telefono")
-      valor = valor
-        .replace(/\D/g, "")
-        .slice(0, 8)
-        .replace(/^(\d{4})(\d)/, "$1 $2");
+    if (campo === "telefono") valor = formatearCelular(valor);
     setDatos((d) => ({ ...d, [campo]: valor }));
   }
 
@@ -278,7 +275,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
       apellidoPaciente: datos.apellido.trim(),
       rut: tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? limpiarPasaporte(datos.rut) : limpiarRut(datos.rut),
       tipo_documento: tipoDocumento,
-      telefono: `+569${datos.telefono.replace(/\D/g, "")}`,
+      telefono: celularParaBackend(datos.telefono),
       email: datos.correo.trim(),
       fechaInicio: fecha,
       horaInicio: bloqueVigente.inicio,
@@ -611,14 +608,15 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
               <span className="mb-1.5 block text-[13px] font-medium text-tinta-2">Celular</span>
               <div className="flex">
                 <span className="flex items-center shrink-0 whitespace-nowrap rounded-l-[12px] bg-niebla px-4 text-[17px] text-tinta-2 shadow-[inset_0_0_0_1px_var(--pp-linea)]">
-                  +56 9
+                  +56
                 </span>
                 <input
                   type="tel"
                   autoComplete="tel-local"
                   inputMode="numeric"
+                  maxLength={11}
                   value={datos.telefono}
-                  placeholder="1234 5678"
+                  placeholder="9 1234 5678"
                   onChange={(e) => cambiar("telefono", e.target.value)}
                   onBlur={() => setTocados((t) => ({ ...t, telefono: true }))}
                   aria-invalid={!!(tocados.telefono && erroresActuales.telefono)}

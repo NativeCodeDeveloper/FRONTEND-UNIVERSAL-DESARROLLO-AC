@@ -19,6 +19,7 @@ import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
 import { ESTADOS_FIRMA, ESTADOS_REGISTRO_SIS } from "@/lib/firma/constantes";
 import { MODO_MOCK } from "@/lib/firma/apiFirma";
 import { rutValido } from "@/lib/rut";
+import { CAMPO_CATEGORIA, CATEGORIA_MAX_LARGO, CATEGORIAS_SUGERIDAS, normalizarCategoria } from "@/lib/categoriasAtencion";
 
 // El campo es un ROTULO de profesion/especialidad ("Cirujano dentista",
 // "Ortodoncista"), no una biografia. Con los 500 caracteres anteriores la gente
@@ -32,6 +33,7 @@ const ESPECIALIDAD_MAX_LARGO = 65;
 const ESTADO_INICIAL = {
   nombreProfesional: "",
   descripcionProfesional: "",
+  [CAMPO_CATEGORIA]: "",
   correoContacto: "",
   numeroTelefono: "",
   rutProfesional: "",
@@ -107,7 +109,9 @@ function Campo({ etiqueta, error, htmlFor, ancho = "", opcional = false, childre
   );
 }
 
-export default function ProfesionalModal({ abierto, profesional, onCerrar, onGuardado, seccionInicial = null }) {
+// `sugerenciasCategoria`: categorías que ya usa el centro (más las comunes), para
+// que todos escriban "Odontología" igual. Ver src/lib/categoriasAtencion.js.
+export default function ProfesionalModal({ abierto, profesional, onCerrar, onGuardado, seccionInicial = null, sugerenciasCategoria = CATEGORIAS_SUGERIDAS }) {
   const API = process.env.NEXT_PUBLIC_API_URL;
   const [datos, setDatos] = useState(ESTADO_INICIAL);
   const [errores, setErrores] = useState({});
@@ -203,6 +207,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
         ? {
             nombreProfesional: profesional.nombreProfesional ?? "",
             descripcionProfesional: profesional.descripcionProfesional ?? "",
+            [CAMPO_CATEGORIA]: profesional[CAMPO_CATEGORIA] ?? "",
             correoContacto: profesional.correoContacto ?? "",
             numeroTelefono: profesional.numeroTelefono ?? "",
             rutProfesional: profesional.rutProfesional ?? "",
@@ -290,6 +295,9 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
     const cuerpo = {
       nombreProfesional: datos.nombreProfesional.trim(),
       descripcionProfesional: datos.descripcionProfesional.trim(),
+      // Agrupa a los profesionales en la reserva en línea. Hasta que el backend
+      // tenga la columna, la ignora sin error (docs/firma/04, Fase B.5).
+      [CAMPO_CATEGORIA]: normalizarCategoria(datos[CAMPO_CATEGORIA]),
       correoContacto: datos.correoContacto.trim(),
       numeroTelefono: datos.numeroTelefono,
       rutProfesional: datos.rutProfesional,
@@ -478,6 +486,33 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
                   datos.descripcionProfesional.length > ESPECIALIDAD_MAX_LARGO ? "font-semibold text-red-600" : "text-slate-400"
                 }`}>
                   {datos.descripcionProfesional.length}/{ESPECIALIDAD_MAX_LARGO}
+                </p>
+              </Campo>
+            </div>
+
+            <div data-campo={CAMPO_CATEGORIA} className="sm:col-span-2">
+              <Campo etiqueta="Categoría de atención" opcional htmlFor="pr-categoria">
+                {/* Texto libre con sugerencias: cada centro tiene las suyas. La
+                    reserva en línea agrupa por categoría ignorando tildes y
+                    mayúsculas, pero las sugerencias evitan duplicados visibles. */}
+                <ShadcnInput
+                  id="pr-categoria"
+                  list="pr-categorias-sugeridas"
+                  value={datos[CAMPO_CATEGORIA]}
+                  onChange={(e) => actualizar(CAMPO_CATEGORIA, e.target.value.replace(/\s*[\r\n]+\s*/g, " "))}
+                  onBlur={(e) => actualizar(CAMPO_CATEGORIA, normalizarCategoria(e.target.value))}
+                  placeholder="Ej: Odontología, Psicología, Kinesiología"
+                  maxLength={CATEGORIA_MAX_LARGO}
+                  autoComplete="off"
+                  className={campoBase}
+                />
+                <datalist id="pr-categorias-sugeridas">
+                  {sugerenciasCategoria.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+                <p className="text-[12px] leading-relaxed text-slate-500">
+                  En la reserva en línea el paciente elige primero la categoría y ve a los profesionales que la atienden.
                 </p>
               </Campo>
             </div>

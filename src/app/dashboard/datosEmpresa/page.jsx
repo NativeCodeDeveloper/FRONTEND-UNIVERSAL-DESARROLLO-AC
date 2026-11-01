@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import ToasterClient from "@/Componentes/ToasterClient";
 import { ButtonDinamic } from "@/Componentes/ButtonDinamic";
+import LogoEmpresa from "@/Componentes/LogoEmpresa";
 
 /*
  * DATOS DE LA EMPRESA — CRUD
@@ -34,6 +35,8 @@ export default function DatosEmpresa() {
     // Datos generales
     const [id_empresa, setId_empresa] = useState(1);
     const [empresaNombre, setEmpresaNombre] = useState("");
+    // Se guarda aparte (POST /datosempresa/actualizarLogo), no con "Guardar todos los datos"
+    const [logoEmpresa, setLogoEmpresa] = useState("");
 
     // Contacto
     const [contactoTelefono, setContactoTelefono] = useState("");
@@ -63,6 +66,7 @@ export default function DatosEmpresa() {
 
         setId_empresa(d.id_empresa || 1);
         setEmpresaNombre(d.empresaNombre || "");
+        setLogoEmpresa(d.logoEmpresa || "");
         setContactoTelefono(d.contactoTelefono || "");
         setContactoWhatsapp(d.contactoWhatsapp || "");
         setContactoEmail(d.contactoEmail || "");
@@ -107,7 +111,7 @@ export default function DatosEmpresa() {
     async function guardarDatosEmpresa() {
         // Solo los campos esenciales son obligatorios — las redes sociales son opcionales
         if (!empresaNombre || !contactoTelefono || !contactoEmail || !id_empresa) {
-            toast.error("Completa los campos obligatorios: nombre de empresa, teléfono y email.");
+            toast.error("Completa los campos obligatorios: nombre de tu centro o clínica, teléfono y email.");
             return;
         }
 
@@ -153,7 +157,7 @@ export default function DatosEmpresa() {
         }
     }
 
-    const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100";
+    const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-[#007AFF] focus:ring-4 focus:ring-[#007AFF]/15";
     const textareaClass = `${inputClass} resize-none`;
     const labelClass = "text-sm font-medium text-slate-700";
 
@@ -178,11 +182,11 @@ export default function DatosEmpresa() {
                     </div>
                 </div>
 
-                <details className="rounded-[24px] border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm">
-                    <summary className="cursor-pointer select-none text-sm font-semibold text-indigo-950">
+                <details className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
+                    <summary className="cursor-pointer select-none text-sm font-semibold text-[#1D1D1F]">
                         Dónde se usa esta información
                     </summary>
-                    <div className="mt-4 space-y-3 text-sm leading-relaxed text-slate-700">
+                    <div className="mt-4 space-y-3 text-sm leading-relaxed text-[#6E6E73]">
                         <p>
                             Los datos que ingreses acá se muestran en la web pública de agendamiento y también se usan en flujos internos de la plataforma, como correos, mensajes de WhatsApp, recordatorios y redirecciones del sitio.
                         </p>
@@ -195,19 +199,19 @@ export default function DatosEmpresa() {
                         <p>
                             El sitio web / otra URL se usa como URL pública del cliente para redirecciones y enlaces generales de la plataforma.
                         </p>
-                        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
-                            <p className="font-semibold">Importante para el mapa</p>
+                        <div className="rounded-2xl bg-[#F5F5F7] p-4 text-[#3A3A3C]">
+                            <p className="font-semibold text-[#1D1D1F]">Importante para el mapa</p>
                             <p className="mt-2">
                                 Para que el mapa aparezca dentro del footer (la parte final de la página web), no pegues el link normal de la ubicación. El link normal solo abre Google Maps en otra pestaña. Acá debes pegar el código para insertar el mapa, llamado iframe, o al menos el enlace que viene dentro de ese iframe.
                             </p>
                             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                                <div className="rounded-xl border border-red-200 bg-white p-3">
-                                    <p className="font-semibold text-red-700">No usar</p>
-                                    <p className="mt-1 text-xs text-slate-600">Un link como google.com/maps/place/... sirve para abrir la ubicación, pero no muestra el mapa insertado.</p>
+                                <div className="rounded-xl bg-white p-3 ring-1 ring-black/[0.05]">
+                                    <p className="font-semibold text-[#1D1D1F]">No sirve</p>
+                                    <p className="mt-1 text-xs text-[#6E6E73]">Un link como google.com/maps/place/... sirve para abrir la ubicación, pero no muestra el mapa insertado.</p>
                                 </div>
-                                <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                                    <p className="font-semibold text-emerald-700">Usar</p>
-                                    <p className="mt-1 text-xs text-slate-600">El código que empieza con &lt;iframe ...&gt; o el enlace que empieza con https://www.google.com/maps/embed?pb=...</p>
+                                <div className="rounded-xl bg-white p-3 ring-1 ring-black/[0.05]">
+                                    <p className="font-semibold text-[#007AFF]">Sí sirve</p>
+                                    <p className="mt-1 text-xs text-[#6E6E73]">El código que empieza con &lt;iframe ...&gt; o el enlace que empieza con https://www.google.com/maps/embed?pb=...</p>
                                 </div>
                             </div>
                             <p className="mt-3">
@@ -225,12 +229,18 @@ export default function DatosEmpresa() {
                             <p className="text-sm text-slate-500">
                                 {/* CONEXIÓN: empresaNombre se usa en Footer.jsx (copyright), FloatingWhatsApp.jsx,
                                     WhatsAppFloatButton.jsx (aria-label) y layout.jsx (metadata del sitio) */}
-                                Nombre de la empresa tal como aparece en la web y en los metadatos del sitio.
+                                Logo y nombre tal como aparecen en tu página web, en los documentos y en los correos a pacientes.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 gap-5">
-                            <div className="space-y-1.5">
-                                <label className={labelClass}>Nombre de la empresa</label>
+                            <LogoEmpresa
+                                idEmpresa={id_empresa}
+                                logoId={logoEmpresa}
+                                nombre={empresaNombre}
+                                onCambio={setLogoEmpresa}
+                            />
+                            <div className="space-y-1.5 border-t border-slate-100 pt-5">
+                                <label className={labelClass}>Nombre de tu centro o clínica</label>
                                 <input
                                     value={empresaNombre}
                                     onChange={(e) => setEmpresaNombre(e.target.value)}

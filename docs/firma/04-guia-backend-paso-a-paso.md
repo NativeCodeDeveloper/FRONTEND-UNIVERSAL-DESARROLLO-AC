@@ -20,6 +20,7 @@ y se puede activar sin esperar a las siguientes.
 | Fase | Qué queda funcionando | Dificultad | Se activa en el front con |
 |---|---|---|---|
 | **A** | **Previsión y comentario de la reserva + estadística por previsión en Finanzas** (requerimiento 28-10-2026, ya implementado en la rama `feat/prevision-reserva`) | Muy fácil | (automático) |
+| **B** | **Página pública: pulir el aporte de Nicolás (navbar, portada, datos) y categorías de atención en la reserva** (01-11-2026; front listo, falta 1 columna en el backend) | Fácil | (automático) |
 | 0 | Rama, respaldo, dependencias y variables | Muy fácil | — |
 | 1 | Tablas nuevas y textos legales en la base | Fácil | — |
 | 2 | **Política de privacidad en la reserva pública** (una casilla), con constancia en PDF | Fácil | `NEXT_PUBLIC_CONSENTIMIENTOS_HABILITADOS=1` |
@@ -147,6 +148,184 @@ Pendientes para el próximo sprint:
 | 3 | Capturas del dashboard (Finanzas "Reservas por previsión" y Panel de Reservaciones) a 390 px y escritorio | Front | Media |
 | 4 | `validar` responde 404 cuando la hora está ocupada (ruido en consola); evaluar 200 con `{ message: false }` coordinando con el front | Backend + `Reserva.jsx` | Baja |
 | 5 | pm2 del servidor con la versión en memoria desactualizada (`pm2 update`) | Servidor `desarrollo` | Baja |
+
+---
+
+## Fase B · Página pública: pulir el aporte de Nicolás y categorías de atención
+
+Revisión del 01-11-2026 sobre `desarrollo.agendaclinicas.cl` (`main` 6d0af51, los dos
+commits de Nicolás del 29-10: `9a423af` y `6d0af51`). **Nada se rompió**: se conserva
+el color teal y la estructura que armó, y se le pone el acabado premium de la
+plataforma. Ordenado de lo más fácil a lo más difícil; cada paso se publica solo.
+
+**Reglas de toda la fase**
+
+- Antes de tocar un componente, revisarlo en el link de desarrollo y comparar después.
+- Conservar la paleta teal de Nicolás (`#007f89`, `#00858f`, `#c6df86`), pero llevada a
+  tokens de `paginaPublica.css`: nada de colores sueltos `bg-[#…]` en los componentes.
+- Títulos y párrafos **sutiles**: las clases de la plataforma (`titular-portada`,
+  `titular-2`, `text-tinta-2`) en vez de tamaños inline grandes.
+- **Sin íconos decorativos** (lucide fuera de navbar, portada y datos); sin eyebrows
+  ni líneas de adorno.
+- Todo lo que muestra el centro sale del **backend** (`datosempresa`, portadas,
+  profesionales). Nada hardcodeado.
+- Responsive con captura real a **390 px, 768 px y escritorio**.
+
+### B.1 Navbar (muy fácil) ✅
+
+Se conserva el diseño de Nicolás (lo pidió así el 01-11), afinado:
+
+- Izquierda: **nombre del centro desde `datosEmpresa.empresaNombre`** (el layout lo pasa
+  por prop). Se borró el logo fijo `public/fonts/asdasd.png`.
+- Cápsula teal con "Buscar profesional o especialidad" (lleva a `/agendaProfesionales`)
+  y "Agendar hora" en verde lima. Solo queda la lupa, que indica búsqueda; el ícono de
+  calendario salió. Colores como tokens (`acento`, `lima`), sin hex sueltos.
+- Segunda fila con el menú, que **se pliega al hacer scroll** (queda una sola fila de
+  72 px y no tapa contenido).
+- Celular: nombre + "Agendar hora" + menú.
+- Espacio superior ajustado en inicio, profesionales, reserva y verificación.
+
+### B.2 Portada / hero (fácil)
+
+- Se mantiene el bloque teal con la imagen a la derecha (el color quedó bien integrado).
+- **Quitar la línea verde** de arriba del título.
+- Título con `titular-portada` y párrafo en tamaño de lectura (17 px), no 22 px.
+- Botones sin ícono, con las clases `boton` de la plataforma adaptadas al fondo teal.
+  El secundario dice **"Conócenos"** (sirve para profesional independiente, centro o clínica).
+- Texto, imagen y título siguen saliendo de `carruselPortada` / `datosempresa`.
+- Revisar de paso que el nombre de la instancia sea coherente: en desarrollo la
+  pestaña dice "Clinica Salud Mujer" y la portada "Centro Clínico Costanera" (es dato,
+  no código, pero se ve en la revisión).
+
+### B.3 Datos bajo la portada (fácil)
+
+Hoy correo y dirección van en una sola píldora, pegados y separados por un punto.
+Queda: **celdas separadas** (correo, teléfono, dirección; cada una solo si existe),
+con su rótulo pequeño (`Correo`, `Dirección`) y el valor debajo, en una grilla que en
+móvil pasa a una columna. Sin íconos. Cada celda sigue siendo enlace (mailto, mapa).
+
+### B.4 Reserva: quitar sucursales (fácil)
+
+El paso **Sucursal** de `SelectorAtencion.jsx` se elimina (las 3 sucursales eran de
+relleno). Flujo nuevo en `/agendaProfesionales`:
+
+**Tipo de atención → Profesional → Hora** (la hora sigue en `/agendaEspecificaProfersional/[id]`).
+
+Mientras no exista B.5, el paso de tipo de atención no se muestra y se ve la grilla
+de profesionales directo, como antes. Nunca se muestran las 9 categorías de relleno.
+
+### B.5 Categorías de atención (fácil) — backend · **lo que falta para conectar**
+
+Decisión del 01-11-2026: la categoría se escribe **al crear o editar al profesional**
+(Odontología, Psicología… las que el centro quiera). Es **un solo campo en
+`profesionales`**: la reserva pública arma la lista de categorías con los profesionales
+que ya trae, así que **no hacen falta tablas ni endpoints nuevos**.
+
+El front **ya envía** `categoriaProfesional` en `insertarProfesional` y
+`actualizarProfesional`; hoy el backend lo ignora sin error. Para conectarlo:
+
+```sql
+-- migraciones/2026-11-XX_categoria_profesional.sql  (respaldo antes, como en la Fase A)
+ALTER TABLE profesionales
+  ADD COLUMN categoriaProfesional VARCHAR(60) NULL AFTER descripcionProfesional,
+  ADD INDEX idx_categoria_profesional (categoriaProfesional);
+```
+
+| Archivo | Cambio |
+|---|---|
+| `controller/ProfesionalesController.js` → `insertarProfesionalController` y `actualizarProfesionalController` | Leer `categoriaProfesional` del `req.body`; limpiar (espacios simples, sin saltos) y cortar a 60; vacío → `NULL` |
+| `model/Profesionales.js` → `INSERT` y `UPDATE` | Agregar la columna |
+| `SELECT` de `seleccionarTodosProfesionales` y `seleccionarProfesional` | Nada: ya usan `SELECT *` (`model/Profesionales.js`), la columna sale sola |
+
+Comprobar: crear un profesional con categoría, editarlo, dejarla vacía (→ `NULL`), y
+que `/profesionales/seleccionarTodosProfesionales` la devuelva. Apenas haya **dos o
+más categorías distintas**, la reserva pública muestra el paso solo.
+
+### B.6 Categorías en el dashboard — front ✅
+
+`ProfesionalModal.jsx`: campo opcional **"Categoría de atención"** (texto libre, 60
+caracteres) con sugerencias: primero las que ya usa el centro, después las comunes
+(`src/lib/categoriasAtencion.js`). La tarjeta del profesional en el dashboard la muestra
+bajo la especialidad.
+
+### B.7 Categorías en la reserva pública — front ✅
+
+`SelectorAtencion.jsx`, paso 1: **"¿Qué tipo de atención necesitas?"**
+
+- Las categorías se agrupan ignorando tildes, mayúsculas y espacios
+  ("Odontología" = " odontologia ").
+- Tarjetas sobrias (nombre + cuántos profesionales), sin íconos; 1 columna en
+  celular, 2 en tablet y 3 en escritorio. Tocar una avanza directo, sin "Continuar".
+- **Más de 8:** buscador arriba.
+- **Menos de 2 categorías:** no hay paso y se ve la grilla directa (es lo que pasa hoy,
+  mientras el backend no guarde el campo).
+- "No sé cuál elegir: ver los N profesionales" siempre visible.
+- La elección queda en la URL (`?atencion=odontologia`): funcionan "atrás" y los enlaces compartidos.
+- Barra de pasos: Atención → Profesional → Hora.
+
+### B.8 Orden y pulido de `/agendaProfesionales` (fácil, al final)
+
+Encabezado sutil, una sola explicación (hoy el texto repite lo del panel), espacios
+consistentes con el inicio y revisión completa a 390 px / 768 px / escritorio.
+
+### B.9b Logo del centro (01-11-2026) — front ✅ · backend ✅ desplegado en desarrollo
+
+**Dashboard → Datos de la clínica → Datos generales**, antes de "Nombre de tu centro o clínica" (opcional, fila compacta con las recomendaciones plegadas). El usuario elige el archivo, lo
+recorta en **círculo** (mismo `ImageCropperModal` de publicaciones, ahora con
+`cropShape="round"`) y se sube a Cloudflare con el endpoint de siempre. Se guarda **al
+confirmar el recorte**, con un endpoint propio: no depende de "Guardar todos los datos"
+(que exige campos que no tienen que ver con el logo).
+
+- Requisitos que se muestran y se validan antes de abrir el recorte: PNG, JPG o WebP;
+  hasta **5 MB**; mínimo **200 × 200 px** (ideal 512 × 512). Aviso suave si es de baja
+  resolución o alargado. Lógica en `src/lib/logoEmpresa.js` (pruebas `tests/logoEmpresa.test.mjs`).
+- Se exporta como **PNG 512 × 512** para conservar la transparencia (antes el recorte
+  siempre exportaba JPG: un logo transparente habría quedado con fondo negro).
+- **Página pública:** círculo de 36/40 px antes del nombre en el navbar. Sin logo, solo el nombre.
+- Quitar pide confirmación y guarda `NULL`.
+
+**Backend** (rama `feat/logo-empresa` de `BACKEND-DESARROLLO-UNIVERSAL-AC`, commit `ca46f07`, en origin):
+
+| Archivo | Cambio |
+|---|---|
+| `migraciones/2026-11-01_logo_empresa.sql` | `ALTER TABLE datos_empresa ADD COLUMN logoEmpresa VARCHAR(100) NULL AFTER empresaNombre` |
+| `services/logoEmpresa.js` | Valida: solo id de Cloudflare (sin URL, `/`, `:` ni espacios, ≤100); `""`/`null` → `NULL`. `id_empresa` entero positivo |
+| `model/DatosEmpresa.js` | `actualizarLogoEmpresa(logo, id)` — `UPDATE … WHERE id_empresa = ? AND estadoActivo <> 0` |
+| `controller/DatosEmpresaController.js` | `actualizarLogo`: 200 `{message:true, logoEmpresa}` · 400 `logo-invalido`/`empresa-invalida` · 404 `empresa-no-encontrada` · 500. Bitácora `[AUDITORIA]` sin datos personales |
+| `view/datosEmpresaRoutes.js` | `POST /datosempresa/actualizarLogo`, **después** del gate de Clerk |
+
+Los `SELECT *` ya devuelven la columna, y `actualizar` (guardar todos los datos) **no la toca**.
+
+Pruebas (01-11, MySQL 9.6 aislado con la tabla real del dump): `node --test pruebas/datosEmpresa/`
+→ **14/14** (6 unitarias + 8 de punta a punta: 401 sin token o con token falso, guardar,
+GET público, guardar el resto no borra el logo, 7 valores inválidos, 404, quitar y bitácora).
+
+**Desplegado el 01-11-2026** en el servidor `desarrollo`: respaldo
+`/root/respaldos/AGENDA_CLINICA_DESARROLLO_antes-logo_20261101-045648.sql` → checkout de
+`feat/logo-empresa` (`ca46f07`) → migración aplicada → `pm2 restart agendaclinica-backend`
+(solo esa app; las otras 7 siguieron arriba). Comprobado en el servidor: el GET público
+devuelve `logoEmpresa`, `actualizarLogo` responde 401 sin token y con token falso, los demás
+endpoints 200 y el log sin errores. **Pendiente:** fusionar la rama a `main` y dejar el
+servidor de vuelta en `main`, como con la Fase A.
+
+### B.9 Estado
+
+| # | Paso | Estado |
+|---|---|---|
+| B.1 | Navbar | ✅ Front (01-11) |
+| B.2 | Portada | ✅ Front (01-11) |
+| B.3 | Datos bajo la portada | ✅ Front (01-11) |
+| B.4 | Quitar sucursales | ✅ Front (01-11) |
+| B.5 | Categorías: backend (1 columna) | **Pendiente: lo único que falta para conectar** |
+| B.6 | Categorías: dashboard | ✅ Front (01-11) |
+| B.7 | Categorías: reserva pública | ✅ Front (01-11) |
+| B.8 | Pulido `/agendaProfesionales` | ✅ Front (01-11) |
+| B.9b | Logo del centro | ✅ Front · ✅ Backend desplegado en desarrollo (14/14) · falta fusionar a `main` |
+
+Verificado el 01-11 en una copia aislada (build OK, sin desborde horizontal a 390 / 768 /
+1440 px); el paso de categorías se probó con categorías ficticias inyectadas solo en
+esa copia. Capturas en `~/Desktop/firma-fes/capturas/fase-B/`. Pruebas:
+`node --test tests/categoriasAtencion.test.mjs` (7/7).
 
 ---
 

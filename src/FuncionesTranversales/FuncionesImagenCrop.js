@@ -35,6 +35,8 @@ export async function recortarImagenACroppedFile(imageSrc, croppedAreaPixels, {
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, mimeType, quality));
     if (!blob) throw new Error("No fue posible generar la imagen recortada.");
 
+    // La extensión sigue al formato real: un PNG (logo con transparencia) no puede llamarse .jpg
+    const extension = { "image/png": "png", "image/webp": "webp" }[mimeType] || "jpg";
     const baseName = fileName.replace(/\.\w+$/, "") || "imagen";
-    return new File([blob], `${baseName}.jpg`, { type: mimeType });
+    return new File([blob], `${baseName}.${extension}`, { type: mimeType });
 }

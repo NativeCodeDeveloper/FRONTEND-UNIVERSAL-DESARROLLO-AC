@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { CalendarDays as Calendario, MessageCircle as Mensaje, Search as Lupa } from "lucide-react";
 import { useEffect, useState } from "react";
-import { IconoCerrar, IconoMenu } from "@/Componentes/PaginaPublica/Comunes/Iconos";
+import { IconoCerrar, IconoLupa, IconoMenu } from "@/Componentes/PaginaPublica/Comunes/Iconos";
+import { cfImageUrl } from "@/lib/cloudflare";
 
 const enlaces = [
   { href: "/#inicio", texto: "Inicio" },
@@ -15,7 +14,9 @@ const enlaces = [
   { href: "/#contacto", texto: "Contacto" },
 ];
 
-export default function Navegacion() {
+/* `nombre` y `logo` (id de Cloudflare) vienen de datosempresa; los pasa el layout */
+export default function Navegacion({ nombre, logo }) {
+  const urlLogo = cfImageUrl(logo, "card");
   const [abierto, setAbierto] = useState(false);
   const [conFondo, setConFondo] = useState(false);
 
@@ -35,74 +36,101 @@ export default function Navegacion() {
 
   return (
     <>
+      {/*
+       * Diseño de Nicolás (29-10) afinado: nombre del centro a la izquierda, cápsula teal con
+       * el acceso a profesionales y "Agendar hora", y el menú en una segunda fila que se pliega
+       * al hacer scroll (queda solo la fila principal, 72 px).
+       */}
       <header
-        className={`fixed inset-x-0 top-0 z-40 rounded-b-[24px] transition-colors duration-300 md:rounded-b-[28px] ${
+        className={`fixed inset-x-0 top-0 z-40 rounded-b-[24px] border-b transition-[background-color,border-color,box-shadow] duration-300 md:rounded-b-[28px] ${
           conFondo || abierto
-            ? "border-b border-[#d4e9eb] bg-white/95 shadow-sm backdrop-blur-xl"
-            : "border-b border-transparent bg-white/95"
+            ? "border-black/[0.06] bg-white/90 shadow-[0_8px_30px_-18px_rgb(0_0_0/0.18)] backdrop-blur-xl backdrop-saturate-180"
+            : "border-transparent bg-white/80 backdrop-blur-md"
         }`}
       >
-        <nav
-          className="mx-auto grid min-h-14 max-w-[1600px] grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3 px-4 md:grid-cols-[200px_minmax(0,1fr)] md:gap-x-6 md:px-6 md:pt-2 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-x-8 xl:px-10"
-          aria-label="Principal"
-        >
-          <div className="flex min-w-0 items-center py-1 md:py-0">
-            <Link href="/" aria-label="Inicio" className="shrink-0">
-              <Image
-                src="/fonts/asdasd.png"
-                alt=""
-                width={2172}
-                height={724}
-                priority
-                className="h-12 w-auto md:h-14 lg:h-16"
-              />
+        <nav className="mx-auto max-w-[1180px] px-4 sm:px-6" aria-label="Principal">
+          <div className="flex h-16 items-center gap-3 md:h-[72px] md:gap-8">
+            {/* Logo (si el centro lo cargó) y nombre: cada instancia muestra los suyos */}
+            <Link
+              href="/"
+              className="group flex min-w-0 items-center gap-2 md:max-w-[340px] md:gap-3"
+            >
+              {urlLogo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={urlLogo}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="size-9 shrink-0 rounded-full bg-white object-cover ring-1 ring-black/[0.06] md:size-10"
+                />
+              ) : null}
+              <span className={`truncate font-semibold tracking-[-0.022em] text-tinta transition-colors group-hover:text-acento md:text-[19px] ${urlLogo ? "text-[16px]" : "text-[17px]"}`}>
+                {nombre || "Inicio"}
+              </span>
             </Link>
+
+            <div className="ml-auto hidden min-w-0 flex-1 items-center gap-1.5 rounded-full bg-acento p-1.5 shadow-[0_10px_24px_-16px_rgb(0_102_110/0.7)] md:flex md:max-w-[640px]">
+              <Link
+                href="/agendaProfesionales"
+                className="group flex min-h-10 min-w-0 flex-1 items-center justify-between gap-3 rounded-full bg-white/[0.14] pl-5 pr-3.5 text-[14px] text-white/85 transition-colors duration-200 hover:bg-white/[0.22] hover:text-white focus-visible:!outline-white"
+              >
+                <span className="truncate">Buscar profesional o especialidad</span>
+                <IconoLupa className="h-[18px] w-[18px] shrink-0 opacity-80 transition-opacity group-hover:opacity-100" />
+              </Link>
+              <Link
+                href="/agendaProfesionales"
+                className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-full bg-lima px-5 text-[14px] font-semibold whitespace-nowrap text-acento-hondo transition-colors duration-200 hover:bg-white focus-visible:!outline-white"
+              >
+                Agendar hora
+              </Link>
+            </div>
+
+            <div className="ml-auto flex shrink-0 items-center gap-1 md:hidden">
+              <Link
+                href="/agendaProfesionales"
+                className="inline-flex min-h-9 items-center rounded-full bg-acento px-4 text-[14px] font-semibold whitespace-nowrap text-white transition-colors hover:bg-acento-hondo"
+              >
+                Agendar hora
+              </Link>
+              <button
+                type="button"
+                className="-mr-2 flex size-11 items-center justify-center rounded-full text-tinta transition-colors hover:bg-acento-suave"
+                aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
+                aria-expanded={abierto}
+                onClick={() => setAbierto((v) => !v)}
+              >
+                {abierto ? <IconoCerrar className="h-5 w-5" /> : <IconoMenu className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
 
-          <div className="hidden min-h-13 min-w-0 items-center justify-end gap-2.5 rounded-full bg-[#00858f] p-2 md:flex lg:gap-3 xl:gap-4 xl:pl-10">
-            <Link href="/agendaProfesionales" className="flex min-h-10 min-w-0 flex-1 items-center justify-between gap-2.5 rounded-full bg-[#8ec2c6] px-4 py-2 text-[14px] font-medium text-[#204a50] transition-colors hover:bg-[#aad5d8] focus-visible:outline-white lg:text-[15px]">
-              <span className="truncate">Profesionales</span>
-              <Lupa aria-hidden="true" className="size-5 shrink-0" />
-            </Link>
-            <Link href="/#contacto" className="hidden min-h-10 shrink-0 items-center justify-center gap-2.5 rounded-full bg-[#bcf0e8] px-5 py-2 text-[15px] font-semibold text-[#153c3b] transition-colors hover:bg-[#d6f8f2] focus-visible:outline-white xl:inline-flex">
-              <Mensaje aria-hidden="true" className="size-5 shrink-0" />
-              Contacto
-            </Link>
-            <Link href="/agendaProfesionales" className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2.5 rounded-full bg-[#c6df86] px-4 py-2 text-[14px] font-semibold whitespace-nowrap text-[#18352c] transition-colors hover:bg-[#d7e999] focus-visible:outline-white lg:px-5 lg:text-[15px]">
-              <Calendario aria-hidden="true" className="size-5 shrink-0" />
-              Agendar hora
-            </Link>
-          </div>
-
-          <ul className="col-span-2 hidden min-h-12 w-full items-center justify-center gap-1 text-[14px] font-medium tracking-normal text-[#4b575b] md:flex lg:gap-3 lg:text-[15px]">
-            {enlaces.map((e) => (
-              <li key={e.href}>
-                <Link href={e.href} className="inline-flex min-h-9 items-center justify-center rounded-lg px-3 py-2 whitespace-nowrap transition-colors duration-200 hover:bg-[#edf6f6] hover:text-[#007f89] focus-visible:bg-[#edf6f6] focus-visible:text-[#007f89] lg:px-5">
-                  {e.texto}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <Link href="/agendaProfesionales" className="inline-flex min-h-9 items-center justify-center gap-2 rounded-full bg-[#c6df86] px-3 text-[12px] font-semibold whitespace-nowrap text-[#18352c] transition-colors hover:bg-[#d7e999] sm:px-5 sm:text-[13px] md:hidden">
-            <Calendario aria-hidden="true" className="size-4 shrink-0" />
-            Agendar hora
-          </Link>
-          <button
-            type="button"
-            className="-mr-2 flex size-10 items-center justify-center rounded-full text-[#007f89] transition-colors hover:bg-[#e0f0f1] md:hidden"
-            aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={abierto}
-            onClick={() => setAbierto((v) => !v)}
+          {/* Segunda fila: visible arriba de todo, se pliega al bajar */}
+          <div
+            className={`hidden transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.28,0.11,0.32,1)] md:grid ${
+              conFondo ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"
+            }`}
+            inert={conFondo || undefined}
           >
-            {abierto ? <IconoCerrar className="h-5 w-5" /> : <IconoMenu className="h-5 w-5" />}
-          </button>
+            <ul className="flex min-h-0 items-center justify-center gap-1 overflow-hidden text-[14px] text-tinta-2 lg:gap-2">
+              {enlaces.map((e) => (
+                <li key={e.href} className="pb-3">
+                  <Link
+                    href={e.href}
+                    className="inline-flex min-h-9 items-center rounded-full px-3.5 transition-colors duration-200 hover:bg-acento-suave hover:text-acento-hondo lg:px-4"
+                  >
+                    {e.texto}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
       </header>
 
       {/* Fuera del header: el backdrop-blur convierte al header en contenedor de los hijos fixed */}
       {abierto && (
-        <div className="animar-velo fixed inset-x-0 bottom-0 top-14 z-30 bg-white md:hidden">
+        <div className="animar-velo fixed inset-x-0 bottom-0 top-16 z-30 bg-white md:hidden">
           <ul className="flex flex-col px-6 pt-2">
             {[...enlaces, { href: "/agendaProfesionales", texto: "Profesionales" }].map((e, i) => (
               <li key={e.href} className="animar-modal border-b border-linea-suave" style={{ animationDelay: `${i * 35}ms` }}>

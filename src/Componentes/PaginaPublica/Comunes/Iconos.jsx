@@ -17,6 +17,15 @@ export function IconoChevron({ className, direccion = "derecha" }) {
   );
 }
 
+export function IconoLupa({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="M16 16l4 4" />
+    </svg>
+  );
+}
+
 export function IconoCerrar({ className }) {
   return (
     <svg viewBox="0 0 24 24" className={className} {...base}>

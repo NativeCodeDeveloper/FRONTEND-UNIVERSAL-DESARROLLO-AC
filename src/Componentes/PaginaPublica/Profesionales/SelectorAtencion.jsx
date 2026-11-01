@@ -1,79 +1,52 @@
 "use client";
 
-import { Fragment, useState } from "react";
-import { Ambulance, Bone, HandHeart, MapPin, MonitorSmartphone, Scan, Stethoscope, Syringe, TestTubes } from "lucide-react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import GrillaProfesionales from "@/Componentes/PaginaPublica/Profesionales/GrillaProfesionales";
 import { IconoCheck, IconoChevron } from "@/Componentes/PaginaPublica/Comunes/Iconos";
+import { agruparCategorias, claveCategoria, filtrarPorCategoria } from "@/lib/categoriasAtencion";
 
 /*
- * Asistente previo a la grilla, en un panel compacto al estilo de la portada:
- * el paciente elige la sucursal, después el tipo de atención y recién entonces
- * ve a los profesionales.
+ * Reserva de hora por pasos: el paciente elige el tipo de atención y ve solo a
+ * los profesionales que la atienden; la hora se elige después, en la ficha del
+ * profesional (/agendaEspecificaProfersional/[id]).
  *
- * HARDCodeado a propósito: las sucursales y las categorías (y sus ubicaciones,
- * que se vienen después) todavía no existen en los datos del centro. Cuando haya
- * datos reales, reemplazar SUCURSALES y CATEGORIAS_ATENCION y conectar el cruce
- * en filtrarPorCategoria.
+ * Las categorías salen del campo `categoriaProfesional` de cada profesional (se
+ * escribe en el dashboard, ver src/lib/categoriasAtencion.js). Con menos de dos
+ * categorías el paso no aporta nada y se muestra la grilla directa, que es lo que
+ * pasa mientras el backend no guarde el campo.
+ *
+ * La elección queda en la URL (?atencion=odontologia) para que el botón "atrás"
+ * del navegador y los enlaces compartidos funcionen.
  */
 
 const PASOS = [
-  { id: "sucursal", etiqueta: "Sucursal" },
-  { id: "categoria", etiqueta: "Tipo de atención" },
-  { id: "profesionales", etiqueta: "Profesional" },
+  { id: "atencion", etiqueta: "Atención" },
+  { id: "profesional", etiqueta: "Profesional" },
+  { id: "hora", etiqueta: "Hora" },
 ];
 
-/* HARDCodeado: reemplazar por las sucursales reales del centro */
-const SUCURSALES = [
-  { id: "sucursal-centro", nombre: "Sucursal Centro" },
-  { id: "sucursal-norte", nombre: "Sucursal Norte" },
-  { id: "sucursal-sur", nombre: "Sucursal Sur" },
-];
+/* Desde cuántas categorías se ofrece el buscador en vez de solo tarjetas */
+const CATEGORIAS_SIN_BUSCADOR = 8;
 
-/* Lucide no trae diente; mismo trazo y caja que el resto de los íconos. */
-function IconoDental({ className, strokeWidth = 2 }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M12 5.6c-1.5-1.9-4.1-2.4-5.8-1.1-1.7 1.2-2.1 3.5-1.5 5.5.6 2 .9 4.5 1.2 6.8.2 1.4.5 3.2 1.7 3.2 1.5 0 1.3-2 1.6-3.8.3-1.7.7-3.7 2.8-3.7s2.5 2 2.8 3.7c.3 1.8.1 3.8 1.6 3.8 1.2 0 1.5-1.8 1.7-3.2.3-2.3.6-4.8 1.2-6.8.6-2 .2-4.3-1.5-5.5-1.7-1.3-4.3-.8-5.8 1.1z" />
-    </svg>
-  );
+/* "todos" = ver a todo el equipo sin filtrar */
+const TODOS = "todos";
+const PARAMETRO = "atencion";
+
+function leerUrl() {
+  return new URLSearchParams(window.location.search).get(PARAMETRO);
 }
 
-const CATEGORIAS_ATENCION = [
-  { id: "consultas", nombre: "Consultas", Icono: Stethoscope },
-  { id: "dental", nombre: "Dental", Icono: IconoDental },
-  { id: "imagenes", nombre: "Imágenes y Procedimientos", Icono: Scan },
-  { id: "telemedicina", nombre: "Telemedicina", Icono: MonitorSmartphone },
-  { id: "kinesiologia", nombre: "Kinesiología", Icono: Bone },
-  { id: "laboratorio", nombre: "Laboratorio y Toma de Muestras", Icono: TestTubes },
-  { id: "vacunatorio", nombre: "Vacunatorio", Icono: Syringe },
-  { id: "domicilio", nombre: "Toma de muestras a domicilio", Icono: Ambulance },
-  { id: "donacion", nombre: "Donación de Sangre", Icono: HandHeart },
-];
+function escribirUrl(clave) {
+  const url = new URL(window.location.href);
+  if (clave) url.searchParams.set(PARAMETRO, clave);
+  else url.searchParams.delete(PARAMETRO);
+  window.history.pushState(null, "", url);
+}
 
-/* Fondos pastel que se rotan entre tarjetas, como en el diseño de referencia */
-const FONDOS = ["bg-[#dfecea]", "bg-[#edf3f2]", "bg-[#eef1d8]"];
-
-/* La página baja suave al cambiar de paso, salvo que el equipo pida menos movimiento */
-function subirSuave() {
+function subirAlAsistente() {
   const sinMovimiento = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  window.scrollTo({ top: 0, behavior: sinMovimiento ? "auto" : "smooth" });
+  document.getElementById("reserva-pasos")?.scrollIntoView({ behavior: sinMovimiento ? "auto" : "smooth", block: "start" });
 }
-
-/*
- * Todavía no hay forma real de cruzar profesionales con sucursal ni categoría (la
- * tabla de profesionales no tiene ese dato). Cuando exista —o cuando se agreguen
- * las ubicaciones— el cruce va acá.
- */
-const filtrarPorCategoria = (profesionales) => profesionales;
 
 /* Barra de progreso: hecho = check, actual = número con halo, pendiente = punto */
 function BarraPasos({ indice }) {
@@ -85,18 +58,18 @@ function BarraPasos({ indice }) {
         return (
           <Fragment key={paso.id}>
             {i > 0 && (
-              <span aria-hidden className={`h-0.5 min-w-4 flex-1 rounded-full ${i <= indice ? "bg-acento" : "bg-linea-suave"}`} />
+              <span aria-hidden className={`mx-2 h-px min-w-4 flex-1 ${i <= indice ? "bg-acento" : "bg-linea"}`} />
             )}
             <li className="flex shrink-0 items-center gap-2" aria-current={actual ? "step" : undefined}>
               <span
                 className={`flex items-center justify-center rounded-full text-white ${
-                  hecho || actual ? "bg-acento" : "bg-linea-suave"
-                } ${actual ? "size-8 ring-4 ring-acento-suave" : hecho ? "size-7" : "size-2.5"}`}
+                  hecho || actual ? "bg-acento" : "bg-linea"
+                } ${actual ? "size-7 ring-4 ring-acento-suave" : hecho ? "size-6" : "size-2"}`}
               >
-                {hecho && <IconoCheck className="h-4 w-4" />}
-                {actual && <span className="text-[13px] font-semibold">{i + 1}</span>}
+                {hecho && <IconoCheck className="h-3.5 w-3.5" />}
+                {actual && <span className="text-[12px] font-semibold">{i + 1}</span>}
               </span>
-              <span className={`hidden text-[13px] md:block ${actual ? "font-semibold text-tinta" : "text-tinta-3"}`}>
+              <span className={`text-[13px] ${actual ? "font-medium text-tinta" : "hidden text-tinta-3 sm:inline"}`}>
                 {paso.etiqueta}
               </span>
             </li>
@@ -107,165 +80,138 @@ function BarraPasos({ indice }) {
   );
 }
 
-function TarjetaOpcion({ opcion, fondo, seleccionada, onElegir }) {
-  /* Las sucursales no llevan ícono propio: por defecto, pin de ubicación */
-  const { Icono = MapPin } = opcion;
+function TarjetaCategoria({ categoria, onElegir }) {
   return (
     <button
       type="button"
-      role="radio"
-      aria-checked={seleccionada}
       onClick={onElegir}
-      className={`h-full overflow-hidden rounded-[18px] border bg-papel text-left transition-shadow duration-300 ${
-        seleccionada ? "border-acento shadow-caja-alta ring-2 ring-acento" : "border-linea-suave hover:shadow-caja"
-      }`}
+      className="group flex min-h-[76px] w-full items-center justify-between gap-3 rounded-2xl bg-niebla px-5 py-4 text-left transition-[background-color,box-shadow] duration-200 hover:bg-acento-suave hover:shadow-[inset_0_0_0_1px_var(--pp-acento)]"
     >
-      <span className={`relative flex aspect-[5/4] items-center justify-center ${fondo}`}>
-        <Icono className="h-10 w-10 text-acento-hondo" strokeWidth={1.6} />
-        <span
-          className={`absolute left-2.5 top-2.5 flex h-6 w-6 items-center justify-center rounded-full transition-colors duration-200 ${
-            seleccionada ? "bg-acento text-white" : "bg-white text-transparent"
-          }`}
-        >
-          <IconoCheck className="h-3.5 w-3.5" />
+      <span className="min-w-0">
+        <span className="block text-[16px] font-medium leading-snug text-tinta [overflow-wrap:anywhere]">{categoria.nombre}</span>
+        <span className="mt-0.5 block text-[13px] text-tinta-3">
+          {categoria.cantidad} {categoria.cantidad === 1 ? "profesional" : "profesionales"}
         </span>
       </span>
-      <span className="flex flex-1 items-center justify-center px-2.5 py-3 text-center text-[14px] font-medium leading-snug">
-        {opcion.nombre}
-      </span>
+      <IconoChevron className="h-4 w-4 shrink-0 text-tinta-3 transition-[color,translate] duration-200 group-hover:translate-x-0.5 group-hover:text-acento" />
     </button>
   );
 }
 
-/* Grilla de tarjetas de un paso de elección */
-function GrillaOpciones({ opciones, valor, onElegir, columnas }) {
+function PasoAtencion({ categorias, total, onElegir }) {
+  const [busqueda, setBusqueda] = useState("");
+  const conBuscador = categorias.length > CATEGORIAS_SIN_BUSCADOR;
+  const termino = claveCategoria(busqueda);
+  const visibles = termino ? categorias.filter((c) => c.clave.includes(termino)) : categorias;
+
   return (
-    <div role="radiogroup" className={`mt-6 grid gap-3.5 sm:gap-4 ${columnas}`}>
-      {opciones.map((opcion, i) => (
-        <TarjetaOpcion
-          key={opcion.id}
-          opcion={opcion}
-          fondo={FONDOS[i % FONDOS.length]}
-          seleccionada={opcion.id === valor}
-          onElegir={() => onElegir(opcion.id)}
-        />
-      ))}
-    </div>
+    <>
+      <h2 className="titular-3">¿Qué tipo de atención necesitas?</h2>
+      <p className="mt-1.5 text-[15px] text-tinta-2">Elige una y te mostramos a los profesionales que la atienden.</p>
+
+      {conBuscador && (
+        <div className="mt-6">
+          <label htmlFor="buscar-atencion" className="sr-only">
+            Buscar tipo de atención
+          </label>
+          <input
+            id="buscar-atencion"
+            type="search"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Busca tu atención, por ejemplo: Odontología"
+            autoComplete="off"
+            className="campo"
+          />
+        </div>
+      )}
+
+      {visibles.length > 0 ? (
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {visibles.map((categoria) => (
+            <li key={categoria.clave}>
+              <TarjetaCategoria categoria={categoria} onElegir={() => onElegir(categoria.clave)} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-6 rounded-2xl bg-niebla px-5 py-4 text-[15px] text-tinta-2">
+          No encontramos «{busqueda.trim()}». Prueba con otra palabra o revisa todo el equipo.
+        </p>
+      )}
+
+      <div className="mt-6 border-t border-linea-suave pt-5">
+        <button type="button" onClick={() => onElegir(TODOS)} className="enlace text-[15px]">
+          No sé cuál elegir: ver los {total} profesionales
+        </button>
+      </div>
+    </>
   );
 }
 
 export default function SelectorAtencion({ profesionales, preciosDesde = {} }) {
-  const [sucursalId, setSucursalId] = useState(null);
-  const [categoriaId, setCategoriaId] = useState(null);
-  const [paso, setPaso] = useState("sucursal"); // "sucursal" | "categoria" | "profesionales"
+  const categorias = useMemo(() => agruparCategorias(profesionales), [profesionales]);
+  const [eleccion, setEleccion] = useState(null); // null | clave de categoría | TODOS
 
-  const irA = (pasoNuevo) => {
-    setPaso(pasoNuevo);
-    subirSuave();
-  };
+  /* La elección sigue a la URL: al cargar y con los botones atrás/adelante */
+  useEffect(() => {
+    const sincronizar = () => {
+      const clave = leerUrl();
+      setEleccion(clave === TODOS || categorias.some((c) => c.clave === clave) ? clave : null);
+    };
+    sincronizar();
+    window.addEventListener("popstate", sincronizar);
+    return () => window.removeEventListener("popstate", sincronizar);
+  }, [categorias]);
 
-  const indice = PASOS.findIndex((p) => p.id === paso);
-  const esPrimero = indice === 0;
-  const esUltimo = indice === PASOS.length - 1;
-
-  const sucursalElegida = SUCURSALES.find((s) => s.id === sucursalId) ?? null;
-  const categoriaElegida = CATEGORIAS_ATENCION.find((c) => c.id === categoriaId) ?? null;
-
-  let titulo, subtitulo, eleccion;
-  if (paso === "sucursal") {
-    titulo = "¿En qué sucursal quieres atenderte?";
-    subtitulo = "Selecciona la sucursal donde quieres reservar tu hora.";
-    eleccion = sucursalElegida;
-  } else if (paso === "categoria") {
-    titulo = "¿Qué tipo de atención necesitas?";
-    subtitulo = "Selecciona el servicio que necesites.";
-    eleccion = categoriaElegida;
-  } else {
-    titulo = "Profesionales disponibles";
-    subtitulo = `${sucursalElegida.nombre} · ${categoriaElegida.nombre}`;
+  /* Sin al menos dos categorías no hay nada que elegir */
+  if (categorias.length < 2) {
+    return <GrillaProfesionales profesionales={profesionales} preciosDesde={preciosDesde} />;
   }
 
+  const elegir = (clave) => {
+    escribirUrl(clave);
+    setEleccion(clave);
+    subirAlAsistente();
+  };
+
+  const categoria = categorias.find((c) => c.clave === eleccion) ?? null;
+  const enProfesionales = eleccion !== null;
+  const lista = categoria ? filtrarPorCategoria(profesionales, categoria.clave) : profesionales;
+
   return (
-    <div className="caja overflow-hidden rounded-[28px]">
-      {/* Encabezado del asistente */}
-      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-linea-suave px-6 pt-6 md:px-8">
-        <h2 className="text-[19px] font-semibold tracking-tight">Reserva de hora</h2>
-        <p className="text-[14px] text-tinta-3">
-          Paso {indice + 1} de {PASOS.length}: <span className="text-tinta-2">{PASOS[indice].etiqueta}</span>
-        </p>
-      </header>
-      <div className="border-b border-linea-suave px-6 py-4 md:px-8">
-        <BarraPasos indice={indice} />
+    <div id="reserva-pasos" className="scroll-mt-24">
+      <div className="caja overflow-hidden">
+        <div className="border-b border-linea-suave px-5 py-4 sm:px-8">
+          <BarraPasos indice={enProfesionales ? 1 : 0} />
+        </div>
+
+        <div key={eleccion ?? "inicio"} className="animar-modal px-5 py-7 sm:px-8 sm:py-8">
+          {enProfesionales ? (
+            <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+              <div className="min-w-0">
+                <h2 className="titular-3 [overflow-wrap:anywhere]">{categoria ? categoria.nombre : "Todo el equipo"}</h2>
+                <p className="mt-1.5 text-[15px] text-tinta-2">
+                  {lista.length} {lista.length === 1 ? "profesional disponible" : "profesionales disponibles"}. Elige uno para ver
+                  sus horas.
+                </p>
+              </div>
+              <button type="button" onClick={() => elegir(null)} className="boton boton-tenue !min-h-10 !text-[15px]">
+                <IconoChevron direccion="izquierda" className="h-4 w-4" />
+                Cambiar atención
+              </button>
+            </div>
+          ) : (
+            <PasoAtencion categorias={categorias} total={profesionales.length} onElegir={elegir} />
+          )}
+        </div>
       </div>
 
-      {/* Contenido del paso */}
-      <div key={paso} className="animar-modal px-6 py-7 md:px-8">
-        <h3 className="titular-3">{titulo}</h3>
-        <p className="mt-1.5 text-tinta-2">{subtitulo}</p>
-
-        {paso === "sucursal" && (
-          <GrillaOpciones
-            opciones={SUCURSALES}
-            valor={sucursalId}
-            onElegir={setSucursalId}
-            columnas="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
-          />
-        )}
-        {paso === "categoria" && (
-          <GrillaOpciones
-            opciones={CATEGORIAS_ATENCION}
-            valor={categoriaId}
-            onElegir={setCategoriaId}
-            columnas="grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
-          />
-        )}
-        {paso === "profesionales" && (
-          <div className="mt-6">
-            <GrillaProfesionales
-              profesionales={filtrarPorCategoria(profesionales, sucursalElegida, categoriaElegida)}
-              preciosDesde={preciosDesde}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Barra inferior: volver a la izquierda, Continuar a la derecha */}
-      <footer className="flex items-center gap-4 border-t border-linea-suave px-6 py-4 md:px-8">
-        {esPrimero ? (
-          <span aria-hidden className="size-12 shrink-0" />
-        ) : (
-          <button
-            type="button"
-            onClick={() => irA(PASOS[indice - 1].id)}
-            aria-label="Volver al paso anterior"
-            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-acento-suave text-acento-hondo transition-colors hover:bg-acento hover:text-white"
-          >
-            <IconoChevron direccion="izquierda" className="h-5 w-5" />
-          </button>
-        )}
-
-        {!esUltimo && (
-          <div className="ml-auto flex items-center gap-4">
-            <p className="hidden text-[14px] text-tinta-3 sm:block">
-              {eleccion ? (
-                <>
-                  Elegiste <span className="font-medium text-tinta">{eleccion.nombre}</span>
-                </>
-              ) : (
-                "Elige una opción para continuar"
-              )}
-            </p>
-            <button
-              type="button"
-              onClick={() => irA(PASOS[indice + 1].id)}
-              disabled={!eleccion}
-              className="boton boton-principal min-w-[170px]"
-            >
-              Continuar
-            </button>
-          </div>
-        )}
-      </footer>
+      {enProfesionales && (
+        <div className="mt-8">
+          <GrillaProfesionales profesionales={lista} preciosDesde={preciosDesde} />
+        </div>
+      )}
     </div>
   );
 }

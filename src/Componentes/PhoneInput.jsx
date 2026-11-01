@@ -33,6 +33,27 @@ function extraerDigitosLocales(valor = "") {
     return digitos;
 }
 
+// Mientras se escribe: solo dígitos, "+" y espacios, y no más dígitos de los que
+// caben según cómo empezó ("56 9…" → 11, "9…" → 9, sin prefijo → 8). Así nadie
+// escribe de más y se entera recién al salir del campo.
+function recortarTelefono(valor = "") {
+    const limpio = String(valor).replace(/[^\d+\s]/g, "");
+    const digitos = limpio.replace(/\D/g, "");
+    const tope = digitos.startsWith("56") ? 11 : digitos.startsWith("9") ? 9 : DIGITOS_LOCALES;
+    if (digitos.length <= tope) return limpio;
+
+    let restantes = tope;
+    let salida = "";
+    for (const caracter of limpio) {
+        if (/\d/.test(caracter)) {
+            if (restantes === 0) break;
+            restantes -= 1;
+        }
+        salida += caracter;
+    }
+    return salida;
+}
+
 function normalizarTelefonoChile(valor = "") {
     const digitosLocales = extraerDigitosLocales(valor);
 
@@ -58,7 +79,7 @@ export function PhoneInput({
     }, [value]);
 
     function handleChange(e) {
-        setTelefonoEscrito(e.target.value);
+        setTelefonoEscrito(recortarTelefono(e.target.value));
         if (touched) setError("");
     }
 

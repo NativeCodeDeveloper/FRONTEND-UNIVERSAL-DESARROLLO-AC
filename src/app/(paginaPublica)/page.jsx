@@ -52,7 +52,7 @@ export default async function Inicio() {
       {/* Portada (carruselPortada) y franja de datos: en escritorio ocupan justo la primera pantalla */}
       <section
         id="inicio"
-        className="flex flex-col rounded-b-[36px] bg-linear-to-br from-[#f5fbfc] via-[#e3f5f6] to-[#f5fbfc] pb-8 pt-24 md:rounded-b-[48px] md:pb-10 md:pt-28 lg:min-h-svh lg:justify-center lg:pb-12 lg:pt-32"
+        className="flex flex-col rounded-b-[36px] bg-linear-to-b from-acento-suave/70 to-papel pb-8 pt-24 md:rounded-b-[48px] md:pb-10 md:pt-36 lg:min-h-svh lg:justify-center lg:pb-12 lg:pt-40"
       >
         {/* En escritorio la portada se centra en el espacio libre y la franja se asienta al pie de la pantalla */}
         <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6">
