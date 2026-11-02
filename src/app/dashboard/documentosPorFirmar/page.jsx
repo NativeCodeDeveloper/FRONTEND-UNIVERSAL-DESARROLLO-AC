@@ -132,7 +132,7 @@ export default function DocumentosPorFirmar() {
                 <button
                   type="button"
                   onClick={() => revisar(d)}
-                  className="h-10 shrink-0 rounded-xl bg-black px-5 text-[13px] font-semibold text-white transition-colors hover:bg-slate-800"
+                  className="h-10 shrink-0 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF]"
                 >
                   Revisar y firmar
                 </button>

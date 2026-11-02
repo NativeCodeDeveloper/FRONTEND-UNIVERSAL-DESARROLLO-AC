@@ -1450,7 +1450,7 @@ export default function DetalleCotizacion() {
                                 <h2 className="truncate text-base font-bold leading-tight text-slate-900">
                                     {cotizacionActual?.nombre} {cotizacionActual?.apellido}
                                 </h2>
-                                <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                <p className="mt-1 text-[12px] font-semibold text-slate-400">
                                     ID paciente #{cotizacionActual?.id_paciente ?? "-"}
                                 </p>
                             </div>
@@ -1465,7 +1465,7 @@ export default function DetalleCotizacion() {
                         <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
                             <IdCard className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
                             <div className="min-w-0">
-                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">RUT</dt>
+                                <dt className="text-[12px] font-bold text-slate-400">RUT</dt>
                                 <dd className="mt-0.5 truncate font-mono text-xs font-semibold text-slate-700" title={cotizacionActual?.rut}>
                                     {formatRut(String(cotizacionActual?.rut ?? "")) || "-"}
                                 </dd>
@@ -1474,7 +1474,7 @@ export default function DetalleCotizacion() {
                         <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
                             <Phone className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
                             <div className="min-w-0">
-                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Teléfono</dt>
+                                <dt className="text-[12px] font-bold text-slate-400">Teléfono</dt>
                                 <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.telefono}>
                                     {cotizacionActual?.telefono || "-"}
                                 </dd>
@@ -1483,7 +1483,7 @@ export default function DetalleCotizacion() {
                         <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5 lg:col-span-1 sm:col-span-2 xl:col-span-1">
                             <Mail className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
                             <div className="min-w-0">
-                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Correo</dt>
+                                <dt className="text-[12px] font-bold text-slate-400">Correo</dt>
                                 <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.correo}>
                                     {cotizacionActual?.correo || "-"}
                                 </dd>
@@ -1492,7 +1492,7 @@ export default function DetalleCotizacion() {
                         <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
                             <ClipboardList className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
                             <div className="min-w-0">
-                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Cotización</dt>
+                                <dt className="text-[12px] font-bold text-slate-400">Cotización</dt>
                                 <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.nombre_cotizacion}>
                                     {cotizacionActual?.nombre_cotizacion || "-"}
                                 </dd>
@@ -1501,7 +1501,7 @@ export default function DetalleCotizacion() {
                         <div className="flex min-w-0 items-start gap-2.5 rounded-xl bg-slate-50/70 px-3 py-2.5">
                             <Stethoscope className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true"/>
                             <div className="min-w-0">
-                                <dt className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Profesional</dt>
+                                <dt className="text-[12px] font-bold text-slate-400">Profesional</dt>
                                 <dd className="mt-0.5 truncate text-xs font-semibold text-slate-700" title={cotizacionActual?.profesional_solicitante_nombre}>
                                     {cotizacionActual?.profesional_solicitante_nombre || "-"}
                                 </dd>
@@ -1528,7 +1528,7 @@ export default function DetalleCotizacion() {
                         <button
                             onClick={() => actualizarObservacion(observacionesDetalle, id_cotizacion_paciente)}
                             type="button"
-                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 text-xs font-bold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 lg:w-auto"
+                            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-[#1D1D1F] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#007AFF] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40 focus-visible:ring-offset-2 lg:w-auto"
                         >
                             <Save className="size-4" aria-hidden="true"/>
                             Guardar observación

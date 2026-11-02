@@ -199,7 +199,7 @@ export function RecordatorioPaciente({ email: emailInicial = "", telefono = "", 
                             type="button"
                             onClick={() => cambiarTipo(clave)}
                             className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
-                                tipo === clave ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-50"
+                                tipo === clave ? "bg-[#1D1D1F] text-white" : "text-slate-500 hover:bg-slate-50"
                             }`}
                         >
                             {etiqueta}
@@ -243,7 +243,7 @@ export function RecordatorioPaciente({ email: emailInicial = "", telefono = "", 
                         type="button"
                         onClick={enviarPorCorreo}
                         disabled={enviando}
-                        className={`inline-flex flex-1 items-center justify-center gap-2 font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${tamanoBoton}`}
+                        className={`inline-flex flex-1 items-center justify-center gap-2 font-semibold text-white bg-[#007AFF] rounded-lg hover:bg-[#007AFF] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${tamanoBoton}`}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className={`shrink-0 ${tamanoIcono}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>

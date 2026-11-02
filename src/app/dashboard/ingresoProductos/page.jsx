@@ -584,7 +584,7 @@ useEffect(() => {
                             <button
                                 type="button"
                                 onClick={() => insertarProducto(tituloProducto, descripcionProducto, valorProducto, categoriaProducto, subcategorias, subsubcategorias)}
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 active:scale-[0.98] disabled:opacity-60"
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-[#007AFF] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 active:scale-[0.98] disabled:opacity-60"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
                                     <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
@@ -596,7 +596,7 @@ useEffect(() => {
                                 <button
                                     type="button"
                                     onClick={() => actualizarProducto(tituloProducto, descripcionProducto, valorProducto, categoriaProducto, subcategorias, subsubcategorias, id_producto)}
-                                    className="inline-flex items-center gap-1.5 rounded-lg bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 active:scale-[0.98]"
+                                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#007AFF] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 active:scale-[0.98]"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
                                         <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
@@ -669,7 +669,7 @@ useEffect(() => {
                             <button
                                 type="button"
                                 onClick={() => buscarSimilar(tituloSimilar)}
-                                className="inline-flex items-center justify-center rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 active:scale-[0.98]"
+                                className="inline-flex items-center justify-center rounded-lg bg-[#007AFF] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 active:scale-[0.98]"
                             >
                                 Buscar
                             </button>

@@ -551,7 +551,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
           ) : veSecciones ? (
             <div className="mt-5 space-y-3 border-t border-slate-100 pt-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                <p className="text-[12px] font-semibold text-slate-400">
                   Documentos firmados · opcional
                 </p>
                 {MODO_MOCK ? (
@@ -630,7 +630,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
             onClick={guardar}
             disabled={enviando}
             data-tour="profesional-guardar"
-            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-6 text-[14px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
+            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-60"
           >
             {enviando ? (
               <>

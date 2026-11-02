@@ -541,7 +541,7 @@ export default function ReecetasPacientes() {
                                     { label: "País",        value: paciente.pais },
                                 ].map(({ label, value }) => (
                                     <div key={label} className="bg-white px-4 py-3">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
+                                        <p className="text-[12px] font-bold text-slate-400 mb-1">{label}</p>
                                         <p className="text-[13px] font-medium text-slate-800 break-words">{value || "---"}</p>
                                     </div>
                                 ))}
@@ -564,10 +564,10 @@ export default function ReecetasPacientes() {
                                 <div className="space-y-5">
                                     {/* Profesional */}
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
-                                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Profesional que emite la receta</p>
+                                        <p className="text-[12px] font-bold text-slate-500">Profesional que emite la receta</p>
                                         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                                             <div>
-                                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Profesional</label>
+                                                <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Profesional</label>
                                                 <Select
                                                     value={uiOnlyProfesionalSeleccionado}
                                                     onValueChange={(value) => {
@@ -591,11 +591,11 @@ export default function ReecetasPacientes() {
                                                 </Select>
                                             </div>
                                             <div>
-                                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">RUT profesional</label>
+                                                <label className="mb-1.5 block text-[12px] font-bold text-slate-500">RUT profesional</label>
                                                 <ShadcnInput value={rut_profesional_manual} onChange={(e) => setRut_profesional_manual(e.target.value)} placeholder="Opcional, para PDF" className="h-10 rounded-xl border-slate-200 bg-white shadow-none"/>
                                             </div>
                                             <div>
-                                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">Diagnóstico</label>
+                                                <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Diagnóstico</label>
                                                 <ShadcnInput value={diagnostico_pdf} onChange={(e) => setDiagnostico_pdf(e.target.value)} placeholder="Opcional, para PDF" className="h-10 rounded-xl border-slate-200 bg-white shadow-none"/>
                                             </div>
                                         </div>
@@ -604,7 +604,7 @@ export default function ReecetasPacientes() {
 
                                     {/* Texto de la receta */}
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Indicaciones y contenido de la receta</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Indicaciones y contenido de la receta</label>
                                         <Textarea
                                             value={descripcion_receta}
                                             onChange={(e) => setDescripcion_receta(e.target.value)}
@@ -619,7 +619,7 @@ export default function ReecetasPacientes() {
                                 <div className="space-y-4">
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/60 overflow-hidden">
                                         <div className="border-b border-slate-100 px-4 py-3">
-                                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Resumen de emisión</p>
+                                            <p className="text-[12px] font-bold text-slate-500">Resumen de emisión</p>
                                         </div>
                                         <div className="space-y-2 p-4">
                                             {[
@@ -628,13 +628,13 @@ export default function ReecetasPacientes() {
                                                 ...(diagnostico_pdf.trim() ? [{ label: "Diagnóstico", value: diagnostico_pdf }] : []),
                                             ].map(({ label, value }) => (
                                                 <div key={label} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p>
+                                                    <p className="text-[12px] font-bold text-slate-400">{label}</p>
                                                     <p className="mt-0.5 text-[13px] font-semibold text-slate-800">{value}</p>
                                                 </div>
                                             ))}
                                             {descripcion_receta.trim() && (
                                                 <div className="rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 mb-1">Vista previa</p>
+                                                    <p className="text-[12px] font-bold text-slate-400 mb-1">Vista previa</p>
                                                     <p className="text-[12px] leading-5 text-slate-600 whitespace-pre-line line-clamp-6">{descripcion_receta}</p>
                                                 </div>
                                             )}
@@ -643,7 +643,7 @@ export default function ReecetasPacientes() {
 
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/60 overflow-hidden">
                                         <div className="border-b border-slate-100 px-4 py-3">
-                                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Estado</p>
+                                            <p className="text-[12px] font-bold text-slate-500">Estado</p>
                                         </div>
                                         <div className="space-y-2 p-4">
                                             {[
@@ -667,7 +667,7 @@ export default function ReecetasPacientes() {
                                 <button
                                     onClick={() => insertarFichasPaciente(nombre_paciente, apellido_paciente, rut_paciente, id_paciente, id_profesional, profesional_responsable, descripcion_receta)}
                                     type="button"
-                                    className="inline-flex items-center gap-1.5 rounded-xl bg-black hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all"
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#007AFF] hover:bg-[#007AFF] px-4 py-2.5 text-sm font-semibold text-white transition-all"
                                 >
                                     Guardar receta
                                 </button>
@@ -722,10 +722,10 @@ export default function ReecetasPacientes() {
                                 <Table className="min-w-[700px]">
                                     <TableHeader>
                                         <TableRow className="bg-slate-50 border-b border-slate-100 hover:bg-slate-50">
-                                            <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Paciente</TableHead>
-                                            <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Profesional</TableHead>
-                                            <TableHead className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Descripción</TableHead>
-                                            <TableHead className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Acción</TableHead>
+                                            <TableHead className="px-6 py-4 text-[12px] font-bold text-slate-400">Paciente</TableHead>
+                                            <TableHead className="px-6 py-4 text-[12px] font-bold text-slate-400">Profesional</TableHead>
+                                            <TableHead className="px-6 py-4 text-[12px] font-bold text-slate-400">Descripción</TableHead>
+                                            <TableHead className="px-6 py-4 text-right text-[12px] font-bold text-slate-400">Acción</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>

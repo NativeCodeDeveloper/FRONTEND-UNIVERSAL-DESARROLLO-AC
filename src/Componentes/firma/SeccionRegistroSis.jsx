@@ -194,7 +194,7 @@ export default function SeccionRegistroSis({ idProfesional, registro, puedeEdita
             type="button"
             onClick={guardar}
             disabled={guardando || sinCambios}
-            className="h-10 rounded-xl bg-black px-5 text-[13px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-40"
+            className="h-10 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-40"
           >
             {guardando ? "Guardando…" : "Guardar registro"}
           </button>

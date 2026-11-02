@@ -130,7 +130,7 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
         <div className="rounded-xl bg-slate-50 border border-slate-100 px-4 py-3 space-y-2">
           {prestacion && (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 mb-0.5">
+              <p className="text-[12px] font-semibold text-slate-400 mb-0.5">
                 Tipo de consulta
               </p>
               <p className="text-[13px] font-semibold text-slate-800">{prestacion}</p>
@@ -163,7 +163,7 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
       {/* Accesos rápidos */}
       {reserva?.rut && canSeeFichasClinicas && (
         <div className="flex flex-col gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <p className="text-[12px] font-semibold text-slate-400">
             Accesos rápidos
           </p>
           <div className="grid grid-cols-2 gap-2">
@@ -211,7 +211,7 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
 
       {/* Acciones clínicas rápidas */}
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+        <p className="text-[12px] font-semibold text-slate-400">
           Cambiar estado
         </p>
         <div className="grid grid-cols-1 gap-1.5">
@@ -265,7 +265,7 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
         onClick={() => setAbierto((prev) => !prev)}
         className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-600">
+        <span className="text-[12px] font-semibold text-emerald-600">
           Repetir cita en más fechas (opcional)
           {fechasRepeticion.length > 0 && (
             <span className="ml-2 inline-flex items-center justify-center rounded-full bg-[#007AFF]/10 text-[#007AFF] text-[10px] font-bold px-1.5 py-0.5 normal-case tracking-normal">
@@ -744,7 +744,7 @@ function FormSection({
       {/* Rango de fecha/hora */}
       {selectionDraft && (
         <div data-tour="reserva-horario" className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
+          <p className="text-[12px] font-semibold text-slate-400 mb-2.5">
             Horario
           </p>
           <div>
@@ -788,7 +788,7 @@ function FormSection({
       {/* Datos del paciente */}
       {mode !== "bloqueo" && (
         <div data-tour="reserva-paciente" className="rounded-2xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] p-4 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#007AFF] mb-2.5">
+          <p className="text-[12px] font-semibold text-[#007AFF] mb-2.5">
             Datos del paciente
           </p>
           <div>
@@ -886,7 +886,7 @@ function FormSection({
       {/* Selector de tarifa / servicio del profesional */}
       {mode !== "bloqueo" && listaTarifasProfesional.length > 0 && (
         <div data-tour="reserva-servicio" className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
+          <p className="text-[12px] font-semibold text-slate-400 mb-2.5">
             Servicio
           </p>
           <div>
@@ -932,7 +932,7 @@ function FormSection({
           La previsión usa la fuente única @/lib/previsiones (la misma de fichas). */}
       {mode !== "bloqueo" && (
         <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
+          <p className="text-[12px] font-semibold text-slate-400 mb-2.5">
             Previsión y comentarios
           </p>
           <div>
@@ -991,7 +991,7 @@ function FormSection({
 
       {mode !== "bloqueo" && (
         <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+          <p className="text-[12px] font-semibold text-slate-500">
             Consulta
           </p>
 
@@ -1071,7 +1071,7 @@ function FormSection({
       {/* Bloqueo rápido */}
       {mode === "create" && (
         <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
+          <p className="text-[12px] font-semibold text-slate-400 mb-2.5">
             Bloqueo rápido (opcional)
           </p>
           <div>
@@ -1101,7 +1101,7 @@ function FormSection({
       {/* Cambio de estado en modo edición */}
       {mode === "edit" && (
         <div className="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2.5">
+          <p className="text-[12px] font-semibold text-slate-400 mb-2.5">
             Cambiar estado
           </p>
           <div className="grid grid-cols-1 gap-1.5">
@@ -1207,7 +1207,7 @@ export function AppointmentDrawer({
         {/* Header del drawer */}
         <div className="flex items-start justify-between border-b border-slate-100 bg-white px-5 py-4 flex-shrink-0">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#007AFF]">
+            <p className="text-[12px] font-semibold text-[#007AFF]">
               Agenda Clínica
             </p>
             <h2 className="text-[17px] font-semibold tracking-[-0.015em] text-slate-900 leading-snug mt-0.5">
@@ -1317,7 +1317,7 @@ export function AppointmentDrawer({
                           onConfirmar?.();
                         }
                       }}
-                      className="h-11 flex-1 rounded-xl bg-black px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                      className="h-11 flex-1 rounded-xl bg-[#007AFF] px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#007AFF] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                       title={requiereConfirmarRepeticion ? "Revisa y confirma la lista de fechas adicionales antes de agendar" : undefined}
                     >
                       {popupForm.motivoBloqueo?.trim() ? "Bloquear horario" : "Agendar"}
@@ -1336,7 +1336,7 @@ export function AppointmentDrawer({
                     <button
                       type="button"
                       onClick={onActualizar}
-                      className="h-11 flex-1 rounded-xl bg-black px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.99]"
+                      className="h-11 flex-1 rounded-xl bg-[#007AFF] px-4 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#007AFF] active:scale-[0.99]"
                     >
                       Actualizar
                     </button>

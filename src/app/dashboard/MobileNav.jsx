@@ -128,7 +128,7 @@ export default function MobileNav() {
               <img src="/logo-mark-purple.png" alt="AgendaClinica" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-[14px] font-extrabold uppercase leading-tight tracking-wide text-slate-900">{name}</p>
+              <p className="truncate text-[14px] font-semibold leading-tight text-slate-900">{name}</p>
               <p className="text-[12px] font-medium text-slate-400">Panel clínico</p>
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function MobileNav() {
                     key={section.id}
                     className="rounded-2xl border border-slate-200 bg-white p-2"
                   >
-                    <div className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                    <div className="px-2 pb-2 text-[12px] font-semibold text-slate-400">
                       {section.title}
                     </div>
 

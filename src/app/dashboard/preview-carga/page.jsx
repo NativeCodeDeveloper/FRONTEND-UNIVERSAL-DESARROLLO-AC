@@ -41,7 +41,7 @@ export default function PreviewCargaPage() {
                         key={v.id}
                         type="button"
                         onClick={() => setActiva(v.id)}
-                        className="rounded-lg bg-[#16181C] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-black"
+                        className="rounded-lg bg-[#16181C] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#007AFF]"
                     >
                         Ver {v.etiqueta}
                     </button>
@@ -52,7 +52,7 @@ export default function PreviewCargaPage() {
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="rounded-xl border border-[#EAEAEC] bg-white p-5">
-                        <div className="text-xs uppercase tracking-[0.14em] text-[#8B8F96]">
+                        <div className="text-xs text-[#8B8F96]">
                             Tarjeta de ejemplo
                         </div>
                         <div className="mt-3 text-2xl font-semibold text-[#16181C]">

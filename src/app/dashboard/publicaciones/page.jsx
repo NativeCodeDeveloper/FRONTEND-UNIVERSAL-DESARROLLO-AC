@@ -489,7 +489,7 @@ export default function Publicaciones() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
                                 </div>
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">Crear Nueva Publicación</h2>
+                                <h2 className="text-[12px] font-bold text-slate-500">Crear Nueva Publicación</h2>
                             </div>
 
                             <form onSubmit={handleInsertSubmit} className="p-8 space-y-6">
@@ -512,7 +512,7 @@ export default function Publicaciones() {
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleNewFileChange}
-                                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-slate-900 file:text-white hover:file:bg-slate-800 transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
+                                                className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:bg-[#007AFF] file:text-white hover:file:bg-[#007AFF] transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
                                                 disabled={isInserting}
                                             />
                                         </div>
@@ -536,7 +536,7 @@ export default function Publicaciones() {
                                     <button
                                         type="submit"
                                         disabled={isInserting}
-                                        className="h-12 px-8 bg-slate-900 text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center gap-2 disabled:opacity-50"
+                                        className="h-12 px-8 bg-[#007AFF] text-white text-sm font-bold rounded-2xl hover:bg-[#007AFF] transition-all shadow-lg shadow-slate-100 flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {isInserting ? "Insertando..." : "Confirmar Creación"}
                                     </button>
@@ -552,7 +552,7 @@ export default function Publicaciones() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
                                 </div>
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">Actualizar Publicación Existente</h2>
+                                <h2 className="text-[12px] font-bold text-slate-500">Actualizar Publicación Existente</h2>
                             </div>
 
                             <form onSubmit={handleUpdateSubmit} className="p-8 space-y-6">
@@ -576,7 +576,7 @@ export default function Publicaciones() {
                                     <div className="flex flex-col justify-end">
                                         <div className="h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-center gap-2">
                                             <span className="h-2 w-2 rounded-full bg-[#007AFF]"></span>
-                                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">
+                                            <span className="text-[12px] font-bold text-slate-500 tracking-tight">
                                                 Límite: {selectedAllowsMultiple ? "3 Imágenes" : "1 Imagen"}
                                             </span>
                                         </div>
@@ -602,7 +602,7 @@ export default function Publicaciones() {
                                         accept="image/*"
                                         multiple={selectedAllowsMultiple}
                                         onChange={handleFileChange}
-                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-black file:text-white hover:file:bg-slate-800 transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
+                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:bg-[#007AFF] file:text-white hover:file:bg-[#007AFF] transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
                                         disabled={isUploading}
                                     />
                                 </div>
@@ -611,7 +611,7 @@ export default function Publicaciones() {
                                     <button
                                         type="submit"
                                         disabled={isUploading}
-                                        className="h-12 px-8 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
+                                        className="h-12 px-8 bg-[#007AFF] text-white text-sm font-bold rounded-2xl hover:bg-[#007AFF] transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {isUploading ? "Procesando..." : "Actualizar Contenido"}
                                     </button>

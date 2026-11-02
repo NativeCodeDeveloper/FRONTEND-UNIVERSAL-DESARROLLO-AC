@@ -329,13 +329,13 @@ export default function SubCategoria(){
                                 <ShadcnButton
                                     nombre={'Actualizar Subcategoria'}
                                     funcion={()=> actualizarSubCategoria(descripcionSubcategoria, id, id_subcategoria)}
-                                    className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800"
+                                    className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF]"
                                 />
                             ) : (
                                 <ShadcnButton
                                     nombre={'Ingresar Subcategoria'}
                                     funcion={()=> insertarSubcategoria(descripcionSubcategoria, id)}
-                                    className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800"
+                                    className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF]"
                                 />
                             )}
                             <ShadcnButton

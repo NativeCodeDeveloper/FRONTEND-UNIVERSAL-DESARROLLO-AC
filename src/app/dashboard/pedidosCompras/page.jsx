@@ -145,7 +145,7 @@ export default function PedidosCompra() {
                                             placeholder="Busca por similitud en nombres (solo nombre, sin apellido)"
                                         />
                                         <button onClick={() => filtrarSimilitudNombre(comprador)}
-                                            className="h-10 px-5 rounded-xl bg-black text-white text-[12px] font-bold hover:bg-slate-800 transition-all flex-shrink-0 flex items-center gap-2">
+                                            className="h-10 px-5 rounded-xl bg-[#1D1D1F] text-white text-[12px] font-bold hover:bg-[#007AFF] transition-all flex-shrink-0 flex items-center gap-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                             Buscar
                                         </button>

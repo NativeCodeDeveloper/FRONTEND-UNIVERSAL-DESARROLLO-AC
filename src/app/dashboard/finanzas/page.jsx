@@ -1370,7 +1370,7 @@ export default function Finanzas() {
                                                                             type="button"
                                                                             onClick={() => guardarDistribucion(item.id_profesional)}
                                                                             disabled={guardando || pctBorrador === undefined || !hayCambiosSinGuardar}
-                                                                            className="h-8 rounded-lg bg-slate-900 px-3 text-[11px] font-bold text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                                                                            className="h-8 rounded-lg bg-[#1D1D1F] px-3 text-[11px] font-bold text-white transition-colors hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
                                                                         >
                                                                             {guardando ? "Guardando..." : "Guardar"}
                                                                         </button>

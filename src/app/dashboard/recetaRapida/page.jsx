@@ -176,15 +176,15 @@ export default function RecetaRapida() {
                         </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Ficha</p>
+                                <p className="text-[12px] font-semibold text-slate-500">Ficha</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{idFicha || "-"}</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Paciente</p>
+                                <p className="text-[12px] font-semibold text-slate-500">Paciente</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{nombreCompletoPaciente || "-"}</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profesional</p>
+                                <p className="text-[12px] font-semibold text-slate-500">Profesional</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{nombreProfesional || "-"}</p>
                             </div>
                         </div>
@@ -195,7 +195,7 @@ export default function RecetaRapida() {
                     <div className="space-y-6 lg:col-span-3">
                         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-700">Datos clínicos</h2>
+                                <h2 className="text-sm font-semibold text-slate-700">Datos clínicos</h2>
                             </div>
 
                             <div className="grid grid-cols-1 gap-5 p-5 md:grid-cols-2 md:p-6">
@@ -323,7 +323,7 @@ export default function RecetaRapida() {
 
                         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="border-b border-slate-100 px-5 py-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-700">Descripción de la receta</h2>
+                                <h2 className="text-sm font-semibold text-slate-700">Descripción de la receta</h2>
                             </div>
                             <div className="p-5 md:p-6">
                                 <label className="mb-1.5 block text-sm font-medium text-slate-700">Indicación médica</label>
@@ -340,27 +340,27 @@ export default function RecetaRapida() {
                     <div className="space-y-6 lg:col-span-2">
                         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="border-b border-slate-100 bg-slate-50 px-5 py-4">
-                                <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-700">Vista previa</h2>
+                                <h2 className="text-sm font-semibold text-slate-700">Vista previa</h2>
                             </div>
                             <div className="space-y-4 p-5">
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Paciente</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Paciente</p>
                                     <p className="mt-1 text-sm font-semibold text-slate-900">{nombreCompletoPaciente || "-"}</p>
                                 </div>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Rut</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Rut</p>
                                     <p className="mt-1 text-sm font-semibold text-slate-900">{rutPaciente || "-"}</p>
                                 </div>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profesional</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Profesional</p>
                                     <p className="mt-1 text-sm font-semibold text-slate-900">{nombreProfesional || "-"}</p>
                                 </div>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Diagnóstico</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Diagnóstico</p>
                                     <p className="mt-1 text-sm font-semibold text-slate-900">{diagnostico || "-"}</p>
                                 </div>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Fechas</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Fechas</p>
                                     <p className="mt-1 text-sm font-semibold text-slate-900">
                                         {fechaEmision ? new Date(`${fechaEmision}T00:00:00`).toLocaleDateString("es-CL") : "-"}
                                     </p>
@@ -369,7 +369,7 @@ export default function RecetaRapida() {
                                     </p>
                                 </div>
                                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Cuerpo de receta</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Cuerpo de receta</p>
                                     <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">
                                         {descripcionReceta || "La indicación médica aparecerá aquí en formato limpio y clínico."}
                                     </p>

@@ -382,7 +382,7 @@ export default function BloqueosAgendas() {
                     <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                         <Link
                             href="/dashboard/calendario"
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-black px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#1D1D1F] px-3 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40 focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -517,7 +517,7 @@ export default function BloqueosAgendas() {
                                                         onClick={() => toggleDiaSemana(dia.value)}
                                                         className={`flex-1 py-2 text-[12px] font-bold rounded-xl transition-all ${
                                                             diasSemanaSeleccionados.includes(dia.value)
-                                                                ? "bg-black text-white shadow-sm"
+                                                                ? "bg-[#1D1D1F] text-white shadow-sm"
                                                                 : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-900"
                                                         }`}
                                                     >
@@ -654,7 +654,7 @@ export default function BloqueosAgendas() {
                                         data-tour="bloqueo-guardar"
                                         onClick={insertarBloqueosMultiples}
                                         disabled={cargandoInsercion}
-                                        className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all duration-200 shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#007AFF] text-white text-sm font-bold rounded-2xl hover:bg-[#007AFF] transition-all duration-200 shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
                                         {cargandoInsercion ? (
                                             <>

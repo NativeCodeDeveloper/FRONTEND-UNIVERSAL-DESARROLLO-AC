@@ -139,7 +139,7 @@ export default function TextoLegalModal({ abierto, titulo, version, cuerpo, onCe
             <button
               type="button"
               onClick={accionPrincipal.onClick}
-              className="h-11 rounded-xl bg-black px-6 text-[14px] font-semibold text-white transition-colors hover:bg-slate-800"
+              className="h-11 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF]"
             >
               {accionPrincipal.etiqueta}
             </button>

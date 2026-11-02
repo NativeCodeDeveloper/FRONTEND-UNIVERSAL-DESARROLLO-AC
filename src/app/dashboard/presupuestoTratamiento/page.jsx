@@ -469,7 +469,7 @@ export default function PresupuestoTratamiento() {
                                                         </svg>
                                                     </button>
                                                 </div>
-                                                <label className="mt-3 block text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                                <label className="mt-3 block text-[12px] font-semibold text-slate-500">
                                                     Observacion para PDF
                                                 </label>
                                                 <textarea
@@ -519,7 +519,7 @@ export default function PresupuestoTratamiento() {
                                     data-tour="presupuesto-pdf"
                                     onClick={descargarPresupuestoPDF}
                                     disabled={listaPresupuesto.length === 0}
-                                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 transition-all duration-150 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#007AFF] rounded-xl hover:bg-[#007AFF] transition-all duration-150 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
@@ -654,7 +654,7 @@ export default function PresupuestoTratamiento() {
                                                         <button
                                                             type="button"
                                                             onClick={() => generarPresupuesto(servicio)}
-                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-black rounded-lg hover:bg-slate-800 transition-all duration-150 shadow-sm active:scale-[0.98]"
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#1D1D1F] rounded-lg hover:bg-[#007AFF] transition-all duration-150 shadow-sm active:scale-[0.98]"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>

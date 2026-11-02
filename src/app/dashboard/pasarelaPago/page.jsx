@@ -16,7 +16,7 @@ function DatoActual({ icon, etiqueta, valor, ayuda }) {
                     {icon}
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{etiqueta}</p>
+                    <p className="text-[12px] font-bold text-slate-400">{etiqueta}</p>
                     <p className="mt-1 truncate text-base font-semibold text-slate-900">{valor}</p>
                     {ayuda ? <p className="mt-1 text-xs leading-5 text-slate-500">{ayuda}</p> : null}
                 </div>
@@ -272,7 +272,7 @@ export default function PasarelaPagoPage() {
                                     id_mercadoPago_persistence
                                 )}
                                 type="button"
-                                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#007AFF]"
                             >
                                 <CreditCard className="h-4 w-4" />
                                 Actualizar datos

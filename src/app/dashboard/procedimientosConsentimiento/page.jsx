@@ -123,7 +123,7 @@ function VistaAnexo({ cuerpo, vacio = "Completa los campos para ver el texto." }
     <div className="space-y-2.5 text-[14px] leading-relaxed text-[#3A3A3C]">
       {bloques.map((b, i) =>
         b.tipo === "titulo" ? (
-          <h4 key={i} className="pt-2 text-[13px] font-semibold uppercase tracking-[0.04em] text-[#1D1D1F] first:pt-0">{b.texto}</h4>
+          <h4 key={i} className="pt-2 text-[13px] font-semibold text-[#1D1D1F] first:pt-0">{b.texto}</h4>
         ) : b.tipo === "lista" ? (
           <ul key={i} className="space-y-1 pl-5 marker:text-[#C7C7CC] [list-style:disc]">
             {b.items.map((it, j) => <li key={j}>{it}</li>)}
@@ -238,7 +238,7 @@ function EditorProcedimiento({ abierto, procedimiento, onCerrar, onGuardado, api
 
   const vistaPrevia = (
     <Tarjeta className="p-5 sm:p-6">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#007AFF]">Así lo leerá el paciente</p>
+      <p className="text-[12px] font-semibold text-[#007AFF]">Así lo leerá el paciente</p>
       <p className="mt-1 text-[17px] font-semibold text-[#1D1D1F]">{nombre.trim() || "Nombre del procedimiento"}</p>
       <p className="mb-4 text-[13px] text-[#6E6E73]">Se agrega como anexo al consentimiento base, después de la declaración del paciente.</p>
       <VistaAnexo cuerpo={cuerpo} />
@@ -506,7 +506,7 @@ export default function ProcedimientosConsentimientoPage() {
         ) : (
           porGrupo.map(([grupo, lista]) => (
             <section key={grupo} aria-labelledby={`grupo-${grupo}`}>
-              <h2 id={`grupo-${grupo}`} className="mb-2 px-4 text-[13px] font-normal uppercase tracking-[0.02em] text-[#6E6E73]">
+              <h2 id={`grupo-${grupo}`} className="mb-2 px-4 text-[13px] font-normal text-[#6E6E73]">
                 {grupo} · {lista.length}
               </h2>
               <Tarjeta>

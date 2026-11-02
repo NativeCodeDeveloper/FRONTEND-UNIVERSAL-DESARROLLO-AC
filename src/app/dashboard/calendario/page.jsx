@@ -2867,7 +2867,7 @@ function CalendarioContent() {
                                         <thead>
                                             <tr className="border-b border-slate-100 text-left">
                                                 {["Motivo", "Fecha inicio", "Hora inicio", "Fecha fin", "Hora fin", "Acción"].map((h) => (
-                                                    <th key={h} className="pb-2 pr-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{h}</th>
+                                                    <th key={h} className="pb-2 pr-4 text-[12px] font-semibold text-slate-400">{h}</th>
                                                 ))}
                                             </tr>
                                         </thead>

@@ -435,15 +435,15 @@ export default function ExamenDocumento() {
                         </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Catálogo</p>
+                                <p className="text-[12px] font-semibold text-slate-400">Catálogo</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{listaExamenes.length}</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Paciente</p>
+                                <p className="text-[12px] font-semibold text-slate-400">Paciente</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{nombrePaciente.trim() || "-"}</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Seleccionados</p>
+                                <p className="text-[12px] font-semibold text-slate-400">Seleccionados</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{totalExamenes}</p>
                             </div>
                         </div>
@@ -542,7 +542,7 @@ export default function ExamenDocumento() {
                                     {!FIRMA_HABILITADA && <button
                                         type="button"
                                         onClick={generarDocumentoPDF}
-                                        className="inline-flex items-center gap-2 rounded-xl bg-black hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
+                                        className="inline-flex items-center gap-2 rounded-xl bg-[#007AFF] hover:bg-[#007AFF] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-8m0 8l-3-3m3 3l3-3M4 19h16"/>
@@ -570,21 +570,21 @@ export default function ExamenDocumento() {
 
                             <div className="grid grid-cols-1 gap-px bg-slate-100 sm:grid-cols-2">
                                 <div className="bg-white px-5 py-4 sm:col-span-2">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">Nombre completo</p>
+                                    <p className="text-[12px] font-bold text-slate-400 mb-1">Nombre completo</p>
                                     <p className="text-[13px] font-semibold text-slate-900">
                                         {nombrePaciente.trim() || "-"}
                                     </p>
                                 </div>
                                 <div className="bg-white px-5 py-4">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">RUT</p>
+                                    <p className="text-[12px] font-bold text-slate-400 mb-1">RUT</p>
                                     <p className="text-[13px] font-semibold text-slate-900">{rutPaciente.trim() || "-"}</p>
                                 </div>
                                 <div className="bg-white px-5 py-4">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">Profesional</p>
+                                    <p className="text-[12px] font-bold text-slate-400 mb-1">Profesional</p>
                                     <p className="text-[13px] font-semibold text-slate-900">{nombreProfesional.trim() || "-"}</p>
                                 </div>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Fecha solicitud</p>
+                                    <p className="text-[12px] font-semibold text-slate-500">Fecha solicitud</p>
                                     <p className="mt-1 text-sm font-semibold text-slate-900">
                                         {fechaSolicitud ? new Date(`${fechaSolicitud}T00:00:00`).toLocaleDateString("es-CL") : "-"}
                                     </p>
@@ -653,7 +653,7 @@ export default function ExamenDocumento() {
                                                         className={`inline-flex w-full shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 md:w-[196px] ${
                                                             yaAgregado
                                                                 ? "cursor-not-allowed border border-emerald-200 bg-emerald-50 text-emerald-700"
-                                                                : "bg-black hover:bg-slate-800 text-white shadow-sm"
+                                                                : "bg-[#007AFF] hover:bg-[#007AFF] text-white shadow-sm"
                                                         }`}
                                                     >
                                                         {yaAgregado ? "Agregado" : "Agregar al documento"}
@@ -692,7 +692,7 @@ export default function ExamenDocumento() {
                                             className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 md:flex-row md:items-start md:justify-between"
                                         >
                                             <div className="flex items-start gap-3">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1D1D1F] text-xs font-bold text-white">
                                                     {index + 1}
                                                 </div>
                                                 <div className="space-y-1">
@@ -740,7 +740,7 @@ export default function ExamenDocumento() {
                                     {!FIRMA_HABILITADA && <button
                                         type="button"
                                         onClick={generarDocumentoPDF}
-                                        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
+                                        className="inline-flex items-center gap-2 rounded-xl bg-[#007AFF] hover:bg-[#007AFF] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-150"
                                     >
                                         Generar documento PDF
                                     </button>}

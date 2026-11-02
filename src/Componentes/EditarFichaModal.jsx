@@ -348,7 +348,7 @@ export default function EditarFichaModal({ abierto, id_ficha, paciente, idProfes
             type="button"
             onClick={guardar}
             disabled={guardando || cargandoFicha || !usuarioCargado || Boolean(idProfesionalAgendaAsignada && !profesionalAsignado)}
-            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-6 text-[14px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
+            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-60"
           >
             {guardando ? (
               <>

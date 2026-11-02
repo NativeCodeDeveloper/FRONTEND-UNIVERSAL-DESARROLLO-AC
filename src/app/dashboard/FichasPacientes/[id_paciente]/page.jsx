@@ -1180,7 +1180,7 @@ export default function Paciente() {
                             </button>
                             <button
                                 onClick={() => volverAListaTrabajo()}
-                                className="h-14 flex-1 sm:flex-none px-6 rounded-2xl bg-slate-900 text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center justify-center gap-2"
+                                className="h-14 flex-1 sm:flex-none px-6 rounded-2xl bg-[#007AFF] text-white text-[13px] font-bold hover:bg-[#007AFF] transition-all shadow-lg shadow-slate-100 flex items-center justify-center gap-2"
                             >
                                 Reservaciones
                             </button>
@@ -1264,7 +1264,7 @@ export default function Paciente() {
                                     <div>
                                         <button
                                             onClick={editarPaciente}
-                                            className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 text-[11px] font-bold text-white transition-all hover:bg-slate-800"
+                                            className="flex h-9 w-full items-center justify-center gap-2 rounded-xl bg-[#1D1D1F] text-[11px] font-bold text-white transition-all hover:bg-[#007AFF]"
                                         >
                                             Editar Información de Ingreso
                                         </button>
@@ -1280,20 +1280,20 @@ export default function Paciente() {
                         {/* Acciones Rápidas */}
                         <div data-tour="ficha-acciones-rapidas" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                             <button data-tour="ficha-boton-nueva" onClick={() => nuevaFichaClinica(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Ficha</span>
                             </button>
                             <button onClick={agendarPaciente} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Agendar</span>
                             </button>
                             {canSeeOdontograma && (
                                 <button onClick={verOdontogramas} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75h4.5m-4.5 4.5h4.5M7.5 3.75h9A2.25 2.25 0 0118.75 6v12A2.25 2.25 0 0116.5 20.25h-9A2.25 2.25 0 015.25 18V6A2.25 2.25 0 017.5 3.75z" /></svg>
                                     </span>
                                     <span className="text-[13px] font-semibold text-slate-800">Odontograma</span>
@@ -1301,20 +1301,20 @@ export default function Paciente() {
                             )}
                             {canSeeRecetaMedica && (
                                 <button onClick={() => irAReceta(id_paciente)} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
                                     </span>
                                     <span className="text-[13px] font-semibold text-slate-800">Recetas</span>
                                 </button>
                             )}
                             <button type="button" onClick={irACotizaciones} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Cotizaciones</span>
                             </button>
                             <button onClick={irADocumentos} className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Documentos</span>
@@ -1324,7 +1324,7 @@ export default function Paciente() {
                                     onClick={() => router.push(`/dashboard/telemedicina/${id_paciente}`)}
                                     className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                                 >
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                                     </span>
                                     <span className="text-[13px] font-semibold text-slate-800">Telemedicina</span>
@@ -1334,7 +1334,7 @@ export default function Paciente() {
                                     onClick={() => router.push(`/dashboard/consentimiento?id_paciente=${id_paciente}`)}
                                     className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
                                 >
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-black text-white transition-colors duration-200 group-hover:bg-slate-800">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 3.75h7l4.25 4.25V19A2.25 2.25 0 0117 21.25H8A2.25 2.25 0 015.75 19V6A2.25 2.25 0 018 3.75zM15 3.75V8h4.25M9 12h6m-6 3.5h6m-6 3.5h3" /></svg>
                                     </span>
                                     <span className="min-w-0 text-[13px] font-semibold leading-tight text-slate-800">Consentimiento</span>
@@ -1345,7 +1345,7 @@ export default function Paciente() {
                         {pacienteActual && (
                             <details data-tour="ficha-info-ingreso" className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-transparent bg-[#1D1D1F] text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
@@ -1377,19 +1377,19 @@ export default function Paciente() {
                                 </summary>
                                 <div className="grid grid-cols-1 gap-3 border-t border-slate-100 bg-slate-50/60 p-3 sm:grid-cols-2">
                                     <div className="min-w-0 rounded-xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#007AFF]">Antecedentes</p>
+                                        <p className="text-[12px] font-bold text-[#007AFF]">Antecedentes</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.observacion1 || "Sin antecedentes registrados"}</p>
                                     </div>
                                     <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Medicamentos</p>
+                                        <p className="text-[12px] font-bold text-slate-400">Medicamentos</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.medicamentosUsados || "Sin información"}</p>
                                     </div>
                                     <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Hábitos</p>
+                                        <p className="text-[12px] font-bold text-slate-400">Hábitos</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.habitos || "Sin información"}</p>
                                     </div>
                                     <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Comentarios</p>
+                                        <p className="text-[12px] font-bold text-slate-400">Comentarios</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.comentariosAdicionales || "Sin información"}</p>
                                     </div>
                                 </div>
@@ -1402,7 +1402,7 @@ export default function Paciente() {
                                 <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" onClick={(e) => e.stopPropagation()} className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/60 px-5 py-3 sm:px-6">
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#007AFF]">Paciente</p>
+                                        <p className="text-[12px] font-bold text-[#007AFF]">Paciente</p>
                                         <h3 className="mt-0.5 text-sm font-bold text-slate-900">Editar Información de Ingreso</h3>
                                     </div>
                                     <button onClick={() => setMostrarFormulario(false)} aria-label="Cerrar edición" className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
@@ -1498,7 +1498,7 @@ export default function Paciente() {
                                 </div>
                                 <div className="flex shrink-0 items-center justify-end gap-2.5 border-t border-slate-200 bg-slate-50/95 px-4 py-2.5 sm:px-5">
                                     <button onClick={() => setMostrarFormulario(false)} className="h-9 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-500 transition-colors hover:bg-slate-50">Cancelar</button>
-                                    <button disabled={guardandoPaciente} onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente)} className="h-9 rounded-lg bg-black px-5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60">{guardandoPaciente ? "Verificando y guardando..." : "Guardar Cambios"}</button>
+                                    <button disabled={guardandoPaciente} onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, id_paciente)} className="h-9 rounded-lg bg-[#1D1D1F] px-5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#007AFF] disabled:cursor-wait disabled:opacity-60">{guardandoPaciente ? "Verificando y guardando..." : "Guardar Cambios"}</button>
                                 </div>
                             </div>
                             </div>
@@ -1511,7 +1511,7 @@ export default function Paciente() {
                                 para no dejar espacio en blanco cuando no se está usando. */}
                             <details data-tour="ficha-filtros" className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center justify-between gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-transparent bg-[#1D1D1F] text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18l-7 8v6l-4 2v-8L3 4z" />
                                         </svg>
@@ -1547,7 +1547,7 @@ export default function Paciente() {
                                                 className="h-11 w-full rounded-xl border-none bg-slate-50 pl-11 pr-4 text-sm transition-all focus:ring-2 focus:ring-[#007AFF]/10"
                                             />
                                         </div>
-                                        <button onClick={buscarPorProfesional} className="h-11 shrink-0 rounded-xl bg-slate-900 px-6 text-[13px] font-bold text-white transition-all hover:bg-slate-800">Buscar</button>
+                                        <button onClick={buscarPorProfesional} className="h-11 shrink-0 rounded-xl bg-[#007AFF] px-6 text-[13px] font-bold text-white transition-all hover:bg-[#007AFF]">Buscar</button>
                                         {/* Va en la misma fila para no alargar el panel hacia abajo. */}
                                         <input
                                             type="date"
@@ -1594,7 +1594,7 @@ export default function Paciente() {
                                 e "Información de ingreso". */}
                             <details data-tour="ficha-historial" className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300">
                                 <summary className="relative flex min-h-[88px] cursor-pointer list-none items-center gap-4 overflow-hidden px-5 py-4 transition-colors duration-300 hover:bg-white/80 [&::-webkit-details-marker]:hidden">
-                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-800 bg-black text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-slate-800">
+                                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-transparent bg-[#1D1D1F] text-white shadow-sm transition-colors duration-300 group-open:border-slate-700 group-open:bg-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 12v3l2 1" />
@@ -1756,7 +1756,7 @@ export default function Paciente() {
                                                 <div className="relative z-10 flex min-w-0 items-center gap-3.5">
                                                     <div className="min-w-0">
                                                         <div className="flex flex-wrap items-center gap-2">
-                                                            <p className="truncate text-[9px] font-bold uppercase tracking-[0.18em] text-teal-700">Prof. {ficha.observaciones || "No informado"}</p>
+                                                            <p className="truncate text-[12px] font-bold text-teal-700">Prof. {ficha.observaciones || "No informado"}</p>
                                                             {esMasReciente && (
                                                                 <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-bold text-emerald-700 shadow-sm">Más reciente</span>
                                                             )}
@@ -1778,7 +1778,7 @@ export default function Paciente() {
                                                     </div>
                                                 </div>
                                                 <div className="relative z-10 flex flex-wrap items-center gap-2 xl:justify-end">
-                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-800 bg-black px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-700 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-transparent bg-[#1D1D1F] px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-700 hover:bg-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40 focus-visible:ring-offset-2">
                                                         {expandida ? "Ocultar" : "Ver detalle"}
                                                     </button>
                                                     {FIRMA_HABILITADA ? (() => {
@@ -1820,13 +1820,13 @@ export default function Paciente() {
                                                                     <div key={cat.nombre} className="space-y-3.5">
                                                                         <div className="flex items-center gap-3">
                                                                             <span className="h-2 w-2 rounded-full bg-[#007AFF] shadow-[0_0_0_4px_rgba(0,122,255,0.1)]" />
-                                                                            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#007AFF]">{cat.nombre}</span>
+                                                                            <span className="text-[12px] font-bold text-[#007AFF]">{cat.nombre}</span>
                                                                             <div className="h-px flex-1 bg-slate-200"></div>
                                                                         </div>
                                                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                                             {cat.campos.map((campo, idx) => (
                                                                                 <div key={idx} className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-300 hover:border-slate-300">
-                                                                                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">{campo.nombre}</span>
+                                                                                    <span className="text-[12px] font-bold text-slate-400">{campo.nombre}</span>
                                                                                     <p className="mt-2 whitespace-pre-wrap text-[13px] font-semibold leading-relaxed text-slate-700">{campo.valor || "-"}</p>
                                                                                 </div>
                                                                             ))}

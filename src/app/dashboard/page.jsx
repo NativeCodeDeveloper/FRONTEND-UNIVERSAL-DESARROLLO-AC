@@ -985,7 +985,7 @@ export default function AgendaCitas() {
                             </div>
                         </div>
                         <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-slate-900 text-white">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#1D1D1F] text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div className="flex flex-col justify-center">
@@ -1025,7 +1025,7 @@ export default function AgendaCitas() {
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/calendario")}
-                            className="flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-black px-4 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            className="flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#007AFF] px-4 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40 focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -1085,14 +1085,14 @@ export default function AgendaCitas() {
                                         <label className="text-[12px] font-medium text-slate-400 ml-1">Nombre Paciente</label>
                                         <div className="flex gap-2">
                                             <ShadcnInput value={nombrePaciente} onChange={(e) => setnombrePaciente(e.target.value)} placeholder="Ej: Nicolas..." className="h-9 rounded-xl border-slate-200" />
-                                            <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-9 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
+                                            <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-9 px-4 shrink-0 rounded-xl bg-[#1D1D1F] text-white text-xs font-bold hover:bg-[#007AFF] transition-all">Buscar</button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[12px] font-medium text-slate-400 ml-1">RUT Paciente</label>
                                         <div className="flex gap-2">
                                             <ShadcnInput value={rut} onChange={(e) => setrut(e.target.value)} placeholder="12.345.678-9" className="h-9 rounded-xl border-slate-200" />
-                                            <button onClick={() => buscarPorRut(rut)} className="h-9 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
+                                            <button onClick={() => buscarPorRut(rut)} className="h-9 px-4 shrink-0 rounded-xl bg-[#1D1D1F] text-white text-xs font-bold hover:bg-[#007AFF] transition-all">Buscar</button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
@@ -1127,7 +1127,7 @@ export default function AgendaCitas() {
                                 <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4 pt-6 border-t border-slate-100">
                                     <Calendar28 nombre="Desde" value={fechaInicio} onChange={(v) => setfechaInicio(v)} />
                                     <Calendar28 nombre="Hasta" value={fechaFinalizacion} onChange={(v) => setfechaFinalizacion(v)} />
-                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-9 w-full bg-black text-white text-[13px] font-bold rounded-xl hover:bg-slate-800 shadow-sm transition-all">Filtrar por Período</button>
+                                    <button onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)} className="h-9 w-full bg-[#1D1D1F] text-white text-[13px] font-bold rounded-xl hover:bg-[#007AFF] shadow-sm transition-all">Filtrar por Período</button>
                                     <button onClick={() => { limpiarFiltrosPersistidos(); listarTablaCitas(); }} className="h-9 w-full border border-slate-200 text-slate-500 text-[13px] font-bold rounded-xl hover:bg-slate-50 transition-all">Limpiar Filtros</button>
                                 </div>
                             </div>
@@ -1137,7 +1137,7 @@ export default function AgendaCitas() {
                     {/* Tabla de Resultados */}
                     <div data-tour="dashboard-tabla-citas" className="overflow-visible rounded-[32px] border border-slate-200 bg-white shadow-sm">
                         <div data-tour="dashboard-citas-header" className="flex items-center justify-between gap-3 rounded-t-[32px] border-b border-slate-100 bg-slate-50/30 px-4 py-3.5 md:px-8 md:py-5">
-                            <h2 className="text-[13px] font-extrabold uppercase tracking-[0.08em] text-slate-900 md:text-[11px] md:font-bold md:tracking-widest md:text-slate-500">Citas Agendadas</h2>
+                            <h2 className="text-[13px] font-semibold text-slate-900 md:text-[11px] md:font-bold md:text-slate-500">Citas Agendadas</h2>
                             <div className="flex items-center gap-2.5 md:gap-3">
                                 <span className="text-[13px] font-bold text-slate-400 md:text-[11px]">{dataLista.length} {dataLista.length === 1 ? "cita" : "citas"}</span>
                                 <button
@@ -1427,7 +1427,7 @@ export default function AgendaCitas() {
                                     type="button"
                                     onClick={guardarComentarioReserva}
                                     disabled={guardandoComentario}
-                                    className="h-10 rounded-xl bg-black px-5 text-[13px] font-bold text-white transition-all hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60"
+                                    className="h-10 rounded-xl bg-[#007AFF] px-5 text-[13px] font-bold text-white transition-all hover:bg-[#007AFF] disabled:cursor-wait disabled:opacity-60"
                                 >
                                     {guardandoComentario ? "Guardando..." : "Guardar"}
                                 </button>

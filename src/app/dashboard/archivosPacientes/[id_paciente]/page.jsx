@@ -388,7 +388,7 @@ export default function ArchivosPaciente() {
                             </button>
                             <button
                                 onClick={volverAListaTrabajo}
-                                className="h-14 px-6 rounded-2xl bg-slate-900 text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center justify-center gap-2"
+                                className="h-14 px-6 rounded-2xl bg-[#007AFF] text-white text-[13px] font-bold hover:bg-[#007AFF] transition-all shadow-lg shadow-slate-100 flex items-center justify-center gap-2"
                             >
                                 Reservaciones
                             </button>
@@ -434,7 +434,7 @@ export default function ArchivosPaciente() {
                         <button
                             onClick={abrirSelectorArchivo}
                             disabled={subiendo}
-                            className="h-10 px-5 rounded-xl bg-slate-900 text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="h-10 px-5 rounded-xl bg-[#007AFF] text-white text-[13px] font-bold hover:bg-[#007AFF] transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {subiendo ? (
                                 <>

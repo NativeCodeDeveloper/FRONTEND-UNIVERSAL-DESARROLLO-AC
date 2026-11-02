@@ -381,7 +381,7 @@ export default function DatosEmpresa() {
                 <div className="flex justify-end pb-4">
                     <ButtonDinamic
                         onClick={guardarDatosEmpresa}
-                        className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
+                        className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF] transition-colors"
                     >
                         {cargando ? "Guardando..." : "Guardar todos los datos"}
                     </ButtonDinamic>

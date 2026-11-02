@@ -299,7 +299,7 @@ export default function Paciente(){
                     {canSeeFichasClinicas && (
                         <button
                             onClick={volverAFichas}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl bg-black hover:bg-slate-800 shadow-sm transition-all"
+                            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl bg-[#007AFF] hover:bg-[#007AFF] shadow-sm transition-all"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
@@ -394,7 +394,7 @@ export default function Paciente(){
                                     { label: "Sexo",                value: paciente.sexo || "---" },
                                 ].map(({ label, value }) => (
                                     <div key={label} className="flex items-baseline justify-between gap-4 px-6 py-3.5">
-                                        <dt className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</dt>
+                                        <dt className="text-[12px] font-bold text-slate-400">{label}</dt>
                                         <dd className="text-[13px] font-semibold text-slate-800 text-right break-words">{value}</dd>
                                     </div>
                                 ))}
@@ -422,7 +422,7 @@ export default function Paciente(){
                                         { label: "País",               value: paciente.pais },
                                     ].map(({ label, value }) => (
                                         <div key={label} className="bg-white px-6 py-4">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
+                                            <p className="text-[12px] font-bold text-slate-400 mb-1">{label}</p>
                                             <p className="text-[13px] font-medium text-slate-800 break-words">{value || "---"}</p>
                                         </div>
                                     ))}
@@ -445,7 +445,7 @@ export default function Paciente(){
                                         { label: "RUT apoderado", value: paciente.apoderado_rut },
                                     ].map(({ label, value }) => (
                                         <div key={label} className="bg-white px-6 py-4">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">{label}</p>
+                                            <p className="text-[12px] font-bold text-slate-400 mb-1">{label}</p>
                                             <p className="text-[13px] font-medium text-slate-800 break-words">{value || "---"}</p>
                                         </div>
                                     ))}
@@ -503,7 +503,7 @@ export default function Paciente(){
                                     { label: "Comentarios adicionales",value: paciente.comentariosAdicionales },
                                 ].map(({ label, value }) => (
                                     <div key={label} className="bg-white px-5 py-5">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-2">{label}</p>
+                                        <p className="text-[12px] font-bold text-slate-400 mb-2">{label}</p>
                                         <p className="text-[13px] leading-relaxed text-slate-700 break-words whitespace-pre-wrap">
                                             {value || <span className="text-slate-400 italic">Sin información</span>}
                                         </p>
@@ -523,7 +523,7 @@ export default function Paciente(){
                         {/* Header form */}
                         <div className="flex items-start justify-between gap-4 border-b border-slate-100 bg-slate-50/40 px-6 py-5 sm:px-8">
                             <div>
-                                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500">Edición</p>
+                                <p className="text-[12px] font-bold text-slate-500">Edición</p>
                                 <h2 className="mt-0.5 text-lg font-bold text-slate-900">Actualizar Datos del Paciente</h2>
                                 <p className="mt-0.5 text-sm text-slate-500">{canSeeFichasClinicas ? "Modifica los datos demográficos y clínicos." : "Modifica los datos demográficos y de contacto."}</p>
                             </div>
@@ -543,45 +543,45 @@ export default function Paciente(){
 
                             {/* Datos básicos */}
                             <section>
-                                <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Identidad</p>
+                                <p className="mb-1 text-[12px] font-bold text-slate-400">Identidad</p>
                                 <h3 className="mb-5 text-base font-semibold text-slate-900">Datos básicos</h3>
                                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Nombre</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Nombre</label>
                                         <ShadcnInput value={nombre} placeholder="Ej: José Nicolás" onChange={(e) => setNombre(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Apellido</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Apellido</label>
                                         <ShadcnInput value={apellido} placeholder="Ej: González Garrido" onChange={(e) => setApellido(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Documento</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Documento</label>
                                         <RutInput permitirExtranjero tipoDocumento={tipoDocumento} onTipoDocumentoChange={setTipoDocumento} value={rut} onChange={(clean) => setRut(clean)} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Sexo</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Sexo</label>
                                         <ShadcnInput value={sexo} placeholder="Ej: Femenino" onChange={(e) => setSexo(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Previsión</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Previsión</label>
                                         <div className="[&_button]:w-full [&_button]:justify-between [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:text-sm [&_button]:text-slate-700 [&_button]:shadow-none">
                                             <ShadcnSelect nombreDefault="Seleccione Previsión" opciones={NOMBRES_PREVISION} value={prevision} onChange={(v) => setPrevision(v)}/>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Teléfono</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Teléfono</label>
                                         <PhoneInput value={telefono} onChange={(full) => setTelefono(full)} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Correo</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Correo</label>
                                         <ShadcnInput value={correo} placeholder="paciente@email.com" onChange={(e) => setCorreo(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Dirección</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Dirección</label>
                                         <ShadcnInput value={direccion} placeholder="Av. España 123, Concepción" onChange={(e) => setDireccion(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">País</label>
+                                        <label className="mb-1.5 block text-[12px] font-bold text-slate-500">País</label>
                                         <ShadcnInput value={pais} placeholder="Chile" onChange={(e) => setPais(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div className="sm:col-span-2 xl:col-span-3">
@@ -593,15 +593,15 @@ export default function Paciente(){
                             {/* Apoderado + Antecedentes */}
                             <section className="grid grid-cols-1 gap-6 xl:grid-cols-[0.85fr_1.15fr]">
                                 <div className="rounded-[24px] border border-slate-200 bg-slate-50/50 p-5">
-                                    <p className="mb-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Referencia</p>
+                                    <p className="mb-0.5 text-[12px] font-bold text-slate-400">Referencia</p>
                                     <h3 className="mb-5 text-sm font-semibold text-slate-900">Apoderado</h3>
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Nombre Apoderado</label>
+                                            <label className="mb-1.5 block text-[12px] font-bold text-slate-500">Nombre Apoderado</label>
                                             <ShadcnInput value={apoderado} placeholder="Nombre completo" onChange={(e) => setApoderado(e.target.value)} className="bg-white border-slate-200"/>
                                         </div>
                                         <div>
-                                            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">RUT Apoderado</label>
+                                            <label className="mb-1.5 block text-[12px] font-bold text-slate-500">RUT Apoderado</label>
                                             <ShadcnInput value={apoderadoRut} placeholder="11222333K" onChange={(e) => setApoderadoRut(e.target.value)} className="bg-white border-slate-200"/>
                                         </div>
                                     </div>
@@ -610,7 +610,7 @@ export default function Paciente(){
                                 {/* Solo perfiles clínicos. Para los demás los valores se conservan y se reenvían sin cambios. */}
                                 {canSeeFichasClinicas ? (
                                 <div className="rounded-[24px] border border-[#007AFF]/10 bg-[#007AFF]/[0.06] p-5">
-                                    <p className="mb-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Resumen clínico</p>
+                                    <p className="mb-0.5 text-[12px] font-bold text-slate-500">Resumen clínico</p>
                                     <h3 className="mb-5 text-sm font-semibold text-slate-900">Observaciones y antecedentes</h3>
                                     <div className="space-y-4">
                                         {[
@@ -620,7 +620,7 @@ export default function Paciente(){
                                             { label: "Comentarios adicionales", value: comentariosAdicionales, setter: setComentariosAdicionales },
                                         ].map(({ label, value, setter }) => (
                                             <div key={label}>
-                                                <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">{label}</label>
+                                                <label className="mb-1.5 block text-[12px] font-bold text-slate-500">{label}</label>
                                                 <Textarea value={value} onChange={(e) => setter(e.target.value)} className="min-h-[80px] resize-y bg-white border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                             </div>
                                         ))}

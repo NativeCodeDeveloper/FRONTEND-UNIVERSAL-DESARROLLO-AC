@@ -99,7 +99,7 @@ export default function Testimonios() {
               onClick={() => setFiltroRating(0)}
               className={`h-8 px-3 rounded-full text-[11px] font-bold transition-all ${
                 filtroRating === 0
-                  ? "bg-black text-white"
+                  ? "bg-[#1D1D1F] text-white"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
             >
@@ -111,7 +111,7 @@ export default function Testimonios() {
                 onClick={() => setFiltroRating(n)}
                 className={`h-8 px-3 rounded-full text-[11px] font-bold flex items-center gap-1 transition-all ${
                   filtroRating === n
-                    ? "bg-black text-white"
+                    ? "bg-[#1D1D1F] text-white"
                     : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
               >

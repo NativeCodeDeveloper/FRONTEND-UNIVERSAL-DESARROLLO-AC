@@ -371,7 +371,7 @@ export default function AgendaCitas() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Gestión de Pacientes</p>
+                        <p className="text-[12px] font-bold text-[#007AFF]">Gestión de Pacientes</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Listado de Reservaciones</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Monitorea y gestiona el estado de todas las citas. Puedes filtrar por profesional, fecha o datos del paciente para realizar confirmaciones rápidas.
@@ -416,7 +416,7 @@ export default function AgendaCitas() {
                                             />
                                             <button 
                                                 onClick={() => buscarPorNombres(nombrePaciente)}
-                                                className="h-11 px-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0"
+                                                className="h-11 px-4 bg-[#007AFF] text-white rounded-xl hover:bg-[#007AFF] transition-colors flex-shrink-0"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -434,7 +434,7 @@ export default function AgendaCitas() {
                                             />
                                             <button 
                                                 onClick={() => buscarPorRut(rut)}
-                                                className="h-11 px-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0"
+                                                className="h-11 px-4 bg-[#007AFF] text-white rounded-xl hover:bg-[#007AFF] transition-colors flex-shrink-0"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -578,13 +578,13 @@ export default function AgendaCitas() {
                                                             </div>
                                                             <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100">
                                                                 <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'asiste')} disabled={actualizandoReservaId === data.id_reserva}
-                                                                    className="flex-1 h-8 rounded-xl bg-cyan-50 text-cyan-600 text-[9px] font-bold uppercase tracking-tight hover:bg-cyan-600 hover:text-white transition-all border border-cyan-100 disabled:opacity-40">Asiste</button>
+                                                                    className="flex-1 h-8 rounded-xl bg-cyan-50 text-cyan-600 text-[12px] font-bold tracking-tight hover:bg-cyan-600 hover:text-white transition-all border border-cyan-100 disabled:opacity-40">Asiste</button>
                                                                 <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'no asiste')} disabled={actualizandoReservaId === data.id_reserva}
-                                                                    className="flex-1 h-8 rounded-xl bg-pink-50 text-pink-600 text-[9px] font-bold uppercase tracking-tight hover:bg-pink-600 hover:text-white transition-all border border-pink-100 disabled:opacity-40">Faltó</button>
+                                                                    className="flex-1 h-8 rounded-xl bg-pink-50 text-pink-600 text-[12px] font-bold tracking-tight hover:bg-pink-600 hover:text-white transition-all border border-pink-100 disabled:opacity-40">Faltó</button>
                                                                 <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'finalizado')} disabled={actualizandoReservaId === data.id_reserva}
-                                                                    className="flex-1 h-8 rounded-xl bg-[#F2F2F7] text-[#C76A00] text-[9px] font-bold uppercase tracking-tight hover:bg-[#C76A00] hover:text-white transition-all border border-[#E5E5EA] disabled:opacity-40">Fin</button>
+                                                                    className="flex-1 h-8 rounded-xl bg-[#F2F2F7] text-[#C76A00] text-[12px] font-bold tracking-tight hover:bg-[#C76A00] hover:text-white transition-all border border-[#E5E5EA] disabled:opacity-40">Fin</button>
                                                                 <button onClick={() => verDetalleAgenda(data.id_reserva)}
-                                                                    className="h-8 w-8 rounded-xl bg-white border border-slate-200 text-slate-400 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all flex items-center justify-center shadow-sm shrink-0">
+                                                                    className="h-8 w-8 rounded-xl bg-white border border-slate-200 text-slate-400 hover:bg-[#007AFF] hover:text-white hover:border-transparent transition-all flex items-center justify-center shadow-sm shrink-0">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -621,7 +621,7 @@ export default function AgendaCitas() {
                                             <TableCell className="py-5 text-center">
                                                 <div className="inline-flex flex-col items-center bg-[#007AFF]/[0.06] px-3 py-1.5 rounded-xl border border-[#007AFF]/10">
                                                     <span className="text-[13px] font-bold text-[#0062CC]">{formatearFecha(data.fechaInicio)}</span>
-                                                    <span className="text-[10px] font-bold text-[#007AFF]/60 uppercase tracking-tighter">{data.horaInicio || '--:--'}</span>
+                                                    <span className="text-[12px] font-bold text-[#007AFF]/60 tracking-tighter">{data.horaInicio || '--:--'}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="py-5">
@@ -646,21 +646,21 @@ export default function AgendaCitas() {
                                                 <div className="flex items-center justify-center gap-2">
                                                     <button
                                                         onClick={() => actualizarEstadoReservaRapido(data.id_reserva, "asiste")}
-                                                        className="h-9 px-3 rounded-xl bg-cyan-50 text-cyan-600 text-[10px] font-bold uppercase tracking-tight hover:bg-cyan-600 hover:text-white transition-all shadow-sm border border-cyan-100"
+                                                        className="h-9 px-3 rounded-xl bg-cyan-50 text-cyan-600 text-[12px] font-bold tracking-tight hover:bg-cyan-600 hover:text-white transition-all shadow-sm border border-cyan-100"
                                                         title="Marcar Asistencia"
                                                     >
                                                         Asiste
                                                     </button>
                                                     <button
                                                         onClick={() => actualizarEstadoReservaRapido(data.id_reserva, "no asiste")}
-                                                        className="h-9 px-3 rounded-xl bg-pink-50 text-pink-600 text-[10px] font-bold uppercase tracking-tight hover:bg-pink-600 hover:text-white transition-all shadow-sm border border-pink-100"
+                                                        className="h-9 px-3 rounded-xl bg-pink-50 text-pink-600 text-[12px] font-bold tracking-tight hover:bg-pink-600 hover:text-white transition-all shadow-sm border border-pink-100"
                                                         title="Marcar Inasistencia"
                                                     >
                                                         Faltó
                                                     </button>
                                                     <button
                                                         onClick={() => actualizarEstadoReservaRapido(data.id_reserva, "finalizado")}
-                                                        className="h-9 px-3 rounded-xl bg-[#F2F2F7] text-[#C76A00] text-[10px] font-bold uppercase tracking-tight hover:bg-[#C76A00] hover:text-white transition-all shadow-sm border border-[#E5E5EA]"
+                                                        className="h-9 px-3 rounded-xl bg-[#F2F2F7] text-[#C76A00] text-[12px] font-bold tracking-tight hover:bg-[#C76A00] hover:text-white transition-all shadow-sm border border-[#E5E5EA]"
                                                         title="Finalizar Atención"
                                                     >
                                                         Fin
@@ -670,7 +670,7 @@ export default function AgendaCitas() {
                                             <TableCell className="py-5 text-center">
                                                 <button
                                                     onClick={() => verDetalleAgenda(data.id_reserva)}
-                                                    className="h-10 w-10 inline-flex items-center justify-center rounded-2xl bg-slate-100 text-slate-500 hover:bg-slate-900 hover:text-white transition-all active:scale-95 shadow-sm"
+                                                    className="h-10 w-10 inline-flex items-center justify-center rounded-2xl bg-slate-100 text-slate-500 hover:bg-[#007AFF] hover:text-white transition-all active:scale-95 shadow-sm"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

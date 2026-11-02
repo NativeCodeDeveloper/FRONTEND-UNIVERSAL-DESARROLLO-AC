@@ -307,7 +307,7 @@ export default function SeccionFirmaElectronica({ idProfesional, firma, puedeDib
           type="button"
           onClick={guardar}
           disabled={enviando || !trazos.length || !actaAceptada}
-          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-6 text-[14px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
+          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
         >
           {enviando ? "Registrando…" : firma ? "Registrar nueva firma" : "Registrar firma"}
         </button>

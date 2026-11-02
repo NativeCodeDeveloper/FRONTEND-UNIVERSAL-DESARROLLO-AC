@@ -391,7 +391,7 @@ export default function PublicacionesTituloDescripcion() {
 
                         <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row">
                             <ButtonDinamic
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
+                                className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF] transition-colors"
                                 onClick={publicacionEditando ? actualizarPublicacion : guardarPublicacionConImagen}
                             >
                                 {cargandoGuardado
@@ -410,7 +410,7 @@ export default function PublicacionesTituloDescripcion() {
                 {dataPublicacionesEspecifica.length > 0 && (
                     <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
                         <div className="space-y-1">
-                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Detalle de publicación</p>
+                            <p className="text-[12px] font-bold text-[#007AFF]">Detalle de publicación</p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                             {dataPublicacionesEspecifica.map((publicacion) => (

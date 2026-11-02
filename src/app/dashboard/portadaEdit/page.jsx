@@ -361,7 +361,7 @@ export default function CarruselPortada() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">Detalles de la Portada</h2>
+                                <h2 className="text-[12px] font-bold text-slate-500">Detalles de la Portada</h2>
                             </div>
 
                             <div className="p-8 space-y-6">
@@ -392,7 +392,7 @@ export default function CarruselPortada() {
                                             type='file'
                                             accept="image/*"
                                             onChange={capturarImagen}
-                                            className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-widest file:bg-slate-900 file:text-white hover:file:bg-slate-800 transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
+                                            className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-[11px] file:font-bold file:bg-[#007AFF] file:text-white hover:file:bg-[#007AFF] transition-all cursor-pointer bg-slate-50 p-3 rounded-2xl border border-dashed border-slate-200"
                                         />
                                     </div>
                                 </div>
@@ -401,7 +401,7 @@ export default function CarruselPortada() {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => subirPortadaClick()}
-                                            className="flex-1 h-12 bg-black text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm flex items-center justify-center gap-2"
+                                            className="flex-1 h-12 bg-[#007AFF] text-white text-sm font-bold rounded-2xl hover:bg-[#007AFF] transition-all shadow-sm flex items-center justify-center gap-2"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -418,7 +418,7 @@ export default function CarruselPortada() {
                                     {id_publicacionesPortada > 0 && (
                                         <button
                                             onClick={() => actualizaroPortadaClick()}
-                                            className="w-full h-12 bg-slate-900 text-white text-sm font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-100 flex items-center justify-center gap-2"
+                                            className="w-full h-12 bg-[#007AFF] text-white text-sm font-bold rounded-2xl hover:bg-[#007AFF] transition-all shadow-lg shadow-slate-100 flex items-center justify-center gap-2"
                                         >
                                             Actualizar Portada Seleccionada
                                         </button>
@@ -432,7 +432,7 @@ export default function CarruselPortada() {
                             <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-300">
                                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                                     <h3 className="text-[12px] font-medium text-slate-500 ">Previsualización</h3>
-                                    <span className="text-[10px] font-bold text-[#007AFF] bg-[#007AFF]/[0.06] px-2 py-1 rounded-lg uppercase tracking-tight">Efecto Carrusel</span>
+                                    <span className="text-[12px] font-bold text-[#007AFF] bg-[#007AFF]/[0.06] px-2 py-1 rounded-lg tracking-tight">Efecto Carrusel</span>
                                 </div>
                                 <div className="p-4">
                                     <div className="aspect-square rounded-2xl overflow-hidden shadow-inner bg-slate-100 max-w-xs mx-auto">
@@ -480,7 +480,7 @@ export default function CarruselPortada() {
                                             <div className="mt-6 flex items-center gap-3">
                                                 <button 
                                                     onClick={() => seleccionarPortada(c.id_publicacionesPortada)}
-                                                    className="flex-1 h-10 bg-slate-100 text-slate-900 text-xs font-bold rounded-xl hover:bg-slate-900 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                    className="flex-1 h-10 bg-slate-100 text-slate-900 text-xs font-bold rounded-xl hover:bg-[#007AFF] hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

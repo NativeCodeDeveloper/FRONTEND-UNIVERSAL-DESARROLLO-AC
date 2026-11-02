@@ -133,7 +133,7 @@ export default function GestionStock() {
 
                 {/* ── Header ── */}
                 <div className="mb-10">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Administración de Tienda</p>
+                    <p className="text-[12px] font-bold text-[#007AFF]">Administración de Tienda</p>
                     <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                         Gestión de Inventario
                     </h1>

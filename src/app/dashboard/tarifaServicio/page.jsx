@@ -436,14 +436,14 @@ export default function TarifaServicio() {
                         <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="tarifa-guardar">
                             <ButtonDinamic
                                 onClick={() => insertarTarifaProfesional(profesional_id, servicio_id, precioConsulta, duracionServicio)}
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
+                                className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF] transition-colors"
                             >
                                 Guardar Tarifa
                             </ButtonDinamic>
 
                             <ButtonDinamic
                                 onClick={() =>  actualizarTarifaProfesional(profesional_id,servicio_id,precioConsulta,duracionServicio,id_tarifaProfesional)}
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors"
+                                className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF] transition-colors"
                             >
                                 Actualizar Tarifa
                             </ButtonDinamic>
@@ -469,11 +469,11 @@ export default function TarifaServicio() {
                     <Table className="min-w-[600px]">
                         <TableHeader>
                             <TableRow className="bg-slate-50 hover:bg-slate-50">
-                                <TableHead className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Profesional</TableHead>
-                                <TableHead className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Servicio</TableHead>
-                                <TableHead className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Duración</TableHead>
-                                <TableHead className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 text-right">Valor</TableHead>
-                                <TableHead className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 text-center">Acción</TableHead>
+                                <TableHead className="text-[12px] font-bold text-slate-400">Profesional</TableHead>
+                                <TableHead className="text-[12px] font-bold text-slate-400">Servicio</TableHead>
+                                <TableHead className="text-[12px] font-bold text-slate-400">Duración</TableHead>
+                                <TableHead className="text-[12px] font-bold text-slate-400 text-right">Valor</TableHead>
+                                <TableHead className="text-[12px] font-bold text-slate-400 text-center">Acción</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

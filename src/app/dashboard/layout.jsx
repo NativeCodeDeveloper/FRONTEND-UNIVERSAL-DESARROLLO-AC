@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }) {
  * import { Michroma } from "next/font/google";
  * const michroma = Michroma({ weight: "400", subsets: ["latin"], display: "swap" });
  *
- * <aside className="hidden md:flex h-screen w-[240px] shrink-0 flex-col bg-gray-900 text-white border-r border-white/[0.06]">
+ * <aside className="hidden md:flex h-screen w-[240px] shrink-0 flex-col bg-[#007AFF] text-white border-r border-white/[0.06]">
  *   ... (381 líneas del sidebar original con <details>/<summary> colapsables)
  *   ... Grupos: Principal, Agenda, Registros, Documentos, Gestión de Contenido, Configuraciones
  *   ... Footer: sistema operativo con ping verde

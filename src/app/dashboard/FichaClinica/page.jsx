@@ -160,7 +160,7 @@ export default function FichaClinica() {
                         </button>
                         <button
                             onClick={() => router.push("/dashboard")}
-                            className="h-10 px-5 rounded-2xl bg-black text-white flex items-center gap-2 shadow-sm hover:bg-slate-800 transition-all"
+                            className="h-10 px-5 rounded-2xl bg-[#007AFF] text-white flex items-center gap-2 shadow-sm hover:bg-[#007AFF] transition-all"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -195,7 +195,7 @@ export default function FichaClinica() {
                                         />
                                         <button 
                                             onClick={() => buscarNombreSimilar(nombreBuscado)}
-                                            className="h-11 px-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0"
+                                            className="h-11 px-4 bg-[#007AFF] text-white rounded-xl hover:bg-[#007AFF] transition-colors flex-shrink-0"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -214,7 +214,7 @@ export default function FichaClinica() {
                                         />
                                         <button 
                                             onClick={() => buscarRutSimilar(rutBuscado)}
-                                            className="h-11 px-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0"
+                                            className="h-11 px-4 bg-[#007AFF] text-white rounded-xl hover:bg-[#007AFF] transition-colors flex-shrink-0"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -265,7 +265,7 @@ export default function FichaClinica() {
                                                     <span className="text-[14px] font-bold text-slate-700 leading-tight">
                                                         {paciente.nombre} {paciente.apellido}
                                                     </span>
-                                                    <span className="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">
+                                                    <span className="text-[12px] font-medium text-slate-400 mt-1 tracking-tighter">
                                                         Paciente Activo
                                                     </span>
                                                 </div>
@@ -292,7 +292,7 @@ export default function FichaClinica() {
                                                 <div className="flex justify-center">
                                                     <button
                                                         onClick={() => verDetallePaciente(paciente.id_paciente)}
-                                                        className="h-10 px-4 flex items-center justify-center gap-2 rounded-2xl bg-slate-100 text-slate-900 font-bold text-xs hover:bg-slate-900 hover:text-white transition-all active:scale-95 shadow-sm border border-slate-200"
+                                                        className="h-10 px-4 flex items-center justify-center gap-2 rounded-2xl bg-slate-100 text-slate-900 font-bold text-xs hover:bg-[#007AFF] hover:text-white transition-all active:scale-95 shadow-sm border border-slate-200"
                                                     >
                                                         <BookOpenIcon className="h-4 w-4" />
                                                         Abrir Carpeta

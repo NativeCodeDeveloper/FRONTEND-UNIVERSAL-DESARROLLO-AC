@@ -171,7 +171,7 @@ export default function ListaPacientes() {
                             </button>
                             <button
                                 onClick={() => setModalAbierto(true)}
-                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-black px-5 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800"
+                                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-5 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-[#007AFF]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -181,7 +181,7 @@ export default function ListaPacientes() {
                         </div>
                         <div className="flex flex-wrap items-center gap-2 md:justify-end [&_button]:h-9 [&_button]:rounded-xl [&_button]:px-3 [&_button]:text-[12px]">
                             <div className="flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
-                                <span className="text-[10px] font-bold uppercase leading-none tracking-widest text-slate-400">Total</span>
+                                <span className="text-[12px] font-bold leading-none text-slate-400">Total</span>
                                 <span className="text-[12px] font-bold leading-none text-slate-900">{listaPacientes.length}</span>
                             </div>
                             <InfoButton
@@ -216,7 +216,7 @@ export default function ListaPacientes() {
                                         />
                                         <button
                                             onClick={() => buscarNombreSimilar(nombreBuscado)}
-                                            className="h-12 px-6 rounded-2xl bg-black text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
+                                            className="h-12 px-6 rounded-2xl bg-[#007AFF] text-white text-[13px] font-bold hover:bg-[#007AFF] transition-all shadow-sm flex items-center gap-2"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                             Buscar
@@ -235,7 +235,7 @@ export default function ListaPacientes() {
                                         />
                                         <button
                                             onClick={() => buscarRutSimilar(rutBuscado)}
-                                            className="h-12 px-6 rounded-2xl bg-black text-white text-[13px] font-bold hover:bg-slate-800 transition-all shadow-sm flex items-center gap-2"
+                                            className="h-12 px-6 rounded-2xl bg-[#007AFF] text-white text-[13px] font-bold hover:bg-[#007AFF] transition-all shadow-sm flex items-center gap-2"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                             Buscar
@@ -292,7 +292,7 @@ export default function ListaPacientes() {
                                                 <TableCell className="text-center py-4">
                                                     <button
                                                         onClick={() => verDetallePaciente(paciente.id_paciente)}
-                                                        className="h-10 w-10 mx-auto rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center shadow-sm"
+                                                        className="h-10 w-10 mx-auto rounded-xl bg-slate-100 text-slate-600 hover:bg-[#007AFF] hover:text-white transition-all flex items-center justify-center shadow-sm"
                                                     >
                                                         <UserIcon className="w-5 h-5"/>
                                                     </button>

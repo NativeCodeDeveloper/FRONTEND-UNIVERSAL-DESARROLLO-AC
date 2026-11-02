@@ -276,13 +276,13 @@ export default function ServiciosAgendamiento() {
                         <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row" data-tour="servicio-guardar">
                             <ButtonDinamic
                                 onClick={() => insertarServicioProfesional(nombreServicio,descripcionServicio)}
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors">
+                                className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF] transition-colors">
                                 Guardar Servicio
                             </ButtonDinamic>
 
                             <ButtonDinamic
                                 onClick={() => actualizarServicioProfesional(nombreServicio,descripcionServicio,id_servicioProfesional)}
-                                className="rounded-xl bg-black text-white shadow-sm hover:bg-slate-800 transition-colors">
+                                className="rounded-xl bg-[#007AFF] text-white shadow-sm hover:bg-[#007AFF] transition-colors">
                                 Actualizar Servicio
                             </ButtonDinamic>
 
@@ -315,10 +315,10 @@ export default function ServiciosAgendamiento() {
                         <table className="w-full min-w-[760px] border-collapse text-left">
                             <thead>
                                 <tr className="border-b border-slate-100 bg-slate-50/70">
-                                    <th scope="col" className="w-[30%] px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Servicio</th>
-                                    <th scope="col" className="px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Descripción</th>
-                                    <th scope="col" className="w-[130px] px-6 py-3.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Estado</th>
-                                    <th scope="col" className="w-[250px] px-6 py-3.5 text-right text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Acciones</th>
+                                    <th scope="col" className="w-[30%] px-6 py-3.5 text-[12px] font-bold text-slate-400">Servicio</th>
+                                    <th scope="col" className="px-6 py-3.5 text-[12px] font-bold text-slate-400">Descripción</th>
+                                    <th scope="col" className="w-[130px] px-6 py-3.5 text-[12px] font-bold text-slate-400">Estado</th>
+                                    <th scope="col" className="w-[250px] px-6 py-3.5 text-right text-[12px] font-bold text-slate-400">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">

@@ -983,7 +983,7 @@ export default function Calendario() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Agenda Global</p>
+                        <p className="text-[12px] font-bold text-[#007AFF]">Agenda Global</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Vista General
                         </h1>
@@ -1235,7 +1235,7 @@ export default function Calendario() {
                             {/* Header Popup */}
                             <div className="relative px-8 pt-8 pb-6 bg-slate-50/50 border-b border-slate-100">
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF]">Detalle de Cita</span>
+                                    <span className="text-[12px] font-bold text-[#007AFF]">Detalle de Cita</span>
                                     <button onClick={() => setReservaPopup(null)} className="h-8 w-8 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 transition-colors shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                     </button>
@@ -1270,7 +1270,7 @@ export default function Calendario() {
                                 </div>
 
                                 <div className="pt-4 border-t border-slate-50">
-                                    <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Actualizar Asistencia</p>
+                                    <p className="mb-3 text-[12px] font-bold text-slate-400">Actualizar Asistencia</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {accionesPopupEstado.map((accion) => (
                                             <button
@@ -1291,7 +1291,7 @@ export default function Calendario() {
                             <div className="px-8 py-6 bg-slate-50/50 border-t border-slate-100 flex gap-3">
                                 <button
                                     onClick={() => buscarPacienteYNavegar(r.rut)}
-                                    className="flex-1 h-12 bg-slate-900 text-white rounded-2xl text-[13px] font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
+                                    className="flex-1 h-12 bg-[#007AFF] text-white rounded-2xl text-[13px] font-bold hover:bg-[#007AFF] transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                     Expediente Clínico

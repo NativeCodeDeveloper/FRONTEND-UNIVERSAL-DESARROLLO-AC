@@ -240,7 +240,7 @@ return (
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 transition-all duration-150 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#007AFF] rounded-xl hover:bg-[#007AFF] transition-all duration-150 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
@@ -255,7 +255,7 @@ return (
                                             type="button"
                                             onClick={() => actualizarCategoria(categoriaSelecionado.id_categoriaProducto, descripcionCategoria)}
                                             disabled={isLoading}
-                                            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-slate-800 transition-all duration-150 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#007AFF] rounded-xl hover:bg-[#007AFF] transition-all duration-150 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>

@@ -232,7 +232,7 @@ export default function EmisionDocumento({
           type="button"
           onClick={abrirVistaPrevia}
           disabled={deshabilitarAcciones}
-          className="inline-flex h-10 items-center justify-center rounded-xl bg-black px-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center rounded-xl bg-[#1D1D1F] px-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
         >
           Firmar
         </button>
@@ -271,7 +271,7 @@ export default function EmisionDocumento({
             type="button"
             onClick={abrirVistaPrevia}
             disabled={deshabilitarAcciones}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-5 text-[13px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
           >
             Previsualizar y firmar
           </button>
@@ -454,7 +454,7 @@ export function ModalEmision({
                       type="button"
                       onClick={enviar}
                       disabled={enviando}
-                      className="h-11 rounded-xl bg-black px-5 text-[13px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
+                      className="h-11 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-60"
                     >
                       {enviando ? "Enviando…" : "Enviar al correo"}
                     </button>
@@ -478,7 +478,7 @@ export function ModalEmision({
                 Quedó en la bandeja de <span className="font-semibold text-slate-900">{profesional?.nombre}</span>. Cuando lo firme,
                 podrás enviarlo al paciente desde su carpeta.
               </p>
-              <button type="button" onClick={onCerrar} className="h-11 rounded-xl bg-black px-5 text-[13px] font-semibold text-white hover:bg-slate-800">
+              <button type="button" onClick={onCerrar} className="h-11 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white hover:bg-[#007AFF]">
                 Listo
               </button>
             </div>
@@ -511,7 +511,7 @@ export function ModalEmision({
                   type="button"
                   onClick={onFirmar}
                   disabled={!borrador || paso === "trabajando" || sinFirma || faltaAceptacion}
-                  className="h-11 rounded-xl bg-black px-6 text-[13px] font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-50"
+                  className="h-11 rounded-xl bg-[#007AFF] px-6 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
                 >
                   {paso === "trabajando" ? "Procesando…" : esFirmante ? "Firmar con FES" : "Enviar a firma"}
                 </button>

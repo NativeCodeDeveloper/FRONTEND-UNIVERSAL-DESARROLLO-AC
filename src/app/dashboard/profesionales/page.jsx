@@ -270,7 +270,7 @@ export default function Profesionales() {
                         <button
                             onClick={abrirNuevo}
                             data-tour="profesional-nuevo"
-                            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl bg-black px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-slate-800"
+                            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#007AFF] px-6 text-[13px] font-bold text-white shadow-sm transition-all hover:bg-[#007AFF]"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

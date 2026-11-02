@@ -57,7 +57,7 @@ export default function Navbar() {
           <Link
             href="/agendaProfesionales"
             aria-label="Agendar hora"
-            className="hidden rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition duration-300 hover:bg-slate-800 hover:scale-105 sm:inline-flex"
+            className="hidden rounded-full bg-[#007AFF] px-6 py-2.5 text-sm font-bold text-white transition duration-300 hover:bg-[#007AFF] hover:scale-105 sm:inline-flex"
           >
             Agendar hora
           </Link>
@@ -95,7 +95,7 @@ export default function Navbar() {
             <Link
               href="/agendaProfesionales"
               onClick={() => setIsOpen(false)}
-              className="block w-full rounded-2xl bg-slate-900 px-5 py-4 text-center text-[15px] font-bold text-white transition duration-300 hover:bg-slate-800"
+              className="block w-full rounded-2xl bg-[#007AFF] px-5 py-4 text-center text-[15px] font-bold text-white transition duration-300 hover:bg-[#007AFF]"
             >
               Agendar hora
             </Link>

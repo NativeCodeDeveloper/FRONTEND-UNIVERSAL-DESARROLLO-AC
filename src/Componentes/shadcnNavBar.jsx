@@ -20,15 +20,15 @@ export function ShadcnNavBar() {
       <div className="mx-auto flex h-[82px] w-full max-w-7xl items-center justify-between px-5 md:h-[90px] md:px-10 xl:px-12">
         <Link href="/#inicio" className="flex min-w-0 items-center gap-3" aria-label="Inicio">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-dashed border-[#c88d6d]/85 bg-white/5">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#e4c5b2]">
+            <span className="text-[12px] font-semibold text-[#e4c5b2]">
               Logo
             </span>
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold uppercase tracking-[0.22em] text-white/95">
+            <p className="truncate text-sm font-semibold text-white/95">
               Centro Integral ESSENZA
             </p>
-            <p className="truncate text-[11px] uppercase tracking-[0.18em] text-white/65">
+            <p className="truncate text-[12px] text-white/65">
               Salud y bienestar integral
             </p>
           </div>
@@ -40,7 +40,7 @@ export function ShadcnNavBar() {
               <li key={item.title}>
                 <Link
                   href={item.href}
-                  className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/75 transition hover:text-[#f4d8c7]"
+                  className="text-[12px] font-semibold text-white/75 transition hover:text-[#f4d8c7]"
                 >
                   {item.title}
                 </Link>
@@ -52,7 +52,7 @@ export function ShadcnNavBar() {
         <div className="flex items-center gap-3">
           <Link
             href="/reserva-hora"
-            className="hidden rounded-full border border-[#d6a283] bg-[#c88d6d] px-6 py-2.5 text-[12px] font-semibold uppercase tracking-[0.16em] text-[#3f4145] transition hover:bg-[#d8a88b] sm:inline-flex"
+            className="hidden rounded-full border border-[#d6a283] bg-[#c88d6d] px-6 py-2.5 text-[12px] font-semibold text-[#3f4145] transition hover:bg-[#d8a88b] sm:inline-flex"
           >
             Agendar evaluacion
           </Link>
@@ -81,7 +81,7 @@ export function ShadcnNavBar() {
             <Link
               key={item.title}
               href={item.href}
-              className="block rounded-xl px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/85 transition hover:bg-white/10"
+              className="block rounded-xl px-4 py-2.5 text-xs font-semibold text-white/85 transition hover:bg-white/10"
               onClick={() => setMobileOpen(false)}
             >
               {item.title}
@@ -89,7 +89,7 @@ export function ShadcnNavBar() {
           ))}
           <Link
             href="/reserva-hora"
-            className="mt-2 inline-flex rounded-full border border-[#d6a283] bg-[#c88d6d] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#3f4145]"
+            className="mt-2 inline-flex rounded-full border border-[#d6a283] bg-[#c88d6d] px-5 py-2.5 text-xs font-semibold text-[#3f4145]"
             onClick={() => setMobileOpen(false)}
           >
             Agendar evaluacion

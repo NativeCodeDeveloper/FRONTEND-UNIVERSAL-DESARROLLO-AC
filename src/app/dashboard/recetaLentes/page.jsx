@@ -86,7 +86,7 @@ function valorVisual(value, fallback = "—") {
 function SectionTitle({eyebrow, title, description}) {
     return (
         <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{eyebrow}</p>
+            <p className="text-[12px] font-semibold text-slate-500">{eyebrow}</p>
             <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">{title}</h2>
             {description && (
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{description}</p>
@@ -114,7 +114,7 @@ function InputField({label, value, onChange, onBlur, placeholder, className = ""
 function PrescriptionTable({title, dataOd, dataOi, compact = false}) {
     return (
         <div>
-            <h3 className="text-base font-bold uppercase tracking-[0.08em] text-slate-800">{title}</h3>
+            <h3 className="text-base font-bold text-slate-800">{title}</h3>
             <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200">
                 <table className="w-full border-collapse text-center">
                     <thead>
@@ -295,15 +295,15 @@ export default function RecetaLentesPage() {
 
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Fecha</p>
+                                <p className="text-[12px] font-semibold text-slate-500">Fecha</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{formatDateDisplay(formulario.fechaEmision)}</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Paciente</p>
+                                <p className="text-[12px] font-semibold text-slate-500">Paciente</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{valorVisual(formulario.nombrePaciente, "-")}</p>
                             </div>
                             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profesional</p>
+                                <p className="text-[12px] font-semibold text-slate-500">Profesional</p>
                                 <p className="mt-1 text-sm font-semibold text-slate-900">{valorVisual(formulario.nombreProfesional, "-")}</p>
                             </div>
                         </div>
@@ -523,23 +523,23 @@ export default function RecetaLentesPage() {
 
                                     <div className="mt-6 grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm sm:grid-cols-2">
                                         <div>
-                                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Paciente</p>
+                                            <p className="text-[12px] font-semibold text-slate-500">Paciente</p>
                                             <p className="mt-1 font-semibold text-slate-900">{valorVisual(formulario.nombrePaciente, "-")}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">RUT paciente</p>
+                                            <p className="text-[12px] font-semibold text-slate-500">RUT paciente</p>
                                             <p className="mt-1 font-semibold text-slate-900">{valorVisual(formulario.rutPaciente, "-")}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Profesional</p>
+                                            <p className="text-[12px] font-semibold text-slate-500">Profesional</p>
                                             <p className="mt-1 font-semibold text-slate-900">{valorVisual(formulario.nombreProfesional, "-")}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">RUT profesional</p>
+                                            <p className="text-[12px] font-semibold text-slate-500">RUT profesional</p>
                                             <p className="mt-1 font-semibold text-slate-900">{valorVisual(formulario.rutProfesional, "-")}</p>
                                         </div>
                                         <div className="sm:col-span-2">
-                                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Fecha</p>
+                                            <p className="text-[12px] font-semibold text-slate-500">Fecha</p>
                                             <p className="mt-1 font-semibold text-slate-900">FECHA: {formatDateDashed(formulario.fechaEmision)}</p>
                                         </div>
                                     </div>
@@ -579,7 +579,7 @@ export default function RecetaLentesPage() {
                                         </div>
 
                                         <div>
-                                            <p className="text-base font-bold uppercase tracking-[0.08em] text-slate-800">Observaciones</p>
+                                            <p className="text-base font-bold text-slate-800">Observaciones</p>
                                             <div className="mt-3 min-h-[88px] rounded-2xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-sm leading-7 text-slate-700">
                                                 {(formulario.observaciones || formulario.notas)
                                                     ? (

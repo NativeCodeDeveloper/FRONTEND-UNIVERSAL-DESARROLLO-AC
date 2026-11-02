@@ -337,7 +337,7 @@ function ModuloConsentimiento() {
             <div className="mx-auto max-w-7xl">
                 <header className="mb-7 flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#007AFF]">Documentación clínica</p>
+                        <p className="mb-2 text-[12px] font-semibold text-[#007AFF]">Documentación clínica</p>
                         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Consentimiento informado</h1>
                         <p className="mt-2 text-sm text-slate-500">Completa la atención, revisa el documento y recoge ambas firmas en la tablet.</p>
                     </div>
@@ -354,7 +354,7 @@ function ModuloConsentimiento() {
                     <div className="grid items-start gap-6 xl:grid-cols-[minmax(320px,0.86fr)_minmax(0,1.14fr)]">
                         <div className="space-y-5">
                             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                                <div className="mb-5 flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white">01</span><h2 className="font-semibold">Datos del paciente</h2></div>
+                                <div className="mb-5 flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1D1D1F] text-xs font-bold text-white">01</span><h2 className="font-semibold">Datos del paciente</h2></div>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="sm:col-span-2"><span className={etiqueta}>Nombre completo</span><p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-medium">{datosPaciente.nombre}</p></div>
                                     <div><span className={etiqueta}>Documento</span><p className="rounded-xl bg-slate-50 px-3 py-3 text-sm">{datosPaciente.documento || "Sin registrar"}</p></div>
@@ -373,7 +373,7 @@ function ModuloConsentimiento() {
                             </section>
 
                             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                                <div className="mb-5 flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white">02</span><h2 className="font-semibold">Profesional tratante</h2></div>
+                                <div className="mb-5 flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1D1D1F] text-xs font-bold text-white">02</span><h2 className="font-semibold">Profesional tratante</h2></div>
                                 <label><span className={etiqueta}>Profesional</span>
                                     <select value={idProfesional} disabled={bloqueado} onChange={(e) => cambiar(setIdProfesional, e.target.value)} className={campo}>
                                         <option value="">Selecciona un profesional</option>
@@ -384,7 +384,7 @@ function ModuloConsentimiento() {
                             </section>
 
                             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                                <div className="mb-5 flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white">03</span><h2 className="font-semibold">Datos de la consulta</h2></div>
+                                <div className="mb-5 flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1D1D1F] text-xs font-bold text-white">03</span><h2 className="font-semibold">Datos de la consulta</h2></div>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <label><span className={etiqueta}>Fecha</span><input type="date" value={fecha} disabled={bloqueado} onChange={(e) => cambiar(setFecha, e.target.value)} className={campo} /></label>
                                     <label><span className={etiqueta}>Hora</span><input type="time" value={hora} disabled={bloqueado} onChange={(e) => cambiar(setHora, e.target.value)} className={campo} /></label>
@@ -409,7 +409,7 @@ function ModuloConsentimiento() {
                                     <div><h2 className="text-sm font-semibold">Documento para revisión</h2><p className="mt-1 text-xs text-slate-500">Texto específico del procedimiento y PDF imprimible.</p></div>
                                     <div className="flex flex-wrap gap-2">
                                         <button type="button" onClick={previsualizar} className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold hover:bg-slate-50">{firmaPacienteVacia && firmaProfesionalVacia ? "Vista previa PDF" : "Ver PDF con firmas"}</button>
-                                        <button type="button" onClick={imprimir} disabled={imprimiendo} className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50">{imprimiendo ? "Preparando…" : archivoFirmado ? "Imprimir PDF firmado" : firmaPacienteVacia && firmaProfesionalVacia ? "Imprimir para firmar en papel" : "Imprimir PDF con firmas"}</button>
+                                        <button type="button" onClick={imprimir} disabled={imprimiendo} className="rounded-xl bg-[#1D1D1F] px-3 py-2 text-xs font-semibold text-white hover:bg-[#007AFF] disabled:opacity-50">{imprimiendo ? "Preparando…" : archivoFirmado ? "Imprimir PDF firmado" : firmaPacienteVacia && firmaProfesionalVacia ? "Imprimir para firmar en papel" : "Imprimir PDF con firmas"}</button>
                                     </div>
                                 </div>
                                 {!firmaPacienteVacia || !firmaProfesionalVacia || archivoFirmado ? <p className="px-5 pb-3 text-xs text-slate-500 sm:px-6">Las firmas aparecen al final del PDF. Revisa la última página.</p> : null}

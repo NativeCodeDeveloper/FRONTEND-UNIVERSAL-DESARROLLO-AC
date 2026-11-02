@@ -131,7 +131,7 @@ export default function CortexAssistant() {
                     CORTEX A.I
                   </h2>
                   <p
-                    className="mt-0.5 text-[9px] font-medium uppercase tracking-[0.2em] text-white/30 antialiased"
+                    className="mt-0.5 text-[12px] font-medium text-white/30 antialiased"
                     style={{ fontFamily: "var(--font-outfit)" }}
                   >
                     Agente Inteligencia Artificial
@@ -264,7 +264,7 @@ export default function CortexAssistant() {
                     type="submit"
                     aria-label="Enviar mensaje"
                     disabled={!message.trim() || isEvolving}
-                    className="grid h-9 w-9 place-items-center rounded-lg bg-[#21183D] text-white transition hover:bg-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#007AFF] disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
+                    className="grid h-9 w-9 place-items-center rounded-lg bg-[#21183D] text-white transition hover:bg-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF] disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
                   >
                     <Send className="h-4 w-4" />
                   </button>
