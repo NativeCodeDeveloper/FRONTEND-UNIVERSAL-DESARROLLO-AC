@@ -28,10 +28,29 @@ const FORMULARIO_INICIAL = {
   nombreUsuario: "",
   password: "",
   confirmPassword: "",
+  tipoCuenta: "",
   role: "",
   idProfesionalAgenda: "",
   administraClinica: false,
 };
+
+/*
+ * Tipo de cuenta: la primera decisión al crear un usuario. No crea perfiles nuevos:
+ * cada tipo se traduce a los perfiles que ya existen en dashboard-access.js.
+ *   independiente → perfil profesional + administraClinica (atiende y administra su consulta)
+ *   centro        → perfil profesional, sin administrar
+ *   administracion→ perfil de administrador según el tipo de centro
+ *   recepcion     → recepción
+ *   nativecode    → técnico (solo soporte)
+ */
+const TIPOS_CUENTA = [
+  { valor: "independiente", titulo: "Profesional independiente", texto: "Atiende y administra su propia consulta: agenda, pacientes, finanzas y página web.", grupo: "profesionales", administra: true },
+  { valor: "centro", titulo: "Profesional de un centro", texto: "Atiende en una clínica que administra otra persona. Ve solo su agenda.", grupo: "profesionales", administra: false },
+  { valor: "administracion", titulo: "Administración", texto: "Gestiona la clínica (agenda, finanzas, configuración) sin ver fichas clínicas.", grupo: "administracion" },
+  { valor: "recepcion", titulo: "Recepción", texto: "Coordina agenda, reservas y registro de pacientes.", rol: "recepcion" },
+  { valor: "nativecode", titulo: "Soporte NativeCode", texto: "Acceso técnico para dar soporte, con registro de cada ingreso.", grupo: "nativecode" },
+].filter((t) => (t.grupo ? PERFILES.some((p) => p.grupo === t.grupo) : PERFIL_POR_VALOR.has(t.rol)));
+const TIPO_POR_VALOR = new Map(TIPOS_CUENTA.map((t) => [t.valor, t]));
 
 async function leerRespuesta(response) {
   const texto = await response.text();
@@ -119,6 +138,30 @@ function SelectorAgenda({ value, onChange, profesionales, disabled = false, requ
   );
 }
 
+/** Tarjeta seleccionable (radio) estilo iOS: título, texto breve y check al elegirla. */
+function OpcionTarjeta({ nombre, valor, seleccionada, onElegir, titulo, texto, extra }) {
+  return (
+    <label
+      className={`relative flex cursor-pointer flex-col rounded-2xl p-4 transition-[box-shadow,background-color] duration-150 ${
+        seleccionada ? "bg-[#007AFF]/[0.06] ring-2 ring-[#007AFF]" : "bg-white ring-1 ring-black/[0.08] hover:bg-[#F9F9FB]"
+      }`}
+    >
+      <input type="radio" name={nombre} value={valor} checked={seleccionada} onChange={() => onElegir(valor)} className="sr-only" />
+      <span className="flex items-start justify-between gap-3">
+        <span className="text-[15px] font-semibold text-[#1D1D1F]">{titulo}</span>
+        <span
+          aria-hidden="true"
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${seleccionada ? "bg-[#007AFF] text-white" : "ring-1 ring-black/15"}`}
+        >
+          {seleccionada ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
+        </span>
+      </span>
+      {texto ? <span className="mt-1 text-[13px] leading-snug text-[#6E6E73]">{texto}</span> : null}
+      {extra}
+    </label>
+  );
+}
+
 /** Interruptor estilo iOS. */
 function Interruptor({ activo, onCambio, etiqueta, descripcion, disabled = false }) {
   return (
@@ -144,7 +187,18 @@ function Interruptor({ activo, onCambio, etiqueta, descripcion, disabled = false
   );
 }
 
-function DetallePerfil({ perfil }) {
+// Cuando el profesional también administra, el detalle debe mostrar la combinación:
+// ve todas las agendas, montos y configuración (lo que suma el perfil de administrador).
+function permisosCombinados(perfil, administra) {
+  if (!perfil || !administra || !perfil.esProfesional) return { access: perfil?.access || [], restrictions: perfil?.restrictions || [] };
+  const access = perfil.access
+    .map((a) => (/^Solo su propia agenda/i.test(a) ? "Todas las agendas y sus bloqueos." : a))
+    .concat(["Finanzas, configuración y página web de la clínica."]);
+  const restrictions = perfil.restrictions.filter((r) => !/montos|configuraci/i.test(r));
+  return { access, restrictions };
+}
+
+function DetallePerfil({ perfil, administra = false }) {
   if (!perfil) {
     return (
       <div className="rounded-2xl border border-dashed border-black/[0.1] px-5 py-7 text-center">
@@ -157,7 +211,7 @@ function DetallePerfil({ perfil }) {
   return (
     <div className="overflow-hidden rounded-2xl bg-[#F5F5F7]" aria-live="polite">
       <div className="px-4 py-3.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#007AFF]">{perfil.grupoLabel}</p>
+        <p className="text-[12px] text-[#86868B]">{perfil.grupoLabel}{administra && perfil.esProfesional ? " · también administra" : ""}</p>
         <p className="mt-0.5 text-[15px] font-semibold text-[#1D1D1F]">{perfil.label}</p>
         <p className="mt-0.5 text-[13px] text-[#6E6E73]">{perfil.description}</p>
       </div>
@@ -165,7 +219,7 @@ function DetallePerfil({ perfil }) {
         <div className="bg-white px-4 py-3.5">
           <p className="text-[12px] font-semibold text-[#1D1D1F]">Puede</p>
           <ul className="mt-2 space-y-1.5">
-            {perfil.access.map((a) => (
+            {permisosCombinados(perfil, administra).access.map((a) => (
               <li key={a} className="flex items-start gap-2 text-[13px] leading-snug text-[#3A3A3C]">
                 <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#34C759]" strokeWidth={3} />
                 {a}
@@ -176,7 +230,7 @@ function DetallePerfil({ perfil }) {
         <div className="bg-white px-4 py-3.5">
           <p className="text-[12px] font-semibold text-[#1D1D1F]">No puede</p>
           <ul className="mt-2 space-y-1.5">
-            {perfil.restrictions.map((r) => (
+            {permisosCombinados(perfil, administra).restrictions.map((r) => (
               <li key={r} className="flex items-start gap-2 text-[13px] leading-snug text-[#6E6E73]">
                 <Minus className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#AEAEB2]" strokeWidth={3} />
                 {r}
@@ -258,6 +312,30 @@ export default function CrearUsuarioPage() {
     setError("");
   }
 
+  function cambiarTipo(valor) {
+    const tipo = TIPO_POR_VALOR.get(valor);
+    setForm((f) => ({
+      ...f,
+      tipoCuenta: valor,
+      // Recepción no tiene sub-elección: el perfil queda fijado de inmediato
+      role: tipo?.rol || "",
+      idProfesionalAgenda: "",
+      administraClinica: Boolean(tipo?.administra),
+    }));
+    setError("");
+  }
+
+  function elegirPerfilDelTipo(valor) {
+    const tipo = TIPO_POR_VALOR.get(form.tipoCuenta);
+    setForm((f) => ({
+      ...f,
+      role: valor,
+      idProfesionalAgenda: PERFIL_POR_VALOR.get(valor)?.esProfesional ? f.idProfesionalAgenda : "",
+      administraClinica: Boolean(tipo?.administra) && Boolean(PERFIL_POR_VALOR.get(valor)?.esProfesional),
+    }));
+    setError("");
+  }
+
   function cambiarPerfil(valor) {
     const esProfesional = PERFIL_POR_VALOR.get(valor)?.esProfesional;
     // Agenda e interruptor solo existen en perfiles profesionales.
@@ -279,7 +357,8 @@ export default function CrearUsuarioPage() {
     if (!form.nombreUsuario.trim()) return setError("Completa el nombre de usuario.");
     if (!form.password) return setError("Completa la contraseña.");
     if (form.password !== form.confirmPassword) return setError("Las contraseñas no coinciden.");
-    if (!perfil) return setError("Selecciona un perfil.");
+    if (!form.tipoCuenta) return setError("Elige el tipo de cuenta.");
+    if (!perfil) return setError(TIPO_POR_VALOR.get(form.tipoCuenta)?.grupo === "administracion" ? "Elige el tipo de centro." : "Elige la profesión.");
     if (perfil.esProfesional && !form.idProfesionalAgenda) {
       return setError("Asigna la agenda del profesional: define qué ve y con qué identidad firma.");
     }
@@ -302,7 +381,7 @@ export default function CrearUsuarioPage() {
       const data = await leerRespuesta(response);
       if (!response.ok) throw new Error(data?.error || `No se pudo crear el usuario (HTTP ${response.status}).`);
       setCreado(data?.user || null);
-      setForm({ ...FORMULARIO_INICIAL, role: form.role });
+      setForm({ ...FORMULARIO_INICIAL, tipoCuenta: form.tipoCuenta, role: form.role, administraClinica: form.administraClinica });
       await cargarUsuarios();
     } catch (err) {
       setError(err.message || "No se pudo crear el usuario.");
@@ -363,31 +442,77 @@ export default function CrearUsuarioPage() {
             </div>
 
             <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6">
-              <Campo etiqueta="Perfil" ayuda="Según su cargo y, si es profesional, su especialidad">
-                <SelectorPerfil value={form.role} onChange={cambiarPerfil} />
-              </Campo>
-
-              {perfil?.esProfesional ? (
-                <>
-                  <Campo etiqueta="Agenda del profesional" ayuda="Obligatoria: verá solo esta agenda y firmará como este profesional">
-                    <SelectorAgenda
-                      value={form.idProfesionalAgenda}
-                      onChange={(v) => actualizar("idProfesionalAgenda", v)}
-                      profesionales={profesionales}
-                      requerida
+              <fieldset>
+                <legend className="text-[13px] font-medium text-[#1D1D1F]">Tipo de cuenta</legend>
+                <div className="mt-2 grid gap-2.5 sm:grid-cols-2">
+                  {TIPOS_CUENTA.map((t) => (
+                    <OpcionTarjeta
+                      key={t.valor}
+                      nombre="tipo-cuenta"
+                      valor={t.valor}
+                      seleccionada={form.tipoCuenta === t.valor}
+                      onElegir={cambiarTipo}
+                      titulo={t.titulo}
+                      texto={t.texto}
                     />
-                    {errorProfesionales ? <span className="mt-1 block text-[12px] text-[#C4291D]">{errorProfesionales}</span> : null}
-                  </Campo>
-                  <Interruptor
-                    activo={form.administraClinica}
-                    onCambio={(v) => actualizar("administraClinica", v)}
-                    etiqueta="También administra la clínica"
-                    descripcion={`Para el dueño que atiende: suma los módulos de ${perfil.administradorAsociado} y ve todas las agendas.`}
-                  />
-                </>
+                  ))}
+                </div>
+              </fieldset>
+
+              {TIPO_POR_VALOR.get(form.tipoCuenta)?.grupo && TIPO_POR_VALOR.get(form.tipoCuenta).grupo !== "nativecode" ? (
+                <fieldset>
+                  <legend className="text-[13px] font-medium text-[#1D1D1F]">
+                    {TIPO_POR_VALOR.get(form.tipoCuenta).grupo === "administracion" ? "Tipo de centro" : "Profesión"}
+                  </legend>
+                  <p className="mt-0.5 text-[12px] text-[#86868B]">
+                    {TIPO_POR_VALOR.get(form.tipoCuenta).grupo === "administracion"
+                      ? "Define qué catálogos y documentos administra."
+                      : "Define qué documentos clínicos puede emitir."}
+                  </p>
+                  <div className="mt-2 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                    {PERFILES.filter((p) => p.grupo === TIPO_POR_VALOR.get(form.tipoCuenta).grupo).map((p) => (
+                      <OpcionTarjeta
+                        key={p.value}
+                        nombre="perfil"
+                        valor={p.value}
+                        seleccionada={form.role === p.value}
+                        onElegir={elegirPerfilDelTipo}
+                        titulo={p.label.replace(/^Administrador · /, "")}
+                        texto={p.description}
+                      />
+                    ))}
+                  </div>
+                </fieldset>
               ) : null}
 
-              <DetallePerfil perfil={perfil} />
+              {form.tipoCuenta === "nativecode" ? (
+                <fieldset>
+                  <div className="mt-1 grid gap-2.5 sm:grid-cols-2">
+                    {PERFILES.filter((p) => p.grupo === "nativecode").map((p) => (
+                      <OpcionTarjeta key={p.value} nombre="perfil" valor={p.value} seleccionada={form.role === p.value} onElegir={elegirPerfilDelTipo} titulo={p.label} texto={p.description} />
+                    ))}
+                  </div>
+                </fieldset>
+              ) : null}
+
+              {perfil?.esProfesional ? (
+                <Campo etiqueta="Agenda del profesional" ayuda="Obligatoria: verá esta agenda y firmará como este profesional">
+                  <SelectorAgenda
+                    value={form.idProfesionalAgenda}
+                    onChange={(v) => actualizar("idProfesionalAgenda", v)}
+                    profesionales={profesionales}
+                    requerida
+                  />
+                  {errorProfesionales ? <span className="mt-1 block text-[12px] text-[#C4291D]">{errorProfesionales}</span> : null}
+                </Campo>
+              ) : null}
+
+              <DetallePerfil perfil={perfil} administra={form.administraClinica} />
+              {perfil?.esProfesional && form.administraClinica ? (
+                <p className="rounded-2xl bg-[#F5F5F7] px-4 py-3 text-[13px] leading-snug text-[#3A3A3C]">
+                  Además administra la clínica: suma los módulos de <span className="font-medium">{perfil.administradorAsociado}</span> y ve todas las agendas.
+                </p>
+              ) : null}
             </div>
 
             <div className="mt-6 space-y-3">
@@ -414,10 +539,10 @@ export default function CrearUsuarioPage() {
             <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Cómo funcionan los perfiles</h2>
             <ol className="mt-4 space-y-4">
               {[
-                ["Por cargo y especialidad", "Cada perfil ve solo lo que su trabajo necesita. Un médico no hace lo mismo que un psicólogo ni que un odontólogo."],
-                ["Administración por categoría", "El administrador gestiona la clínica (agenda, finanzas, configuración) sin ver el contenido de las fichas clínicas."],
-                ["Profesional dueño", "Con «También administra la clínica», un profesional suma lo administrativo de su categoría."],
-                ["Soporte NativeCode", "El técnico ve todo para dar soporte, con autorización de la clínica y quedando registrado."],
+                ["Elige el tipo de cuenta", "Independiente si atiende y administra su consulta; de un centro si solo atiende; administración o recepción para el equipo."],
+                ["Luego la profesión", "Define qué documentos emite: un psicólogo no emite recetas ni exámenes; un médico, sí; un odontólogo además usa odontograma y presupuestos."],
+                ["Asigna su agenda", "Cada profesional ve su agenda y firma con su propia identidad."],
+                ["Fichas protegidas", "Administración y recepción gestionan la clínica sin ver el contenido de las fichas clínicas."],
               ].map(([titulo, texto], i) => (
                 <li key={titulo} className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#007AFF] text-[12px] font-semibold text-white">{i + 1}</span>
