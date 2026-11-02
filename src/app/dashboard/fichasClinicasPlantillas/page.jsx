@@ -216,7 +216,7 @@ export default function FichasClinicasPlantillas() {
                         className="group inline-flex w-full items-center justify-between gap-4 rounded-[32px] border border-slate-200 bg-white px-5 py-4 text-left shadow-sm transition-all duration-150 hover:border-slate-300 hover:bg-slate-50/60"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE] text-[#6E56CF]">
+                            <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#E5F0FF] text-[#007AFF]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 1.918-2 3.522-2 2.071 0 3.75 1.343 3.75 3 0 1.235-.934 2.296-2.267 2.75-.827.282-1.483 1.02-1.483 1.894V15m0 3h.008M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -243,8 +243,8 @@ export default function FichasClinicasPlantillas() {
                         <div className="mt-3 rounded-[32px] border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
                             <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                                 <div className="max-w-2xl">
-                                    <div className="inline-flex items-center gap-2 rounded-lg border border-[#DDD6FE] bg-[#F3F0FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6E56CF]">
-                                        <span className="size-2 rounded-full bg-[#6E56CF]" />
+                                    <div className="inline-flex items-center gap-2 rounded-lg border border-[#CCE4FF] bg-[#EBF4FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#007AFF]">
+                                        <span className="size-2 rounded-full bg-[#007AFF]" />
                                         Gu&iacute;a R&aacute;pida
                                     </div>
                                     <h2 className="mt-3 text-xl font-semibold text-slate-900">
@@ -266,7 +266,7 @@ export default function FichasClinicasPlantillas() {
                             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#EDE9FE] text-sm font-bold text-[#6E56CF]">1</div>
+                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#E5F0FF] text-sm font-bold text-[#007AFF]">1</div>
                                         <h3 className="text-sm font-semibold text-slate-900">Crear la plantilla</h3>
                                     </div>
                                     <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -276,7 +276,7 @@ export default function FichasClinicasPlantillas() {
 
                                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#EDE9FE] text-sm font-bold text-[#6E56CF]">2</div>
+                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#E5F0FF] text-sm font-bold text-[#007AFF]">2</div>
                                         <h3 className="text-sm font-semibold text-slate-900">Describir su uso</h3>
                                     </div>
                                     <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -286,7 +286,7 @@ export default function FichasClinicasPlantillas() {
 
                                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#EDE9FE] text-sm font-bold text-[#6E56CF]">3</div>
+                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#E5F0FF] text-sm font-bold text-[#007AFF]">3</div>
                                         <h3 className="text-sm font-semibold text-slate-900">Entrar a configurar</h3>
                                     </div>
                                     <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -296,7 +296,7 @@ export default function FichasClinicasPlantillas() {
 
                                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#EDE9FE] text-sm font-bold text-[#6E56CF]">4</div>
+                                        <div className="flex size-9 items-center justify-center rounded-xl bg-[#E5F0FF] text-sm font-bold text-[#007AFF]">4</div>
                                         <h3 className="text-sm font-semibold text-slate-900">Agregar campos &uacute;tiles</h3>
                                     </div>
                                     <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -324,8 +324,8 @@ export default function FichasClinicasPlantillas() {
                     {/* Empty state */}
                     {plantillas.length === 0 && (
                         <div className="rounded-[32px] border border-slate-200 bg-white p-10 text-center shadow-sm sm:p-14">
-                            <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-[#DDD6FE] bg-[#F3F0FF]">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="size-8 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-[#CCE4FF] bg-[#EBF4FF]">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="size-8 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
                             </div>
@@ -343,8 +343,8 @@ export default function FichasClinicasPlantillas() {
 
                                 {/* Info de la plantilla */}
                                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                    <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-5 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[#E5F0FF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-5 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
                                     </div>
@@ -412,8 +412,8 @@ export default function FichasClinicasPlantillas() {
                         <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#EDE9FE]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#E5F0FF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
                                         </svg>
                                     </div>
@@ -425,7 +425,7 @@ export default function FichasClinicasPlantillas() {
                         {/* Body */}
                         <div className="p-6 space-y-4">
                             <div>
-                                <label htmlFor="nueva-plantilla-nombre" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Nombre</label>
+                                <label htmlFor="nueva-plantilla-nombre" className="block text-xs font-semibold text-slate-500 mb-2">Nombre</label>
                                 <input
                                     id="nueva-plantilla-nombre"
                                     aria-label="Nombre de la nueva plantilla"
@@ -433,11 +433,11 @@ export default function FichasClinicasPlantillas() {
                                     value={nuevaPlantillaNombre}
                                     onChange={(e) => setNuevaPlantillaNombre(e.target.value)}
                                     placeholder="Ej: Dermatolog&iacute;a, Pediatr&iacute;a..."
-                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div>
-                                <label htmlFor="nueva-plantilla-descripcion" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Descripci&oacute;n</label>
+                                <label htmlFor="nueva-plantilla-descripcion" className="block text-xs font-semibold text-slate-500 mb-2">Descripci&oacute;n</label>
                                 <textarea
                                     id="nueva-plantilla-descripcion"
                                     aria-label="Descripción de la nueva plantilla"
@@ -445,7 +445,7 @@ export default function FichasClinicasPlantillas() {
                                     onChange={(e) => setNuevaPlantillaDescripcion(e.target.value)}
                                     placeholder="Descripci&oacute;n breve de para qu&eacute; sirve esta plantilla..."
                                     rows={3}
-                                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all resize-none placeholder:text-slate-400"
+                                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all resize-none placeholder:text-slate-400"
                                 />
                             </div>
                         </div>
@@ -484,8 +484,8 @@ export default function FichasClinicasPlantillas() {
                         <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#EDE9FE]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#E5F0FF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
                                     </div>
@@ -497,25 +497,25 @@ export default function FichasClinicasPlantillas() {
                         {/* Body */}
                         <div className="p-6 space-y-4">
                             <div>
-                                <label htmlFor="editar-plantilla-nombre" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Nombre</label>
+                                <label htmlFor="editar-plantilla-nombre" className="block text-xs font-semibold text-slate-500 mb-2">Nombre</label>
                                 <input
                                     id="editar-plantilla-nombre"
                                     aria-label="Nombre de la plantilla"
                                     type="text"
                                     value={nuevaPlantillaNombre}
                                     onChange={(e) => setNuevaPlantillaNombre(e.target.value)}
-                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div>
-                                <label htmlFor="editar-plantilla-descripcion" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Descripci&oacute;n</label>
+                                <label htmlFor="editar-plantilla-descripcion" className="block text-xs font-semibold text-slate-500 mb-2">Descripci&oacute;n</label>
                                 <textarea
                                     id="editar-plantilla-descripcion"
                                     aria-label="Descripción de la plantilla"
                                     value={nuevaPlantillaDescripcion}
                                     onChange={(e) => setNuevaPlantillaDescripcion(e.target.value)}
                                     rows={3}
-                                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all resize-none placeholder:text-slate-400"
+                                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all resize-none placeholder:text-slate-400"
                                 />
                             </div>
                         </div>

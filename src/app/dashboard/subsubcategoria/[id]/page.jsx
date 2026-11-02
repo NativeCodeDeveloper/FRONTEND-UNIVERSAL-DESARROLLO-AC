@@ -281,13 +281,13 @@ export default function SubSubCategoria(){
                         </h1>
                         <p className="text-[13px] text-slate-500">
                             Subcategoría principal:
-                            <span className="ml-2 font-semibold text-[#6E56CF]">{nombreSubcategoriaPadre}</span>
+                            <span className="ml-2 font-semibold text-[#007AFF]">{nombreSubcategoriaPadre}</span>
                         </p>
                     </div>
                     <TutorialGuiadoSubSubCategorias
                         ariaLabel="Iniciar el tutorial guiado de sub-subcategorías"
-                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
-                        claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
+                        claseIcono="flex size-4 shrink-0 items-center justify-center text-[#007AFF]"
                     />
                 </div>
 
@@ -295,7 +295,7 @@ export default function SubSubCategoria(){
                 <div data-tour="subsub-formulario" className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                     <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-4">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#6E56CF] text-white">
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#007AFF] text-white">
                                 <Plus className="size-3.5"/>
                             </div>
                             <div>
@@ -303,12 +303,12 @@ export default function SubSubCategoria(){
                                     {idSubSubCategoriaSeleccionada > 0 ? "Editar sub-subcategoría" : "Nueva sub-subcategoría"}
                                 </h2>
                                 <p className="text-[11px] text-slate-400">
-                                    Subcategoría principal: <span className="font-semibold text-[#6E56CF]">{nombreSubcategoriaPadre}</span>
+                                    Subcategoría principal: <span className="font-semibold text-[#007AFF]">{nombreSubcategoriaPadre}</span>
                                 </p>
                             </div>
                         </div>
                         {idSubSubCategoriaSeleccionada > 0 && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[#F3F0FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#6E56CF] ring-1 ring-[#DDD6FE]">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#EBF4FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#007AFF] ring-1 ring-[#CCE4FF]">
                                 Editando ID: {idSubSubCategoriaSeleccionada}
                             </span>
                         )}
@@ -317,7 +317,7 @@ export default function SubSubCategoria(){
                     <div className="space-y-4 p-5 sm:p-6">
                         <div className="space-y-1.5">
                             <label className="text-sm font-medium text-slate-700">Nombre de la sub-subcategoría</label>
-                            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 transition focus-within:border-[#6E56CF] focus-within:ring-2 focus-within:ring-violet-100">
+                            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 transition focus-within:border-[#007AFF] focus-within:ring-2 focus-within:ring-[#007AFF]/10">
                                 <ShadcnInput
                                     value={descripcionSubSubCategoria}
                                     onChange={(e)=> setDescripcionSubSubCategorias(e.target.value)}
@@ -357,17 +357,17 @@ export default function SubSubCategoria(){
                 <div data-tour="subsub-listado" className="mt-8 overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                     <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-4">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#6E56CF] text-white">
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#007AFF] text-white">
                                 <Layers className="size-3.5"/>
                             </div>
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-800">Sub-Subcategorías</h3>
                                 <p className="text-[11px] text-slate-400">
-                                    Asociadas a <span className="font-semibold text-[#6E56CF]">{nombreSubcategoriaPadre}</span>
+                                    Asociadas a <span className="font-semibold text-[#007AFF]">{nombreSubcategoriaPadre}</span>
                                 </p>
                             </div>
                         </div>
-                        <span className="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#F3F0FF] px-2 text-[11px] font-bold text-[#6E56CF]">
+                        <span className="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#EBF4FF] px-2 text-[11px] font-bold text-[#007AFF]">
                             {listaSubSubCategorias.length}
                         </span>
                     </div>
@@ -376,8 +376,8 @@ export default function SubSubCategoria(){
                         <Table>
                             <TableHeader>
                                 <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80">
-                                    <TableHead className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sub-Subcategoría</TableHead>
-                                    <TableHead className="w-[240px] px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Acciones</TableHead>
+                                    <TableHead className="px-5 py-3 text-[12px] font-semibold text-slate-500">Sub-Subcategoría</TableHead>
+                                    <TableHead className="w-[240px] px-5 py-3 text-right text-[12px] font-semibold text-slate-500">Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="divide-y divide-slate-100">
@@ -400,16 +400,16 @@ export default function SubSubCategoria(){
                                         return (
                                             <TableRow
                                                 key={subsubcategoria.id_subsubcategoria}
-                                                className={`transition-colors duration-150 hover:bg-slate-50 ${seleccionada ? "bg-[#F3F0FF]/70" : ""}`}
+                                                className={`transition-colors duration-150 hover:bg-slate-50 ${seleccionada ? "bg-[#EBF4FF]/70" : ""}`}
                                             >
                                                 <TableCell className="px-5 py-3.5">
                                                     <div className="flex items-center gap-2.5">
-                                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${seleccionada ? "bg-[#6E56CF] text-white" : "bg-[#F3F0FF] text-[#6E56CF]"}`}>
+                                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${seleccionada ? "bg-[#007AFF] text-white" : "bg-[#EBF4FF] text-[#007AFF]"}`}>
                                                             <Folder className="size-3.5"/>
                                                         </div>
                                                         <span className="text-sm font-semibold text-slate-800">{subsubcategoria.descripcionSubSubCategoria}</span>
                                                         {seleccionada && (
-                                                            <span className="inline-flex items-center rounded-full bg-[#6E56CF] px-2 py-0.5 text-[10px] font-bold text-white">
+                                                            <span className="inline-flex items-center rounded-full bg-[#007AFF] px-2 py-0.5 text-[10px] font-bold text-white">
                                                                 Editando
                                                             </span>
                                                         )}
@@ -421,7 +421,7 @@ export default function SubSubCategoria(){
                                                         <button
                                                             type="button"
                                                             onClick={() => seleccionarSubSubCategoria(subsubcategoria.id_subsubcategoria)}
-                                                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#DDD6FE] bg-[#F3F0FF] px-2.5 text-xs font-semibold text-[#6E56CF] transition hover:bg-[#EDE9FE] active:scale-[0.97]"
+                                                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#CCE4FF] bg-[#EBF4FF] px-2.5 text-xs font-semibold text-[#007AFF] transition hover:bg-[#E5F0FF] active:scale-[0.97]"
                                                             aria-label={`Editar ${subsubcategoria.descripcionSubSubCategoria}`}
                                                         >
                                                             <Pencil className="size-3.5"/>
@@ -430,7 +430,7 @@ export default function SubSubCategoria(){
                                                         <button
                                                             type="button"
                                                             onClick={() => eliminarSubSubCategoria(subsubcategoria.id_subsubcategoria)}
-                                                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-2.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100 active:scale-[0.97]"
+                                                            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#FF3B30]/25 bg-[#FF3B30]/[0.08] px-2.5 text-xs font-semibold text-[#FF3B30] transition hover:bg-[#FF3B30]/[0.12] active:scale-[0.97]"
                                                             aria-label={`Eliminar ${subsubcategoria.descripcionSubSubCategoria}`}
                                                         >
                                                             <Trash2 className="size-3.5"/>

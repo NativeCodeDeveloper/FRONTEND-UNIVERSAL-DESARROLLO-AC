@@ -95,7 +95,7 @@ function ImageViewer({ src, nombre, onClose }) {
         <div className="fixed inset-0 z-50 flex flex-col bg-[#0a0a0f]">
             <div className="flex items-center justify-between px-6 py-3 bg-[#111118] border-b border-white/10">
                 <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-8 w-8 rounded-lg bg-[#6E56CF]/20 text-[#a78bfa] flex items-center justify-center shrink-0">
+                    <div className="h-8 w-8 rounded-lg bg-[#007AFF]/20 text-[#4DA2FF] flex items-center justify-center shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </div>
                     <span className="text-[13px] font-semibold text-white truncate">{nombre}</span>
@@ -117,7 +117,7 @@ function ImageViewer({ src, nombre, onClose }) {
                     <button onClick={resetView} className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors" title="Resetear vista">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
-                    <button onClick={() => setInverted((v) => !v)} className={`h-8 px-3 rounded-lg flex items-center gap-1.5 text-[11px] font-bold transition-colors ${inverted ? "bg-[#6E56CF] text-white" : "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"}`} title="Invertir colores (negativo)">
+                    <button onClick={() => setInverted((v) => !v)} className={`h-8 px-3 rounded-lg flex items-center gap-1.5 text-[11px] font-bold transition-colors ${inverted ? "bg-[#007AFF] text-white" : "bg-white/5 hover:bg-white/10 text-white/70 hover:text-white"}`} title="Invertir colores (negativo)">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                         INV
                     </button>
@@ -151,7 +151,7 @@ function ImageViewer({ src, nombre, onClose }) {
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-2">
                     <div className="h-7 px-3 rounded-lg bg-black/50 backdrop-blur-sm flex items-center">
-                        <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Scroll = Zoom &middot; Drag = Mover</span>
+                        <span className="text-[12px] font-medium text-white/60 ">Scroll = Zoom &middot; Drag = Mover</span>
                     </div>
                 </div>
             </div>
@@ -373,7 +373,7 @@ export default function ArchivosPaciente() {
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Documentos</span>
+                            <span className="text-[12px] font-medium text-slate-400 leading-none">Documentos</span>
                             <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{archivos.length} Archivos</span>
                         </div>
                         <div className="flex gap-2">
@@ -400,26 +400,26 @@ export default function ArchivosPaciente() {
                 {paciente && (
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden mb-8 transition-all hover:shadow-md">
                         <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/30 flex items-center gap-4">
-                            <div className="h-14 w-14 rounded-[20px] bg-[#6E56CF] text-white flex items-center justify-center text-lg font-bold shadow-lg shadow-indigo-100">
+                            <div className="h-14 w-14 rounded-[20px] bg-[#007AFF] text-white flex items-center justify-center text-lg font-bold shadow-lg shadow-indigo-100">
                                 {paciente.nombre?.charAt(0)}{paciente.apellido?.charAt(0)}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <h2 className="text-lg font-bold text-slate-900 leading-tight">{paciente.nombre} {paciente.apellido}</h2>
-                                <p className="text-[12px] text-slate-400 font-medium uppercase tracking-wider mt-0.5">ID Paciente #{id_paciente}</p>
+                                <p className="text-[12px] text-slate-400 font-medium mt-0.5">ID Paciente #{id_paciente}</p>
                             </div>
                             <div className="hidden sm:flex items-center gap-6">
                                 <div className="space-y-0.5 text-right">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">RUT</span>
+                                    <span className="text-[12px] font-medium text-slate-400 block">RUT</span>
                                     <span className="text-[13px] font-bold text-slate-900 font-mono">{formatRut(paciente.rut) || "-"}</span>
                                 </div>
                                 <div className="h-8 w-px bg-slate-200" />
                                 <div className="space-y-0.5 text-right">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Teléfono</span>
+                                    <span className="text-[12px] font-medium text-slate-400 block">Teléfono</span>
                                     <span className="text-[13px] font-semibold text-slate-700">{paciente.telefono || "-"}</span>
                                 </div>
                                 <div className="h-8 w-px bg-slate-200" />
                                 <div className="space-y-0.5 text-right">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Correo</span>
+                                    <span className="text-[12px] font-medium text-slate-400 block">Correo</span>
                                     <span className="text-[13px] font-semibold text-slate-700">{paciente.correo || "-"}</span>
                                 </div>
                             </div>
@@ -430,7 +430,7 @@ export default function ArchivosPaciente() {
                 {/* ── Tabla de Documentos ── */}
                 <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                     <div className="px-8 py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                        <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Archivos Clínicos</h3>
+                        <h3 className="text-[12px] font-medium text-slate-500 ">Archivos Clínicos</h3>
                         <button
                             onClick={abrirSelectorArchivo}
                             disabled={subiendo}
@@ -457,12 +457,12 @@ export default function ArchivosPaciente() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-slate-100">
-                                        <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fecha Subida</th>
-                                        <th className="px-4 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest w-[120px]">Tipo</th>
-                                        <th className="px-4 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nombre Documento</th>
-                                        <th className="px-4 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-[80px]">Descargar</th>
-                                        <th className="px-4 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-[80px]">Eliminar</th>
-                                        <th className="px-4 py-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest w-[80px]">Visualizar</th>
+                                        <th className="px-8 py-4 text-left text-[12px] font-medium text-slate-400 ">Fecha Subida</th>
+                                        <th className="px-4 py-4 text-left text-[12px] font-medium text-slate-400 w-[120px]">Tipo</th>
+                                        <th className="px-4 py-4 text-left text-[12px] font-medium text-slate-400 ">Nombre Documento</th>
+                                        <th className="px-4 py-4 text-center text-[12px] font-medium text-slate-400 w-[80px]">Descargar</th>
+                                        <th className="px-4 py-4 text-center text-[12px] font-medium text-slate-400 w-[80px]">Eliminar</th>
+                                        <th className="px-4 py-4 text-center text-[12px] font-medium text-slate-400 w-[80px]">Visualizar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -513,7 +513,7 @@ export default function ArchivosPaciente() {
                                                 <div className="flex justify-center">
                                                     <button
                                                         onClick={() => handleVisualizar(archivo)}
-                                                        className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-violet-50 text-[#6E56CF] hover:bg-violet-100 border border-violet-100 transition-all hover:shadow-sm"
+                                                        className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-[#007AFF]/[0.06] text-[#007AFF] hover:bg-[#007AFF]/10 border border-[#007AFF]/10 transition-all hover:shadow-sm"
                                                         title="Visualizar archivo"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -462,7 +462,7 @@ export default function Publicaciones() {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total Piezas</span>
+                            <span className="text-[12px] font-medium text-slate-400 leading-none">Total Piezas</span>
                             <span className="text-xl font-bold text-slate-900 mt-1 leading-none">{listaPublicaciones.length}</span>
                         </div>
                         <InfoButton
@@ -496,7 +496,7 @@ export default function Publicaciones() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Descripción del Banner</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Descripción del Banner</label>
                                             <input
                                                 type="text"
                                                 value={newDescripcion}
@@ -507,7 +507,7 @@ export default function Publicaciones() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Imagen Principal</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Imagen Principal</label>
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -526,7 +526,7 @@ export default function Publicaciones() {
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-                                                <span className="text-[10px] font-bold uppercase tracking-widest">Vista Previa</span>
+                                                <span className="text-[12px] font-medium ">Vista Previa</span>
                                             </div>
                                         )}
                                     </div>
@@ -547,7 +547,7 @@ export default function Publicaciones() {
                         {/* Form: Actualizar */}
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden transition-all hover:shadow-md">
                             <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-[#6E56CF] shadow-sm">
+                                <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-[#007AFF] shadow-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
@@ -558,9 +558,9 @@ export default function Publicaciones() {
                             <form onSubmit={handleUpdateSubmit} className="p-8 space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Seleccionar Publicación</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Seleccionar Publicación</label>
                                         <select
-                                            className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-50"
+                                            className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-[#007AFF] focus:ring-4 focus:ring-[#007AFF]/[0.06]"
                                             value={id_publicaciones}
                                             onChange={handlePublicationSelect}
                                             disabled={isUploading}
@@ -575,7 +575,7 @@ export default function Publicaciones() {
                                     </div>
                                     <div className="flex flex-col justify-end">
                                         <div className="h-12 px-4 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-center gap-2">
-                                            <span className="h-2 w-2 rounded-full bg-[#6E56CF]"></span>
+                                            <span className="h-2 w-2 rounded-full bg-[#007AFF]"></span>
                                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">
                                                 Límite: {selectedAllowsMultiple ? "3 Imágenes" : "1 Imagen"}
                                             </span>
@@ -584,19 +584,19 @@ export default function Publicaciones() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Nueva Descripción</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nueva Descripción</label>
                                     <input
                                         type="text"
                                         value={descripcionPublicaciones}
                                         onChange={(e) => setDescripcionPublicaciones(e.target.value)}
-                                        className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-50"
+                                        className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-[#007AFF] focus:ring-4 focus:ring-[#007AFF]/[0.06]"
                                         placeholder="Ej: Nuestra nueva tecnología láser..."
                                         disabled={isUploading}
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Cargar Imágenes</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Cargar Imágenes</label>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -624,7 +624,7 @@ export default function Publicaciones() {
                     <div className="lg:col-span-5 space-y-6">
                         <div className="flex items-center justify-between px-2">
                             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Publicaciones Activas</h3>
-                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Grilla de Inventario</span>
+                            <span className="text-[12px] font-medium text-slate-400 ">Grilla de Inventario</span>
                         </div>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -665,7 +665,7 @@ export default function Publicaciones() {
                                                 {!isProtected && (
                                                     <button 
                                                         onClick={() => { if(confirm("¿Eliminar publicación?")) eliminarPublicacion(p.id_publicaciones) }}
-                                                        className="h-10 w-10 rounded-xl bg-white text-rose-600 flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                                                        className="h-10 w-10 rounded-xl bg-white text-[#FF3B30] flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

@@ -820,7 +820,7 @@ export default function AgendaCitas() {
                     style={estiloBoton || obtenerEstiloBotonEstado(data.estadoReserva)}
                     disabled={actualizandoReservaId === data.id_reserva}
                 >
-                    <span className="truncate text-[11px] font-bold uppercase tracking-wide leading-none">
+                    <span className="truncate text-[12px] font-medium leading-none">
                         {actualizandoReservaId === data.id_reserva ? "Cargando..." : textoBoton || data.estadoReserva || "Reservada"}
                     </span>
                     <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 shrink-0 opacity-60 transition-transform duration-200 ${menuEstadoAbiertoId === data.id_reserva ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -829,7 +829,7 @@ export default function AgendaCitas() {
                 </button>
                 {menuEstadoAbiertoId === data.id_reserva && (
                     <div className={`absolute ${menuPositionClass} w-56 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200`}>
-                        <p className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Cambiar estado</p>
+                        <p className="px-3 pt-3 pb-1 text-[12px] font-medium text-slate-400">Cambiar estado</p>
                         <div className="p-2 pt-1 grid grid-cols-1 gap-1">
                             {accionesRapidasEstado.map((accion) => (
                                 <button
@@ -849,14 +849,14 @@ export default function AgendaCitas() {
                                     type="button"
                                     disabled={eliminandoReservaId === data.id_reserva}
                                     onClick={() => eliminarReservaDesdeListado(data.id_reserva)}
-                                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-rose-50 transition-colors text-left disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#FF3B30]/[0.08] transition-colors text-left disabled:cursor-not-allowed disabled:opacity-60"
                                 >
-                                    <div className="h-7 w-7 rounded-lg flex items-center justify-center bg-rose-50 border border-rose-200 text-rose-600">
+                                    <div className="h-7 w-7 rounded-lg flex items-center justify-center bg-[#FF3B30]/[0.08] border border-[#FF3B30]/25 text-[#FF3B30]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                         </svg>
                                     </div>
-                                    <span className="text-[12px] font-bold text-rose-700">
+                                    <span className="text-[12px] font-bold text-[#C4291D]">
                                         {eliminandoReservaId === data.id_reserva ? "Eliminando..." : "Eliminar reserva"}
                                     </span>
                                 </button>
@@ -916,7 +916,7 @@ export default function AgendaCitas() {
                 aria-label="Editar comentario"
                 className={`h-10 w-10 rounded-xl border transition-all flex items-center justify-center shadow-sm disabled:cursor-not-allowed disabled:opacity-60 ${
                     !esNoIndicado(reserva.comentario)
-                        ? "border-[#EDE9FE] bg-[#F3F0FF] text-[#6E56CF] hover:brightness-95"
+                        ? "border-[#E5F0FF] bg-[#EBF4FF] text-[#007AFF] hover:brightness-95"
                         : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100"
                 }`}
             >
@@ -980,7 +980,7 @@ export default function AgendaCitas() {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">Total</span>
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{dataLista.length}</span>
                             </div>
                         </div>
@@ -989,7 +989,7 @@ export default function AgendaCitas() {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Confirmadas</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">Confirmadas</span>
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.confirmadas}</span>
                             </div>
                         </div>
@@ -998,16 +998,16 @@ export default function AgendaCitas() {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m0 0l-5-5m5 5l5-5"/></svg>
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Asiste</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">Asiste</span>
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.asiste}</span>
                             </div>
                         </div>
                         <div className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 shadow-sm">
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-rose-50 text-rose-500">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#FF3B30]/[0.08] text-[#FF3B30]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636L5.636 18.364M5.636 5.636l12.728 12.728"/></svg>
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Anuladas</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">Anuladas</span>
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.anuladas}</span>
                             </div>
                         </div>
@@ -1016,7 +1016,7 @@ export default function AgendaCitas() {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14 9V5a3 3 0 00-3-3l-1 9V21h9.28a2 2 0 001.97-1.66l1.38-9A2 2 0 0020.66 8H14z" /><path strokeLinecap="round" strokeLinejoin="round" d="M7 11H4a2 2 0 00-2 2v6a2 2 0 002 2h3" /></svg>
                             </div>
                             <div className="flex flex-col justify-center">
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest leading-none">Finalizadas</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">Finalizadas</span>
                                 <span className="text-sm font-bold text-slate-900 mt-0.5 leading-none">{resumenEstados.finalizadas}</span>
                             </div>
                         </div>
@@ -1070,10 +1070,10 @@ export default function AgendaCitas() {
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div data-tour="dashboard-filtros-header" onClick={() => setMostrarFiltros(!mostrarFiltros)} className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors">
                             <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-lg bg-[#F3F0FF] text-[#6E56CF] flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-lg bg-[#EBF4FF] text-[#007AFF] flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
                                 </div>
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Filtros Avanzados y Búsqueda</h2>
+                                <h2 className="text-[12px] font-medium text-slate-500 ">Filtros Avanzados y Búsqueda</h2>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-slate-400 transition-transform ${mostrarFiltros ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                         </div>
@@ -1082,23 +1082,23 @@ export default function AgendaCitas() {
                                 {/* Fila 1: búsqueda por campo */}
                                 <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-4">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre Paciente</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Nombre Paciente</label>
                                         <div className="flex gap-2">
                                             <ShadcnInput value={nombrePaciente} onChange={(e) => setnombrePaciente(e.target.value)} placeholder="Ej: Nicolas..." className="h-9 rounded-xl border-slate-200" />
                                             <button onClick={() => buscarPorNombres(nombrePaciente)} className="h-9 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT Paciente</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">RUT Paciente</label>
                                         <div className="flex gap-2">
                                             <ShadcnInput value={rut} onChange={(e) => setrut(e.target.value)} placeholder="12.345.678-9" className="h-9 rounded-xl border-slate-200" />
                                             <button onClick={() => buscarPorRut(rut)} className="h-9 px-4 shrink-0 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-all">Buscar</button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Profesional</label>
                                         {idProfesionalAgendaActiva ? (
-                                            <div className="flex h-9 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-3 text-[12px] font-semibold text-violet-900">
+                                            <div className="flex h-9 w-full items-center rounded-xl border border-[#007AFF]/20 bg-[#007AFF]/[0.06] px-3 text-[12px] font-semibold text-[#1D1D1F]">
                                                 {listaProfesionales.find((profesional) => String(profesional.id_profesional) === idProfesionalAgendaActiva)?.nombreProfesional || "Agenda asignada"}
                                             </div>
                                         ) : (
@@ -1112,7 +1112,7 @@ export default function AgendaCitas() {
                                         )}
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Estado Reserva</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Estado Reserva</label>
                                         <Select value={estadoReserva || "null"} onValueChange={(v) => setestadoReserva(v)}>
                                             <SelectTrigger className="h-9 w-full rounded-xl border-slate-200 bg-white"><SelectValue placeholder="Cualquier estado..." /></SelectTrigger>
                                             <SelectContent>
@@ -1170,12 +1170,12 @@ export default function AgendaCitas() {
                                         <article key={data.id_reserva} className="self-start overflow-visible rounded-[20px] border border-slate-200 bg-white p-3.5 shadow-sm">
                                             <div className="flex items-stretch gap-3.5">
                                                 {/* Insignia de fecha: abarca toda la altura de las filas */}
-                                                <div className="flex w-[74px] shrink-0 flex-col items-center justify-center rounded-2xl bg-[#F3F0FF] py-4 text-center">
+                                                <div className="flex w-[74px] shrink-0 flex-col items-center justify-center rounded-2xl bg-[#EBF4FF] py-4 text-center">
                                                     <span className="text-[30px] font-extrabold leading-none text-slate-900">{fecha?.dia ?? "—"}</span>
-                                                    <span className="mt-2 text-[11px] font-bold tracking-[0.22em] text-[#6E56CF]">{fecha?.mesCorto ?? ""}</span>
+                                                    <span className="mt-2 text-[11px] font-bold tracking-[0.22em] text-[#007AFF]">{fecha?.mesCorto ?? ""}</span>
                                                     <span className="mt-0.5 text-[10px] font-semibold text-slate-400">{fecha?.anio ?? ""}</span>
                                                     {fecha?.diaCorto ? (
-                                                        <span className="mt-2 rounded-md bg-[#EDE9FE] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6E56CF]">{fecha.diaCorto}</span>
+                                                        <span className="mt-2 rounded-md bg-[#E5F0FF] px-2 py-0.5 text-[12px] font-medium text-[#007AFF]">{fecha.diaCorto}</span>
                                                     ) : null}
                                                 </div>
 
@@ -1189,11 +1189,11 @@ export default function AgendaCitas() {
                                                                 </svg>
                                                             </span>
                                                             <div className="leading-tight">
-                                                                <p className="text-[16px] font-bold text-[#6E56CF]">{formatearHoraDashboard(data.horaInicio)}</p>
+                                                                <p className="text-[16px] font-bold text-[#007AFF]">{formatearHoraDashboard(data.horaInicio)}</p>
                                                                 <p className="mt-0.5 text-[13px] font-medium text-slate-400">{fecha?.diaSemana ?? ""}</p>
                                                             </div>
                                                         </div>
-                                                        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold uppercase tracking-wide" style={{ backgroundColor: tokenEstado.bg, color: tokenEstado.text, border: `1px solid ${tokenEstado.border}` }}>
+                                                        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium " style={{ backgroundColor: tokenEstado.bg, color: tokenEstado.text, border: `1px solid ${tokenEstado.border}` }}>
                                                             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: tokenEstado.dot }} />
                                                             {formatearEstadoVisible(data.estadoReserva) || "reservada"}
                                                         </span>
@@ -1259,7 +1259,7 @@ export default function AgendaCitas() {
                                                 {renderMenuAccionesReserva(data, {
                                                     textoBoton: "Cambiar estado",
                                                     claseBoton: "h-12 w-[55%] min-w-[160px] max-w-[250px] px-5",
-                                                    estiloBoton: { backgroundColor: "#F3F0FF", color: "#6E56CF", border: "1px solid #EDE9FE" },
+                                                    estiloBoton: { backgroundColor: "#EBF4FF", color: "#007AFF", border: "1px solid #E5F0FF" },
                                                 })}
                                                 {renderBotonFichaReserva(data, {
                                                     conEtiqueta: true,
@@ -1281,15 +1281,15 @@ export default function AgendaCitas() {
                             <Table className="table-fixed">
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                                        <TableHead className="w-[112px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pl-8">Horario</TableHead>
-                                        <TableHead className="w-[17%] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Identidad Paciente</TableHead>
-                                        <TableHead className="w-[136px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Profesional</TableHead>
-                                        <TableHead className="w-[13%] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Motivo</TableHead>
-                                        <TableHead className="w-[84px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Previsión</TableHead>
-                                        <TableHead className="w-[11%] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Comentario</TableHead>
-                                        <TableHead className="w-[150px] text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Control de Estado</TableHead>
+                                        <TableHead className="w-[112px] text-left text-[12px] font-medium text-slate-400 py-5 pl-8">Horario</TableHead>
+                                        <TableHead className="w-[17%] text-left text-[12px] font-medium text-slate-400 py-5">Identidad Paciente</TableHead>
+                                        <TableHead className="w-[136px] text-left text-[12px] font-medium text-slate-400 py-5">Profesional</TableHead>
+                                        <TableHead className="w-[13%] text-left text-[12px] font-medium text-slate-400 py-5">Motivo</TableHead>
+                                        <TableHead className="w-[84px] text-left text-[12px] font-medium text-slate-400 py-5">Previsión</TableHead>
+                                        <TableHead className="w-[11%] text-left text-[12px] font-medium text-slate-400 py-5">Comentario</TableHead>
+                                        <TableHead className="w-[150px] text-left text-[12px] font-medium text-slate-400 py-5">Control de Estado</TableHead>
                                         {canSeeFichasClinicas && (
-                                            <TableHead className="w-[128px] text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5 pr-6">Ficha</TableHead>
+                                            <TableHead className="w-[128px] text-center text-[12px] font-medium text-slate-400 py-5 pr-6">Ficha</TableHead>
                                         )}
                                     </TableRow>
                                 </TableHeader>
@@ -1325,7 +1325,7 @@ export default function AgendaCitas() {
                                                     <div className="flex flex-col">
                                                         <span className="text-[13px] font-semibold text-slate-700 truncate">{reserva.motivo_reserva}</span>
                                                         {canSeeReservationAmounts ? (
-                                                            <span className="text-[13px] font-bold text-[#6E56CF] mt-0.5">${reserva.monto_reserva}</span>
+                                                            <span className="text-[13px] font-bold text-[#007AFF] mt-0.5">${reserva.monto_reserva}</span>
                                                         ) : null}
                                                     </div>
                                                 </TableCell>
@@ -1386,7 +1386,7 @@ export default function AgendaCitas() {
                         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={cerrarModalComentario} />
                         <div className="relative w-full max-w-md overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-5">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F3F0FF] text-[#6E56CF]">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EBF4FF] text-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
@@ -1408,7 +1408,7 @@ export default function AgendaCitas() {
                                     rows={4}
                                     autoFocus
                                     placeholder="Escribe un comentario para esta cita..."
-                                    className="w-full resize-none rounded-xl border border-slate-200 px-3.5 py-3 text-[13px] font-medium text-slate-700 placeholder:font-normal placeholder:text-slate-300 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-[#6E56CF]/20"
+                                    className="w-full resize-none rounded-xl border border-slate-200 px-3.5 py-3 text-[13px] font-medium text-slate-700 placeholder:font-normal placeholder:text-slate-300 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20"
                                 />
                                 <p className="text-right text-[11px] font-bold text-slate-400">
                                     {comentarioBorrador.length}/{MAX_CARACTERES_COMENTARIO}

@@ -264,7 +264,7 @@ export default function Profesionales() {
                         <TutorialGuiadoProfesionales
                             ariaLabel="Iniciar el tutorial guiado de profesionales"
                             className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#007AFF]"
                         />
                         {!soloPropia && (
                         <button

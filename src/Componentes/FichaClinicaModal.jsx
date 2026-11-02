@@ -319,7 +319,7 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
               : "El RUT se completa automáticamente.")}
           >
             {!usuarioCargado || idProfesionalAgendaAsignada ? (
-              <div className="flex h-11 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-3 text-sm font-medium text-violet-900">
+              <div className="flex h-11 w-full items-center rounded-xl border border-[#007AFF]/20 bg-[#007AFF]/[0.06] px-3 text-sm font-medium text-[#1D1D1F]">
                 {!usuarioCargado
                   ? "Cargando usuario..."
                   : profesionalAsignado?.nombreProfesional || (listaProfesionales.length > 0
@@ -360,7 +360,7 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
               <section key={categoria.id_categoria} className="rounded-2xl border border-slate-200">
                 <header className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/70 px-4 py-3">
                   <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                  <h3 className="text-[12px] font-semibold uppercase tracking-wider text-slate-600">
+                  <h3 className="text-[12px] font-semibold text-slate-600">
                     {categoria.nombre}
                   </h3>
                 </header>

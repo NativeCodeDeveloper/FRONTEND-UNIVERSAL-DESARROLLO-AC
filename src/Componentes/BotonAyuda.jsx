@@ -35,7 +35,7 @@ import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 const CLASE_ITEM =
     "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-semibold text-slate-700 transition-colors hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none";
 const CLASE_ITEM_ICONO =
-    "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]";
+    "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EBF4FF] text-[#007AFF]";
 
 // En px y no solo en clases de Tailwind porque hay que saber cuanto mide el
 // popover ANTES de pintarlo, para decidir hacia que lado abre.
@@ -279,7 +279,7 @@ export default function BotonAyuda({
                             <ol className="space-y-1.5">
                                 {info.pasos.map((paso, i) => (
                                     <li key={i} className="flex gap-2">
-                                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#F3F0FF] text-[10px] font-bold leading-none text-[#6E56CF]">
+                                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#EBF4FF] text-[10px] font-bold leading-none text-[#007AFF]">
                                             {i + 1}
                                         </span>
                                         <span className="text-slate-700">{paso}</span>
@@ -289,7 +289,7 @@ export default function BotonAyuda({
                         )}
 
                         {info.nota && (
-                            <p className="rounded-lg bg-amber-50 px-3 py-2 text-[12px] font-medium text-amber-800">
+                            <p className="rounded-lg bg-[#F2F2F7] px-3 py-2 text-[12px] font-medium text-[#3A3A3C]">
                                 {info.nota}
                             </p>
                         )}

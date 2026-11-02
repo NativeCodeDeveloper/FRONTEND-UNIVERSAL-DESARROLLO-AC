@@ -179,14 +179,14 @@ export default function SolicitudExamenes() {
                     {/* Formulario */}
                     <div className="bg-white border border-slate-200 rounded-[32px] shadow-[0_8px_30px_rgba(15,23,42,0.06)] overflow-hidden">
                         <div className="border-b border-slate-100 bg-slate-50/30 px-6 py-4 flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">
                                 {id_examen ? 'Editar Examen' : 'Nuevo Examen'}
                             </h2>
                             {id_examen && (
-                                <span className="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+                                <span className="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#007AFF]/10 text-[#0062CC]">
                                     ID: {id_examen}
                                 </span>
                             )}
@@ -218,7 +218,7 @@ export default function SolicitudExamenes() {
                                 <div className="sm:col-span-2">
                                     <label className="block text-sm font-medium text-slate-700 mb-1.5">Descripción</label>
                                     <textarea
-                                        className="flex w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 min-h-[80px] resize-none transition-colors"
+                                        className="flex w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]/30 min-h-[80px] resize-none transition-colors"
                                         value={descripcion_examen}
                                         placeholder="Descripción del examen (opcional)"
                                         onChange={(e) => setDescripcionExamen(e.target.value)}
@@ -239,7 +239,7 @@ export default function SolicitudExamenes() {
                                 </button>
                                 <button
                                     onClick={actualizarExamen}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-[#6E56CF] bg-[#F3F0FF] border border-[#DDD6FE] rounded-xl hover:bg-[#EDE9FE] transition-all duration-150"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-[#007AFF] bg-[#EBF4FF] border border-[#CCE4FF] rounded-xl hover:bg-[#E5F0FF] transition-all duration-150"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
@@ -248,7 +248,7 @@ export default function SolicitudExamenes() {
                                 </button>
                                 <button
                                     onClick={eliminarExamen}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition-all duration-150 shadow-sm"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#FF3B30] rounded-xl hover:bg-[#C4291D] transition-all duration-150 shadow-sm"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -272,13 +272,13 @@ export default function SolicitudExamenes() {
                     <div className="bg-white border border-slate-200 rounded-[32px] shadow-[0_8px_30px_rgba(15,23,42,0.06)] overflow-hidden">
                         <div className="border-b border-slate-100 bg-slate-50/30 px-6 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                                 </svg>
                                 <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em]">Listado de Exámenes</h2>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-violet-100 text-violet-700">
+                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-[#007AFF]/10 text-[#0062CC]">
                                     {listaExamenes.length}
                                 </span>
                                 <button
@@ -298,23 +298,23 @@ export default function SolicitudExamenes() {
                                 <TableCaption className="font-medium text-slate-400 text-xs py-4">Catálogo de exámenes clínicos registrados</TableCaption>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 hover:bg-slate-50">
-                                        <TableHead className="w-[80px] text-center font-semibold text-slate-400 text-xs uppercase tracking-wider px-3 py-3">Sel.</TableHead>
-                                        <TableHead className="text-left font-semibold text-slate-400 text-xs uppercase tracking-wider px-3 py-3">Nombre</TableHead>
-                                        <TableHead className="text-left font-semibold text-slate-400 text-xs uppercase tracking-wider px-3 py-3">Descripción</TableHead>
-                                        <TableHead className="text-right font-semibold text-slate-400 text-xs uppercase tracking-wider px-3 py-3">Valor</TableHead>
+                                        <TableHead className="w-[80px] text-center font-semibold text-slate-400 text-xs px-3 py-3">Sel.</TableHead>
+                                        <TableHead className="text-left font-semibold text-slate-400 text-xs px-3 py-3">Nombre</TableHead>
+                                        <TableHead className="text-left font-semibold text-slate-400 text-xs px-3 py-3">Descripción</TableHead>
+                                        <TableHead className="text-right font-semibold text-slate-400 text-xs px-3 py-3">Valor</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {listaExamenes.map((examen, i) => (
                                         <TableRow
                                             key={examen.id_examen}
-                                            className={"hover:bg-slate-50 transition-colors duration-100 cursor-pointer " + (id_examen === examen.id_examen ? 'bg-[#F3F0FF] ring-1 ring-inset ring-[#DDD6FE]' : (i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'))}
+                                            className={"hover:bg-slate-50 transition-colors duration-100 cursor-pointer " + (id_examen === examen.id_examen ? 'bg-[#EBF4FF] ring-1 ring-inset ring-[#CCE4FF]' : (i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'))}
                                             onClick={() => seleccionarExamen(examen)}
                                         >
                                             <TableCell className="text-center px-3 py-2.5">
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); seleccionarExamen(examen); }}
-                                                    className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 hover:bg-violet-100 hover:text-violet-700 transition-colors duration-150"
+                                                    className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-[#007AFF]/[0.06] border border-[#007AFF]/10 text-[#007AFF] hover:bg-[#007AFF]/10 hover:text-[#0062CC] transition-colors duration-150"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />

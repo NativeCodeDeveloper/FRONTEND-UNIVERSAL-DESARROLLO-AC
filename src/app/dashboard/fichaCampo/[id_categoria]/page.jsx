@@ -321,8 +321,8 @@ export default function FichaCampo() {
                         <div className="mt-3 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                             <div className="flex gap-3">
                                 <div className="flex-shrink-0 flex items-start justify-center pt-0.5">
-                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#EDE9FE]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#E5F0FF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                         </svg>
                                     </div>
@@ -334,22 +334,22 @@ export default function FichaCampo() {
                                     </p>
 
                                     <div className="mb-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-                                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Ejemplo para la categor&iacute;a &quot;Evaluaci&oacute;n&quot;</p>
+                                        <p className="text-xs font-semibold text-slate-400 mb-2.5">Ejemplo para la categor&iacute;a &quot;Evaluaci&oacute;n&quot;</p>
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2.5">
-                                                <span className="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-lg bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">1</span>
+                                                <span className="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-lg bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">1</span>
                                                 <span className="text-sm text-slate-700 font-medium">Motivo de consulta</span>
-                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#F3F0FF] text-[#6E56CF] border border-[#DDD6FE]">Requerido</span>
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF4FF] text-[#007AFF] border border-[#CCE4FF]">Requerido</span>
                                             </div>
                                             <div className="flex items-center gap-2.5">
-                                                <span className="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-lg bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">2</span>
+                                                <span className="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-lg bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">2</span>
                                                 <span className="text-sm text-slate-700 font-medium">Antecedentes</span>
                                                 <span className="text-xs text-slate-400">Opcional</span>
                                             </div>
                                             <div className="flex items-center gap-2.5">
-                                                <span className="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-lg bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">3</span>
+                                                <span className="inline-flex size-6 flex-shrink-0 items-center justify-center rounded-lg bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">3</span>
                                                 <span className="text-sm text-slate-700 font-medium">S&iacute;ntomas asociados</span>
-                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#F3F0FF] text-[#6E56CF] border border-[#DDD6FE]">Requerido</span>
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF4FF] text-[#007AFF] border border-[#CCE4FF]">Requerido</span>
                                             </div>
                                         </div>
                                     </div>
@@ -369,8 +369,8 @@ export default function FichaCampo() {
                     {/* Empty state */}
                     {campos.length === 0 && (
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm p-10 sm:p-14 text-center">
-                            <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-[#DDD6FE] bg-[#F3F0FF]">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="size-8 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-2xl border border-[#CCE4FF] bg-[#EBF4FF]">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="size-8 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
                                 </svg>
                             </div>
@@ -388,15 +388,15 @@ export default function FichaCampo() {
 
                                 {/* Info del campo */}
                                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                    <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE]">
-                                        <span className="text-sm font-bold text-[#6E56CF]">{campo.orden}</span>
+                                    <div className="flex size-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[#E5F0FF]">
+                                        <span className="text-sm font-bold text-[#007AFF]">{campo.orden}</span>
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2.5 flex-wrap">
                                             <h3 className="text-sm sm:text-base font-semibold text-slate-800 truncate">{campo.nombre}</h3>
                                             {campo.requerido === 1 ? (
-                                                <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#F3F0FF] text-[#6E56CF] border border-[#DDD6FE]">
-                                                    <span className="size-1 rounded-full bg-[#6E56CF]" />
+                                                <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF4FF] text-[#007AFF] border border-[#CCE4FF]">
+                                                    <span className="size-1 rounded-full bg-[#007AFF]" />
                                                     Requerido
                                                 </span>
                                             ) : (
@@ -450,8 +450,8 @@ export default function FichaCampo() {
                         <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#EDE9FE]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#E5F0FF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
                                         </svg>
                                     </div>
@@ -463,24 +463,24 @@ export default function FichaCampo() {
                         {/* Body */}
                         <div className="p-6 space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Nombre del campo</label>
+                                <label className="block text-xs font-semibold text-slate-500 mb-2">Nombre del campo</label>
                                 <input
                                     type="text"
                                     value={nuevoCampoNombre}
                                     onChange={(e) => setNuevoCampoNombre(e.target.value)}
                                     placeholder="Ej: Motivo de consulta, Antecedentes..."
-                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Orden</label>
+                                <label className="block text-xs font-semibold text-slate-500 mb-2">Orden</label>
                                 <input
                                     type="number"
                                     value={nuevoCampoOrden}
                                     onChange={(e) => setNuevoCampoOrden(e.target.value)}
                                     placeholder="Ej: 1, 2, 3..."
                                     min="1"
-                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
@@ -495,7 +495,7 @@ export default function FichaCampo() {
                                         onChange={(e) => setNuevoCampoRequerido(e.target.checked)}
                                         className="sr-only peer"
                                     />
-                                    <div className="w-10 h-[22px] bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-violet-100 rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[18px] after:w-[18px] after:shadow-sm after:transition-all duration-200 peer-checked:bg-[#6E56CF]"/>
+                                    <div className="w-10 h-[22px] bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#007AFF]/10 rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[18px] after:w-[18px] after:shadow-sm after:transition-all duration-200 peer-checked:bg-[#007AFF]"/>
                                 </label>
                             </div>
                         </div>
@@ -529,8 +529,8 @@ export default function FichaCampo() {
                         <div className="border-b border-slate-100 bg-slate-50/70 px-6 py-5">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#EDE9FE]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#E5F0FF]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
                                     </div>
@@ -542,22 +542,22 @@ export default function FichaCampo() {
                         {/* Body */}
                         <div className="p-6 space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Nombre del campo</label>
+                                <label className="block text-xs font-semibold text-slate-500 mb-2">Nombre del campo</label>
                                 <input
                                     type="text"
                                     value={editCampoNombre}
                                     onChange={(e) => setEditCampoNombre(e.target.value)}
-                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Orden</label>
+                                <label className="block text-xs font-semibold text-slate-500 mb-2">Orden</label>
                                 <input
                                     type="number"
                                     value={editCampoOrden}
                                     onChange={(e) => setEditCampoOrden(e.target.value)}
                                     min="1"
-                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#6E56CF] transition-all placeholder:text-slate-400"
+                                    className="w-full h-10 px-3.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/10 focus:border-[#007AFF] transition-all placeholder:text-slate-400"
                                 />
                             </div>
                             <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
@@ -572,7 +572,7 @@ export default function FichaCampo() {
                                         onChange={(e) => setEditCampoRequerido(e.target.checked)}
                                         className="sr-only peer"
                                     />
-                                    <div className="w-10 h-[22px] bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-violet-100 rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[18px] after:w-[18px] after:shadow-sm after:transition-all duration-200 peer-checked:bg-[#6E56CF]"/>
+                                    <div className="w-10 h-[22px] bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#007AFF]/10 rounded-full peer peer-checked:after:translate-x-[18px] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-[18px] after:w-[18px] after:shadow-sm after:transition-all duration-200 peer-checked:bg-[#007AFF]"/>
                                 </label>
                             </div>
                         </div>

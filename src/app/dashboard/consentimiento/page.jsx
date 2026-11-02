@@ -20,7 +20,7 @@ import { generarConsentimientoInformadoPdf } from "@/lib/documentos/generadores/
 import { formatearFechaCivil, formatearFechaLargaCivil, hoyCivil, ZONA_CLINICA } from "@/lib/fechas";
 import { imprimirPdf } from "@/lib/documentos/imprimirPdf";
 
-const campo = "h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 disabled:bg-slate-100 disabled:text-slate-500";
+const campo = "h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 disabled:bg-slate-100 disabled:text-slate-500";
 const etiqueta = "mb-1.5 block text-xs font-semibold text-slate-700";
 
 function horaClinica() {
@@ -337,7 +337,7 @@ function ModuloConsentimiento() {
             <div className="mx-auto max-w-7xl">
                 <header className="mb-7 flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6E56CF]">Documentación clínica</p>
+                        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#007AFF]">Documentación clínica</p>
                         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Consentimiento informado</h1>
                         <p className="mt-2 text-sm text-slate-500">Completa la atención, revisa el documento y recoge ambas firmas en la tablet.</p>
                     </div>
@@ -361,7 +361,7 @@ function ModuloConsentimiento() {
                                     <div><span className={etiqueta}>Nacimiento</span><p className="rounded-xl bg-slate-50 px-3 py-3 text-sm">{formatearFechaCivil(paciente.nacimiento, "Sin registrar")}</p></div>
                                 </div>
                                 <label className="mt-5 flex items-start gap-3 text-sm text-slate-700">
-                                    <input type="checkbox" checked={conRepresentante} disabled={bloqueado} onChange={(e) => cambiar(setConRepresentante, e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#6E56CF]" />
+                                    <input type="checkbox" checked={conRepresentante} disabled={bloqueado} onChange={(e) => cambiar(setConRepresentante, e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#007AFF]" />
                                     Firma un representante legal
                                 </label>
                                 {conRepresentante ? (
@@ -395,7 +395,7 @@ function ModuloConsentimiento() {
                                             {procedimientos.map((item) => <option key={item.codigo} value={item.codigo}>{item.grupo} · {item.nombre}</option>)}
                                         </select>
                                         {errorProcedimientos ? <span className="mt-2 block text-xs text-red-700">No se pudieron cargar las plantillas vigentes. <button type="button" onClick={recargarProcedimientos} className="font-semibold underline">Reintentar</button></span> : null}
-                                        {!PROCEDIMIENTOS_EN_SERVIDOR ? <span className="mt-2 block text-xs leading-5 text-amber-800">Esta instancia usa textos de procedimiento de ejemplo. Revisa su contenido y ajusta las observaciones del caso antes de recoger las firmas.</span> : null}
+                                        {!PROCEDIMIENTOS_EN_SERVIDOR ? <span className="mt-2 block text-xs leading-5 text-[#3A3A3C]">Esta instancia usa textos de procedimiento de ejemplo. Revisa su contenido y ajusta las observaciones del caso antes de recoger las firmas.</span> : null}
                                     </label>
                                     <label className="sm:col-span-2"><span className={etiqueta}>Motivo de consulta</span><input value={motivo} disabled={bloqueado} onChange={(e) => cambiar(setMotivo, e.target.value)} className={campo} /></label>
                                     <label className="sm:col-span-2"><span className={etiqueta}>Observaciones y riesgos del caso</span><textarea rows={4} maxLength={1500} value={observaciones} disabled={bloqueado} onChange={(e) => cambiar(setObservaciones, e.target.value)} className={campo + " h-auto min-h-28 py-3"} placeholder="Antecedentes o riesgos particulares informados al paciente" /></label>
@@ -413,7 +413,7 @@ function ModuloConsentimiento() {
                                     </div>
                                 </div>
                                 {!firmaPacienteVacia || !firmaProfesionalVacia || archivoFirmado ? <p className="px-5 pb-3 text-xs text-slate-500 sm:px-6">Las firmas aparecen al final del PDF. Revisa la última página.</p> : null}
-                                {enlaceImpresion ? <a href={enlaceImpresion} target="_blank" rel="noreferrer" className="block px-5 py-2 text-xs font-semibold text-[#6E56CF]">Abrir PDF para imprimir</a> : null}
+                                {enlaceImpresion ? <a href={enlaceImpresion} target="_blank" rel="noreferrer" className="block px-5 py-2 text-xs font-semibold text-[#007AFF]">Abrir PDF para imprimir</a> : null}
                                 {vistaPrevia ? <div className="bg-slate-100 p-3 sm:p-5"><VisorPdf blob={vistaPrevia} titulo="Consentimiento informado" alto="68dvh" /></div> : (
                                     <div className="max-h-[540px] overflow-y-auto px-5 py-6 sm:px-8">
                                         {texto ? bloquesDeTexto(texto).map((bloque, indice) => bloque.tipo === "titulo"
@@ -434,7 +434,7 @@ function ModuloConsentimiento() {
                                 <div><p className="mb-2 text-xs font-semibold text-slate-700">Firma del profesional {firmaProfesionalVacia ? "" : "· Capturada"}</p><PadFirma ref={firmaProfesionalRef} tinta={tintaProfesional} onCambioTinta={(tinta) => { setTintaProfesional(tinta); setVistaPrevia(null); setEnlaceImpresion(""); setAceptacion(false); }} onCambio={({ vacio }) => { setFirmaProfesionalVacia(vacio); setVistaPrevia(null); setEnlaceImpresion(""); setAceptacion(false); setError(""); }} deshabilitado={bloqueado || guardando} /></div>
                                 </div>
                                 <label className="mt-6 flex items-start gap-3 rounded-xl bg-slate-50 p-4 text-xs leading-5 text-slate-700">
-                                    <input type="checkbox" checked={aceptacion} disabled={bloqueado || guardando} onChange={(e) => setAceptacion(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#6E56CF]" />
+                                    <input type="checkbox" checked={aceptacion} disabled={bloqueado || guardando} onChange={(e) => setAceptacion(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#007AFF]" />
                                     Confirmo que el documento fue explicado y revisado con el paciente o representante, y que ambas firmas corresponden a las personas identificadas.
                                 </label>
                                 {archivoFirmado ? (
@@ -446,13 +446,13 @@ function ModuloConsentimiento() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <button type="button" onClick={guardarFirmado} disabled={guardando || firmaPacienteVacia || firmaProfesionalVacia} className="mt-5 w-full rounded-xl bg-[#6E56CF] px-5 py-3 text-sm font-semibold text-white hover:bg-[#5D46BC] disabled:cursor-not-allowed disabled:opacity-50">
+                                    <button type="button" onClick={guardarFirmado} disabled={guardando || firmaPacienteVacia || firmaProfesionalVacia} className="mt-5 w-full rounded-xl bg-[#007AFF] px-5 py-3 text-sm font-semibold text-white hover:bg-[#5D46BC] disabled:cursor-not-allowed disabled:opacity-50">
                                         {guardando ? "Guardando documento…" : "Guardar consentimiento firmado"}
                                     </button>
                                 )}
                             </section>
 
-                            {archivos.length ? <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"><h2 className="mb-3 text-sm font-semibold">Consentimientos archivados</h2><ul className="divide-y divide-slate-100">{archivos.map((archivo) => <li key={archivo.id_archivo} className="flex items-center justify-between gap-3 py-3"><span className="min-w-0 truncate text-xs text-slate-700">{archivo.nombre_documento}</span><button type="button" onClick={() => abrirArchivado(archivo)} className="shrink-0 text-xs font-semibold text-[#6E56CF]">Abrir PDF</button></li>)}</ul></section> : null}
+                            {archivos.length ? <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"><h2 className="mb-3 text-sm font-semibold">Consentimientos archivados</h2><ul className="divide-y divide-slate-100">{archivos.map((archivo) => <li key={archivo.id_archivo} className="flex items-center justify-between gap-3 py-3"><span className="min-w-0 truncate text-xs text-slate-700">{archivo.nombre_documento}</span><button type="button" onClick={() => abrirArchivado(archivo)} className="shrink-0 text-xs font-semibold text-[#007AFF]">Abrir PDF</button></li>)}</ul></section> : null}
                         </div>
                     </div>
                 ) : null}

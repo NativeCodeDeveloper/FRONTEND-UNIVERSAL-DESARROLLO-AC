@@ -404,7 +404,7 @@ export default function PresupuestoTratamiento() {
                         <a
                             href="/dashboard/ingresoProductos"
                             data-tour="presupuesto-prestaciones"
-                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                         >
                             Ir a prestaciones
                         </a>
@@ -416,7 +416,7 @@ export default function PresupuestoTratamiento() {
                             }}
                             tutorial={TutorialGuiadoPresupuesto}
                             tutorialProps={{ ariaLabel: "Iniciar el tutorial guiado del presupuesto de tratamiento" }}
-                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                         />
                     </div>
                 </div>
@@ -428,12 +428,12 @@ export default function PresupuestoTratamiento() {
                         <div data-tour="presupuesto-listado" className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                             <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/>
                                     </svg>
-                                    <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Presupuesto</h2>
+                                    <h2 className="text-sm font-semibold text-slate-700 ">Presupuesto</h2>
                                 </div>
-                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-[#F3F0FF] text-[#6E56CF]">
+                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-[#EBF4FF] text-[#007AFF]">
                                     {listaPresupuesto.length}
                                 </span>
                             </div>
@@ -476,7 +476,7 @@ export default function PresupuestoTratamiento() {
                                                     value={servicio.observacionCotizacion || ""}
                                                     onChange={(event) => actualizarObservacionPresupuesto(index, event.target.value)}
                                                     placeholder="Ej: lugar anatomico, sesiones, diente, zona, frecuencia..."
-                                                    className="mt-1 min-h-20 w-full resize-y rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 placeholder:text-slate-400"
+                                                    className="mt-1 min-h-20 w-full resize-y rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 placeholder:text-slate-400"
                                                 />
                                             </div>
                                         ))}
@@ -486,7 +486,7 @@ export default function PresupuestoTratamiento() {
 
                             {/* Total */}
                             <div className="border-t border-slate-100 bg-slate-50/80 px-5 py-4 flex items-center justify-between">
-                                <span className="text-sm font-semibold text-slate-600 uppercase tracking-wide">Total</span>
+                                <span className="text-sm font-semibold text-slate-600 ">Total</span>
                                 <span className="text-xl font-bold text-slate-900">{formatoCLP.format(totalPresupuesto)}</span>
                             </div>
 
@@ -538,10 +538,10 @@ export default function PresupuestoTratamiento() {
                         {/* Datos del profesional y paciente */}
                         <div data-tour="presupuesto-datos" className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden mb-6">
                             <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
                                 </svg>
-                                <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Datos del Presupuesto</h2>
+                                <h2 className="text-sm font-semibold text-slate-700 ">Datos del Presupuesto</h2>
                             </div>
 
                             <div className="p-5 space-y-4">
@@ -557,7 +557,7 @@ export default function PresupuestoTratamiento() {
                                                     rutDeProfesional(profesionalPorId(listaProfesionales, value))
                                                 );
                                             }}
-                                            className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-100"
+                                            className="rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/10"
                                             options={listaProfesionales.map(profesional => ({
                                                 value: profesional.id_profesional,
                                                 label: profesional.nombreProfesional
@@ -576,7 +576,7 @@ export default function PresupuestoTratamiento() {
                                                 if (prof) setNombreProfesional(prof.id_profesional);
                                             }}
                                             placeholder="Ej: 12.345.678-9"
-                                            className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-100"
+                                            className="rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/10"
                                         />
                                         {profesionalPorRut(listaProfesionales, rutProfesionalManual) ? (
                                             <p className="mt-1 text-[11px] font-medium text-emerald-600">
@@ -593,7 +593,7 @@ export default function PresupuestoTratamiento() {
                                             value={nombrePaciente}
                                             onChange={(e) => setNombrePaciente(e.target.value)}
                                             placeholder="Ej: Andrea Varela Garrido"
-                                            className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-100"
+                                            className="rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/10"
                                         />
                                     </div>
                                     <div>
@@ -602,7 +602,7 @@ export default function PresupuestoTratamiento() {
                                             value={rutaPaciente}
                                             onChange={(e) => setRutaPaciente(e.target.value)}
                                             placeholder="Ej: 12345678-9"
-                                            className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-100"
+                                            className="rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/10"
                                         />
                                     </div>
                                 </div>
@@ -614,12 +614,12 @@ export default function PresupuestoTratamiento() {
                         <div data-tour="presupuesto-catalogo" className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                             <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
                                     </svg>
-                                    <h2 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">Servicios Disponibles</h2>
+                                    <h2 className="text-sm font-semibold text-slate-700 ">Servicios Disponibles</h2>
                                 </div>
-                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-[#F3F0FF] text-[#6E56CF]">
+                                <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full text-xs font-bold bg-[#EBF4FF] text-[#007AFF]">
                                     {listaServicios.length}
                                 </span>
                             </div>
@@ -630,9 +630,9 @@ export default function PresupuestoTratamiento() {
                                     <TableCaption className="font-medium text-slate-400 text-xs py-4">Selecciona un servicio para agregarlo al presupuesto</TableCaption>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50 hover:bg-slate-50">
-                                            <TableHead className="text-left font-semibold text-slate-400 text-xs uppercase tracking-wider px-4 py-3">Servicio</TableHead>
-                                            <TableHead className="text-right font-semibold text-slate-400 text-xs uppercase tracking-wider px-4 py-3">Valor</TableHead>
-                                            <TableHead className="text-center font-semibold text-slate-400 text-xs uppercase tracking-wider px-4 py-3 w-[120px]">Accion</TableHead>
+                                            <TableHead className="text-left font-semibold text-slate-400 text-xs px-4 py-3">Servicio</TableHead>
+                                            <TableHead className="text-right font-semibold text-slate-400 text-xs px-4 py-3">Valor</TableHead>
+                                            <TableHead className="text-center font-semibold text-slate-400 text-xs px-4 py-3 w-[120px]">Accion</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>

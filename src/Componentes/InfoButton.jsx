@@ -12,7 +12,7 @@ export function InfoButton({informacion, pasos, nota}) {
             <TooltipTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="h-9 gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:ring-2 focus-visible:ring-[#6E56CF]"
+                    className="h-9 gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:ring-2 focus-visible:ring-[#007AFF]"
                 >
                     <HelpCircle className="h-4 w-4" />
                     Información
@@ -36,7 +36,7 @@ export function InfoButton({informacion, pasos, nota}) {
                         <ol className="space-y-1.5">
                             {pasos.map((paso, index) => (
                                 <li key={index} className="flex gap-2">
-                                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#F3F0FF] text-[10px] font-bold leading-none text-[#6E56CF]">
+                                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#EBF4FF] text-[10px] font-bold leading-none text-[#007AFF]">
                                         {index + 1}
                                     </span>
                                     <span className="text-slate-700">{paso}</span>
@@ -46,7 +46,7 @@ export function InfoButton({informacion, pasos, nota}) {
                     )}
 
                     {nota && (
-                        <p className="rounded-lg bg-amber-50 px-3 py-2 text-[12px] font-medium text-amber-800">
+                        <p className="rounded-lg bg-[#F2F2F7] px-3 py-2 text-[12px] font-medium text-[#3A3A3C]">
                             {nota}
                         </p>
                     )}

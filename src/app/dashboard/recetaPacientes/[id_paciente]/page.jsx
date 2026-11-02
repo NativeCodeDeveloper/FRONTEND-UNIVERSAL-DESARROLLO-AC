@@ -506,7 +506,7 @@ export default function ReecetasPacientes() {
                         Cargando datos del paciente...
                     </div>
                 ) : !paciente ? (
-                    <div className="rounded-[28px] border border-dashed border-rose-200 bg-white p-10 text-center text-sm text-rose-500">
+                    <div className="rounded-[28px] border border-dashed border-[#FF3B30]/25 bg-white p-10 text-center text-sm text-[#FF3B30]">
                         No fue posible encontrar información del paciente.
                     </div>
                 ) : (
@@ -515,7 +515,7 @@ export default function ReecetasPacientes() {
                         {/* ── Tarjeta del paciente ── */}
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                             <div className="flex items-center gap-4 px-6 py-5 border-b border-slate-100">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EDE9FE] text-base font-bold text-[#6E56CF]">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#E5F0FF] text-base font-bold text-[#007AFF]">
                                     {paciente.nombre?.charAt(0)}{paciente.apellido?.charAt(0)}
                                 </div>
                                 <div className="min-w-0">
@@ -523,7 +523,7 @@ export default function ReecetasPacientes() {
                                     <p className="text-[13px] text-slate-500 font-mono">RUT {formatRut(paciente.rut) || "---"}</p>
                                 </div>
                                 <div className="ml-auto flex flex-wrap gap-2">
-                                    <span className="inline-flex items-center rounded-lg bg-[#F3F0FF] border border-[#DDD6FE] px-2.5 py-0.5 text-[11px] font-semibold text-[#6E56CF] uppercase tracking-wide">
+                                    <span className="inline-flex items-center rounded-lg bg-[#EBF4FF] border border-[#CCE4FF] px-2.5 py-0.5 text-[12px] font-semibold text-[#007AFF] ">
                                         {previsionDesdeId(paciente.prevision_id)}
                                     </span>
                                     <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
@@ -551,8 +551,8 @@ export default function ReecetasPacientes() {
                         {/* ── Formulario de receta ── */}
                         <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                             <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
-                                <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <div className="h-8 w-8 rounded-xl bg-[#E5F0FF] flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </div>
@@ -609,7 +609,7 @@ export default function ReecetasPacientes() {
                                             value={descripcion_receta}
                                             onChange={(e) => setDescripcion_receta(e.target.value)}
                                             placeholder="Ej: Administrar paracetamol 500 mg cada 8 horas por 5 días. Mantener reposo, hidratación y control en caso de persistencia de síntomas."
-                                            className="min-h-[220px] resize-y border-slate-200 bg-white text-sm leading-7 text-slate-900 shadow-none focus-visible:ring-violet-100 rounded-xl"
+                                            className="min-h-[220px] resize-y border-slate-200 bg-white text-sm leading-7 text-slate-900 shadow-none focus-visible:ring-[#007AFF]/10 rounded-xl"
                                         />
                                         <p className="mt-1.5 text-[11px] text-slate-400">{descripcion_receta.trim().length} caracteres</p>
                                     </div>
@@ -681,7 +681,7 @@ export default function ReecetasPacientes() {
                                 <button
                                     onClick={() => eliminarReceta(id_receta)}
                                     type="button"
-                                    className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 text-sm font-semibold text-rose-700 transition-all"
+                                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#FF3B30]/25 bg-[#FF3B30]/[0.08] hover:bg-[#FF3B30]/[0.12] px-4 py-2.5 text-sm font-semibold text-[#C4291D] transition-all"
                                 >
                                     Eliminar
                                 </button>

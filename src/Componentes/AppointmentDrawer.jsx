@@ -175,7 +175,7 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
               }}
               className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Ver ficha
@@ -185,7 +185,7 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
               onClick={() => router.push(`/dashboard/FichasPacientes?rut=${encodeURIComponent(reserva.rut)}`)}
               className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[12px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
               Carpeta
@@ -268,7 +268,7 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
         <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-600">
           Repetir cita en más fechas (opcional)
           {fechasRepeticion.length > 0 && (
-            <span className="ml-2 inline-flex items-center justify-center rounded-full bg-violet-100 text-[#6E56CF] text-[10px] font-bold px-1.5 py-0.5 normal-case tracking-normal">
+            <span className="ml-2 inline-flex items-center justify-center rounded-full bg-[#007AFF]/10 text-[#007AFF] text-[10px] font-bold px-1.5 py-0.5 normal-case tracking-normal">
               {fechasRepeticion.length}
             </span>
           )}
@@ -315,7 +315,7 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
                 <button
                   type="button"
                   onClick={() => actualizarFechas([])}
-                  className="text-[10px] font-semibold text-rose-400 hover:text-rose-600 transition-colors"
+                  className="text-[10px] font-semibold text-[#FF3B30]/70 hover:text-[#FF3B30] transition-colors"
                 >
                   Limpiar
                 </button>
@@ -324,13 +324,13 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
                 {[...fechasRepeticion].sort((a, b) => a - b).map((dia) => (
                   <span
                     key={dia.toISOString()}
-                    className="inline-flex items-center gap-1 bg-violet-100 text-[#6E56CF] text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                    className="inline-flex items-center gap-1 bg-[#007AFF]/10 text-[#007AFF] text-[11px] font-semibold px-2.5 py-1 rounded-full"
                   >
                     {format(dia, "EEE d MMM", { locale: es })}
                     <button
                       type="button"
                       onClick={() => actualizarFechas(fechasRepeticion.filter((d) => d.toISOString() !== dia.toISOString()))}
-                      className="hover:text-rose-500 transition-colors ml-0.5"
+                      className="hover:text-[#FF3B30] transition-colors ml-0.5"
                     >
                       ×
                     </button>
@@ -346,7 +346,7 @@ function RepetirFechasSection({ popupForm, onPopupFormChange, selectionDraft, fo
                   type="checkbox"
                   checked={!!popupForm.confirmacionFechasRepeticion}
                   onChange={(e) => onPopupFormChange("confirmacionFechasRepeticion", e.target.checked)}
-                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-violet-600 accent-violet-600 focus:ring-2 focus:ring-violet-200"
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-[#007AFF] accent-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20"
                 />
                 <span className="text-[11px] font-semibold text-slate-600 leading-snug">
                   Revisé la lista de arriba y son las fechas correctas. Se creará 1 reserva el día principal + {fechasRepeticion.length} más. Si alguna fecha ya tiene una cita o un bloqueo, esa fecha no se agenda y se avisa al finalizar.
@@ -504,7 +504,7 @@ function CampoNumerico({
                   }}
                   className={`w-full px-3 py-1.5 text-left text-[13px] tabular-nums transition-colors ${
                     elegido
-                      ? "bg-violet-50 font-semibold text-violet-700"
+                      ? "bg-[#007AFF]/[0.06] font-semibold text-[#0062CC]"
                       : habilitada
                         ? "text-slate-700 hover:bg-slate-50"
                         : "cursor-not-allowed text-slate-300"
@@ -580,7 +580,7 @@ function SelectorHora({
       </div>
 
       {valorFueraDeRango && (
-        <p className="mt-1.5 text-[11px] font-medium text-amber-600">
+        <p className="mt-1.5 text-[11px] font-medium text-[#C76A00]">
           Ese horario queda fuera del horario de la agenda.
         </p>
       )}
@@ -639,7 +639,7 @@ function FormSection({
   // enfocar un input con letra menor a 16px, y ese zoom descuadra el panel.
   // Desde sm vuelve a 13px. h-11 = 44px, el objetivo tactil minimo de Apple.
   const inputClass =
-    "h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 text-[16px] sm:text-[13px] text-slate-800 outline-none transition-shadow placeholder:text-slate-400 focus:border-violet-300 focus:ring-4 focus:ring-violet-100/70";
+    "h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 text-[16px] sm:text-[13px] text-slate-800 outline-none transition-shadow placeholder:text-slate-400 focus:border-[#007AFF]/30 focus:ring-4 focus:ring-[#007AFF]/10";
   const labelClass = "block text-[11px] font-medium text-slate-500 mb-1.5";
   const selectClass = `${inputClass} cursor-pointer pr-8`;
 
@@ -787,8 +787,8 @@ function FormSection({
 
       {/* Datos del paciente */}
       {mode !== "bloqueo" && (
-        <div data-tour="reserva-paciente" className="rounded-2xl border border-violet-100 bg-violet-50/40 p-4 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-violet-500 mb-2.5">
+        <div data-tour="reserva-paciente" className="rounded-2xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] p-4 space-y-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#007AFF] mb-2.5">
             Datos del paciente
           </p>
           <div>
@@ -799,7 +799,7 @@ function FormSection({
                   type="checkbox"
                   checked={esRutDesconocido}
                   onChange={(e) => onPopupFormChange("rut", e.target.checked ? "RUT DESCONOCIDO" : "")}
-                  className="h-4 w-4 rounded border-slate-300 text-violet-600 accent-violet-600 focus:ring-2 focus:ring-violet-200"
+                  className="h-4 w-4 rounded border-slate-300 text-[#007AFF] accent-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20"
                 />
                 RUT desconocido
               </label>
@@ -821,7 +821,7 @@ function FormSection({
             )}
             {buscandoPaciente && (
               <div className="mt-2 flex items-center gap-2 rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-[11px] font-medium text-slate-500">
-                <svg className="h-3.5 w-3.5 animate-spin text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-3.5 w-3.5 animate-spin text-[#007AFF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
@@ -1207,7 +1207,7 @@ export function AppointmentDrawer({
         {/* Header del drawer */}
         <div className="flex items-start justify-between border-b border-slate-100 bg-white px-5 py-4 flex-shrink-0">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-500">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#007AFF]">
               Agenda Clínica
             </p>
             <h2 className="text-[17px] font-semibold tracking-[-0.015em] text-slate-900 leading-snug mt-0.5">
@@ -1218,7 +1218,7 @@ export function AppointmentDrawer({
                 type="button"
                 onClick={() => onVerFichaClinica?.(reserva)}
                 disabled={cargandoFichaClinica}
-                className="mt-3 inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-xl border border-violet-200 bg-violet-50 px-3 text-[11px] font-bold text-violet-700 transition-colors hover:border-violet-300 hover:bg-violet-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 disabled:cursor-wait disabled:opacity-60"
+                className="mt-3 inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-xl border border-[#007AFF]/20 bg-[#007AFF]/[0.06] px-3 text-[11px] font-bold text-[#0062CC] transition-colors hover:border-[#007AFF]/30 hover:bg-[#007AFF]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/30 disabled:cursor-wait disabled:opacity-60"
               >
                 {cargandoFichaClinica ? (
                   <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
@@ -1329,7 +1329,7 @@ export function AppointmentDrawer({
                     <button
                       type="button"
                       onClick={onEliminar}
-                      className="h-11 rounded-xl border border-rose-200 bg-rose-50 px-4 text-sm font-semibold text-rose-700 hover:bg-rose-100 active:scale-[0.99] transition-all"
+                      className="h-11 rounded-xl border border-[#FF3B30]/25 bg-[#FF3B30]/[0.08] px-4 text-sm font-semibold text-[#C4291D] hover:bg-[#FF3B30]/[0.12] active:scale-[0.99] transition-all"
                     >
                       Eliminar
                     </button>

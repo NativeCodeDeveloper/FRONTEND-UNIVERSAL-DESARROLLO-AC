@@ -206,7 +206,7 @@ export default function PasarelaPagoPage() {
                     <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
                         <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
                             <div className="mb-6 flex items-start gap-4">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F3F0FF] text-[#6E56CF]">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#EBF4FF] text-[#007AFF]">
                                     <WalletCards className="h-5 w-5" />
                                 </div>
                                 <div>

@@ -172,14 +172,14 @@ export default function CortexAssistant() {
                   key={`${item.role}-${index}`}
                   className={`w-fit max-w-[86%] break-words rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm ${
                     item.role === "user"
-                      ? "ml-auto rounded-tr-sm border border-violet-900/30 bg-[#21183D] text-white"
+                      ? "ml-auto rounded-tr-sm border border-[#1D1D1F] bg-[#21183D] text-white"
                       : "rounded-tl-sm border border-white/[0.08] bg-white/[0.07] text-white/80"
                   }`}
                 >
                   {item.type === "capabilities" ? (
                     <div>
                       <p>De momento no estoy disponible en este plan, pero puedo:</p>
-                      <ul className="mt-2.5 space-y-1.5 pl-4 text-left [list-style-type:disc] marker:text-violet-400">
+                      <ul className="mt-2.5 space-y-1.5 pl-4 text-left [list-style-type:disc] marker:text-[#007AFF]/60">
                         <li>Agendar pacientes por ti.</li>
                         <li>Mejorar la redacción de tus fichas.</li>
                         <li>Realizar bloqueos específicos.</li>
@@ -255,7 +255,7 @@ export default function CortexAssistant() {
                 <div className="flex shrink-0 flex-col items-end gap-1.5 pb-0.5">
                   <span
                     className={`font-mono text-[9px] tabular-nums transition-colors ${
-                      isNearLimit ? "text-amber-400" : "text-slate-600"
+                      isNearLimit ? "text-[#FF9F0A]" : "text-slate-600"
                     }`}
                   >
                     {message.length}/{MAX_CHARS}
@@ -264,7 +264,7 @@ export default function CortexAssistant() {
                     type="submit"
                     aria-label="Enviar mensaje"
                     disabled={!message.trim() || isEvolving}
-                    className="grid h-9 w-9 place-items-center rounded-lg bg-[#21183D] text-white transition hover:bg-violet-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
+                    className="grid h-9 w-9 place-items-center rounded-lg bg-[#21183D] text-white transition hover:bg-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#007AFF] disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
                   >
                     <Send className="h-4 w-4" />
                   </button>
@@ -286,7 +286,7 @@ export default function CortexAssistant() {
             aria-label="Abrir CORTEX A.I"
             aria-expanded={isOpen}
             aria-controls="cortex-assistant-dialog"
-            className="pointer-events-auto rounded-full bg-transparent p-0 shadow-none transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-violet-200/60"
+            className="pointer-events-auto rounded-full bg-transparent p-0 shadow-none transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#007AFF]/20"
           >
             <span className="relative block h-16 w-16 overflow-hidden rounded-full bg-transparent">
               <InteractiveNebulaOrb isThinking={isEvolving} className="h-full w-full" />

@@ -95,7 +95,7 @@ export default function ImageCropperModal({
 
                     <div className="px-6 py-4 space-y-4">
                         <div className="flex items-center gap-3">
-                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Zoom</span>
+                            <span className="text-[12px] font-medium text-slate-400 ">Zoom</span>
                             <input
                                 type="range"
                                 min={1}
@@ -103,7 +103,7 @@ export default function ImageCropperModal({
                                 step={0.01}
                                 value={zoom}
                                 onChange={(e) => setZoom(Number(e.target.value))}
-                                className="flex-1 accent-[#6E56CF]"
+                                className="flex-1 accent-[#007AFF]"
                             />
                         </div>
 

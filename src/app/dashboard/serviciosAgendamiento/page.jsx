@@ -230,8 +230,8 @@ export default function ServiciosAgendamiento() {
                         </div>
                         <TutorialGuiadoServicios
                             ariaLabel="Iniciar el tutorial guiado de servicios de agendamiento"
-                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2 sm:self-auto"
-                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2 sm:self-auto"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#007AFF]"
                         />
                     </div>
                 </div>
@@ -354,7 +354,7 @@ export default function ServiciosAgendamiento() {
                                                     <button
                                                         type="button"
                                                         onClick={() => seleccionarServicioProfesional(servicio.id_servicioProfesional)}
-                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-white px-3.5 text-xs font-bold text-[#6E56CF] shadow-sm transition-all hover:border-violet-300 hover:bg-[#F3F0FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-[#007AFF]/20 bg-white px-3.5 text-xs font-bold text-[#007AFF] shadow-sm transition-all hover:border-[#007AFF]/30 hover:bg-[#EBF4FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                                                         aria-label={`Editar ${servicio.nombreServicio}`}
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -365,7 +365,7 @@ export default function ServiciosAgendamiento() {
                                                     <button
                                                         type="button"
                                                         onClick={() => eliminarServicioProfesional(servicio.id_servicioProfesional)}
-                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-3.5 text-xs font-bold text-rose-600 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+                                                        className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-[#FF3B30]/25 bg-white px-3.5 text-xs font-bold text-[#FF3B30] shadow-sm transition-all hover:border-[#FF3B30]/40 hover:bg-[#FF3B30]/[0.08] hover:text-[#C4291D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF3B30] focus-visible:ring-offset-2"
                                                         aria-label={`Eliminar ${servicio.nombreServicio}`}
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

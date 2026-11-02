@@ -293,10 +293,10 @@ export default function AgendaCitas() {
         const lower = normalizarEstadoReserva(estado);
         if (lower === 'asiste') return 'bg-cyan-50/90 text-cyan-800 border-cyan-200';
         if (lower === 'no asiste' || lower === 'no asistio' || lower === 'no asistste') return 'bg-pink-50/90 text-pink-800 border-pink-200';
-        if (lower === 'finalizado') return 'bg-orange-50/90 text-orange-800 border-orange-200';
+        if (lower === 'finalizado') return 'bg-[#F2F2F7] text-[#3A3A3C] border-black/[0.08]';
         if (lower === 'confirmada') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
         if (lower === 'anulada') return 'bg-red-50 text-red-600 border-red-200';
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-[#F2F2F7] text-[#3A3A3C] border-black/[0.08]';
     }
 
     async function actualizarEstadoReservaRapido(id_reserva, nuevoEstado) {
@@ -371,7 +371,7 @@ export default function AgendaCitas() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Gestión de Pacientes</p>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Gestión de Pacientes</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Listado de Reservaciones</h1>
                         <p className="mt-2 text-[13px] text-slate-500 max-w-2xl leading-relaxed">
                             Monitorea y gestiona el estado de todas las citas. Puedes filtrar por profesional, fecha o datos del paciente para realizar confirmaciones rápidas.
@@ -399,7 +399,7 @@ export default function AgendaCitas() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
                             </div>
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Filtros de Búsqueda</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Filtros de Búsqueda</h2>
                         </div>
                         
                         <div className="p-6">
@@ -407,7 +407,7 @@ export default function AgendaCitas() {
                                 {/* Búsqueda Directa */}
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Nombre del Paciente</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Nombre del Paciente</label>
                                         <div className="flex gap-2">
                                             <ShadcnInput
                                                 value={nombrePaciente}
@@ -425,7 +425,7 @@ export default function AgendaCitas() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">RUT del Paciente</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">RUT del Paciente</label>
                                         <div className="flex gap-2">
                                             <ShadcnInput
                                                 value={rut}
@@ -447,7 +447,7 @@ export default function AgendaCitas() {
                                 {/* Selección de Profesional y Reset */}
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Profesional Responsable</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Profesional Responsable</label>
                                         <SelectDinamic
                                             value={id_profesional}
                                             onChange={(e) => setId_profesional(e.target.value)}
@@ -475,17 +475,17 @@ export default function AgendaCitas() {
                                 <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex flex-col justify-between">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Desde</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ">Desde</label>
                                             <Calendar28 value={fechaInicio} onChange={setfechaInicio} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hasta</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ">Hasta</label>
                                             <Calendar28 value={fechaFinalizacion} onChange={setfechaFinalizacion} />
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => buscarEntreFechas(fechaInicio, fechaFinalizacion)}
-                                        className="mt-4 h-11 bg-[#6E56CF] text-white text-sm font-bold rounded-xl hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100"
+                                        className="mt-4 h-11 bg-[#007AFF] text-white text-sm font-bold rounded-xl hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100"
                                     >
                                         Filtrar por Rango
                                     </button>
@@ -499,18 +499,18 @@ export default function AgendaCitas() {
                         <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
                                 <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Reservaciones</h2>
-                                <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-xs font-bold flex items-center justify-center">
+                                <span className="h-6 px-2.5 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-xs font-bold flex items-center justify-center">
                                     {dataLista.length} registros
                                 </span>
                                 {/* Toggle vista */}
                                 <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-0.5">
                                     <button
                                         onClick={() => setViewMode('lista')}
-                                        className={`h-7 px-3 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'lista' ? 'bg-white text-[#6E56CF] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`h-7 px-3 rounded-lg text-[12px] font-medium transition-all ${viewMode === 'lista' ? 'bg-white text-[#007AFF] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                                     >Tarjetas</button>
                                     <button
                                         onClick={() => setViewMode('tabla')}
-                                        className={`h-7 px-3 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'tabla' ? 'bg-white text-[#6E56CF] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                                        className={`h-7 px-3 rounded-lg text-[12px] font-medium transition-all ${viewMode === 'tabla' ? 'bg-white text-[#007AFF] shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                                     >Tabla</button>
                                 </div>
                             </div>
@@ -551,24 +551,24 @@ export default function AgendaCitas() {
                                         {citasAgrupadas.map(({ key, label, isHoy, items }) => (
                                             <div key={key} className="px-6 py-5">
                                                 <div className="flex items-center gap-3 mb-4">
-                                                    <span className={`text-[11px] font-bold uppercase tracking-widest ${isHoy ? 'text-[#6E56CF]' : 'text-slate-400'}`}>{label}</span>
-                                                    {isHoy && <span className="h-1.5 w-1.5 rounded-full bg-[#6E56CF] animate-pulse" />}
+                                                    <span className={`text-[12px] font-medium ${isHoy ? 'text-[#007AFF]' : 'text-slate-400'}`}>{label}</span>
+                                                    {isHoy && <span className="h-1.5 w-1.5 rounded-full bg-[#007AFF] animate-pulse" />}
                                                     <div className="flex-1 h-px bg-slate-100" />
                                                     <span className="text-[10px] font-bold text-slate-300 tabular-nums">{items.length} cita{items.length !== 1 ? 's' : ''}</span>
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                                                     {items.map(data => (
-                                                        <div key={data.id_reserva} className="bg-slate-50/60 border border-slate-100 rounded-2xl p-4 hover:border-violet-100 hover:bg-violet-50/20 transition-all">
+                                                        <div key={data.id_reserva} className="bg-slate-50/60 border border-slate-100 rounded-2xl p-4 hover:border-[#007AFF]/10 hover:bg-[#007AFF]/[0.06] transition-all">
                                                             <div className="flex items-center justify-between mb-3">
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="h-9 w-9 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
-                                                                        <span className="text-[11px] font-extrabold text-violet-700 leading-tight">{(data.horaInicio || '--:--').slice(0, 5)}</span>
+                                                                        <span className="text-[11px] font-extrabold text-[#0062CC] leading-tight">{(data.horaInicio || '--:--').slice(0, 5)}</span>
                                                                     </div>
                                                                     {data.horaFinalizacion && (
                                                                         <span className="text-[10px] text-slate-400 font-medium">→ {data.horaFinalizacion.slice(0, 5)}</span>
                                                                     )}
                                                                 </div>
-                                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border shadow-sm ${badgeEstado(data.estadoReserva)}`}>
+                                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-medium border shadow-sm ${badgeEstado(data.estadoReserva)}`}>
                                                                     {data.estadoReserva}
                                                                 </span>
                                                             </div>
@@ -582,7 +582,7 @@ export default function AgendaCitas() {
                                                                 <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'no asiste')} disabled={actualizandoReservaId === data.id_reserva}
                                                                     className="flex-1 h-8 rounded-xl bg-pink-50 text-pink-600 text-[9px] font-bold uppercase tracking-tight hover:bg-pink-600 hover:text-white transition-all border border-pink-100 disabled:opacity-40">Faltó</button>
                                                                 <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'finalizado')} disabled={actualizandoReservaId === data.id_reserva}
-                                                                    className="flex-1 h-8 rounded-xl bg-orange-50 text-orange-600 text-[9px] font-bold uppercase tracking-tight hover:bg-orange-600 hover:text-white transition-all border border-orange-100 disabled:opacity-40">Fin</button>
+                                                                    className="flex-1 h-8 rounded-xl bg-[#F2F2F7] text-[#C76A00] text-[9px] font-bold uppercase tracking-tight hover:bg-[#C76A00] hover:text-white transition-all border border-[#E5E5EA] disabled:opacity-40">Fin</button>
                                                                 <button onClick={() => verDetalleAgenda(data.id_reserva)}
                                                                     className="h-8 w-8 rounded-xl bg-white border border-slate-200 text-slate-400 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all flex items-center justify-center shadow-sm shrink-0">
                                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -607,21 +607,21 @@ export default function AgendaCitas() {
                             <Table className="min-w-[800px]">
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 text-center">Fecha y Hora</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5">Paciente / Profesional</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 text-center">RUT</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 text-center">Estado</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 text-center">Acciones Rápidas</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 text-center">Ficha</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Fecha y Hora</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5">Paciente / Profesional</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">RUT</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Estado</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Acciones Rápidas</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Ficha</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {dataLista.map((data) => (
                                         <TableRow key={data.id_reserva} className="border-slate-50 hover:bg-slate-50/30 transition-colors">
                                             <TableCell className="py-5 text-center">
-                                                <div className="inline-flex flex-col items-center bg-violet-50/50 px-3 py-1.5 rounded-xl border border-violet-100">
-                                                    <span className="text-[13px] font-bold text-violet-700">{formatearFecha(data.fechaInicio)}</span>
-                                                    <span className="text-[10px] font-bold text-violet-400 uppercase tracking-tighter">{data.horaInicio || '--:--'}</span>
+                                                <div className="inline-flex flex-col items-center bg-[#007AFF]/[0.06] px-3 py-1.5 rounded-xl border border-[#007AFF]/10">
+                                                    <span className="text-[13px] font-bold text-[#0062CC]">{formatearFecha(data.fechaInicio)}</span>
+                                                    <span className="text-[10px] font-bold text-[#007AFF]/60 uppercase tracking-tighter">{data.horaInicio || '--:--'}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="py-5">
@@ -638,7 +638,7 @@ export default function AgendaCitas() {
                                                 {formatRut(data.rut)}
                                             </TableCell>
                                             <TableCell className="py-5 text-center">
-                                                <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider border shadow-sm ${badgeEstado(data.estadoReserva)}`}>
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[12px] font-medium border shadow-sm ${badgeEstado(data.estadoReserva)}`}>
                                                     {data.estadoReserva}
                                                 </span>
                                             </TableCell>
@@ -660,7 +660,7 @@ export default function AgendaCitas() {
                                                     </button>
                                                     <button
                                                         onClick={() => actualizarEstadoReservaRapido(data.id_reserva, "finalizado")}
-                                                        className="h-9 px-3 rounded-xl bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-tight hover:bg-orange-600 hover:text-white transition-all shadow-sm border border-orange-100"
+                                                        className="h-9 px-3 rounded-xl bg-[#F2F2F7] text-[#C76A00] text-[10px] font-bold uppercase tracking-tight hover:bg-[#C76A00] hover:text-white transition-all shadow-sm border border-[#E5E5EA]"
                                                         title="Finalizar Atención"
                                                     >
                                                         Fin

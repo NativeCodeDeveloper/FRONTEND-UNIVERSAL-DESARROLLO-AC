@@ -56,9 +56,9 @@ function SeleccionCard({ event }) {
   return (
     <div
       className="flex h-full w-full items-center gap-1 px-1.5 py-1"
-      style={{ borderLeft: "3px solid #6E56CF" }}
+      style={{ borderLeft: "3px solid #007AFF" }}
     >
-      <span className="truncate text-[11px] font-semibold text-violet-700">
+      <span className="truncate text-[11px] font-semibold text-[#0062CC]">
         {event.title || "Nueva reserva"}
       </span>
     </div>

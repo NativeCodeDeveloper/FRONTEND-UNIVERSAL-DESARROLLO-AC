@@ -396,7 +396,7 @@ export default function EdicionPagina() {
                         </p>
                     </div>
                     <div className="h-12 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm shrink-0">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Última actualización</span>
+                        <span className="text-[12px] font-medium text-slate-400 leading-none">Última actualización</span>
                         <span suppressHydrationWarning className="text-[12px] font-bold text-slate-700 mt-0.5 leading-none">{ultimaActualizacion || '—'}</span>
                     </div>
                 </div>
@@ -406,27 +406,27 @@ export default function EdicionPagina() {
                     {/* ── Título Principal ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título Principal</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Título Principal</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{titulo || 'No hay título configurado'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo Título</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo Título</label>
                                     <textarea value={nuevoTitulo} onChange={(e) => setNuevoTitulo(e.target.value)} placeholder="Escribe el nuevo título"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={3} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={3} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
                                         className="h-10 px-6 rounded-xl bg-black text-[12px] font-bold text-white hover:bg-slate-800 transition-all disabled:opacity-50">
                                         Guardar Cambios
                                     </button>
-                                    {mensaje && <p className={`text-[12px] font-medium ${mensaje.startsWith('✅') ? 'text-emerald-700' : 'text-amber-700'}`}>{mensaje}</p>}
+                                    {mensaje && <p className={`text-[12px] font-medium ${mensaje.startsWith('✅') ? 'text-emerald-700' : 'text-[#3A3A3C]'}`}>{mensaje}</p>}
                                 </div>
                             </form>
                         </div>
@@ -435,20 +435,20 @@ export default function EdicionPagina() {
                     {/* ── Subtítulo ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Subtítulo</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Subtítulo</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{subtitulo || '—'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleUpdateSubtitulo} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo Subtítulo</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo Subtítulo</label>
                                     <textarea value={nuevoSubtitulo} onChange={(e) => setNuevoSubtitulo(e.target.value)} placeholder="Escribe el nuevo subtítulo"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={3} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={3} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
@@ -464,20 +464,20 @@ export default function EdicionPagina() {
                     {/* ── Sobre nosotros ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título: Acerca de</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Título: Acerca de</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{sobreNosotros || '—'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleUpdateSobreNosotros} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo texto</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo texto</label>
                                     <textarea value={nuevoSobreNosotros} onChange={(event) => setNuevoSobreNosotros(event.target.value)} placeholder="Escribe el nuevo 'Sobre nosotros'"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={3} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={3} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
@@ -493,20 +493,20 @@ export default function EdicionPagina() {
                     {/* ── Título Proyectos ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título: Proyectos</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Título: Proyectos</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{tituloProyectos || '—'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleSubmitProyectos} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo título</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo título</label>
                                     <textarea value={nuevoTituloProyecto} onChange={(evento) => setnuevoTituloProyecto(evento.target.value)} placeholder="Nuevo titulo de la seccion Proyectos"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={2} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={2} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
@@ -522,20 +522,20 @@ export default function EdicionPagina() {
                     {/* ── Título Contacto ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Título: Contacto</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Título: Contacto</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{tituloContacto || '—'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleSubmitContacto} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo título</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo título</label>
                                     <textarea value={contactoTitulo} onChange={(evento) => setcontactoTitulo(evento.target.value)} placeholder="Nuevo titulo de la seccion contacto"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={2} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={2} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
@@ -551,20 +551,20 @@ export default function EdicionPagina() {
                     {/* ── Párrafo 1 ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Primer Párrafo</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Primer Párrafo</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{primerParrafo || '—'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleSubmitText1} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo texto</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo texto</label>
                                     <textarea value={texto1} onChange={(event) => settexto1(event.target.value)} placeholder="Nuevo texto Párrafo"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={4} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={4} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}
@@ -580,20 +580,20 @@ export default function EdicionPagina() {
                     {/* ── Párrafo 2 ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Segundo Párrafo</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Segundo Párrafo</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-4">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Texto actual</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Texto actual</label>
                                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                                     <p className="text-[13px] text-slate-700">{segundoParrafo || '—'}</p>
                                 </div>
                             </div>
                             <form onSubmit={handleSubmitText2} className="space-y-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nuevo texto</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nuevo texto</label>
                                     <textarea value={texto2} onChange={(event) => settexto2(event.target.value)} placeholder="Nuevo texto Párrafo"
-                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#6E56CF] focus:outline-none focus:ring-2 focus:ring-violet-50" rows={4} />
+                                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:border-[#007AFF] focus:outline-none focus:ring-2 focus:ring-[#007AFF]/[0.06]" rows={4} />
                                 </div>
                                 <div className="flex items-center justify-between gap-4">
                                     <button type="submit" disabled={cargando}

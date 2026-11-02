@@ -64,7 +64,7 @@ export default function Calendario() {
             .rbc-timeslot-group { border-bottom: 1px solid #F1F5F9 !important; }
             .rbc-day-slot .rbc-time-slot:hover { background: rgba(168, 85, 247, 0.04) !important; }
             .rbc-today { background: rgba(248, 250, 252, 0.5) !important; }
-            .rbc-current-time-indicator { background-color: #7c3aed !important; height: 2px !important; }
+            .rbc-current-time-indicator { background-color: #0062CC !important; height: 2px !important; }
             .rbc-slot-selection { background: rgba(124, 58, 237, 0.12) !important; border: 1px solid rgba(124, 58, 237, 0.3) !important; border-radius: 12px !important; }
             .rbc-selected-cell { background: rgba(124, 58, 237, 0.04) !important; }
             .rbc-event, .rbc-background-event { border-radius: 8px !important; box-shadow: none !important; overflow: hidden !important; border: none !important; background: transparent !important; }
@@ -80,8 +80,8 @@ export default function Calendario() {
             .rbc-row-segment { padding: 0 2px 1px !important; }
 
             /* ── "Ver más" link ── */
-            .rbc-show-more { color: #6E56CF !important; font-size: 11px !important; font-weight: 700 !important; padding: 2px 6px !important; margin: 0 2px !important; cursor: pointer !important; background: #F3F0FF !important; border-radius: 4px !important; display: inline-block !important; }
-            .rbc-show-more:hover { background: #EDE9FE !important; text-decoration: none !important; }
+            .rbc-show-more { color: #007AFF !important; font-size: 11px !important; font-weight: 700 !important; padding: 2px 6px !important; margin: 0 2px !important; cursor: pointer !important; background: #EBF4FF !important; border-radius: 4px !important; display: inline-block !important; }
+            .rbc-show-more:hover { background: #E5F0FF !important; text-decoration: none !important; }
 
             /* ── Popup overlay ── */
             .rbc-overlay { background: white !important; border-radius: 14px !important; border: 1px solid #e2e8f0 !important; box-shadow: 0 20px 50px rgba(15,23,42,0.12) !important; padding: 6px !important; z-index: 9999 !important; min-width: 220px !important; }
@@ -960,9 +960,9 @@ export default function Calendario() {
         const dayNumber = format(date, "d");
     
         return (
-            <div className={`flex items-center justify-center gap-1.5 py-2.5 bg-white border-b border-slate-100 ${isToday ? "text-[#6E56CF]" : "text-slate-600"}`}>
+            <div className={`flex items-center justify-center gap-1.5 py-2.5 bg-white border-b border-slate-100 ${isToday ? "text-[#007AFF]" : "text-slate-600"}`}>
                 <span className="capitalize text-[12px] font-medium">{dayName}</span>
-                <span className={`text-[12px] font-bold w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-[#6E56CF] text-white shadow-sm" : ""}`}>
+                <span className={`text-[12px] font-bold w-6 h-6 flex items-center justify-center rounded-full ${isToday ? "bg-[#007AFF] text-white shadow-sm" : ""}`}>
                     {dayNumber}
                 </span>
             </div>
@@ -983,7 +983,7 @@ export default function Calendario() {
                 {/* ── Header ── */}
                 <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Agenda Global</p>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Agenda Global</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Vista General
                         </h1>
@@ -994,8 +994,8 @@ export default function Calendario() {
 
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-white px-4 py-2 shadow-sm">
-                            <span className="h-2 w-2 rounded-full bg-[#6E56CF] animate-pulse"></span>
-                            <span className="text-[12px] font-bold text-slate-600 uppercase tracking-widest">{events.length} CITAS TOTALES</span>
+                            <span className="h-2 w-2 rounded-full bg-[#007AFF] animate-pulse"></span>
+                            <span className="text-[12px] font-medium text-slate-600 ">{events.length} CITAS TOTALES</span>
                         </div>
                         
                         <div className="h-12 w-[280px]">
@@ -1011,7 +1011,7 @@ export default function Calendario() {
 
                         <button 
                             onClick={refrescarCalendario}
-                            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-400 transition-all hover:bg-slate-50 hover:text-[#6E56CF] shadow-sm"
+                            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-400 transition-all hover:bg-slate-50 hover:text-[#007AFF] shadow-sm"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                         </button>
@@ -1052,7 +1052,7 @@ export default function Calendario() {
                             <button
                                 type="button"
                                 onClick={() => setCurrentDate(new Date())}
-                                className="rounded-xl border border-violet-200 bg-[#F3F0FF] px-4 py-2 text-[13px] font-semibold text-[#6E56CF] shadow-sm hover:bg-[#EDE9FE] transition-colors"
+                                className="rounded-xl border border-[#007AFF]/20 bg-[#EBF4FF] px-4 py-2 text-[13px] font-semibold text-[#007AFF] shadow-sm hover:bg-[#E5F0FF] transition-colors"
                             >
                                 Hoy
                             </button>
@@ -1088,7 +1088,7 @@ export default function Calendario() {
                                     onClick={() => { setCurrentView(esMobile ? "day" : key); setMonthPopover(null); }}
                                     className={`px-3.5 py-1.5 text-[13px] transition-all duration-150 rounded-lg ${
                                         vistaActiva === key
-                                            ? "bg-white text-[#6E56CF] font-bold shadow-sm"
+                                            ? "bg-white text-[#007AFF] font-bold shadow-sm"
                                             : "text-slate-500 font-medium hover:text-slate-700"
                                     }`}
                                 >
@@ -1139,7 +1139,7 @@ export default function Calendario() {
                             }}
                             dayPropGetter={(date) => ({
                                 style: {
-                                    backgroundColor: format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ? 'rgba(110, 86, 207, 0.03)' : 'transparent'
+                                    backgroundColor: format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd') ? 'rgba(0,122,255, 0.03)' : 'transparent'
                                 }
                             })}
                             onSelectEvent={(event) => {
@@ -1235,7 +1235,7 @@ export default function Calendario() {
                             {/* Header Popup */}
                             <div className="relative px-8 pt-8 pb-6 bg-slate-50/50 border-b border-slate-100">
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#6E56CF]">Detalle de Cita</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF]">Detalle de Cita</span>
                                     <button onClick={() => setReservaPopup(null)} className="h-8 w-8 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-600 transition-colors shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                     </button>
@@ -1250,11 +1250,11 @@ export default function Calendario() {
                             <div className="px-8 py-6 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center">
+                                        <div className="h-10 w-10 rounded-xl bg-[#007AFF]/[0.06] text-[#007AFF] flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Fecha</p>
+                                            <p className="text-[12px] font-medium text-slate-400 leading-none">Fecha</p>
                                             <p className="text-[13px] font-bold text-slate-700 mt-1 capitalize">{formatFechaLarga(start)}</p>
                                         </div>
                                     </div>
@@ -1263,7 +1263,7 @@ export default function Calendario() {
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Horario</p>
+                                            <p className="text-[12px] font-medium text-slate-400 leading-none">Horario</p>
                                             <p className="text-[13px] font-bold text-slate-700 mt-1">{formatHoraCorta(start)} - {formatHoraCorta(end)}</p>
                                         </div>
                                     </div>

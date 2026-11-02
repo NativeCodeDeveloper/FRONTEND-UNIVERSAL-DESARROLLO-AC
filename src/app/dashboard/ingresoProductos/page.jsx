@@ -427,7 +427,7 @@ useEffect(() => {
                     <div className="flex items-center gap-3">
                         <a
                             href="/dashboard/presupuestoTratamiento"
-                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                         >
                             Ir a presupuestos
                         </a>
@@ -439,7 +439,7 @@ useEffect(() => {
                             }}
                             tutorial={TutorialGuiadoProductos}
                             tutorialProps={{ ariaLabel: "Iniciar el tutorial guiado de prestaciones y servicios" }}
-                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                         />
                     </div>
                 </div>
@@ -451,7 +451,7 @@ useEffect(() => {
                 <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm">
                     {/* Cabecera del card */}
                     <div data-tour="productos-formulario" className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center gap-2.5">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF]">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#007AFF]">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-white">
                                 <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
                             </svg>
@@ -463,7 +463,7 @@ useEffect(() => {
                             <p className="text-[11px] text-slate-400">Complete los campos requeridos</p>
                         </div>
                         {id_producto && (
-                            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#F3F0FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#6E56CF] ring-1 ring-[#DDD6FE]">
+                            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#EBF4FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#007AFF] ring-1 ring-[#CCE4FF]">
                                 Editando ID: {id_producto}
                             </span>
                         )}
@@ -474,13 +474,13 @@ useEffect(() => {
 
                             {/* Categoria */}
                             <div>
-                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">
                                     Categoria Principal
                                 </label>
                                 <select
                                     value={categoriaProducto}
                                     onChange={(e) => setcategoriaProducto(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer placeholder:text-slate-400"
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 cursor-pointer placeholder:text-slate-400"
                                 >
                                     <option value="" disabled>Seleccione una categoria</option>
                                     {normalizarLista(listadoCategorias).map((categoria) => (
@@ -493,7 +493,7 @@ useEffect(() => {
 
                             {/* Subcategoria — opcional */}
                             <div>
-                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">
                                     Sub-Categoria
                                     <span className="ml-1.5 normal-case font-normal text-slate-400">(opcional)</span>
                                 </label>
@@ -501,7 +501,7 @@ useEffect(() => {
                                     value={subcategorias}
                                     onChange={(e) => setsubcategorias(e.target.value)}
                                     disabled={!categoriaProducto}
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     <option value="">No aplica</option>
                                     {normalizarLista(listaSubcategorias).map((subcategoria) => (
@@ -514,7 +514,7 @@ useEffect(() => {
 
                             {/* Sub-subcategoria — opcional, solo si hay subcategoria */}
                             <div>
-                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">
                                     Sub-Sub Categoria
                                     <span className="ml-1.5 normal-case font-normal text-slate-400">(opcional)</span>
                                 </label>
@@ -522,7 +522,7 @@ useEffect(() => {
                                     value={subsubcategorias}
                                     onChange={(e) => setsubsubcategorias(e.target.value)}
                                     disabled={!subcategorias}
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     <option value="">No aplica</option>
                                     {normalizarLista(listaSubSubCategorias).map((subsubcategoria) => (
@@ -535,7 +535,7 @@ useEffect(() => {
 
                             {/* Valor */}
                             <div>
-                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">
                                     Valor (sin puntos ni comas)
                                 </label>
                                 <div className="relative">
@@ -545,14 +545,14 @@ useEffect(() => {
                                         value={valorProducto}
                                         onChange={(e) => setvalorProducto(e.target.value)}
                                         placeholder="0"
-                                        className="w-full rounded-lg border border-slate-200 bg-white pl-8 pr-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 placeholder:text-slate-400"
+                                        className="w-full rounded-lg border border-slate-200 bg-white pl-8 pr-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 placeholder:text-slate-400"
                                     />
                                 </div>
                             </div>
 
                             {/* Titulo - full width */}
                             <div className="md:col-span-2">
-                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">
                                     Nombre de la prestacion, producto o servicio
                                 </label>
                                 <input
@@ -560,13 +560,13 @@ useEffect(() => {
                                     value={tituloProducto}
                                     onChange={(e) => settituloProducto(e.target.value)}
                                     placeholder="Ej: Limpieza facial profunda"
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 placeholder:text-slate-400"
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 placeholder:text-slate-400"
                                 />
                             </div>
 
                             {/* Descripcion - full width */}
                             <div className="md:col-span-2">
-                                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+                                <label className="block text-[12px] font-semibold text-slate-500 mb-1.5">
                                     Descripcion
                                 </label>
                                 <textarea
@@ -574,7 +574,7 @@ useEffect(() => {
                                     onChange={(e) => setdescripcionProducto(e.target.value)}
                                     rows={3}
                                     placeholder="Describa brevemente el servicio o producto..."
-                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 resize-none focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 placeholder:text-slate-400"
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm outline-none transition duration-200 resize-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 placeholder:text-slate-400"
                                 />
                             </div>
                         </div>
@@ -624,15 +624,15 @@ useEffect(() => {
                     {/* Filtro por categoria */}
                     <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm">
                         <div className="flex items-center gap-2 mb-3">
-                            <div className="flex size-6 items-center justify-center rounded-md bg-[#EDE9FE]">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-[#6E56CF]">
+                            <div className="flex size-6 items-center justify-center rounded-md bg-[#E5F0FF]">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-[#007AFF]">
                                     <path fillRule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 0 1 .628.74v2.288a2.25 2.25 0 0 1-.659 1.59l-4.682 4.683a2.25 2.25 0 0 0-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 0 1 8 18.25v-5.757a2.25 2.25 0 0 0-.659-1.591L2.659 6.22A2.25 2.25 0 0 1 2 4.629V2.34a.75.75 0 0 1 .628-.74Z" clipRule="evenodd" />
                                 </svg>
                             </div>
                             <h3 className="text-sm font-semibold text-slate-800">Filtrar por categoria</h3>
                         </div>
                         <select
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 cursor-pointer"
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 cursor-pointer"
                             value={categoriaProductoSeleccion}
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -664,7 +664,7 @@ useEffect(() => {
                                 onChange={(e) => settituloSimilar(e.target.value)}
                                 type="text"
                                 placeholder="Ej: limpieza, masaje..."
-                                className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm outline-none transition duration-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-100 hover:border-slate-300 placeholder:text-slate-400"
+                                className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm outline-none transition duration-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/10 hover:border-slate-300 placeholder:text-slate-400"
                             />
                             <button
                                 type="button"
@@ -683,7 +683,7 @@ useEffect(() => {
                     {/* Cabecera de tabla */}
                     <div data-tour="productos-listado" className="border-b border-slate-200 bg-slate-50/70 px-5 py-3 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#6E56CF]">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#007AFF]">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5 text-white">
                                     <path fillRule="evenodd" d="M.99 5.24A2.25 2.25 0 0 1 3.25 3h13.5A2.25 2.25 0 0 1 19 5.25l.01 9.5A2.25 2.25 0 0 1 16.76 17H3.26A2.25 2.25 0 0 1 1 14.75l-.01-9.5Zm8.26 9.52v-.625a.75.75 0 0 0-.75-.75H3.25a.75.75 0 0 0-.75.75v.615c0 .414.336.75.75.75h5.373a.75.75 0 0 0 .627-.74Zm1.5 0a.75.75 0 0 0 .627.74h5.373a.75.75 0 0 0 .75-.75v-.615a.75.75 0 0 0-.75-.75H11.5a.75.75 0 0 0-.75.75v.625Zm6.75-5.995v-.625a.75.75 0 0 0-.75-.75H11.5a.75.75 0 0 0-.75.75v.625c0 .414.336.75.75.75h5.25a.75.75 0 0 0 .75-.75Zm-8.5 0v-.625a.75.75 0 0 0-.75-.75H3.25a.75.75 0 0 0-.75.75v.625c0 .414.336.75.75.75H8.5a.75.75 0 0 0 .75-.75Z" clipRule="evenodd" />
                                 </svg>
@@ -694,14 +694,14 @@ useEffect(() => {
                             <button
                                 type="button"
                                 onClick={() => { cargarProductos(); toast.success("Listado actualizado"); }}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-[#DDD6FE] bg-[#F3F0FF] px-3 py-1.5 text-xs font-semibold text-[#6E56CF] transition hover:bg-[#EDE9FE] active:scale-[0.97]"
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-[#CCE4FF] bg-[#EBF4FF] px-3 py-1.5 text-xs font-semibold text-[#007AFF] transition hover:bg-[#E5F0FF] active:scale-[0.97]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5">
                                     <path fillRule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.451a.75.75 0 0 0 0-1.5H4.5a.75.75 0 0 0-.75.75v3.75a.75.75 0 0 0 1.5 0v-2.033l.364.363a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm-10.624-2.85a5.5 5.5 0 0 1 9.201-2.465l.312.31H11.75a.75.75 0 0 0 0 1.5h3.75a.75.75 0 0 0 .75-.75V3.42a.75.75 0 0 0-1.5 0v2.033l-.364-.364A7 7 0 0 0 3.239 8.227a.75.75 0 0 0 1.449.39Z" clipRule="evenodd" />
                                 </svg>
                                 Recargar todo
                             </button>
-                            <span className="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#F3F0FF] px-2 text-[11px] font-bold text-[#6E56CF]">
+                            <span className="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#EBF4FF] px-2 text-[11px] font-bold text-[#007AFF]">
                                 {productos.length}
                             </span>
                         </div>
@@ -711,11 +711,11 @@ useEffect(() => {
                         <Table className="text-sm">
                             <TableHeader>
                                 <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
-                                    <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 py-3 px-4">Nombre</TableHead>
-                                    <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 py-3 px-4">Categoria</TableHead>
-                                    <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 py-3 px-4 hidden md:table-cell">Descripcion</TableHead>
-                                    <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 py-3 px-4 text-right">Valor</TableHead>
-                                    <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 py-3 px-4 text-center w-[140px]">Acciones</TableHead>
+                                    <TableHead className="text-[12px] font-semibold text-slate-500 py-3 px-4">Nombre</TableHead>
+                                    <TableHead className="text-[12px] font-semibold text-slate-500 py-3 px-4">Categoria</TableHead>
+                                    <TableHead className="text-[12px] font-semibold text-slate-500 py-3 px-4 hidden md:table-cell">Descripcion</TableHead>
+                                    <TableHead className="text-[12px] font-semibold text-slate-500 py-3 px-4 text-right">Valor</TableHead>
+                                    <TableHead className="text-[12px] font-semibold text-slate-500 py-3 px-4 text-center w-[140px]">Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="divide-y divide-slate-100">
@@ -729,7 +729,7 @@ useEffect(() => {
                                 {productos.map((producto) => (
                                     <TableRow
                                         key={producto.id_producto}
-                                        className={`transition-colors duration-150 hover:bg-slate-50 cursor-pointer ${id_producto === producto.id_producto ? "bg-[#F3F0FF] border-l-2 border-l-[#6E56CF]" : ""}`}
+                                        className={`transition-colors duration-150 hover:bg-slate-50 cursor-pointer ${id_producto === producto.id_producto ? "bg-[#EBF4FF] border-l-2 border-l-[#007AFF]" : ""}`}
                                     >
                                         <TableCell className="py-3 px-4 font-medium text-slate-800 max-w-[200px] truncate">
                                             {producto.tituloProducto}
@@ -748,7 +748,7 @@ useEffect(() => {
                                                 <button
                                                     type="button"
                                                     onClick={() => cargarProductoEspecifico(producto.id_producto)}
-                                                    className="inline-flex items-center justify-center rounded-md border border-[#DDD6FE] bg-[#F3F0FF] px-2.5 py-1.5 text-xs font-semibold text-[#6E56CF] transition hover:bg-[#EDE9FE] active:scale-[0.97]"
+                                                    className="inline-flex items-center justify-center rounded-md border border-[#CCE4FF] bg-[#EBF4FF] px-2.5 py-1.5 text-xs font-semibold text-[#007AFF] transition hover:bg-[#E5F0FF] active:scale-[0.97]"
                                                 >
                                                     Editar
                                                 </button>

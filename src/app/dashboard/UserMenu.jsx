@@ -58,7 +58,7 @@ export default function UserMenu({ compacto = false }) {
         return (
             <div className="shrink-0 px-4 pb-3 pt-4">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] text-[#6E56CF] shadow-sm">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-[#007AFF] bg-[#E5F0FF] text-[#007AFF] shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c0-1.105.895-2 2-2s2 .895 2 2v1m-7 0V9a3 3 0 016 0m-8 3h10a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2v-5a2 2 0 012-2z" />
                         </svg>
@@ -85,10 +85,10 @@ export default function UserMenu({ compacto = false }) {
                         title={name}
                         className="flex cursor-pointer list-none select-none items-center justify-center [&::-webkit-details-marker]:hidden"
                     >
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] shadow-sm transition-transform duration-200 group-hover:scale-[1.06]">
+                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#007AFF] bg-[#E5F0FF] shadow-sm transition-transform duration-200 group-hover:scale-[1.06]">
                             {avatar
                                 ? <img src={avatar} alt={name} className="h-full w-full object-cover" />
-                                : <span className="text-[13px] font-bold text-[#6E56CF]">{name.charAt(0)}</span>}
+                                : <span className="text-[13px] font-bold text-[#007AFF]">{name.charAt(0)}</span>}
                         </div>
                     </summary>
 
@@ -104,7 +104,7 @@ export default function UserMenu({ compacto = false }) {
                         <button
                             type="button"
                             onClick={() => openUserProfile()}
-                            className="flex w-full items-center gap-2.5 border-b border-black/[0.05] px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-violet-50 hover:text-[#6E56CF]"
+                            className="flex w-full items-center gap-2.5 border-b border-black/[0.05] px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-[#007AFF]/[0.06] hover:text-[#007AFF]"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -113,7 +113,7 @@ export default function UserMenu({ compacto = false }) {
                         </button>
                         <Link
                             href="/"
-                            className="flex items-center gap-2.5 border-b border-black/[0.05] px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-[#6E56CF]"
+                            className="flex items-center gap-2.5 border-b border-black/[0.05] px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-[#007AFF]"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -141,11 +141,11 @@ export default function UserMenu({ compacto = false }) {
                 <summary aria-label="Abrir menú de usuario" title="Abrir menú de usuario" className="relative flex cursor-pointer list-none select-none flex-col items-center px-1 [&::-webkit-details-marker]:hidden">
 
                     {/* Avatar */}
-                    <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] shadow-sm transition-transform duration-200 group-hover:scale-[1.03]">
+                    <div className="flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#007AFF] bg-[#E5F0FF] shadow-sm transition-transform duration-200 group-hover:scale-[1.03]">
                         {avatar ? (
                             <img src={avatar} alt={name} className="h-full w-full object-cover" />
                         ) : (
-                            <span className="text-xl font-bold text-[#6E56CF]">{name.charAt(0)}</span>
+                            <span className="text-xl font-bold text-[#007AFF]">{name.charAt(0)}</span>
                         )}
                     </div>
 
@@ -168,7 +168,7 @@ export default function UserMenu({ compacto = false }) {
                     <button
                         type="button"
                         onClick={() => openUserProfile()}
-                        className="flex w-full items-center gap-2.5 border-b border-black/[0.05] px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-violet-50 hover:text-[#6E56CF]"
+                        className="flex w-full items-center gap-2.5 border-b border-black/[0.05] px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-[#007AFF]/[0.06] hover:text-[#007AFF]"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -177,7 +177,7 @@ export default function UserMenu({ compacto = false }) {
                     </button>
                     <Link
                         href="/"
-                        className="flex items-center gap-2.5 px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-[#6E56CF] border-b border-black/[0.05]"
+                        className="flex items-center gap-2.5 px-4 py-3 text-[12px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-[#007AFF] border-b border-black/[0.05]"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

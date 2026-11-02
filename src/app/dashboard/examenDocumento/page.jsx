@@ -430,7 +430,7 @@ export default function ExamenDocumento() {
                                 titulo="Orden de exámenes"
                                 etiqueta="Video tutorial"
                                 ariaLabel="Abrir video tutorial de solicitud de exámenes"
-                                className="mt-4 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                className="mt-4 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             />
                         </div>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -454,7 +454,7 @@ export default function ExamenDocumento() {
                     <div className="space-y-6 xl:col-span-2">
                         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-700">Datos del documento</h2>
+                                <h2 className="text-sm font-semibold text-slate-700">Datos del documento</h2>
                             </div>
 
                             <div className="space-y-5 p-5">
@@ -562,8 +562,8 @@ export default function ExamenDocumento() {
 
                         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                             <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 bg-slate-50/50">
-                                <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <div className="h-8 w-8 rounded-xl bg-[#E5F0FF] flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 </div>
                                 <h2 className="text-sm font-semibold text-slate-800">Resumen del documento</h2>
                             </div>
@@ -598,7 +598,7 @@ export default function ExamenDocumento() {
                             <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                                     <div>
-                                        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-700">Catálogo de exámenes</h2>
+                                        <h2 className="text-sm font-semibold text-slate-700">Catálogo de exámenes</h2>
                                         <p className="mt-1 text-xs text-slate-500">Selecciona los exámenes que aparecerán en la orden clínica.</p>
                                     </div>
                                     <div className="w-full md:w-72">
@@ -676,7 +676,7 @@ export default function ExamenDocumento() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600">{totalExamenes} exámenes</span>
-                                    <span className="inline-flex items-center rounded-lg border border-[#DDD6FE] bg-[#F3F0FF] px-2.5 py-1 text-[11px] font-semibold text-[#6E56CF]">Ref. {formatoCLP.format(totalReferencia)}</span>
+                                    <span className="inline-flex items-center rounded-lg border border-[#CCE4FF] bg-[#EBF4FF] px-2.5 py-1 text-[11px] font-semibold text-[#007AFF]">Ref. {formatoCLP.format(totalReferencia)}</span>
                                 </div>
                             </div>
 
@@ -707,7 +707,7 @@ export default function ExamenDocumento() {
                                                 <button
                                                     type="button"
                                                     onClick={() => quitarExamen(examen.id_examen)}
-                                                    className="inline-flex items-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition-colors duration-150 hover:bg-rose-100"
+                                                    className="inline-flex items-center rounded-xl border border-[#FF3B30]/25 bg-[#FF3B30]/[0.08] px-3 py-2 text-xs font-semibold text-[#C4291D] transition-colors duration-150 hover:bg-[#FF3B30]/[0.12]"
                                                 >
                                                     Quitar
                                                 </button>

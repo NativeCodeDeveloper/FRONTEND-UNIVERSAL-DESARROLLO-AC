@@ -1149,11 +1149,11 @@ export default function Paciente() {
                             de la fila y el diseño de escritorio no cambia. */}
                         <div className="grid grid-cols-2 gap-3 sm:contents">
                             <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">RUT</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">RUT</span>
                                 <span className="text-sm font-bold text-slate-900 mt-1 leading-none font-mono">{formatRut(pacienteActual?.rut) || "-"}</span>
                             </div>
                             <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Registros</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">Registros</span>
                                 <span className="text-sm font-bold text-slate-900 mt-1 leading-none">{totalFichas}</span>
                             </div>
                         </div>
@@ -1167,7 +1167,7 @@ export default function Paciente() {
                             tutorialProps={{ ariaLabel: "Iniciar el tutorial guiado de la ficha del paciente" }}
                             claseContenedor="w-full sm:w-auto"
                             className="flex h-14 w-full items-center justify-center gap-2 sm:w-auto whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-5 text-[13px] font-bold text-slate-600 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#6E56CF]"
+                            claseIcono="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EBF4FF] text-[#007AFF]"
                         />
                         <div className="flex w-full gap-2 sm:w-auto">
                             <button
@@ -1196,53 +1196,53 @@ export default function Paciente() {
                         {pacienteActual && (
                             <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
                                 <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/30 px-5 py-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#6E56CF] text-base font-bold text-white shadow-lg shadow-indigo-100">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#007AFF] text-base font-bold text-white shadow-lg shadow-indigo-100">
                                         {pacienteActual.nombre?.charAt(0)}{pacienteActual.apellido?.charAt(0)}
                                     </div>
                                     <div>
                                         <h2 className="text-[14px] font-bold leading-tight text-slate-900">{pacienteActual.nombre} {pacienteActual.apellido}</h2>
-                                        <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">ID Paciente #{id_paciente}</p>
+                                        <p className="mt-0.5 text-[12px] font-medium text-slate-400">ID Paciente #{id_paciente}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-3 px-5 py-4">
                                     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                                         <div className="space-y-1">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Nacimiento</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Nacimiento</span>
                                             <p className="text-[12px] font-semibold text-slate-700">{formatearFecha(pacienteActual.nacimiento)}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Edad</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Edad</span>
                                             <p className="text-[12px] font-semibold text-slate-700">{calcularEdad(pacienteActual.nacimiento) === "-" ? "-" : `${calcularEdad(pacienteActual.nacimiento)} años`}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Previsión</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Previsión</span>
                                             <p className="text-[12px] font-semibold text-slate-700">{previsionDesdeId(pacienteActual.prevision_id)}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sexo</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Sexo</span>
                                             <p className="text-[12px] font-semibold text-slate-700">{pacienteActual.sexo || "-"}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-slate-100 pt-3">
                                         <div className="min-w-0 space-y-1">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Dirección</span>
+                                            <span className="text-[12px] font-medium text-slate-400">Dirección</span>
                                             <p className="break-words text-[11px] font-semibold leading-snug text-slate-700">{pacienteActual.direccion || "Por completar"}</p>
                                         </div>
                                         <div className="min-w-0 space-y-1">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Nacionalidad</span>
+                                            <span className="text-[12px] font-medium text-slate-400">Nacionalidad</span>
                                             <p className="break-words text-[11px] font-semibold leading-snug text-slate-700">{pacienteActual.pais || "Por completar"}</p>
                                         </div>
                                         <div className="min-w-0 space-y-1">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Apoderado</span>
+                                            <span className="text-[12px] font-medium text-slate-400">Apoderado</span>
                                             <p className="break-words text-[11px] font-semibold leading-snug text-slate-700">{pacienteActual.apoderado || "No especificado"}</p>
                                         </div>
                                         <div className="min-w-0 space-y-1">
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">RUT. Apod.</span>
+                                            <span className="text-[12px] font-medium text-slate-400">RUT. Apod.</span>
                                             <p className="break-words font-mono text-[11px] font-semibold leading-snug text-slate-700">{formatRut(pacienteActual.apoderado_rut) || pacienteActual.apoderado_rut || "No especificado"}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between rounded-xl border border-violet-100 bg-violet-50/60 px-3 py-2">
-                                        <span className="text-[9px] font-bold text-[#6E56CF] uppercase tracking-widest">Última atención</span>
+                                    <div className="flex items-center justify-between rounded-xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] px-3 py-2">
+                                        <span className="text-[12px] font-medium text-[#007AFF] ">Última atención</span>
                                         <span className="text-[12px] font-bold text-slate-700">
                                             {ultimaAtencion ? formatearFecha(ultimaAtencion) : "Sin registro"}
                                         </span>
@@ -1376,8 +1376,8 @@ export default function Paciente() {
                                     </div>
                                 </summary>
                                 <div className="grid grid-cols-1 gap-3 border-t border-slate-100 bg-slate-50/60 p-3 sm:grid-cols-2">
-                                    <div className="min-w-0 rounded-xl border border-violet-100 bg-violet-50/60 px-3 py-2.5">
-                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#6E56CF]">Antecedentes</p>
+                                    <div className="min-w-0 rounded-xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] px-3 py-2.5">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#007AFF]">Antecedentes</p>
                                         <p className="mt-0.5 whitespace-pre-wrap break-words text-[12px] leading-snug text-slate-700">{pacienteActual.observacion1 || "Sin antecedentes registrados"}</p>
                                     </div>
                                     <div className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
@@ -1402,7 +1402,7 @@ export default function Paciente() {
                                 <div ref={formularioEdicionRef} role="dialog" aria-modal="true" aria-label="Editar información de ingreso" onClick={(e) => e.stopPropagation()} className="flex max-h-[80vh] w-full max-w-4xl flex-col overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm animate-in fade-in zoom-in-95 duration-200">
                                 <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/60 px-5 py-3 sm:px-6">
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6E56CF]">Paciente</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#007AFF]">Paciente</p>
                                         <h3 className="mt-0.5 text-sm font-bold text-slate-900">Editar Información de Ingreso</h3>
                                     </div>
                                     <button onClick={() => setMostrarFormulario(false)} aria-label="Cerrar edición" className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
@@ -1412,19 +1412,19 @@ export default function Paciente() {
                                 <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50/50 p-3 sm:p-4 [&_input]:h-9">
                                     <div className="grid grid-cols-1 gap-2 rounded-xl border border-slate-100 bg-white p-3 md:grid-cols-2 lg:grid-cols-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre</label>
-                                            <ShadcnInput value={nombre} onChange={(e) => setNombre(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Nombre</label>
+                                            <ShadcnInput value={nombre} onChange={(e) => setNombre(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]" />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Apellido</label>
-                                            <ShadcnInput value={apellido} onChange={(e) => setApellido(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Apellido</label>
+                                            <ShadcnInput value={apellido} onChange={(e) => setApellido(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]" />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">RUT</label>
-                                            <ShadcnInput value={rut} onChange={(e) => setRut(cleanRut(e.target.value).slice(0, 9))} maxLength={9} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">RUT</label>
+                                            <ShadcnInput value={rut} onChange={(e) => setRut(cleanRut(e.target.value).slice(0, 9))} maxLength={9} className="h-11 rounded-xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]" />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Fecha de nacimiento</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Fecha de nacimiento</label>
                                             <div className="w-full [&_button]:h-9 [&_button]:w-full [&_button]:justify-between [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm [&_label]:hidden">
                                                 <ShadcnDatePicker
                                                     label="Fecha de nacimiento"
@@ -1434,11 +1434,11 @@ export default function Paciente() {
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sexo</label>
-                                            <ShadcnInput value={sexo} onChange={(e) => setSexo(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Sexo</label>
+                                            <ShadcnInput value={sexo} onChange={(e) => setSexo(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]" />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Previsión</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Previsión</label>
                                             <div className="w-full [&_button]:h-9 [&_button]:rounded-xl [&_button]:border-slate-200 [&_button]:bg-white [&_button]:text-sm">
                                                 <ShadcnSelect
                                                     nombreDefault={prevision || "Seleccionar..."}
@@ -1449,49 +1449,49 @@ export default function Paciente() {
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Teléfono</label>
-                                            <ShadcnInput value={telefono} onChange={(e) => setTelefono(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]" />
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Teléfono</label>
+                                            <ShadcnInput value={telefono} onChange={(e) => setTelefono(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]" />
                                         </div>
                                     </div>
-                                    <div className="space-y-2 rounded-xl border border-violet-100 bg-white p-3">
+                                    <div className="space-y-2 rounded-xl border border-[#007AFF]/10 bg-white p-3">
                                         <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6E56CF]">Ficha de ingreso</p>
+                                            <p className="text-[12px] font-medium text-[#007AFF]">Ficha de ingreso</p>
                                             <p className="mt-0.5 text-sm font-semibold text-slate-800">Información complementaria</p>
                                         </div>
                                         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Dirección</label>
-                                                <ShadcnInput value={direccion} onChange={(e) => setDireccion(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">Dirección</label>
+                                                <ShadcnInput value={direccion} onChange={(e) => setDireccion(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">País</label>
-                                                <ShadcnInput value={pais} onChange={(e) => setPais(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">País</label>
+                                                <ShadcnInput value={pais} onChange={(e) => setPais(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Apoderado</label>
-                                                <ShadcnInput value={apoderado} onChange={(e) => setApoderado(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">Apoderado</label>
+                                                <ShadcnInput value={apoderado} onChange={(e) => setApoderado(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">RUT del apoderado</label>
-                                                <ShadcnInput value={apoderadoRut} onChange={(e) => setApoderadoRut(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">RUT del apoderado</label>
+                                                <ShadcnInput value={apoderadoRut} onChange={(e) => setApoderadoRut(e.target.value)} className="h-11 rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-1 gap-3 pt-1 md:grid-cols-2">
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Antecedentes</label>
-                                                <textarea value={observacion1} onChange={(e) => setObservacion1(e.target.value)} placeholder="Antecedentes médicos relevantes del paciente..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">Antecedentes</label>
+                                                <textarea value={observacion1} onChange={(e) => setObservacion1(e.target.value)} placeholder="Antecedentes médicos relevantes del paciente..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Medicamentos</label>
-                                                <textarea value={medicamentosUsados} onChange={(e) => setMedicamentosUsados(e.target.value)} placeholder="Medicamentos que utiliza actualmente..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">Medicamentos</label>
+                                                <textarea value={medicamentosUsados} onChange={(e) => setMedicamentosUsados(e.target.value)} placeholder="Medicamentos que utiliza actualmente..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Hábitos</label>
-                                                <textarea value={habitos} onChange={(e) => setHabitos(e.target.value)} placeholder="Hábitos alimenticios, actividad física, consumo de alcohol o tabaco..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">Hábitos</label>
+                                                <textarea value={habitos} onChange={(e) => setHabitos(e.target.value)} placeholder="Hábitos alimenticios, actividad física, consumo de alcohol o tabaco..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="ml-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Comentarios</label>
-                                                <textarea value={comentariosAdicionales} onChange={(e) => setComentariosAdicionales(e.target.value)} placeholder="Observaciones adicionales..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                                <label className="ml-1 text-[12px] font-medium text-slate-400">Comentarios</label>
+                                                <textarea value={comentariosAdicionales} onChange={(e) => setComentariosAdicionales(e.target.value)} placeholder="Observaciones adicionales..." className="min-h-[110px] w-full resize-y rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-slate-700 outline-none transition-colors focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/[0.06]" />
                                             </div>
                                         </div>
                                     </div>
@@ -1544,7 +1544,7 @@ export default function Paciente() {
                                                 onChange={(e) => setFiltroProfesional(e.target.value)}
                                                 onKeyDown={(e) => e.key === "Enter" && buscarPorProfesional()}
                                                 placeholder="Ej: Dra. María González"
-                                                className="h-11 w-full rounded-xl border-none bg-slate-50 pl-11 pr-4 text-sm transition-all focus:ring-2 focus:ring-violet-100"
+                                                className="h-11 w-full rounded-xl border-none bg-slate-50 pl-11 pr-4 text-sm transition-all focus:ring-2 focus:ring-[#007AFF]/10"
                                             />
                                         </div>
                                         <button onClick={buscarPorProfesional} className="h-11 shrink-0 rounded-xl bg-slate-900 px-6 text-[13px] font-bold text-white transition-all hover:bg-slate-800">Buscar</button>
@@ -1555,7 +1555,7 @@ export default function Paciente() {
                                             onChange={(e) => setFiltroFecha(e.target.value)}
                                             aria-label="Filtrar por fecha de consulta"
                                             title="Filtrar por fecha de consulta"
-                                            className="h-11 w-full shrink-0 appearance-none rounded-xl border-none bg-slate-50 px-4 text-[16px] transition-all focus:ring-2 focus:ring-violet-100 sm:w-[168px] sm:text-sm"
+                                            className="h-11 w-full shrink-0 appearance-none rounded-xl border-none bg-slate-50 px-4 text-[16px] transition-all focus:ring-2 focus:ring-[#007AFF]/10 sm:w-[168px] sm:text-sm"
                                             style={{ colorScheme: "light" }}
                                         />
                                         {(filtroProfesional || filtroFecha) && <button onClick={limpiarFiltro} className="h-11 shrink-0 rounded-xl bg-slate-100 px-5 text-[13px] font-bold text-slate-600 hover:bg-slate-200">Limpiar</button>}
@@ -1564,23 +1564,23 @@ export default function Paciente() {
                                 <div className="border-t border-slate-100 p-4">
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
-                                    <label className="ml-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">RUT del profesional</label>
+                                    <label className="ml-1 text-[12px] font-medium text-slate-500">RUT del profesional</label>
                                     <input
                                         type="text"
                                         value={rutProfesionalFirma}
                                         onChange={(e) => setRutProfesionalFirma(e.target.value)}
                                         placeholder="Ej: 12.345.678-9"
-                                        className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
+                                        className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-[#007AFF]/10 transition-all"
                                     />
                                 </div>
                                 <div>
-                                    <label className="ml-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">Especialidad profesional</label>
+                                    <label className="ml-1 text-[12px] font-medium text-slate-500">Especialidad profesional</label>
                                     <input
                                         type="text"
                                         value={especialidadProfesionalFirma}
                                         onChange={(e) => setEspecialidadProfesionalFirma(e.target.value)}
                                         placeholder="Ej: Médico Cirujano"
-                                        className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-violet-100 transition-all"
+                                        className="mt-1 h-11 w-full bg-slate-50 border-none rounded-2xl px-4 text-sm focus:ring-2 focus:ring-[#007AFF]/10 transition-all"
                                     />
                                 </div>
                                     </div>
@@ -1611,7 +1611,7 @@ export default function Paciente() {
                                         </p>
                                     </div>
                                     {!cargandoHistorialCitas && historialCitas.length > 0 && (
-                                        <span className="relative hidden shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 px-3 py-1.5 text-[13px] font-bold text-[#6E56CF] sm:flex">
+                                        <span className="relative hidden shrink-0 items-center justify-center rounded-xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] px-3 py-1.5 text-[13px] font-bold text-[#007AFF] sm:flex">
                                             {historialCitas.length}
                                         </span>
                                     )}
@@ -1631,12 +1631,12 @@ export default function Paciente() {
                                             <Table className="w-full table-fixed">
                                                 <TableHeader>
                                                     <TableRow className="bg-slate-50/60 hover:bg-slate-50/60">
-                                                        <TableHead className="w-[14%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Fecha</TableHead>
-                                                        <TableHead className="w-[9%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Hora</TableHead>
-                                                        <TableHead className="w-[21%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Profesional</TableHead>
-                                                        <TableHead className="w-[23%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Motivo</TableHead>
-                                                        <TableHead className="w-[13%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Monto</TableHead>
-                                                        <TableHead className="w-[20%] text-[11px] font-bold uppercase tracking-wider text-slate-500">Estado</TableHead>
+                                                        <TableHead className="w-[14%] text-[12px] font-medium text-slate-500">Fecha</TableHead>
+                                                        <TableHead className="w-[9%] text-[12px] font-medium text-slate-500">Hora</TableHead>
+                                                        <TableHead className="w-[21%] text-[12px] font-medium text-slate-500">Profesional</TableHead>
+                                                        <TableHead className="w-[23%] text-[12px] font-medium text-slate-500">Motivo</TableHead>
+                                                        <TableHead className="w-[13%] text-[12px] font-medium text-slate-500">Monto</TableHead>
+                                                        <TableHead className="w-[20%] text-[12px] font-medium text-slate-500">Estado</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -1677,7 +1677,7 @@ export default function Paciente() {
                             <div className="mb-6 grid grid-cols-[52px_1fr] gap-4 sm:grid-cols-[84px_1fr] sm:gap-6">
                                 <div aria-hidden="true" />
                                 <div data-tour="ficha-registros" className="flex items-center gap-3">
-                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-[#6E56CF]">
+                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#007AFF]/10 bg-[#007AFF]/[0.06] text-[#007AFF]">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M7 4h7l3 3v13H7V4z" />
                                         </svg>
@@ -1771,7 +1771,7 @@ export default function Paciente() {
                                                                 </svg>
                                                                 {formatearFechaCivil(ficha.fechaConsulta)}
                                                             </p>
-                                                            <span className="inline-flex h-6 items-center rounded-lg border border-violet-100 bg-violet-50/80 px-2 text-[9px] font-bold text-[#6E56CF]">
+                                                            <span className="inline-flex h-6 items-center rounded-lg border border-[#007AFF]/10 bg-[#007AFF]/[0.06] px-2 text-[9px] font-bold text-[#007AFF]">
                                                                 N° Registro {ficha.id_ficha}
                                                             </span>
                                                         </div>
@@ -1819,8 +1819,8 @@ export default function Paciente() {
                                                                 {categorias.map(cat => (
                                                                     <div key={cat.nombre} className="space-y-3.5">
                                                                         <div className="flex items-center gap-3">
-                                                                            <span className="h-2 w-2 rounded-full bg-[#6E56CF] shadow-[0_0_0_4px_rgba(110,86,207,0.1)]" />
-                                                                            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6E56CF]">{cat.nombre}</span>
+                                                                            <span className="h-2 w-2 rounded-full bg-[#007AFF] shadow-[0_0_0_4px_rgba(0,122,255,0.1)]" />
+                                                                            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#007AFF]">{cat.nombre}</span>
                                                                             <div className="h-px flex-1 bg-slate-200"></div>
                                                                         </div>
                                                                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -338,13 +338,13 @@ export default function CarruselPortada() {
                 </div>
 
                 {id_publicacionesPortada > 0 && (
-                    <div className="mb-8 p-4 rounded-2xl bg-violet-50 border border-violet-100 flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
-                        <div className="h-8 w-8 rounded-xl bg-[#6E56CF] text-white flex items-center justify-center">
+                    <div className="mb-8 p-4 rounded-2xl bg-[#007AFF]/[0.06] border border-[#007AFF]/10 flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
+                        <div className="h-8 w-8 rounded-xl bg-[#007AFF] text-white flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                         </div>
-                        <span className="text-[13px] font-bold text-[#6E56CF]">
+                        <span className="text-[13px] font-bold text-[#007AFF]">
                             Editando Portada ID: {id_publicacionesPortada}
                         </span>
                     </div>
@@ -356,7 +356,7 @@ export default function CarruselPortada() {
                     <div className="lg:col-span-5 space-y-8">
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden transition-all hover:shadow-md">
                             <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-[#6E56CF] shadow-sm">
+                                <div className="h-10 w-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-[#007AFF] shadow-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
@@ -366,27 +366,27 @@ export default function CarruselPortada() {
 
                             <div className="p-8 space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Título de la Portada</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Título de la Portada</label>
                                     <ShadcnInput
                                         value={tituloPortadaCarrusel}
                                         placeholder="Ej: Odontología de Vanguardia"
                                         onChange={(e) => settituloPortadaCarrusel(e.target.value)}
-                                        className="h-12 rounded-2xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]"
+                                        className="h-12 rounded-2xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Descripción Breve</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Descripción Breve</label>
                                     <ShadcnInput
                                         value={descripcionPublicacionesPortada}
                                         placeholder="Ej: Especialistas dedicados a tu salud dental"
                                         onChange={(e) => setdescripcionPublicacionesPortada(e.target.value)}
-                                        className="h-12 rounded-2xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]"
+                                        className="h-12 rounded-2xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]"
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Imagen de Portada (Proporción 1:1)</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Imagen de Portada (Proporción 1:1)</label>
                                     <div className="relative group">
                                         <input
                                             type='file'
@@ -431,8 +431,8 @@ export default function CarruselPortada() {
                         {vistaPrevia && (
                             <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-300">
                                 <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Previsualización</h3>
-                                    <span className="text-[10px] font-bold text-[#6E56CF] bg-violet-50 px-2 py-1 rounded-lg uppercase tracking-tight">Efecto Carrusel</span>
+                                    <h3 className="text-[12px] font-medium text-slate-500 ">Previsualización</h3>
+                                    <span className="text-[10px] font-bold text-[#007AFF] bg-[#007AFF]/[0.06] px-2 py-1 rounded-lg uppercase tracking-tight">Efecto Carrusel</span>
                                 </div>
                                 <div className="p-4">
                                     <div className="aspect-square rounded-2xl overflow-hidden shadow-inner bg-slate-100 max-w-xs mx-auto">
@@ -447,7 +447,7 @@ export default function CarruselPortada() {
                     <div className="lg:col-span-7 space-y-6">
                         <div className="flex items-center justify-between px-2">
                             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight">Histórico de Portadas</h3>
-                            <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-xs font-bold flex items-center justify-center">
+                            <span className="h-6 px-2.5 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-xs font-bold flex items-center justify-center">
                                 {dataPublicacionesCarrusel.length} registradas
                             </span>
                         </div>
@@ -469,7 +469,7 @@ export default function CarruselPortada() {
                                         
                                         <div className="flex-1 p-8 flex flex-col justify-between">
                                             <div>
-                                                <h4 className="text-xl font-bold text-slate-800 leading-tight group-hover:text-[#6E56CF] transition-colors">
+                                                <h4 className="text-xl font-bold text-slate-800 leading-tight group-hover:text-[#007AFF] transition-colors">
                                                     {c.tituloPortadaCarrusel}
                                                 </h4>
                                                 <p className="mt-3 text-[14px] text-slate-500 leading-relaxed line-clamp-2">
@@ -489,7 +489,7 @@ export default function CarruselPortada() {
                                                 </button>
                                                 <button 
                                                     onClick={() => eliminarPortada(c.id_publicacionesPortada)}
-                                                    className="h-10 w-10 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-95 flex items-center justify-center"
+                                                    className="h-10 w-10 bg-[#FF3B30]/[0.08] text-[#FF3B30] rounded-xl hover:bg-[#FF3B30] hover:text-white transition-all active:scale-95 flex items-center justify-center"
                                                     title="Eliminar Portada"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -139,8 +139,8 @@ export default function Testimonios() {
         {/* ── Tabla ── */}
         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Reseñas Activas</h2>
-            <span className="h-5 px-2 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">
+            <h2 className="text-[12px] font-medium text-slate-500 ">Reseñas Activas</h2>
+            <span className="h-5 px-2 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-[10px] font-bold flex items-center">
               {lista.length}
             </span>
           </div>
@@ -148,12 +148,12 @@ export default function Testimonios() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                  <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Paciente</TableHead>
-                  <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Profesional</TableHead>
-                  <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Calificación</TableHead>
-                  <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 hidden md:table-cell">Comentario</TableHead>
-                  <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 hidden sm:table-cell">Fecha</TableHead>
-                  <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">Acciones</TableHead>
+                  <TableHead className="text-[12px] font-medium text-slate-400 py-4">Paciente</TableHead>
+                  <TableHead className="text-[12px] font-medium text-slate-400 py-4">Profesional</TableHead>
+                  <TableHead className="text-[12px] font-medium text-slate-400 py-4">Calificación</TableHead>
+                  <TableHead className="text-[12px] font-medium text-slate-400 py-4 hidden md:table-cell">Comentario</TableHead>
+                  <TableHead className="text-[12px] font-medium text-slate-400 py-4 hidden sm:table-cell">Fecha</TableHead>
+                  <TableHead className="text-[12px] font-medium text-slate-400 py-4 text-center">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,7 +173,7 @@ export default function Testimonios() {
                         <AlertDialogTrigger asChild>
                           <button
                             disabled={eliminandoId === r.id_resena}
-                            className="h-8 px-3 rounded-xl bg-rose-50 text-rose-600 text-[11px] font-bold hover:bg-rose-600 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                            className="h-8 px-3 rounded-xl bg-[#FF3B30]/[0.08] text-[#FF3B30] text-[11px] font-bold hover:bg-[#FF3B30] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             {eliminandoId === r.id_resena ? "Desactivando..." : "Desactivar"}

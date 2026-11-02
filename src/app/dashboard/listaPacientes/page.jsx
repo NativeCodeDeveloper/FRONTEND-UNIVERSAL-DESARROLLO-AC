@@ -148,7 +148,7 @@ export default function ListaPacientes() {
                             <button
                                 type="button"
                                 onClick={() => router.push("/dashboard")}
-                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                                 aria-label="Ir a reservas"
                             >
                                 Reservas
@@ -156,7 +156,7 @@ export default function ListaPacientes() {
                             <button
                                 type="button"
                                 onClick={() => router.push("/dashboard/calendario")}
-                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                                 aria-label="Ir al calendario"
                             >
                                 Calendario
@@ -164,7 +164,7 @@ export default function ListaPacientes() {
                             <button
                                 type="button"
                                 onClick={() => router.push("/dashboard/FichaClinica")}
-                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                                className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                                 aria-label="Ir a fichas clínicas"
                             >
                                 Fichas clínicas
@@ -201,18 +201,18 @@ export default function ListaPacientes() {
                     {/* Panel de Búsqueda */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Filtros de Localización</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Filtros de Localización</h2>
                         </div>
                         <div className="p-4 md:p-8">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
                                 <div className="space-y-3">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Buscar por Nombre</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Buscar por Nombre</label>
                                     <div className="flex gap-3">
                                         <ShadcnInput
                                             placeholder="Ej: Nicolas Andres..."
                                             value={nombreBuscado}
                                             onChange={(e) => setNombreBuscado(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]"
+                                            className="h-12 rounded-2xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]"
                                         />
                                         <button
                                             onClick={() => buscarNombreSimilar(nombreBuscado)}
@@ -225,13 +225,13 @@ export default function ListaPacientes() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Buscar por RUT</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Buscar por RUT</label>
                                     <div className="flex gap-3">
                                         <ShadcnInput
                                             value={rutBuscado}
                                             placeholder={"12.345.678-9"}
                                             onChange={(e) => setRutBuscado(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-200 focus:ring-violet-50 focus:border-[#6E56CF]"
+                                            className="h-12 rounded-2xl border-slate-200 focus:ring-[#007AFF]/[0.06] focus:border-[#007AFF]"
                                         />
                                         <button
                                             onClick={() => buscarRutSimilar(rutBuscado)}
@@ -249,7 +249,7 @@ export default function ListaPacientes() {
                     {/* Tabla de Resultados */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Base de Datos de Pacientes</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Base de Datos de Pacientes</h2>
                             <button
                                 onClick={() => listarPacientes()}
                                 className="h-9 px-4 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all flex items-center gap-2"
@@ -263,11 +263,11 @@ export default function ListaPacientes() {
                             <Table className="min-w-[700px]">
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                                        <TableHead className="w-[100px] text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Perfil</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Nombre Completo</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Identificación (RUT)</TableHead>
-                                        <TableHead className="text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Contacto Principal</TableHead>
-                                        <TableHead className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest py-5">Acción Rápida</TableHead>
+                                        <TableHead className="w-[100px] text-center text-[12px] font-medium text-slate-400 py-5">Perfil</TableHead>
+                                        <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Nombre Completo</TableHead>
+                                        <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Identificación (RUT)</TableHead>
+                                        <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Contacto Principal</TableHead>
+                                        <TableHead className="text-center text-[12px] font-medium text-slate-400 py-5">Acción Rápida</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>

@@ -323,8 +323,8 @@ export default function TarifaServicio() {
                         </div>
                         <TutorialGuiadoTarifa
                             ariaLabel="Iniciar el tutorial guiado de tarifas de servicios agendables"
-                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2 sm:self-auto"
-                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#6E56CF]"
+                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2 sm:self-auto"
+                            claseIcono="flex size-4 shrink-0 items-center justify-center text-[#007AFF]"
                         />
                     </div>
                 </div>
@@ -345,7 +345,7 @@ export default function TarifaServicio() {
                                     const prof = listaProfesionales.find(p => String(p.id_profesional) === String(id));
                                     setNombreProfesional(prof?.nombreProfesional || '');
                                 }}
-                                className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
+                                className="rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]"
                                 options={listaProfesionales.map(profesional => ({
                                     value: profesional.id_profesional,
                                     label: profesional.nombreProfesional
@@ -369,7 +369,7 @@ export default function TarifaServicio() {
                                     const serv = listaServiciosProfesionales.find(s => String(s.id_servicioProfesional) === String(id));
                                     setNombreServicio(serv?.nombreServicio || '');
                                 }}
-                                className="rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
+                                className="rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]"
                                 options={listaServiciosProfesionales.map(servicio => ({
                                     value: servicio.id_servicioProfesional,
                                     label: servicio.nombreServicio
@@ -416,7 +416,7 @@ export default function TarifaServicio() {
                                     value={precioConsulta}
                                     onChange={(e) => setPrecioConsulta(e.target.value)}
                                     placeholder="Ej: 70000"
-                                    className="w-full rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
+                                    className="w-full rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]"
                                 />
                                 <p className="text-xs text-slate-400">Solo se permiten valores numéricos.</p>
                             </div>
@@ -427,7 +427,7 @@ export default function TarifaServicio() {
                                     value={duracionServicio}
                                     onChange={(e) => setDuracionServicio(e.target.value)}
                                     placeholder="Ej: 50"
-                                    className="w-full rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-violet-50"
+                                    className="w-full rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-[#007AFF]/[0.06]"
                                 />
                                 <p className="text-xs text-slate-400">Solo se permiten valores numéricos.</p>
                             </div>
@@ -450,7 +450,7 @@ export default function TarifaServicio() {
 
                             <ButtonDinamic
                                 onClick={() => eliminarTarifaProfesional(id_tarifaProfesional)}
-                                className="bg-rose-600 hover:bg-rose-500"
+                                className="bg-[#FF3B30] hover:bg-[#FF3B30]"
                             >
                                 Eliminar Tarifa
                             </ButtonDinamic>

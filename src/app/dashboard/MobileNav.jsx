@@ -161,11 +161,11 @@ export default function MobileNav() {
           <div className="vidrio vidrio-flotante vidrio-aparecer absolute left-0 right-0 z-50 mx-3 mt-2 overflow-hidden rounded-[24px]">
             <div className="border-b border-slate-100 px-5 py-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#6E56CF] bg-[#EDE9FE] shadow-sm">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#007AFF] bg-[#E5F0FF] shadow-sm">
                   {avatar ? (
                     <img src={avatar} alt={name} className="h-full w-full object-cover" />
                   ) : (
-                    <span className="text-lg font-bold text-[#6E56CF]">{name.charAt(0)}</span>
+                    <span className="text-lg font-bold text-[#007AFF]">{name.charAt(0)}</span>
                   )}
                 </div>
                 <div className="min-w-0">
@@ -230,13 +230,13 @@ export default function MobileNav() {
                             onClick={() => setOpen(false)}
                             className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[13px] font-medium transition-all ${
                               isActive
-                                ? "bg-[#F3F0FF] text-[#6E56CF]"
+                                ? "bg-[#EBF4FF] text-[#007AFF]"
                                 : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                             }`}
                           >
                             <span
                               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                                isActive ? "bg-[#EDE9FE] text-[#6E56CF]" : "bg-slate-100 text-slate-400"
+                                isActive ? "bg-[#E5F0FF] text-[#007AFF]" : "bg-slate-100 text-slate-400"
                               }`}
                             >
                               <Icon className="h-4 w-4" />
@@ -316,7 +316,7 @@ export default function MobileNav() {
               onClick={(evento) => evento.stopPropagation()}
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F3F0FF] text-[#6E56CF]">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#EBF4FF] text-[#007AFF]">
                   <Download className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <div>
@@ -329,17 +329,17 @@ export default function MobileNav() {
                 <>
                   <ol className="mt-5 space-y-3">
                     <li className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">1</span>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">1</span>
                       <span className="text-[13px] leading-snug text-slate-600">
                         Toca el botón <span className="inline-flex translate-y-[3px] items-center rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-slate-500"><svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 8H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2h-2" /><path d="M12 15V3" /><path d="M8.5 6.5L12 3l3.5 3.5" /></svg></span> <strong className="font-semibold text-slate-800">Compartir</strong> en la barra de Safari.
                       </span>
                     </li>
                     <li className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">2</span>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">2</span>
                       <span className="text-[13px] leading-snug text-slate-600">Elige <strong className="font-semibold text-slate-800">“Agregar a pantalla de inicio”</strong>.</span>
                     </li>
                     <li className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">3</span>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">3</span>
                       <span className="text-[13px] leading-snug text-slate-600">Confirma tocando <strong className="font-semibold text-slate-800">“Agregar”</strong>.</span>
                     </li>
                   </ol>
@@ -351,11 +351,11 @@ export default function MobileNav() {
                 <>
                   <ol className="mt-5 space-y-3">
                     <li className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">1</span>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">1</span>
                       <span className="text-[13px] leading-snug text-slate-600">Abre el menú de tu navegador (<strong className="font-semibold text-slate-800">⋮</strong> en Android).</span>
                     </li>
                     <li className="flex items-center gap-3">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EDE9FE] text-[11px] font-bold text-[#6E56CF]">2</span>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#E5F0FF] text-[11px] font-bold text-[#007AFF]">2</span>
                       <span className="text-[13px] leading-snug text-slate-600">Elige <strong className="font-semibold text-slate-800">“Instalar aplicación”</strong> o <strong className="font-semibold text-slate-800">“Agregar a pantalla de inicio”</strong>.</span>
                     </li>
                   </ol>
@@ -368,7 +368,7 @@ export default function MobileNav() {
               <button
                 type="button"
                 onClick={() => setGuiaInstalacion(false)}
-                className="mt-5 h-11 w-full rounded-full bg-[#F3F0FF] text-[13px] font-bold uppercase tracking-wide text-[#6E56CF] transition-all hover:brightness-95"
+                className="mt-5 h-11 w-full rounded-full bg-[#EBF4FF] text-[13px] font-medium text-[#007AFF] transition-all hover:brightness-95"
               >
                 Entendido
               </button>

@@ -37,7 +37,7 @@ export default function CampoFormulario({
           {error}
         </p>
       ) : ayuda ? (
-        <p className={`text-[11px] ${resaltarAyuda ? "font-medium text-amber-600" : "text-slate-400"}`}>
+        <p className={`text-[11px] ${resaltarAyuda ? "font-medium text-[#C76A00]" : "text-slate-400"}`}>
           {ayuda}
         </p>
       ) : null}

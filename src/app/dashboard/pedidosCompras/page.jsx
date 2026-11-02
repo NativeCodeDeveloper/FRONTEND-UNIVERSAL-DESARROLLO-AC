@@ -112,7 +112,7 @@ export default function PedidosCompra() {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="h-12 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm shrink-0">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Total</span>
+                            <span className="text-[12px] font-medium text-slate-400 leading-none">Total</span>
                             <span className="text-[13px] font-bold text-slate-800 mt-0.5 leading-none">{pedidos.length} pedidos</span>
                         </div>
                         <InfoButton
@@ -132,12 +132,12 @@ export default function PedidosCompra() {
                     {/* ── Filtros ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Filtros de Búsqueda</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Filtros de Búsqueda</h2>
                         </div>
                         <div className="p-4 md:p-8">
                             <div className="flex flex-col md:flex-row md:items-end gap-4">
                                 <div className="flex-1 space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Buscar por nombre del comprador</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Buscar por nombre del comprador</label>
                                     <div className="flex gap-3">
                                         <ShadcnInput
                                             value={comprador}
@@ -154,8 +154,8 @@ export default function PedidosCompra() {
                                 <div className="flex flex-wrap gap-2">
                                     <button onClick={() => listarPedidos()} className="h-10 px-4 rounded-xl border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition-all">Ver Todos</button>
                                     <button onClick={() => filtrarPorEstado(1)} className="h-10 px-4 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-[11px] font-bold hover:bg-emerald-600 hover:text-white transition-all">Realizadas</button>
-                                    <button onClick={() => filtrarPorEstado(4)} className="h-10 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-[11px] font-bold hover:bg-rose-600 hover:text-white transition-all">Anuladas</button>
-                                    <button onClick={() => filtrarPorEstado("0")} className="h-10 px-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 text-[11px] font-bold hover:bg-amber-500 hover:text-white transition-all">Pago Pendiente</button>
+                                    <button onClick={() => filtrarPorEstado(4)} className="h-10 px-4 rounded-xl border border-[#FF3B30]/25 bg-[#FF3B30]/[0.08] text-[#C4291D] text-[11px] font-bold hover:bg-[#FF3B30] hover:text-white transition-all">Anuladas</button>
+                                    <button onClick={() => filtrarPorEstado("0")} className="h-10 px-4 rounded-xl border border-black/[0.08] bg-[#F2F2F7] text-[#3A3A3C] text-[11px] font-bold hover:bg-[#FF9500] hover:text-white transition-all">Pago Pendiente</button>
                                 </div>
                             </div>
                         </div>
@@ -164,17 +164,17 @@ export default function PedidosCompra() {
                     {/* ── Tabla de Pedidos ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Historial de Pedidos</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Historial de Pedidos</h2>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="min-w-full">
                                 <thead>
                                     <tr className="bg-slate-50/50 border-b border-slate-100">
-                                        <th className="whitespace-nowrap px-4 py-4 md:px-8 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">N° Pedido</th>
-                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">Fecha</th>
-                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">Comprador</th>
-                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400 hidden md:table-cell">Total Pagado</th>
-                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">Estado</th>
+                                        <th className="whitespace-nowrap px-4 py-4 md:px-8 text-left text-[12px] font-medium text-slate-400">N° Pedido</th>
+                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[12px] font-medium text-slate-400">Fecha</th>
+                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[12px] font-medium text-slate-400">Comprador</th>
+                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[12px] font-medium text-slate-400 hidden md:table-cell">Total Pagado</th>
+                                        <th className="whitespace-nowrap px-4 py-4 text-left text-[12px] font-medium text-slate-400">Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
@@ -184,7 +184,7 @@ export default function PedidosCompra() {
                                             <td className="whitespace-nowrap px-4 py-4 text-[13px] text-slate-600">{formatearFecha(pedido.fecha_pedido)}</td>
                                             <td className="whitespace-nowrap px-4 py-4">
                                                 <Link href={`/dashboard/pedidosDetalle?id=${pedido.id_pedido}`}
-                                                    className="text-[13px] font-bold text-[#6E56CF] hover:text-[#5b45bc] transition-colors">
+                                                    className="text-[13px] font-bold text-[#007AFF] hover:text-[#5b45bc] transition-colors">
                                                     {pedido.nombre_comprador + ' ' + pedido.apellidosComprador}
                                                 </Link>
                                             </td>
@@ -196,7 +196,7 @@ export default function PedidosCompra() {
                                                     pedido.estado_pedido === 1
                                                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                                         : pedido.estado_pedido === 0
-                                                            ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                                            ? "bg-[#F2F2F7] text-[#3A3A3C] border border-black/[0.08]"
                                                             : "bg-slate-100 text-slate-600 border border-slate-200"
                                                 }`}>
                                                     {pedido.estado_pedido === 1 ? "Compra Realizada"

@@ -61,11 +61,11 @@ export function StatusFilterChips({ activeFilters = [], onChange }) {
               transition-all duration-150
               ${isActive
                 ? isTodas
-                  ? "border-violet-300 text-white shadow-sm"
+                  ? "border-[#007AFF]/30 text-white shadow-sm"
                   : token?.pill // use the pill classes for proper contrast!
                 : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700"
               }
-            `} style={{ ...(isActive && isTodas ? { backgroundColor: '#6E56CF', color: '#ffffff' } : {}) }}
+            `} style={{ ...(isActive && isTodas ? { backgroundColor: '#007AFF', color: '#ffffff' } : {}) }}
           >
             {!isTodas && (
               <span

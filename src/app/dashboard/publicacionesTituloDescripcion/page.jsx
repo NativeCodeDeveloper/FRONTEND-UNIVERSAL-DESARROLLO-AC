@@ -410,11 +410,11 @@ export default function PublicacionesTituloDescripcion() {
                 {dataPublicacionesEspecifica.length > 0 && (
                     <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm space-y-4">
                         <div className="space-y-1">
-                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Detalle de publicación</p>
+                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Detalle de publicación</p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                             {dataPublicacionesEspecifica.map((publicacion) => (
-                                <div key={publicacion.id_publicacionesTituloDescripcion} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden transition hover:border-[#DDD6FE]">
+                                <div key={publicacion.id_publicacionesTituloDescripcion} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden transition hover:border-[#CCE4FF]">
                                     <img
                                         src={`https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${publicacion.publicacionesTituloDescripcionImagen}/${CARD}`}
                                         alt={publicacion.publicacionesTitulo}
@@ -481,16 +481,16 @@ export default function PublicacionesTituloDescripcion() {
                         <Table>
                             <TableCaption className="py-4 text-xs text-slate-400">Lista de publicaciones de tratamientos</TableCaption>
                             <TableHeader>
-                                <TableRow className="bg-[#6E56CF] hover:bg-[#6E56CF]">
-                                    <TableHead className="text-xs font-semibold uppercase tracking-wide text-white">Imagen</TableHead>
-                                    <TableHead className="text-xs font-semibold uppercase tracking-wide text-white">Título</TableHead>
-                                    <TableHead className="text-xs font-semibold uppercase tracking-wide text-white">Descripción</TableHead>
-                                    <TableHead className="text-xs font-semibold uppercase tracking-wide text-white">Acción</TableHead>
+                                <TableRow className="bg-[#007AFF] hover:bg-[#007AFF]">
+                                    <TableHead className="text-xs font-semibold text-white">Imagen</TableHead>
+                                    <TableHead className="text-xs font-semibold text-white">Título</TableHead>
+                                    <TableHead className="text-xs font-semibold text-white">Descripción</TableHead>
+                                    <TableHead className="text-xs font-semibold text-white">Acción</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {dataPublicaciones.map((item) => (
-                                    <TableRow key={item.id_publicacionesTituloDescripcion} className="hover:bg-[#F3F0FF]/40 transition-colors">
+                                    <TableRow key={item.id_publicacionesTituloDescripcion} className="hover:bg-[#EBF4FF]/40 transition-colors">
                                         <TableCell className="py-3">
                                             <img
                                                 src={`https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_HASH}/${item.publicacionesTituloDescripcionImagen}/${CARD}`}

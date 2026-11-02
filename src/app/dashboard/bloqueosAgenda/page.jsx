@@ -418,7 +418,7 @@ export default function BloqueosAgendas() {
                     <div className="lg:col-span-5 space-y-5">
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center text-[#6E56CF]">
+                                <div className="h-10 w-10 rounded-xl bg-[#007AFF]/[0.06] flex items-center justify-center text-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
@@ -433,9 +433,9 @@ export default function BloqueosAgendas() {
 
                                 {/* Profesional */}
                                 <div data-tour="bloqueo-profesional" data-tour-completo={Boolean(id_profesional)} className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Profesional</label>
+                                    <label className="text-[12px] font-medium text-slate-500 ml-1">Profesional</label>
                                     {idProfesionalAgendaActiva ? (
-                                        <div className="flex h-10 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-3 text-[13px] font-semibold text-violet-900">
+                                        <div className="flex h-10 w-full items-center rounded-xl border border-[#007AFF]/20 bg-[#007AFF]/[0.06] px-3 text-[13px] font-semibold text-[#1D1D1F]">
                                             {listaProfesionales.find((profesional) => String(profesional.id_profesional) === idProfesionalAgendaActiva)?.nombreProfesional || "Agenda asignada"}
                                         </div>
                                     ) : (
@@ -453,7 +453,7 @@ export default function BloqueosAgendas() {
 
                                 {/* Selector de modo */}
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Días a bloquear</label>
+                                    <label className="text-[12px] font-medium text-slate-500 ml-1">Días a bloquear</label>
                                     <div data-tour="bloqueo-modo-selector" className="flex rounded-xl border border-slate-200 bg-slate-100/60 p-1 gap-1">
                                         <button
                                             data-tour="bloqueo-especificos-boton"
@@ -481,25 +481,25 @@ export default function BloqueosAgendas() {
                                             className="grid grid-cols-2 gap-3"
                                         >
                                             <div className="space-y-1">
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Desde</label>
+                                                <label className="text-[12px] font-medium text-slate-400 ml-1">Desde</label>
                                                 <input
                                                     type="date"
                                                     value={rangoDesde}
                                                     min={formatearFechaLocal(hoy)}
                                                     max={formatearFechaLocal(fechaLimite)}
                                                     onChange={e => setRangoDesde(e.target.value)}
-                                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#6E56CF]/30 focus:border-[#6E56CF] transition-all"
+                                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/30 focus:border-[#007AFF] transition-all"
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Hasta</label>
+                                                <label className="text-[12px] font-medium text-slate-400 ml-1">Hasta</label>
                                                 <input
                                                     type="date"
                                                     value={rangoHasta}
                                                     min={rangoDesde || formatearFechaLocal(hoy)}
                                                     max={formatearFechaLocal(fechaLimite)}
                                                     onChange={e => setRangoHasta(e.target.value)}
-                                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#6E56CF]/30 focus:border-[#6E56CF] transition-all"
+                                                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/30 focus:border-[#007AFF] transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -509,7 +509,7 @@ export default function BloqueosAgendas() {
                                             data-tour-completo={diasSemanaSeleccionados.length > 0}
                                             className="space-y-2"
                                         >
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Días de la semana</label>
+                                            <label className="text-[12px] font-medium text-slate-400 ml-1">Días de la semana</label>
                                             <div className="flex gap-1.5">
                                                 {DIAS_SEMANA.map(dia => (
                                                     <button
@@ -560,7 +560,7 @@ export default function BloqueosAgendas() {
                                     {diasSeleccionados.length > 0 && (
                                         <button
                                             onClick={() => setDiasSeleccionados([])}
-                                            className="text-[10px] font-semibold text-rose-400 hover:text-rose-600 transition-colors"
+                                            className="text-[10px] font-semibold text-[#FF3B30]/70 hover:text-[#FF3B30] transition-colors"
                                         >
                                             Limpiar todo
                                         </button>
@@ -575,12 +575,12 @@ export default function BloqueosAgendas() {
                                                 .map((dia) => (
                                                     <span
                                                         key={dia.toISOString()}
-                                                        className="inline-flex items-center gap-1 bg-violet-100 text-[#6E56CF] text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                                                        className="inline-flex items-center gap-1 bg-[#007AFF]/10 text-[#007AFF] text-[11px] font-semibold px-2.5 py-1 rounded-full"
                                                     >
                                                         {format(dia, "EEE d MMM", { locale: es })}
                                                         <button
                                                             onClick={() => setDiasSeleccionados(prev => prev.filter(d => d.toISOString() !== dia.toISOString()))}
-                                                            className="hover:text-rose-500 transition-colors ml-0.5"
+                                                            className="hover:text-[#FF3B30] transition-colors ml-0.5"
                                                         >
                                                             ×
                                                         </button>
@@ -604,7 +604,7 @@ export default function BloqueosAgendas() {
 
                                 {/* Rango horario */}
                                 <div data-tour="bloqueo-rango-horario" data-tour-completo={Boolean(horaInicio && horaFinalizacion && horaFinalizacion > horaInicio)} className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Rango horario</label>
+                                    <label className="text-[12px] font-medium text-slate-500 ml-1">Rango horario</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1">
                                             <label className="text-[10px] text-slate-400 font-medium ml-1">Desde</label>
@@ -629,7 +629,7 @@ export default function BloqueosAgendas() {
 
                                 {/* Motivo */}
                                 <div data-tour="bloqueo-motivo" data-tour-completo={Boolean(motivo.trim())} className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Motivo del bloqueo</label>
+                                    <label className="text-[12px] font-medium text-slate-500 ml-1">Motivo del bloqueo</label>
                                     <InputTextDinamic
                                         value={motivo}
                                         onChange={(e) => setMotivo(e.target.value)}
@@ -639,8 +639,8 @@ export default function BloqueosAgendas() {
 
                                 {/* Resumen antes de guardar */}
                                 {diasSeleccionados.length > 0 && horaInicio && horaFinalizacion && (
-                                    <div className="rounded-2xl bg-violet-50 border border-violet-100 px-4 py-3">
-                                        <p className="text-[12px] font-semibold text-[#6E56CF]">
+                                    <div className="rounded-2xl bg-[#007AFF]/[0.06] border border-[#007AFF]/10 px-4 py-3">
+                                        <p className="text-[12px] font-semibold text-[#007AFF]">
                                             Se crearán <span className="text-base">{diasSeleccionados.length}</span> bloqueo(s) independiente(s)
                                         </p>
                                         <p className="text-[11px] text-slate-500 mt-0.5">
@@ -697,14 +697,14 @@ export default function BloqueosAgendas() {
                                     {id_profesional && listaBloqueos.length > 0 && (
                                         <button
                                             onClick={() => setModalEliminarTodos("paso1")}
-                                            className="text-[11px] font-bold text-rose-400 hover:text-rose-600 uppercase tracking-wider px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                                            className="text-[12px] font-medium text-[#FF3B30]/70 hover:text-[#FF3B30] px-3 py-1.5 rounded-lg hover:bg-[#FF3B30]/[0.08] transition-colors"
                                         >
                                             Eliminar todos
                                         </button>
                                     )}
                                     <button
                                         onClick={verTodosLosBloqueos}
-                                        className="text-[11px] font-bold text-slate-600 uppercase tracking-wider px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                                        className="text-[12px] font-medium text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                                     >
                                         Refrescar
                                     </button>
@@ -715,11 +715,11 @@ export default function BloqueosAgendas() {
                                 <Table className="w-full table-fixed">
                                     <TableHeader className="bg-slate-50/50">
                                         <TableRow className="hover:bg-transparent border-slate-100">
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 w-[28%]">Profesional</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 w-[20%]">Motivo</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 w-[20%]">Día</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 w-[24%]">Horario</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-3 w-[8%] text-center">Ver</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-3 w-[28%]">Profesional</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-3 w-[20%]">Motivo</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-3 w-[20%]">Día</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-3 w-[24%]">Horario</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-3 w-[8%] text-center">Ver</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -727,7 +727,7 @@ export default function BloqueosAgendas() {
                                             listaBloqueos.map((bloqueo) => (
                                                 <TableRow
                                                     key={bloqueo.id_bloqueo}
-                                                    className="border-slate-50 hover:bg-violet-50/30 transition-colors cursor-pointer"
+                                                    className="border-slate-50 hover:bg-[#007AFF]/[0.06] transition-colors cursor-pointer"
                                                     onClick={() => abrirModalBloqueo(bloqueo)}
                                                 >
                                                     <TableCell className="py-3 pr-2">
@@ -789,7 +789,7 @@ export default function BloqueosAgendas() {
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setModalEliminarTodos(false)} />
                     <div className="relative w-full max-w-sm overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
+                            <div className="h-10 w-10 rounded-xl bg-[#FF3B30]/[0.08] flex items-center justify-center text-[#FF3B30]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
@@ -810,7 +810,7 @@ export default function BloqueosAgendas() {
                             <button onClick={() => setModalEliminarTodos(false)} className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all active:scale-[0.98]">
                                 Cancelar
                             </button>
-                            <button onClick={() => setModalEliminarTodos("paso2")} className="rounded-2xl bg-rose-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-rose-600 transition-all active:scale-[0.98]">
+                            <button onClick={() => setModalEliminarTodos("paso2")} className="rounded-2xl bg-[#FF3B30] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#FF3B30] transition-all active:scale-[0.98]">
                                 Sí, continuar
                             </button>
                         </div>
@@ -822,31 +822,31 @@ export default function BloqueosAgendas() {
             {modalEliminarTodos === "paso2" && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModalEliminarTodos(false)} />
-                    <div className="relative w-full max-w-sm overflow-hidden rounded-[32px] border border-rose-200 bg-white shadow-sm">
-                        <div className="px-6 py-5 border-b border-rose-100 bg-rose-50/50 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
+                    <div className="relative w-full max-w-sm overflow-hidden rounded-[32px] border border-[#FF3B30]/25 bg-white shadow-sm">
+                        <div className="px-6 py-5 border-b border-[#FF3B30]/[0.12] bg-[#FF3B30]/[0.08] flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-xl bg-[#FF3B30]/[0.12] flex items-center justify-center text-[#FF3B30]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-base font-bold text-rose-700">¿Estás completamente seguro?</h3>
-                                <p className="text-[11px] text-rose-400 font-medium">Esta acción no se puede deshacer</p>
+                                <h3 className="text-base font-bold text-[#C4291D]">¿Estás completamente seguro?</h3>
+                                <p className="text-[11px] text-[#FF3B30]/70 font-medium">Esta acción no se puede deshacer</p>
                             </div>
                         </div>
                         <div className="px-6 py-5">
                             <p className="text-[13px] text-slate-600 leading-relaxed">
-                                Se eliminarán <span className="font-bold text-rose-600">{listaBloqueos.length} bloqueo(s)</span> de forma permanente. Los horarios quedarán disponibles para nuevas reservas.
+                                Se eliminarán <span className="font-bold text-[#FF3B30]">{listaBloqueos.length} bloqueo(s)</span> de forma permanente. Los horarios quedarán disponibles para nuevas reservas.
                             </p>
                         </div>
-                        <div className="flex items-center justify-end gap-2.5 border-t border-rose-100 bg-rose-50/30 px-6 py-4">
+                        <div className="flex items-center justify-end gap-2.5 border-t border-[#FF3B30]/[0.12] bg-[#FF3B30]/[0.08] px-6 py-4">
                             <button onClick={() => setModalEliminarTodos(false)} className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all active:scale-[0.98]">
                                 Cancelar
                             </button>
                             <button
                                 onClick={eliminarTodosLosBloqueos}
                                 disabled={cargandoEliminarTodos}
-                                className="rounded-2xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center gap-2"
+                                className="rounded-2xl bg-[#FF3B30] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#C4291D] transition-all active:scale-[0.98] disabled:opacity-60 flex items-center gap-2"
                             >
                                 {cargandoEliminarTodos ? (
                                     <>
@@ -869,7 +869,7 @@ export default function BloqueosAgendas() {
                     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={cerrarModalBloqueo} />
                     <div className="relative w-full max-w-md overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center text-[#6E56CF]">
+                            <div className="h-10 w-10 rounded-xl bg-[#007AFF]/[0.06] flex items-center justify-center text-[#007AFF]">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
@@ -882,26 +882,26 @@ export default function BloqueosAgendas() {
 
                         <div className="space-y-4 p-6">
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Profesional</label>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] font-semibold text-slate-700">
                                     {bloqueoSeleccionado.nombreProfesional}
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Motivo</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Motivo</label>
                                 <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] text-slate-700">
                                     {bloqueoSeleccionado.motivo}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Día</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Día</label>
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] font-semibold text-slate-800">
                                         {formatearFechaTabla(bloqueoSeleccionado.fechaInicio)}
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Horario</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Horario</label>
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] font-semibold text-slate-800">
                                         {(bloqueoSeleccionado.horaInicio ?? "").slice(0, 5)} — {(bloqueoSeleccionado.horaFinalizacion ?? "").slice(0, 5)}
                                     </div>
@@ -918,7 +918,7 @@ export default function BloqueosAgendas() {
                             </button>
                             <button
                                 onClick={() => eliminarBloqueo(bloqueoSeleccionado.id_bloqueo)}
-                                className="rounded-2xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-rose-700 active:scale-[0.98]"
+                                className="rounded-2xl bg-[#FF3B30] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#C4291D] active:scale-[0.98]"
                             >
                                 Eliminar este día
                             </button>

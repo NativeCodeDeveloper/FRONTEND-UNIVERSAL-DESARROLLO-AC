@@ -218,7 +218,7 @@ function PedidoDetalleInner(){
                 {/* ── Header ── */}
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Panel de Administrador</p>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Panel de Administrador</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Detalle del Pedido
                         </h1>
@@ -248,14 +248,14 @@ function PedidoDetalleInner(){
                     {/* ── Cambio de Estado ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Estado del Pedido</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Estado del Pedido</h2>
                             {detalleComprador.length > 0 && (
                                 <span className={`inline-flex items-center rounded-xl px-3 py-1 text-[11px] font-bold ${
                                     detalleComprador[0].estado_pedido === 1
                                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                         : detalleComprador[0].estado_pedido === 4
                                             ? "bg-slate-100 text-slate-600 border border-slate-200"
-                                            : "bg-amber-50 text-amber-700 border border-amber-200"
+                                            : "bg-[#F2F2F7] text-[#3A3A3C] border border-black/[0.08]"
                                 }`}>
                                     {({1: "Compra Realizada", 4: "Compra Anulada"})[detalleComprador[0].estado_pedido] ?? "Pago Sin Completar"}
                                 </span>
@@ -273,7 +273,7 @@ function PedidoDetalleInner(){
                                     />
                                 </div>
                                 <button onClick={() => cambiarEstado(id_pedido, nuevoestado)}
-                                    className="h-11 px-6 rounded-xl bg-[#6E56CF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex-shrink-0">
+                                    className="h-11 px-6 rounded-xl bg-[#007AFF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100 flex-shrink-0">
                                     Cambiar Estado
                                 </button>
                             </div>
@@ -283,48 +283,48 @@ function PedidoDetalleInner(){
                     {/* ── Datos del Comprador ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Datos del Comprador</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Datos del Comprador</h2>
                         </div>
                         <div className="p-4 md:p-8">
                             {detalleComprador.map(c => (
                                 <div key={c.id_pedido} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nombre Completo</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Nombre Completo</span>
                                             <p className="text-[14px] font-bold text-slate-800 mt-0.5">{c.nombre_comprador} {c.apellidosComprador}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">RUT</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">RUT</span>
                                             <p className="text-[13px] font-mono text-slate-700 mt-0.5">{c.identificacion_comprador}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Teléfono</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Teléfono</span>
                                             <p className="text-[13px] text-slate-700 mt-0.5">{c.telefono_comprador}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Email</span>
                                             <p className="text-[13px] text-slate-700 mt-0.5">{c.email_Comprador}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fecha del Pedido</span>
-                                            <p className="text-[13px] font-bold text-[#6E56CF] mt-0.5">{formatearFecha(c.fecha_pedido)}</p>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Fecha del Pedido</span>
+                                            <p className="text-[13px] font-bold text-[#007AFF] mt-0.5">{formatearFecha(c.fecha_pedido)}</p>
                                         </div>
                                     </div>
                                     <div className="space-y-3">
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dirección de Despacho</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Dirección de Despacho</span>
                                             <p className="text-[13px] text-slate-700 mt-0.5">{c.direccion_despacho}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Comuna</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Comuna</span>
                                             <p className="text-[13px] text-slate-700 mt-0.5">{c.comuna}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Región / País</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Región / País</span>
                                             <p className="text-[13px] text-slate-700 mt-0.5">{c.regionPais}</p>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Comentarios</span>
+                                            <span className="text-[12px] font-medium text-slate-400 ">Comentarios</span>
                                             <p className="text-[13px] text-slate-500 italic mt-0.5">{c.comentarios || "Sin comentarios"}</p>
                                         </div>
                                     </div>
@@ -336,24 +336,24 @@ function PedidoDetalleInner(){
                     {/* ── Seguimiento por Correo ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-xl bg-violet-50 text-[#6E56CF] flex items-center justify-center">
+                            <div className="h-8 w-8 rounded-xl bg-[#007AFF]/[0.06] text-[#007AFF] flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                             </div>
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Seguimiento de Cliente</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Seguimiento de Cliente</h2>
                         </div>
                         <div className="p-4 md:p-8 space-y-5">
                             <p className="text-[13px] text-slate-500">Envía un correo personalizado al cliente sobre su pedido para recuperar carritos perdidos o confirmar el estado.</p>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Asunto del correo</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Asunto del correo</label>
                                 <ShadcnInput id="asunto" value={asunto} onChange={e => setAsunto(e.target.value)} placeholder="Ej: Actualización de tu pedido #123" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Mensaje</label>
+                                <label className="text-[12px] font-medium text-slate-400 ml-1">Mensaje</label>
                                 <Textarea value={mensaje} onChange={(e) => setMensaje(e.target.value)} id="mensajeCorreo"
                                     placeholder="Escribe aquí el mensaje para el cliente..."
-                                    className="min-h-[140px] resize-none rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50" />
+                                    className="min-h-[140px] resize-none rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/[0.06]" />
                             </div>
                             <button
                                 onClick={handleEnviarSeguimiento}
@@ -369,16 +369,16 @@ function PedidoDetalleInner(){
                     {/* ── Productos del Pedido ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Productos del Pedido</h2>
-                            <span className="h-5 px-2 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{pedidoDetalle.length} productos</span>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Productos del Pedido</h2>
+                            <span className="h-5 px-2 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-[10px] font-bold flex items-center">{pedidoDetalle.length} productos</span>
                         </div>
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                                        <TableHead className="px-4 py-4 md:px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Producto</TableHead>
-                                        <TableHead className="px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cantidad</TableHead>
-                                        <TableHead className="px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Subtotal</TableHead>
+                                        <TableHead className="px-4 py-4 md:px-8 text-[12px] font-medium text-slate-400 ">Producto</TableHead>
+                                        <TableHead className="px-4 py-4 text-[12px] font-medium text-slate-400 ">Cantidad</TableHead>
+                                        <TableHead className="px-4 py-4 text-[12px] font-medium text-slate-400 text-right">Subtotal</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -392,8 +392,8 @@ function PedidoDetalleInner(){
                                 </TableBody>
                                 <TableFooter>
                                     <TableRow className="bg-slate-50/50">
-                                        <TableCell colSpan={2} className="px-4 py-4 md:px-8 text-[12px] font-bold text-slate-500 uppercase tracking-widest">Total Compra</TableCell>
-                                        <TableCell className="px-4 py-4 text-[15px] font-bold text-[#6E56CF] text-right">${totalCompra}</TableCell>
+                                        <TableCell colSpan={2} className="px-4 py-4 md:px-8 text-[12px] font-medium text-slate-500 ">Total Compra</TableCell>
+                                        <TableCell className="px-4 py-4 text-[15px] font-bold text-[#007AFF] text-right">${totalCompra}</TableCell>
                                     </TableRow>
                                 </TableFooter>
                             </Table>

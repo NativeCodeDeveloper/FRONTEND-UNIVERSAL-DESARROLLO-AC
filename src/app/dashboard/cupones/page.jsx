@@ -252,7 +252,7 @@ function mostrarIdSeleccionado(id_cupon) {
                 {/* ── Header ── */}
                 <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Marketing y Descuentos</p>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Marketing y Descuentos</p>
                         <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                             Gestión de Cupones
                         </h1>
@@ -276,34 +276,34 @@ function mostrarIdSeleccionado(id_cupon) {
                     <div className="lg:col-span-5">
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Crear / Editar Cupón</h2>
+                                <h2 className="text-[12px] font-medium text-slate-500 ">Crear / Editar Cupón</h2>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID seleccionado:</span>
-                                    <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{mostrarIdSeleccionado(id_cupon)}</span>
+                                    <span className="text-[12px] font-medium text-slate-400 ">ID seleccionado:</span>
+                                    <span className="h-6 px-2.5 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-[10px] font-bold flex items-center">{mostrarIdSeleccionado(id_cupon)}</span>
                                 </div>
                             </div>
                             <div className="p-4 md:p-8 space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Título del cupón</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Título del cupón</label>
                                     <ShadcnInput value={nombreCupon} onChange={(e) => setNombreCupon(e.target.value)} placeholder="Titulo del cupon.." />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Código verificador</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Código verificador</label>
                                     <ShadcnInput value={codigoVerificadorCupon} onChange={(e) => setCodigoVerificadorCupon(e.target.value)} placeholder="Codigo del cupon.." />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Descripción / Objetivo</label>
-                                    <Textarea className="min-h-[84px] resize-none rounded-xl border-slate-200 focus:border-[#6E56CF] focus:ring-2 focus:ring-violet-50"
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Descripción / Objetivo</label>
+                                    <Textarea className="min-h-[84px] resize-none rounded-xl border-slate-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/[0.06]"
                                         placeholder="Descripción del cupón..." value={objetivoCupon} onChange={(e) => setObjetivoCupon(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Porcentaje de descuento <span className="normal-case text-slate-300">(1–100)</span></label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Porcentaje de descuento <span className="normal-case text-slate-300">(1–100)</span></label>
                                     <ShadcnInput type="number" placeholder="Ej: 15" value={porcentajeDescuento} onChange={(e) => setPorcentajeDescuento(e.target.value)} />
                                 </div>
                                 <div className="flex gap-3 pt-2">
                                     <button
                                         onClick={() => insertarCupon(nombreCupon, codigoVerificadorCupon, objetivoCupon, porcentajeDescuento)}
-                                        className="flex-1 h-11 rounded-xl bg-[#6E56CF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100">
+                                        className="flex-1 h-11 rounded-xl bg-[#007AFF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100">
                                         Ingresar
                                     </button>
                                     <button
@@ -320,19 +320,19 @@ function mostrarIdSeleccionado(id_cupon) {
                     <div className="lg:col-span-7">
                         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                             <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                                <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Cupones Activos</h2>
-                                <span className="h-5 px-2 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{tablaCupones.length}</span>
+                                <h2 className="text-[12px] font-medium text-slate-500 ">Cupones Activos</h2>
+                                <span className="h-5 px-2 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-[10px] font-bold flex items-center">{tablaCupones.length}</span>
                             </div>
                             <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">ID</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Título</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 hidden md:table-cell">Objetivo</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4">Código</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">%</TableHead>
-                                            <TableHead className="text-[10px] font-bold text-slate-400 uppercase tracking-widest py-4 text-center">Acciones</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-4">ID</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-4">Título</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-4 hidden md:table-cell">Objetivo</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-4">Código</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-4 text-center">%</TableHead>
+                                            <TableHead className="text-[12px] font-medium text-slate-400 py-4 text-center">Acciones</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -345,16 +345,16 @@ function mostrarIdSeleccionado(id_cupon) {
                                                     <span className="text-[11px] font-mono bg-slate-100 px-2 py-1 rounded-lg text-slate-600">{cupon.codigoVerificadorCupon}</span>
                                                 </TableCell>
                                                 <TableCell className="py-4 text-center">
-                                                    <span className="text-[12px] font-bold text-[#6E56CF]">{cupon.porcentajeDescuento}%</span>
+                                                    <span className="text-[12px] font-bold text-[#007AFF]">{cupon.porcentajeDescuento}%</span>
                                                 </TableCell>
                                                 <TableCell className="py-4 text-center">
                                                     <div className="flex items-center justify-center gap-2">
                                                         <button onClick={() => seleccionarCupon(cupon.id_cupon)}
-                                                            className="h-8 px-3 rounded-xl bg-violet-50 text-[#6E56CF] text-[11px] font-bold hover:bg-[#6E56CF] hover:text-white transition-all">
+                                                            className="h-8 px-3 rounded-xl bg-[#007AFF]/[0.06] text-[#007AFF] text-[11px] font-bold hover:bg-[#007AFF] hover:text-white transition-all">
                                                             Editar
                                                         </button>
                                                         <button onClick={() => eliminarCupon(cupon.id_cupon)}
-                                                            className="h-8 px-3 rounded-xl bg-rose-50 text-rose-600 text-[11px] font-bold hover:bg-rose-600 hover:text-white transition-all">
+                                                            className="h-8 px-3 rounded-xl bg-[#FF3B30]/[0.08] text-[#FF3B30] text-[11px] font-bold hover:bg-[#FF3B30] hover:text-white transition-all">
                                                             Eliminar
                                                         </button>
                                                     </div>

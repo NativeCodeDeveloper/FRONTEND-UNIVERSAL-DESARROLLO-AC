@@ -144,13 +144,13 @@ export default function FichaClinica() {
                             videoId="KWLr1mHjhA0"
                             titulo="Fichas clínicas"
                             ariaLabel="Abrir video tutorial de fichas clínicas"
-                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             claseEtiqueta="text-[10px] font-bold"
                         />
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/calendario")}
-                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-2xl border border-slate-200 bg-white px-4 text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             aria-label="Ir al calendario para agendar un paciente"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -180,13 +180,13 @@ export default function FichaClinica() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Búsqueda de Carpeta</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Búsqueda de Carpeta</h2>
                         </div>
                         
                         <div className="p-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Nombre del Paciente</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Nombre del Paciente</label>
                                     <div className="flex gap-2">
                                         <ShadcnInput
                                             value={nombreBuscado}
@@ -205,7 +205,7 @@ export default function FichaClinica() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">RUT del Paciente</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">RUT del Paciente</label>
                                     <div className="flex gap-2">
                                         <ShadcnInput
                                             value={rutBuscado}
@@ -242,7 +242,7 @@ export default function FichaClinica() {
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                             <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Pacientes Registrados</h2>
-                            <span className="h-6 px-2.5 rounded-full bg-violet-50 text-[#6E56CF] text-xs font-bold flex items-center justify-center">
+                            <span className="h-6 px-2.5 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-xs font-bold flex items-center justify-center">
                                 {listaPacientes.length} registros
                             </span>
                         </div>
@@ -251,10 +251,10 @@ export default function FichaClinica() {
                             <Table className="min-w-[600px]">
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 px-6">Identidad del Paciente</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 px-6">RUT</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 px-6">Contacto</TableHead>
-                                        <TableHead className="text-[11px] font-bold text-slate-400 uppercase tracking-widest py-5 px-6 text-center">Carpeta Médica</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">Identidad del Paciente</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">RUT</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">Contacto</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6 text-center">Carpeta Médica</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>

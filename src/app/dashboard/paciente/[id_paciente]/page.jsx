@@ -378,7 +378,7 @@ export default function Paciente(){
                                     </p>
                                 </div>
                                 <div className="flex shrink-0 items-center gap-2">
-                                    <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600 uppercase tracking-wide">
+                                    <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[12px] font-semibold text-slate-600 ">
                                         {previsionDesdeId(paciente.prevision_id)}
                                     </span>
                                     <span className="inline-flex items-center rounded-lg bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
@@ -407,8 +407,8 @@ export default function Paciente(){
                             {/* Contacto */}
                             <div className="rounded-[28px] border border-slate-200 bg-white shadow-sm overflow-hidden">
                                 <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
-                                    <div className="h-8 w-8 rounded-xl bg-[#EDE9FE] flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#6E56CF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <div className="h-8 w-8 rounded-xl bg-[#E5F0FF] flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
                                     </div>
@@ -548,11 +548,11 @@ export default function Paciente(){
                                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Nombre</label>
-                                        <ShadcnInput value={nombre} placeholder="Ej: José Nicolás" onChange={(e) => setNombre(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                        <ShadcnInput value={nombre} placeholder="Ej: José Nicolás" onChange={(e) => setNombre(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Apellido</label>
-                                        <ShadcnInput value={apellido} placeholder="Ej: González Garrido" onChange={(e) => setApellido(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                        <ShadcnInput value={apellido} placeholder="Ej: González Garrido" onChange={(e) => setApellido(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Documento</label>
@@ -560,7 +560,7 @@ export default function Paciente(){
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Sexo</label>
-                                        <ShadcnInput value={sexo} placeholder="Ej: Femenino" onChange={(e) => setSexo(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                        <ShadcnInput value={sexo} placeholder="Ej: Femenino" onChange={(e) => setSexo(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Previsión</label>
@@ -574,15 +574,15 @@ export default function Paciente(){
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Correo</label>
-                                        <ShadcnInput value={correo} placeholder="paciente@email.com" onChange={(e) => setCorreo(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                        <ShadcnInput value={correo} placeholder="paciente@email.com" onChange={(e) => setCorreo(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">Dirección</label>
-                                        <ShadcnInput value={direccion} placeholder="Av. España 123, Concepción" onChange={(e) => setDireccion(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                        <ShadcnInput value={direccion} placeholder="Av. España 123, Concepción" onChange={(e) => setDireccion(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">País</label>
-                                        <ShadcnInput value={pais} placeholder="Chile" onChange={(e) => setPais(e.target.value)} className="border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                        <ShadcnInput value={pais} placeholder="Chile" onChange={(e) => setPais(e.target.value)} className="border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                     </div>
                                     <div className="sm:col-span-2 xl:col-span-3">
                                         <ShadcnDatePicker label="Fecha de nacimiento" value={nacimiento} onChange={(f) => setNacimiento(f)}/>
@@ -609,7 +609,7 @@ export default function Paciente(){
 
                                 {/* Solo perfiles clínicos. Para los demás los valores se conservan y se reenvían sin cambios. */}
                                 {canSeeFichasClinicas ? (
-                                <div className="rounded-[24px] border border-violet-100 bg-violet-50/30 p-5">
+                                <div className="rounded-[24px] border border-[#007AFF]/10 bg-[#007AFF]/[0.06] p-5">
                                     <p className="mb-0.5 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">Resumen clínico</p>
                                     <h3 className="mb-5 text-sm font-semibold text-slate-900">Observaciones y antecedentes</h3>
                                     <div className="space-y-4">
@@ -621,7 +621,7 @@ export default function Paciente(){
                                         ].map(({ label, value, setter }) => (
                                             <div key={label}>
                                                 <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">{label}</label>
-                                                <Textarea value={value} onChange={(e) => setter(e.target.value)} className="min-h-[80px] resize-y bg-white border-slate-200 focus:border-violet-300 focus:ring-violet-100"/>
+                                                <Textarea value={value} onChange={(e) => setter(e.target.value)} className="min-h-[80px] resize-y bg-white border-slate-200 focus:border-[#007AFF]/30 focus:ring-[#007AFF]/10"/>
                                             </div>
                                         ))}
                                     </div>
@@ -635,7 +635,7 @@ export default function Paciente(){
                                     type="button"
                                     onClick={() => actualizarDatosPacientes(nombre, apellido, rut, nacimiento, sexo, prevision, telefono, correo, direccion, pais, observacion1, apoderado, apoderadoRut, medicamentosUsados, habitos, comentariosAdicionales, id_paciente)}
                                     className="inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md hover:scale-[1.01]"
-                                    style={{ background: "linear-gradient(135deg, #6E56CF 0%, #8B5CF6 100%)" }}
+                                    style={{ background: "linear-gradient(135deg, #007AFF 0%, #007AFF 100%)" }}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>

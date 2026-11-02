@@ -133,7 +133,7 @@ export default function GestionStock() {
 
                 {/* ── Header ── */}
                 <div className="mb-10">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#6E56CF]">Administración de Tienda</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#007AFF]">Administración de Tienda</p>
                     <h1 className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">
                         Gestión de Inventario
                     </h1>
@@ -147,7 +147,7 @@ export default function GestionStock() {
                     {/* ── Búsqueda ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Búsqueda de Productos</h2>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Búsqueda de Productos</h2>
                         </div>
                         <div className="p-4 md:p-8">
                             <div className="flex flex-col md:flex-row items-stretch gap-3">
@@ -157,12 +157,12 @@ export default function GestionStock() {
                                     onChange={(event) => setProductoSimilar(event.target.value)}
                                     placeholder="Buscar por título o palabra clave..."
                                     aria-label="Buscar similitudes de producto"
-                                    className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-[#6E56CF] focus:ring-4 focus:ring-violet-50 placeholder:text-slate-400"
+                                    className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-[#007AFF] focus:ring-4 focus:ring-[#007AFF]/[0.06] placeholder:text-slate-400"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => buscarProductoSimilar(productoSimilar)}
-                                    className="h-11 px-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#6E56CF] text-sm font-bold text-white hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100"
+                                    className="h-11 px-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#007AFF] text-sm font-bold text-white hover:bg-[#5b45bc] transition-all shadow-lg shadow-indigo-100"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
                                         <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 104.165 9.33l3.003 3.003a.75.75 0 101.06-1.06l-3.003-3.004A5.5 5.5 0 009 3.5zm-4 5.5a4 4 0 118 0 4 4 0 01-8 0z" clipRule="evenodd" />
@@ -183,15 +183,15 @@ export default function GestionStock() {
                     {/* ── Listado de Productos ── */}
                     <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-4 py-4 md:px-8 md:py-5 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                            <h2 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Listado de Productos</h2>
-                            <span className="h-5 px-2 rounded-full bg-violet-50 text-[#6E56CF] text-[10px] font-bold flex items-center">{productos.length}</span>
+                            <h2 className="text-[12px] font-medium text-slate-500 ">Listado de Productos</h2>
+                            <span className="h-5 px-2 rounded-full bg-[#007AFF]/[0.06] text-[#007AFF] text-[10px] font-bold flex items-center">{productos.length}</span>
                         </div>
                         <div className="divide-y divide-slate-50">
                             {productos.map((producto) => (
                                 <div key={producto.id_producto} className="flex items-center gap-4 px-4 py-4 md:px-8 hover:bg-slate-50/50 transition-colors">
                                     <img src={cfToSrc(producto.imagenProducto)} alt="Producto" className="rounded-xl h-12 w-12 object-cover hidden md:block flex-shrink-0" />
                                     <div className="flex flex-col flex-1 min-w-0">
-                                        <span className="text-[10px] uppercase tracking-wider text-slate-400">Producto</span>
+                                        <span className="text-[12px] text-slate-400">Producto</span>
                                         <span className="text-[13px] font-bold text-slate-800 truncate">{producto.tituloProducto}</span>
                                     </div>
                                     <div className="flex items-center gap-3 flex-shrink-0">
@@ -202,14 +202,14 @@ export default function GestionStock() {
                                             min="0"
                                             step="1"
                                             type="number"
-                                            className="w-24 h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-[#6E56CF]"
+                                            className="w-24 h-9 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-[#007AFF]"
                                             value={nuevoStock[producto.id_producto] ?? ""}
                                             onChange={(e) => setNuevoStock((prev) => ({ ...prev, [producto.id_producto]: e.target.value }))}
                                         />
                                         <button
                                             onClick={() => actualizarStock(Number(nuevoStock[producto.id_producto] ?? 0), producto.id_producto)}
                                             type="button"
-                                            className="h-9 px-4 rounded-xl bg-[#6E56CF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all"
+                                            className="h-9 px-4 rounded-xl bg-[#007AFF] text-white text-[12px] font-bold hover:bg-[#5b45bc] transition-all"
                                         >
                                             Actualizar
                                         </button>

@@ -123,10 +123,10 @@ function CalendarioContent() {
                 background: rgba(168, 85, 247, 0.04) !important;
             }
             .rbc-today {
-                background: rgba(110, 86, 207, 0.04) !important;
+                background: rgba(0,122,255, 0.04) !important;
             }
             .rbc-current-time-indicator {
-                background-color: #6E56CF !important;
+                background-color: #007AFF !important;
                 height: 2px !important;
                 z-index: 3 !important;
             }
@@ -138,15 +138,15 @@ function CalendarioContent() {
                 width: 10px;
                 height: 10px;
                 border-radius: 50%;
-                background: #6E56CF;
+                background: #007AFF;
             }
             .rbc-slot-selection {
-                background: rgba(110, 86, 207, 0.10) !important;
-                border: 1px solid rgba(110, 86, 207, 0.35) !important;
+                background: rgba(0,122,255, 0.10) !important;
+                border: 1px solid rgba(0,122,255, 0.35) !important;
                 border-radius: 12px !important;
             }
             .rbc-selected-cell {
-                background: rgba(110, 86, 207, 0.04) !important;
+                background: rgba(0,122,255, 0.04) !important;
             }
             .rbc-event,
             .rbc-background-event {
@@ -176,7 +176,7 @@ function CalendarioContent() {
                 justify-content: center !important;
                 width: 26px !important;
                 height: 26px !important;
-                background: #6E56CF !important;
+                background: #007AFF !important;
                 color: white !important;
                 border-radius: 50% !important;
                 font-weight: 700 !important;
@@ -232,18 +232,18 @@ function CalendarioContent() {
 
             /* ── "Ver más" link (show-more) ── */
             .rbc-show-more {
-                color: #6E56CF !important;
+                color: #007AFF !important;
                 font-size: 11px !important;
                 font-weight: 700 !important;
                 padding: 2px 6px !important;
                 margin: 0 2px !important;
                 cursor: pointer !important;
-                background: #F3F0FF !important;
+                background: #EBF4FF !important;
                 border-radius: 4px !important;
                 display: inline-block !important;
             }
             .rbc-show-more:hover {
-                background: #EDE9FE !important;
+                background: #E5F0FF !important;
                 text-decoration: none !important;
             }
 
@@ -2317,9 +2317,9 @@ function CalendarioContent() {
         const dayNumber = format(date, "d");
 
         return (
-            <div className={`flex items-center justify-center gap-1.5 py-2.5 bg-white border-b border-slate-100 ${isToday ? "text-[#6E56CF]" : "text-slate-600"}`}>
+            <div className={`flex items-center justify-center gap-1.5 py-2.5 bg-white border-b border-slate-100 ${isToday ? "text-[#007AFF]" : "text-slate-600"}`}>
                 <span className="capitalize text-[13px] font-medium">{dayName}</span>
-                <span className={`text-[13px] font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-[#6E56CF] text-white shadow-sm" : ""}`}>
+                <span className={`text-[13px] font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-[#007AFF] text-white shadow-sm" : ""}`}>
                     {dayNumber}
                 </span>
             </div>
@@ -2373,7 +2373,7 @@ function CalendarioContent() {
                     </div>
                     <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                         {idProfesionalAgendaActiva ? (
-                            <div className="flex h-10 w-full items-center rounded-xl border border-violet-200 bg-violet-50 px-4 text-[13px] font-semibold text-violet-900 shadow-sm sm:w-[280px] sm:flex-none">
+                            <div className="flex h-10 w-full items-center rounded-xl border border-[#007AFF]/20 bg-[#007AFF]/[0.06] px-4 text-[13px] font-semibold text-[#1D1D1F] shadow-sm sm:w-[280px] sm:flex-none">
                                 {obtenerNombreProfesionalSeleccionado(idProfesionalAgendaActiva)}
                             </div>
                         ) : (
@@ -2386,7 +2386,7 @@ function CalendarioContent() {
                                         label: p.nombreProfesional,
                                     }))}
                                     placeholder="Seleccionar Agenda"
-                                    className="h-10 rounded-xl border-slate-200 bg-white pl-4 pr-8 text-[13px] font-semibold text-slate-800 shadow-sm focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+                                    className="h-10 rounded-xl border-slate-200 bg-white pl-4 pr-8 text-[13px] font-semibold text-slate-800 shadow-sm focus:border-[#007AFF]/30 focus:ring-2 focus:ring-[#007AFF]/10"
                                 />
                             </div>
                         )}
@@ -2414,7 +2414,7 @@ function CalendarioContent() {
                                 const fin = new Date(inicio.getTime() + 30 * 60000);
                                 abrirPopupSeleccion({ start: inicio, end: fin, bounds: null });
                             }}
-                            className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.98] sm:w-auto sm:min-w-[180px]" style={{ backgroundColor: "#6E56CF" }}
+                            className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.98] sm:w-auto sm:min-w-[180px]" style={{ backgroundColor: "#007AFF" }}
                             id="btn-nueva-reserva"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -2425,7 +2425,7 @@ function CalendarioContent() {
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard")}
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             aria-label="Ir a reservas"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -2436,7 +2436,7 @@ function CalendarioContent() {
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/listaPacientes")}
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             aria-label="Ir a lista de pacientes"
                         >
                             <span>Pacientes</span>
@@ -2445,7 +2445,7 @@ function CalendarioContent() {
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/FichaClinica")}
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             aria-label="Ir a fichas clínicas"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -2462,12 +2462,12 @@ function CalendarioContent() {
                             }}
                             tutorial={TutorialGuiadoCalendario}
                             tutorialProps={{ ariaLabel: "Iniciar el tutorial guiado del proceso de agendamiento" }}
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                         />
                         <button
                             type="button"
                             onClick={() => router.push("/dashboard/bloqueosAgenda")}
-                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#EDE9FE] hover:bg-[#F3F0FF] hover:text-[#6E56CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2"
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-medium text-slate-600 shadow-sm transition-all hover:border-[#E5F0FF] hover:bg-[#EBF4FF] hover:text-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] focus-visible:ring-offset-2"
                             aria-label="Ir a bloqueos de agenda"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -2500,7 +2500,7 @@ function CalendarioContent() {
                         <button
                             type="button"
                             onClick={() => setCurrentDate(new Date())}
-                            className="rounded-xl border border-violet-200 bg-[#F3F0FF] px-4 py-2 text-[13px] font-semibold text-[#6E56CF] shadow-sm hover:bg-[#EDE9FE] transition-colors"
+                            className="rounded-xl border border-[#007AFF]/20 bg-[#EBF4FF] px-4 py-2 text-[13px] font-semibold text-[#007AFF] shadow-sm hover:bg-[#E5F0FF] transition-colors"
                         >
                             Hoy
                         </button>
@@ -2526,7 +2526,7 @@ function CalendarioContent() {
                                 type="date"
                                 value={formatearFechaLocal(currentDate)}
                                 onChange={(e) => manejarCambioFechaMobile(e.target.value)}
-                                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-violet-300"
+                                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-[#007AFF]/30"
                             />
                         )}
                     </div>
@@ -2544,7 +2544,7 @@ function CalendarioContent() {
                                 onClick={() => { setCurrentView(esMobile ? "day" : key); setMonthPopover(null); }}
                                 className={`px-3.5 py-1.5 text-[13px] transition-all duration-150 rounded-lg ${
                                     vistaActiva === key
-                                        ? "bg-white text-[#6E56CF] font-bold shadow-sm"
+                                        ? "bg-white text-[#007AFF] font-bold shadow-sm"
                                         : "text-slate-500 font-medium hover:text-slate-700"
                                 }`}
                             >
@@ -2598,7 +2598,7 @@ function CalendarioContent() {
                                                                 abrirPopupReservaExistente(ev);
                                                             }}
                                                         >
-                                                            <div className="w-1 self-stretch rounded-full shrink-0" style={{ backgroundColor: paleta?.color || "#6E56CF" }} />
+                                                            <div className="w-1 self-stretch rounded-full shrink-0" style={{ backgroundColor: paleta?.color || "#007AFF" }} />
                                                             <div className="w-16 shrink-0">
                                                                 <p className="text-[12px] font-bold tabular-nums text-slate-700">{formatHoraCorta(ev.start)}</p>
                                                                 <p className="text-[11px] text-slate-400 tabular-nums">{formatHoraCorta(ev.end)}</p>
@@ -2608,7 +2608,7 @@ function CalendarioContent() {
                                                                 {prof && <p className="text-[11px] text-slate-400 truncate mt-0.5">{prof}</p>}
                                                             </div>
                                                             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 capitalize"
-                                                                style={{ backgroundColor: `${paleta?.color || "#6E56CF"}18`, color: paleta?.color || "#6E56CF", border: `1px solid ${paleta?.color || "#6E56CF"}35` }}>
+                                                                style={{ backgroundColor: `${paleta?.color || "#007AFF"}18`, color: paleta?.color || "#007AFF", border: `1px solid ${paleta?.color || "#007AFF"}35` }}>
                                                                 {estadoLabel}
                                                             </span>
                                                         </div>
@@ -2630,8 +2630,8 @@ function CalendarioContent() {
                         onClickCapture={(e) => { lastClickPos.current = { x: e.clientX, y: e.clientY }; }}
                     >
                         {selectionPreview && (
-                            <div className="pointer-events-none absolute right-4 top-4 z-20 rounded-xl border border-violet-200 bg-white/95 px-3 py-2 text-xs shadow-md backdrop-blur">
-                                <div className="font-semibold text-violet-700">Seleccionando horario</div>
+                            <div className="pointer-events-none absolute right-4 top-4 z-20 rounded-xl border border-[#007AFF]/20 bg-white/95 px-3 py-2 text-xs shadow-md backdrop-blur">
+                                <div className="font-semibold text-[#0062CC]">Seleccionando horario</div>
                                 <div className="mt-0.5 text-slate-600">{formatFechaLarga(selectionPreview.start)}</div>
                                 <div className="mt-0.5 font-medium text-slate-800">
                                     {formatHoraCorta(selectionPreview.start)} – {formatHoraCorta(selectionPreview.end)}
@@ -2887,7 +2887,7 @@ function CalendarioContent() {
                                                         <button
                                                             type="button"
                                                             onClick={(e) => { e.stopPropagation(); abrirModalBloqueo(bloqueo); }}
-                                                            className="inline-flex items-center gap-1 rounded-lg border border-violet-200 bg-violet-50 px-2.5 py-1.5 text-xs font-medium text-violet-700 hover:bg-violet-100 transition-colors"
+                                                            className="inline-flex items-center gap-1 rounded-lg border border-[#007AFF]/20 bg-[#007AFF]/[0.06] px-2.5 py-1.5 text-xs font-medium text-[#0062CC] hover:bg-[#007AFF]/10 transition-colors"
                                                         >
                                                             Ver detalle
                                                         </button>
@@ -2909,7 +2909,7 @@ function CalendarioContent() {
 
                             {/* Header */}
                             <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-xl bg-violet-50 flex items-center justify-center text-[#6E56CF]">
+                                <div className="h-10 w-10 rounded-xl bg-[#007AFF]/[0.06] flex items-center justify-center text-[#007AFF]">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
@@ -2923,27 +2923,27 @@ function CalendarioContent() {
                             {/* Body */}
                             <div className="space-y-4 p-6">
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Profesional</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Profesional</label>
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] font-semibold text-slate-700">
                                         {obtenerNombreProfesionalSeleccionado()}
                                     </div>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Motivo</label>
+                                    <label className="text-[12px] font-medium text-slate-400 ml-1">Motivo</label>
                                     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] text-slate-700">
                                         {bloqueoSeleccionado.motivo || "Sin motivo"}
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Inicio</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Inicio</label>
                                         <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] text-slate-700">
                                             <span className="block font-semibold text-slate-800">{formatearFechaTabla(bloqueoSeleccionado.fechaInicio)}</span>
                                             <span className="mt-0.5 block text-[11px] font-bold text-slate-400">{bloqueoSeleccionado.horaInicio ?? "--"}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Fin</label>
+                                        <label className="text-[12px] font-medium text-slate-400 ml-1">Fin</label>
                                         <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[13px] text-slate-700">
                                             <span className="block font-semibold text-slate-800">{formatearFechaTabla(bloqueoSeleccionado.fechaFinalizacion)}</span>
                                             <span className="mt-0.5 block text-[11px] font-bold text-slate-400">{bloqueoSeleccionado.horaFinalizacion ?? "--"}</span>
@@ -2962,7 +2962,7 @@ function CalendarioContent() {
                                 </button>
                                 <button
                                     onClick={() => eliminarBloqueo(bloqueoSeleccionado.id_bloqueo)}
-                                    className="rounded-2xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-rose-700 active:scale-[0.98]"
+                                    className="rounded-2xl bg-[#FF3B30] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#C4291D] active:scale-[0.98]"
                                 >
                                     Eliminar Bloqueo
                                 </button>
@@ -3028,7 +3028,7 @@ function CalendarioContent() {
              *   <div className="fixed inset-0 z-[80] bg-transparent" onMouseDown={(e) => e.preventDefault()}>
              *     <div
              *       ref={popupRef}
-             *       className="absolute w-[calc(100vw-32px)] max-w-[420px] rounded-[24px] border border-violet-200 bg-white/95 shadow-[0_28px_80px_rgba(76,29,149,0.18)] backdrop-blur-xl"
+             *       className="absolute w-[calc(100vw-32px)] max-w-[420px] rounded-[24px] border border-[#007AFF]/20 bg-white/95 shadow-[0_28px_80px_rgba(76,29,149,0.18)] backdrop-blur-xl"
              *       style={{ left: popupPosition.x, top: popupPosition.y }}
              *       onMouseDown={(e) => e.stopPropagation()}
              *       onTouchStart={(e) => e.stopPropagation()}
@@ -3056,7 +3056,7 @@ function CalendarioContent() {
                 border-top: 1px solid #f1f5f9 !important;
             }
             .rbc-show-more {
-                background: #6E56CF !important;
+                background: #007AFF !important;
                 color: white !important;
                 font-size: 11px !important;
                 font-weight: 700 !important;
@@ -3067,13 +3067,13 @@ function CalendarioContent() {
                 display: inline-block !important;
                 text-transform: uppercase !important;
                 letter-spacing: 0.5px !important;
-                box-shadow: 0 4px 12px rgba(110, 86, 207, 0.2) !important;
+                box-shadow: 0 4px 12px rgba(0,122,255, 0.2) !important;
                 transition: all 0.2s ease !important;
             }
             .rbc-show-more:hover {
                 background: #5b45bc !important;
                 transform: translateY(-1px) !important;
-                box-shadow: 0 6px 16px rgba(110, 86, 207, 0.3) !important;
+                box-shadow: 0 6px 16px rgba(0,122,255, 0.3) !important;
             }
             .rbc-overlay {
                 border-radius: 20px !important;
