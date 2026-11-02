@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useDatosSoporte } from "@/hooks/useDatosSoporte";
-import { construirUrlSoporte } from "@/lib/soporteWhatsapp";
+import { CORREO_SOPORTE, construirMailtoSoporte, construirUrlSoporte } from "@/lib/soporteWhatsapp";
 
 /**
  * Pantalla de estado del dashboard (sin acceso, cuenta suspendida…).
@@ -18,6 +18,7 @@ import { construirUrlSoporte } from "@/lib/soporteWhatsapp";
 export default function PantallaEstado({ icono: Icono, titulo, children, principal, motivo, conSoporte = true }) {
   const datosSoporte = useDatosSoporte();
   const urlSoporte = useMemo(() => construirUrlSoporte({ ...datosSoporte, motivo }), [datosSoporte, motivo]);
+  const correoSoporte = useMemo(() => construirMailtoSoporte({ ...datosSoporte, motivo }), [datosSoporte, motivo]);
   const externo = principal?.href?.startsWith("http");
 
   return (
@@ -60,6 +61,10 @@ export default function PantallaEstado({ icono: Icono, titulo, children, princip
               Escribir a soporte
             </a>
           ) : null}
+          <p className="text-[13px] text-[#86868B]">
+            Solicitudes por correo:{" "}
+            <a href={correoSoporte} className="font-medium text-[#007AFF] hover:underline">{CORREO_SOPORTE}</a>
+          </p>
         </div>
       </div>
     </div>

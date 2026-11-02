@@ -7,13 +7,13 @@ import { createPortal } from "react-dom";
 import { useUser } from "@clerk/nextjs";
 // Headset (auriculares con microfono) en vez del salvavidas: se lee como
 // "hablar con alguien", que es lo que hace el enlace, y no como emergencia.
-import { Headset, PauseCircle } from "lucide-react";
+import { Headset, Mail, PauseCircle } from "lucide-react";
 import UserMenu from "./UserMenu";
 import NotificationBell from "@/components/NotificationBell";
 import { getDashboardRoleFromUser, getVisibleDashboardSections } from "@/lib/dashboard-access";
 import { useTour } from "@/ContextosGlobales/TourContext";
 import { useDatosSoporte } from "@/hooks/useDatosSoporte";
-import { construirUrlSoporte } from "@/lib/soporteWhatsapp";
+import { construirUrlSoporte, construirMailtoSoporte } from "@/lib/soporteWhatsapp";
 
 const ICONS = {
   home: (
@@ -124,7 +124,7 @@ function SectionLabel({ label }) {
 function NavItem({ href, icon, label }) {
   const pathname = usePathname();
   const isExternal = href.startsWith("http");
-  const isActive = isPathActive(pathname, href);
+  const isActive = !href.startsWith("mailto:") && isPathActive(pathname, href);
 
   return (
     <Link
@@ -500,6 +500,8 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
 
   const datosSoporte = useDatosSoporte();
   const urlSoporte = useMemo(() => construirUrlSoporte(datosSoporte), [datosSoporte]);
+  const correoSoporte = useMemo(() => construirMailtoSoporte(datosSoporte), [datosSoporte]);
+  const correoSoporteSuspendido = useMemo(() => construirMailtoSoporte({ ...datosSoporte, motivo: "Cuenta suspendida" }), [datosSoporte]);
   const urlSoporteSuspendido = useMemo(
     () => construirUrlSoporte({ ...datosSoporte, motivo: "Cuenta suspendida" }),
     [datosSoporte],
@@ -610,6 +612,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
         </div>
         <div className="mx-4 shrink-0 border-t border-black/[0.06] py-2">
           <NavItem href={urlSoporteSuspendido} icon={<Headset className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />} label="Contacto Soporte" />
+          <NavItem href={correoSoporteSuspendido} icon={<Mail className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />} label="Solicitudes por correo" />
         </div>
       </>
     );
@@ -653,6 +656,7 @@ export default function SidebarNav({ colapsado = false, modo = "fijado", onCambi
 
         <div className="mt-3 border-t border-black/[0.06] pt-2">
           <NavItem href={urlSoporte} icon={<Headset className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />} label="Contacto Soporte" />
+          <NavItem href={correoSoporte} icon={<Mail className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />} label="Solicitudes por correo" />
         </div>
       </nav>
 

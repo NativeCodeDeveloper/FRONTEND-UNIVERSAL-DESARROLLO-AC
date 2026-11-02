@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
   LayoutGrid,
   Headset,
+  Mail,
   Lock,
   Menu,
   MonitorSmartphone,
@@ -31,7 +32,7 @@ import {
 } from "lucide-react";
 import { getDashboardRoleFromUser, getVisibleDashboardSections } from "@/lib/dashboard-access";
 import { useDatosSoporte } from "@/hooks/useDatosSoporte";
-import { construirUrlSoporte } from "@/lib/soporteWhatsapp";
+import { construirUrlSoporte, construirMailtoSoporte } from "@/lib/soporteWhatsapp";
 
 const ICONS = {
   home: Home,
@@ -62,6 +63,7 @@ export default function MobileNav() {
 
   const datosSoporte = useDatosSoporte();
   const urlSoporte = construirUrlSoporte(datosSoporte);
+  const correoSoporte = construirMailtoSoporte(datosSoporte);
   const name = user?.fullName || user?.firstName || "Usuario";
   const avatar = user?.imageUrl;
 
@@ -263,6 +265,19 @@ export default function MobileNav() {
                   </span>
                   <span className="flex-1 leading-tight">Contacto Soporte</span>
                 </Link>
+                <a
+                  href={correoSoporte}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-[13px] font-medium text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                    <Mail className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="flex-1 leading-tight">
+                    Solicitudes por correo
+                    <span className="block text-[12px] font-normal text-slate-400">ingenieria.software@nativecode.cl</span>
+                  </span>
+                </a>
               </div>
 
               {!appInstalada && (

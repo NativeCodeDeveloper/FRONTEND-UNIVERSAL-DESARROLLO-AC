@@ -53,3 +53,15 @@ export function construirUrlSoporte(datos = {}) {
   // respeta como salto real.
   return `https://wa.me/${NUMERO_SOPORTE}?text=${encodeURIComponent(construirMensajeSoporte(datos))}`;
 }
+
+// Canal formal para SOLICITUDES a NativeCode (cambios, accesos, datos, reclamos): queda
+// por escrito, a diferencia del WhatsApp, que es para dudas rápidas. Definido una sola
+// vez aquí, igual que el número, para que todos los enlaces apunten al mismo lugar.
+export const CORREO_SOPORTE = "ingenieria.software@nativecode.cl";
+
+export function construirMailtoSoporte(datos = {}) {
+  const empresa = limpiar(datos.empresa);
+  const asunto = `Solicitud de soporte${empresa ? ` · ${empresa}` : ""}${limpiar(datos.motivo) ? ` · ${limpiar(datos.motivo)}` : ""}`;
+  const cuerpo = construirMensajeSoporte(datos).replace("Hola, necesito soporte de AgendaClinica.", "Hola, quiero hacer una solicitud a soporte de AgendaClínica.");
+  return `mailto:${CORREO_SOPORTE}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}

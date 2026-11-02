@@ -483,6 +483,18 @@ UPDATE firma_evento SET ip = 'x' WHERE 1 = 0;   -- debe funcionar (no afecta fil
 
 ## Fase 2 · Política de privacidad (página pública)
 
+> **Estado 02-11-2026:** integrada a mano en el backend (rama `feat/consentimientos-privacidad`,
+> commit `d7de797`) junto con la **Fase 3** (verificación pública del QR) y **desplegada en el
+> servidor `desarrollo`**: respaldo `…antes-consentimientos_20261102-010047.sql` y del `.env`;
+> `qrcode` 1.5.4 y `uuid` 11.0.3; `FIRMA_HMAC_CLAVE` generada en el servidor con `openssl`
+> (no se imprimió: **copiarla al gestor de contraseñas**), `FIRMA_HMAC_VERSION=1`,
+> `URL_PUBLICA_SITIO`; migración de firma y textos legales aplicados (4 triggers append-only);
+> solo `agendaclinica-backend` reiniciado. `model/Profesionales.js` NO se reemplazó (el actual ya
+> trae categorías). Se quitaron los `console.log(req.body)` de reservas y Mercado Pago.
+> Pruebas: `pruebas/consentimientos` 10/10 contra MySQL con el dump (R2 y correo simulados) y
+> 60/60 de todo el backend. **Falta:** `NEXT_PUBLIC_CONSENTIMIENTOS_HABILITADOS=1` en Vercel y una
+> reserva real de prueba; luego fusionar a `main`.
+
 **Resultado:** al reservar (con o sin pago) el paciente marca **una casilla**, la
 política de privacidad. El servidor guarda **qué texto exacto aceptó, cuándo y desde
 qué IP**, genera la constancia en PDF, la guarda en R2 con su huella, la envía al
