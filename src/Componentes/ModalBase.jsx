@@ -89,6 +89,11 @@ export default function ModalBase({
     if (!abierto) return undefined;
 
     function onKeyDown(event) {
+      // Si encima hay otro diálogo (p. ej. la firma con código que se abre desde el
+      // consentimiento), la tecla es de ese: cerrar aquí botaría todo lo llenado.
+      const dialogos = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+      if (dialogos.length > 0 && dialogos[dialogos.length - 1] !== panelRef.current) return;
+
       if (event.key === "Escape") {
         event.stopPropagation();
         cerrar();

@@ -6,6 +6,9 @@ import { useUser } from "@clerk/nextjs";
 import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
 import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
 import EditarFichaModal from "@/Componentes/EditarFichaModal";
+import ModalBase from "@/Componentes/ModalBase";
+import ConsentimientoInformadoPanel from "@/Componentes/documentos/ConsentimientoInformadoPanel";
+import { RecordatorioPaciente } from "@/Componentes/RecordatorioPaciente";
 import { claveFechaCivil, edadCivil, formatearFechaCivil, partesFechaCivil } from "@/lib/fechas";
 import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
@@ -159,6 +162,9 @@ export default function Paciente() {
     const formularioEdicionRef = useRef(null);
 
     const [modalFichaAbierto, setModalFichaAbierto] = useState(false);
+    // Consentimiento informado y recordatorio se abren en popup, sin salir de la carpeta.
+    const [consentimientoAbierto, setConsentimientoAbierto] = useState(false);
+    const [recordatorioAbierto, setRecordatorioAbierto] = useState(false);
 
     // La ficha se rellena en un modal, sin salir de la carpeta del paciente.
     function nuevaFichaClinica() {
@@ -666,6 +672,10 @@ export default function Paciente() {
 
 
     const pacienteActual = detallePaciente[0];
+    // Subtítulo de los popups de la carpeta: a quién corresponde lo que se emite o envía.
+    const descripcionPacientePopup = pacienteActual
+        ? `${`${pacienteActual.nombre || ""} ${pacienteActual.apellido || ""}`.trim()}${pacienteActual.rut ? ` · RUT ${formatRut(pacienteActual.rut) || pacienteActual.rut}` : ""}`
+        : undefined;
     // claveFechaCivil devuelve "AAAA-MM-DD", el mismo formato que entrega un
     // <input type="date">: se comparan como texto, sin pasar por Date, que
     // correria el dia segun la zona horaria.
@@ -1319,27 +1329,38 @@ export default function Paciente() {
                                 </span>
                                 <span className="text-[13px] font-semibold text-slate-800">Documentos</span>
                             </button>
-                            <div className="col-span-2 grid grid-cols-2 gap-2">
-                                <button
-                                    onClick={() => router.push(`/dashboard/telemedicina/${id_paciente}`)}
-                                    className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                                >
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                                    </span>
-                                    <span className="text-[13px] font-semibold text-slate-800">Telemedicina</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => router.push(`/dashboard/consentimiento?id_paciente=${id_paciente}`)}
-                                    className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
-                                >
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 3.75h7l4.25 4.25V19A2.25 2.25 0 0117 21.25H8A2.25 2.25 0 015.75 19V6A2.25 2.25 0 018 3.75zM15 3.75V8h4.25M9 12h6m-6 3.5h6m-6 3.5h3" /></svg>
-                                    </span>
-                                    <span className="min-w-0 text-[13px] font-semibold leading-tight text-slate-800">Consentimiento</span>
-                                </button>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={() => router.push(`/dashboard/telemedicina/${id_paciente}`)}
+                                className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            >
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Telemedicina</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setConsentimientoAbierto(true)}
+                                aria-haspopup="dialog"
+                                className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            >
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 3.75h7l4.25 4.25V19A2.25 2.25 0 0117 21.25H8A2.25 2.25 0 015.75 19V6A2.25 2.25 0 018 3.75zM15 3.75V8h4.25M9 12h6m-6 3.5h6m-6 3.5h3" /></svg>
+                                </span>
+                                <span className="min-w-0 text-[13px] font-semibold leading-tight text-slate-800">Consentimiento</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setRecordatorioAbierto(true)}
+                                aria-haspopup="dialog"
+                                className="group flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+                            >
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D1D1F] text-white transition-colors duration-200 group-hover:bg-[#007AFF]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                                </span>
+                                <span className="text-[13px] font-semibold text-slate-800">Recordatorio</span>
+                            </button>
                         </div>
 
                         {pacienteActual && (
@@ -1852,6 +1873,33 @@ export default function Paciente() {
                         </div>
                 </div>
             </div>
+
+            <ModalBase
+                abierto={consentimientoAbierto}
+                onCerrar={() => setConsentimientoAbierto(false)}
+                ancho="max-w-3xl"
+                titulo="Consentimiento informado"
+                descripcion={descripcionPacientePopup}
+            >
+                {pacienteActual ? (
+                    <ConsentimientoInformadoPanel incrustado paciente={{ ...pacienteActual, id_paciente: Number(id_paciente) }} />
+                ) : null}
+            </ModalBase>
+
+            <ModalBase
+                abierto={recordatorioAbierto}
+                onCerrar={() => setRecordatorioAbierto(false)}
+                ancho="max-w-xl"
+                titulo="Enviar recordatorio"
+                descripcion={descripcionPacientePopup}
+            >
+                <RecordatorioPaciente
+                    incrustado
+                    key={id_paciente}
+                    email={pacienteActual?.correo || ""}
+                    telefono={pacienteActual?.telefono || ""}
+                />
+            </ModalBase>
 
             <FichaClinicaModal
                 abierto={modalFichaAbierto}

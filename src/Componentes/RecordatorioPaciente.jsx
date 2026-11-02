@@ -10,7 +10,7 @@
  * Se usa en:
  *   - /dashboard/AgendaDetalle/[id_reserva]  (detalle de una cita)
  *   - AppointmentDrawer.jsx                  (panel lateral de la agenda)
- *   - /dashboard/paciente/[id_paciente]      (ficha del paciente)
+ *   - /dashboard/FichasPacientes/[id_paciente] (carpeta clínica, en popup: incrustado)
  */
 
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
@@ -82,7 +82,7 @@ function limpiarTelefonoWhatsapp(telefono) {
     return `56${digits}`; // fallback: asumir chileno y anteponer código de país
 }
 
-export function RecordatorioPaciente({ email: emailInicial = "", telefono = "", nombreProfesional = "", compact = false, className = "" }) {
+export function RecordatorioPaciente({ email: emailInicial = "", telefono = "", nombreProfesional = "", compact = false, className = "", incrustado = false }) {
     const API = process.env.NEXT_PUBLIC_API_URL;
 
     const [datosEmpresa, setDatosEmpresa] = useState(null);
@@ -176,6 +176,82 @@ export function RecordatorioPaciente({ email: emailInicial = "", telefono = "", 
         ? "px-3 py-1.5 text-xs"
         : "px-4 py-2.5 text-sm";
     const tamanoIcono = compact ? "h-3.5 w-3.5" : "h-4 w-4";
+
+    // En popup (carpeta clínica): sin acordeón; el título y el cierre los pone ModalBase.
+    if (incrustado) {
+        const campoPopup = "h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-[14px] text-slate-900 outline-none transition focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/15";
+        return (
+            <div className="font-system-apple space-y-5 pb-5">
+                {/* Control segmentado al estilo iOS */}
+                <div role="radiogroup" aria-label="Tipo de recordatorio" className="grid grid-cols-2 rounded-xl bg-[#767680]/[0.12] p-[3px]">
+                    {Object.entries(ETIQUETAS_TIPO).map(([clave, etiqueta]) => (
+                        <button
+                            key={clave}
+                            type="button"
+                            role="radio"
+                            aria-checked={tipo === clave}
+                            onClick={() => cambiarTipo(clave)}
+                            className={`h-8 rounded-[9px] text-[13px] font-medium transition-all duration-200 ease-out ${
+                                tipo === clave
+                                    ? "bg-white text-[#1D1D1F] shadow-[0_3px_8px_rgba(0,0,0,0.12),0_3px_1px_rgba(0,0,0,0.04)]"
+                                    : "text-[#3C3C43]/70 hover:text-[#1D1D1F]"
+                            }`}
+                        >
+                            {etiqueta}
+                        </button>
+                    ))}
+                </div>
+
+                <label className="block">
+                    <span className="mb-1.5 block text-[13px] font-medium text-slate-700">Correo del paciente</span>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@paciente.cl" className={campoPopup} />
+                </label>
+                <label className="block">
+                    <span className="mb-1.5 block text-[13px] font-medium text-slate-700">Asunto</span>
+                    <input value={asunto} onChange={(e) => { setTocado(true); setAsunto(e.target.value); }} className={campoPopup} />
+                </label>
+                <label className="block">
+                    <span className="mb-1.5 block text-[13px] font-medium text-slate-700">Mensaje</span>
+                    <textarea
+                        value={mensaje}
+                        onChange={(e) => { setTocado(true); setMensaje(e.target.value); }}
+                        rows={8}
+                        className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-[14px] leading-relaxed text-slate-900 outline-none transition focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/15"
+                    />
+                </label>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                    <button
+                        type="button"
+                        onClick={enviarPorCorreo}
+                        disabled={enviando}
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#007AFF] px-5 text-[14px] font-semibold text-white shadow-[0_1px_2px_rgba(0,122,255,0.25)] transition-all duration-200 hover:bg-[#0062CC] active:scale-[0.98] disabled:opacity-50"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                        </svg>
+                        {enviando ? "Enviando…" : "Enviar por correo"}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={enviarPorWhatsapp}
+                        disabled={!numeroWhatsapp}
+                        title={!numeroWhatsapp ? "El paciente no tiene teléfono registrado" : "Abre WhatsApp con el mensaje redactado"}
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#1D1D1F] px-5 text-[14px] font-semibold text-white transition-all duration-200 hover:bg-black active:scale-[0.98] disabled:opacity-40"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                            <path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.858.502 3.6 1.375 5.096L2 22l5.03-1.34a9.964 9.964 0 004.974 1.336h.004c5.518 0 10.004-4.486 10.004-10.003C22.012 6.486 17.526 2 12.004 2zm0 18.184h-.003a8.161 8.161 0 01-4.161-1.139l-.298-.177-3.075.822.82-3.001-.194-.309a8.16 8.16 0 01-1.253-4.376c0-4.508 3.667-8.174 8.174-8.174 2.184 0 4.238.85 5.782 2.394a8.126 8.126 0 012.395 5.786c0 4.508-3.674 8.174-8.187 8.174z"/>
+                        </svg>
+                        Enviar por WhatsApp
+                    </button>
+                </div>
+                <p className="text-center text-[12px] leading-relaxed text-slate-400">
+                    WhatsApp se abre con el mensaje ya redactado; el envío lo confirmas tú desde ahí.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <details className={`group rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden ${className}`}>

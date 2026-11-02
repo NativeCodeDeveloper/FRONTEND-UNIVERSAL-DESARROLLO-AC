@@ -21,9 +21,7 @@ import { PhoneInput } from "@/Componentes/PhoneInput";
 import { formatRut } from "@/lib/designTokens";
 import { TIPOS_DOCUMENTO, validarDocumento } from "@/lib/rut";
 import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
-import {RecordatorioPaciente} from "@/Componentes/RecordatorioPaciente";
 import ListaDocumentosPaciente from "@/Componentes/documentos/ListaDocumentosPaciente";
-import ConsentimientoInformadoPanel from "@/Componentes/documentos/ConsentimientoInformadoPanel";
 import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
 
 
@@ -473,13 +471,7 @@ export default function Paciente(){
                         </>
                         ) : null}
 
-                        {/* ── Recordatorio (correo / WhatsApp) ── */}
-                        <RecordatorioPaciente key={id_paciente} email={paciente.correo} telefono={paciente.telefono} />
-
-                        {/* ── Consentimiento informado de un procedimiento ── */}
-                        {canSeeFichasClinicas ? (
-                            <ConsentimientoInformadoPanel paciente={{ ...paciente, id_paciente: Number(id_paciente) }} />
-                        ) : null}
+                        {/* Recordatorio y consentimiento informado: en la carpeta clínica, como popups. */}
 
                         {/* ── Documentos firmados y consentimientos ── */}
                         {FIRMA_HABILITADA ? <ListaDocumentosPaciente idPaciente={id_paciente} correoPaciente={paciente.correo} puedeVerContenido={canSeeFichasClinicas} /> : null}

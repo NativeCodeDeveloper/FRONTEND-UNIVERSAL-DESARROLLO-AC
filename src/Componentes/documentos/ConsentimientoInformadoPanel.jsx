@@ -29,7 +29,7 @@ const campo = "h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text
  * al correo o teléfono de su ficha y luego firma el profesional; el servidor estampa
  * ambas en el PDF. También se puede imprimir para que firmen ambos de puño y letra.
  */
-export default function ConsentimientoInformadoPanel({ paciente }) {
+export default function ConsentimientoInformadoPanel({ paciente, incrustado = false }) {
   const empresa = useDatosEmpresa();
   const profesionales = useProfesionales();
   const sesion = useSesionProfesional();
@@ -116,16 +116,8 @@ export default function ConsentimientoInformadoPanel({ paciente }) {
     ? "Ingresa el nombre del representante legal."
     : "";
 
-  return (
-    <section className="font-system-apple rounded-[24px] border border-slate-200 bg-white">
-      <header className="border-b border-slate-100 px-4 py-4 sm:px-6">
-        <h2 className="text-[15px] font-semibold text-slate-900">Consentimiento informado</h2>
-        <p className="mt-0.5 text-[12px] text-slate-500">
-          Plantilla base + anexo del procedimiento con sus riesgos y alternativas (Ley 20.584, art. 14).
-        </p>
-      </header>
-
-      <div className="space-y-4 px-4 py-4 sm:px-6">
+  const contenido = (
+      <div className={incrustado ? "space-y-4 pb-4" : "space-y-4 px-4 py-4 sm:px-6"}>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="mb-1.5 block text-[13px] font-medium text-slate-700">Procedimiento</span>
@@ -259,6 +251,20 @@ export default function ConsentimientoInformadoPanel({ paciente }) {
           />
         )}
       </div>
+  );
+
+  // En un popup (ModalBase) el título y el cierre los pone el popup.
+  if (incrustado) return <div className="font-system-apple">{contenido}</div>;
+
+  return (
+    <section className="font-system-apple rounded-[24px] border border-slate-200 bg-white">
+      <header className="border-b border-slate-100 px-4 py-4 sm:px-6">
+        <h2 className="text-[15px] font-semibold text-slate-900">Consentimiento informado</h2>
+        <p className="mt-0.5 text-[12px] text-slate-500">
+          Plantilla base + anexo del procedimiento con sus riesgos y alternativas (Ley 20.584, art. 14).
+        </p>
+      </header>
+      {contenido}
     </section>
   );
 }
