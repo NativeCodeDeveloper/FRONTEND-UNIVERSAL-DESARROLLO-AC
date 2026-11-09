@@ -6,6 +6,10 @@ let cierrePendiente;
 // Solo se muestra el loader si la carga real supera este umbral; navegaciones
 // y peticiones más rápidas no llegan a verlo.
 const ESPERA_PARA_MOSTRAR = 600;
+// Tope por carga: si quien la abrió nunca la cierra (petición colgada, fallback
+// retenido por una animación de salida, Clerk que no termina), el overlay no puede
+// quedar pegado hasta recargar. La petición sigue su curso; solo deja de taparse la app.
+const DURACION_MAXIMA = 15000;
 
 function publicar(valor) {
   if (visible === valor) return;
@@ -34,10 +38,12 @@ export function iniciarCarga() {
     }, ESPERA_PARA_MOSTRAR);
   }
   let finalizada = false;
+  const tope = setTimeout(() => finalizar(), DURACION_MAXIMA);
 
-  return () => {
+  function finalizar() {
     if (finalizada) return;
     finalizada = true;
+    clearTimeout(tope);
     pendientes -= 1;
 
     if (pendientes === 0) {
@@ -46,5 +52,7 @@ export function iniciarCarga() {
       // Une peticiones encadenadas y permite que React pinte los datos recibidos.
       if (visible) cierrePendiente = setTimeout(() => publicar(false), 100);
     }
-  };
+  }
+
+  return finalizar;
 }
