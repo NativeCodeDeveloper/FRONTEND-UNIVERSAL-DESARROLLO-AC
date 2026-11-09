@@ -57,6 +57,6 @@ test("cada especialidad se incorpora completa al documento que se firma", () => 
     assert.ok(documento.indexOf("## Información del procedimiento") < documento.indexOf("## Declaraciones del paciente"), grupo);
     assert.doesNotMatch(documento, /\{\{[^}]+\}\}/, grupo);
   }
-  assert.equal(PLANTILLA_BASE.version, 2);
+  assert.equal(PLANTILLA_BASE.version, 3);
   assert.doesNotMatch(PLANTILLA_BASE.cuerpo, /## Anestesia local/);
 });

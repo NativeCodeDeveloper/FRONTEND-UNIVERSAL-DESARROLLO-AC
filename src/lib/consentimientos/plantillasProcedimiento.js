@@ -26,7 +26,7 @@ import { ANEXOS_AVANZADOS } from "./plantillasAvanzadas.js";
 
 export const PLANTILLA_BASE = {
   codigo: "consentimiento_base",
-  version: 2,
+  version: 3,
   titulo: "Consentimiento informado",
   cuerpo: `Yo, {{paciente.nombre}}, {{paciente.documento}}{{paciente.representacion}}, declaro que {{profesional.nombre}}{{profesional.rut}}, {{profesional.profesion}}{{profesional.registro}}, de {{empresa.nombre}}, me ha informado en forma clara, comprensible y suficiente sobre el procedimiento {{procedimiento.nombre}}, cuya información se detalla en este documento.
 
@@ -35,18 +35,19 @@ Declaro que:
 - Se me explicó en qué consiste el procedimiento, su objetivo y los beneficios que razonablemente se pueden esperar.
 - Se me informaron sus riesgos frecuentes y poco frecuentes, las alternativas disponibles y las consecuencias de no realizarlo, conforme al artículo 14 de la Ley N° 20.584.
 - Tuve la oportunidad de hacer preguntas y todas fueron respondidas de forma satisfactoria.
-- Informé de manera veraz mis antecedentes de salud, alergias, medicamentos que uso, embarazo o lactancia y tratamientos previos. Entiendo que ocultar información puede aumentar los riesgos.
+- Informé de manera veraz mis antecedentes de salud, alergias, medicamentos que uso, tratamientos previos y, cuando corresponda, embarazo o lactancia. Entiendo que ocultar información puede aumentar los riesgos.
 - Comprendo que la respuesta a la atención puede variar entre personas y que no se me ha garantizado un resultado determinado.
 - Entiendo que cualquier intervención adicional relevante requiere una explicación y una decisión informada, salvo las medidas urgentes que permita la ley para proteger mi salud.
+- Si este consentimiento lo otorga un representante, el paciente fue informado de acuerdo con su edad y grado de madurez, y su opinión fue escuchada y considerada.
 
 ## Revocación
 Sé que puedo rechazar o revocar este consentimiento antes o durante la atención, comunicar que deseo detenerla y recibir información sobre las consecuencias clínicas de mi decisión. Ello no implica perder mi derecho a recibir atención posterior.
 
 ## Protección de datos personales
-Los datos de este documento y de mi ficha clínica son datos sensibles y serán tratados con reserva para mi atención y las obligaciones legales aplicables, conforme a la Ley N° 19.628 sobre Protección de la Vida Privada y a la Ley N° 20.584. Puedo consultar sobre el tratamiento de mis datos escribiendo a {{empresa.correo}}.
+Los datos de este documento y de mi ficha clínica son datos sensibles y serán tratados con reserva para mi atención y las obligaciones legales aplicables, conforme a la Ley N° 20.584 y a la Ley N° 19.628 sobre Protección de la Vida Privada, con sus modificaciones. Puedo ejercer mis derechos de acceso, rectificación, supresión, oposición y portabilidad escribiendo a {{empresa.correo}}.
 
 ## Autorización
-Por lo anterior, en forma libre, voluntaria e informada, autorizo la realización del procedimiento indicado.`,
+Por lo anterior, en forma libre, voluntaria e informada, autorizo la realización del procedimiento indicado. Recibiré una copia de este documento.`,
 };
 
 /* ── Anexos ─────────────────────────────────────────────────────────────── */
