@@ -31,8 +31,11 @@ const CORREO_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  *   firma y el hash los pone el servidor. Lo que se ve después de firmar es el
  *   PDF del servidor, y ese es el que se envía, descarga e imprime: nunca se
  *   regenera.
- * - Si quien opera no es el profesional firmante, el documento se prepara y
- *   queda en la bandeja de ese profesional ("Enviar a firma").
+ * - El profesional firma al instante, en la misma ventana. La bandeja es opcional:
+ *   "Dejar en bandeja" (p. ej. si el paciente demora con su código) y lo termina después
+ *   desde Documentos por firmar.
+ * - Si quien opera no es el profesional firmante (administración, soporte), el documento
+ *   se prepara y queda en la bandeja de ese profesional ("Enviar a firma").
  * - "Imprimir para firmar a mano" no pasa por la firma electrónica: genera el
  *   documento con línea de firma y lo manda a la impresora sin descargarlo.
  */
@@ -176,6 +179,20 @@ export default function EmisionDocumento({
     }
   }
 
+  // Opcional: el profesional lo deja preparado y lo firma después desde su bandeja.
+  async function dejarEnBandeja() {
+    setPaso("trabajando");
+    try {
+      await asegurarDocumento();
+      setPaso("enviado_a_firma");
+      toast.success("Quedó en tu bandeja de Documentos por firmar.");
+    } catch (error) {
+      setPaso("borrador");
+      console.error("[EmisionDocumento] dejar en bandeja", error);
+      toast.error(mensajeError(error?.codigo || error?.message));
+    }
+  }
+
   async function imprimirManuscrita() {
     setImprimiendo(true);
     setEnlaceRespaldo(null);
@@ -212,6 +229,7 @@ export default function EmisionDocumento({
       paciente={paciente}
       nombreArchivo={nombreArchivo}
       onFirmar={firmarDocumento}
+      onDejarEnBandeja={esFirmante ? dejarEnBandeja : null}
       api={api}
       requiereAceptacion={requiereAceptacionPaciente}
       aceptacion={aceptacion}
@@ -308,7 +326,8 @@ export default function EmisionDocumento({
 
 export function ModalEmision({
   abierto, onCerrar, titulo, paso, borrador, final, documento, esFirmante, firmaActiva, profesional, paciente, nombreArchivo, onFirmar, api,
-  requiereAceptacion = false, aceptacion = null, onAceptado, asegurarDocumento,
+  requiereAceptacion = false, aceptacion = null, onAceptado, asegurarDocumento, destinosPaciente = null,
+  onDejarEnBandeja = null,
 }) {
   const [montado, setMontado] = useState(false);
   const [correo, setCorreo] = useState("");
@@ -499,8 +518,17 @@ export function ModalEmision({
           ) : paso === "enviado_a_firma" ? (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[13px] text-slate-600">
-                Quedó en la bandeja de <span className="font-semibold text-slate-900">{profesional?.nombre}</span>. Cuando lo firme,
-                podrás enviarlo al paciente desde su carpeta.
+                {esFirmante ? (
+                  <>
+                    Quedó en tu bandeja, en <span className="font-semibold text-slate-900">Documentos por firmar</span>.
+                    {requiereAceptacion && !aceptacion ? " Ahí puedes reenviar el código al paciente y firmar cuando lo tenga." : " Fírmalo desde ahí cuando quieras."}
+                  </>
+                ) : (
+                  <>
+                    Quedó en la bandeja de <span className="font-semibold text-slate-900">{profesional?.nombre}</span>. Cuando lo firme,
+                    podrás enviarlo al paciente desde su carpeta.
+                  </>
+                )}
               </p>
               <button type="button" onClick={onCerrar} className={BOTON.primario}>
                 Listo
@@ -512,6 +540,7 @@ export function ModalEmision({
               <AceptacionPacienteOtp
                 api={api}
                 paciente={paciente}
+                destinos={destinosPaciente}
                 asegurarDocumento={asegurarDocumento}
                 aceptacion={aceptacion}
                 onAceptado={onAceptado}
@@ -520,7 +549,9 @@ export function ModalEmision({
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[12px] leading-relaxed text-slate-500">
                 {faltaAceptacion
-                  ? "Primero el paciente debe aceptar con su código. Después firmas tú."
+                  ? onDejarEnBandeja
+                    ? "Primero el paciente acepta con su código y después firmas tú. ¿Se demora? Déjalo en tu bandeja."
+                    : "Primero el paciente acepta con su código. Después firmas tú."
                   : sinFirma
                   ? "Aún no registras tu firma electrónica. Regístrala en Profesionales → Editar, o imprime para firmar a mano."
                   : esFirmante
@@ -531,6 +562,11 @@ export function ModalEmision({
                 <button type="button" onClick={onCerrar} disabled={paso === "trabajando"} className={BOTON.texto}>
                   Cancelar
                 </button>
+                {onDejarEnBandeja ? (
+                  <button type="button" onClick={onDejarEnBandeja} disabled={!borrador || paso === "trabajando"} className={BOTON.secundario}>
+                    Dejar en bandeja
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={onFirmar}

@@ -325,8 +325,23 @@ export function crearMockFirma() {
         .map((r) => r.documento)
         .filter((d) => d.estado === "pendiente_firma");
       // Mismo formato que el servidor: en modo de prueba todo es "para tu firma".
-      // fecha-ok: instante de vencimiento simulado (30 días desde que se preparó).
-      const conVencimiento = (d) => ({ ...d, vence_at: new Date(new Date(d.preparado_at).getTime() + 30 * 86_400_000).toISOString() });
+      const conVencimiento = (d) => {
+        const registro = estado.documentos.get(d.id_documento);
+        const esperaCodigo = Boolean(registro.zonaPaciente) && !registro.aceptacion;
+        const horas = registro.zonaPaciente ? 24 : 30 * 24;
+        return {
+          ...d,
+          requiere_aceptacion_paciente: Boolean(registro.zonaPaciente),
+          paciente_acepto_at: registro.aceptacion?.verificado_at || null,
+          paciente_canal: registro.aceptacion?.canal || null,
+          // fecha-ok: instante de vencimiento simulado desde que se preparó.
+          vence_at: new Date(new Date(d.preparado_at).getTime() + horas * 3_600_000).toISOString(),
+          ...(esperaCodigo ? { contacto_paciente: {
+            telefono: registro.contactoPaciente.telefono ? enmascararTelefono(registro.contactoPaciente.telefono) : null,
+            correo: registro.contactoPaciente.correo ? enmascararCorreo(registro.contactoPaciente.correo) : null,
+          } } : {}),
+        };
+      };
       return { message: true, documentos: documentos.map(conVencimiento), enviados: [], clinica: [] };
     },
 

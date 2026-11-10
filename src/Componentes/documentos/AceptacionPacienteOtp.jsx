@@ -28,9 +28,10 @@ function enmascararTelefono(telefono) {
  * El código lo genera, envía y verifica el servidor; la aceptación queda en la
  * evidencia (otp_paciente_verificado) y se estampa en el PDF al firmar.
  */
-export default function AceptacionPacienteOtp({ api, paciente, asegurarDocumento, aceptacion, onAceptado }) {
-  const correo = enmascararCorreo(paciente?.correo);
-  const telefono = enmascararTelefono(paciente?.telefono);
+export default function AceptacionPacienteOtp({ api, paciente, destinos = null, asegurarDocumento, aceptacion, onAceptado }) {
+  // `destinos`: ya enmascarados por el servidor (bandeja). El código siempre va al dato de la ficha.
+  const correo = destinos ? destinos.correo || "" : enmascararCorreo(paciente?.correo);
+  const telefono = destinos ? destinos.telefono || "" : enmascararTelefono(paciente?.telefono);
   // WhatsApp primero: es el canal que el paciente ya usa con la clínica (confirmaciones).
   const [canal, setCanal] = useState(telefono ? "whatsapp" : "email");
   const [enviado, setEnviado] = useState(null); // { destino, expira_at, codigo_prueba? }

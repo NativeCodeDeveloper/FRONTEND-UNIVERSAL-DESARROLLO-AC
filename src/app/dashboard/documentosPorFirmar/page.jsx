@@ -37,6 +37,7 @@ export default function DocumentosPorFirmar() {
   const [borrador, setBorrador] = useState(null);
   const [final, setFinal] = useState(null);
   const [paso, setPaso] = useState("borrador");
+  const [aceptacion, setAceptacion] = useState(null);
 
   const firmar = useReverification((cuerpo) => api.firmarDocumento(cuerpo));
 
@@ -65,6 +66,7 @@ export default function DocumentosPorFirmar() {
     setBorrador(null);
     setFinal(null);
     setPaso("borrador");
+    setAceptacion(documento.paciente_acepto_at ? { canal: documento.paciente_canal, verificado_at: documento.paciente_acepto_at } : null);
     setAbierto(true);
     try {
       setBorrador(await api.seleccionarBorrador({ id_documento: documento.id_documento }));
@@ -150,7 +152,7 @@ export default function DocumentosPorFirmar() {
                 : "Tu usuario no tiene una agenda profesional asignada, así que no firma documentos."}
               documentos={documentos}
               onQuitar={quitar}
-              detalle={(d) => `Preparado por ${d.preparado_por || "—"}`}
+              detalle={(d) => (d.contacto_paciente ? "Espera el código del paciente" : `Preparado por ${d.preparado_por || "—"}`)}
               accion={(d) => (
                 <button type="button" onClick={() => revisar(d)} className={BOTON.primario}>Revisar y firmar</button>
               )}
@@ -196,6 +198,15 @@ export default function DocumentosPorFirmar() {
         nombreArchivo={actual?.tipo_documento}
         onFirmar={firmarActual}
         api={api}
+        requiereAceptacion={Boolean(actual?.requiere_aceptacion_paciente)}
+        aceptacion={aceptacion}
+        onAceptado={(r) => {
+          setAceptacion(r);
+          // La fila deja de decir "Espera el código del paciente" aunque se cierre sin firmar.
+          setDocumentos((lista) => lista.map((d) => (d.id_documento === actual?.id_documento ? { ...d, contacto_paciente: undefined, paciente_acepto_at: r.verificado_at, paciente_canal: r.canal } : d)));
+        }}
+        asegurarDocumento={async () => actual}
+        destinosPaciente={actual?.contacto_paciente || null}
       />
     </div>
   );
