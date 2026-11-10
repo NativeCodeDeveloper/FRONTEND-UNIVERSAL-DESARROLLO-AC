@@ -887,20 +887,26 @@ process.on("uncaughtException", (error) => { console.error("[proceso] excepción
 
 Las descargas no pasan por el backend: el navegador baja el PDF directo de R2 con
 una URL que vence en 60 segundos. Cloudflare → R2 → tu bucket → **Settings → CORS
-policy**:
+policy** (una sola vez por bucket):
 
 ```json
 [
   {
-    "AllowedOrigins": ["https://desarrollo.agendaclinicas.cl", "http://localhost:3000"],
-    "AllowedMethods": ["GET"],
+    "AllowedOrigins": ["https://*.agendaclinicas.cl", "http://localhost:3000"],
+    "AllowedMethods": ["GET", "HEAD"],
     "AllowedHeaders": ["*"],
-    "MaxAgeSeconds": 600
+    "MaxAgeSeconds": 3600
   }
 ]
 ```
 
-En producción, un origen por dominio de clínica. **Nunca `"*"`.**
+El comodín cubre **todas las clínicas** (`desarrollo.`, `vidanorte.`, cualquier
+cliente nuevo): no hay que tocar Cloudflare al montar una instancia. Comprobado el
+10-11-2026 en `archivos-clinicos`: subdominios propios permitidos; `sitio-ajeno.com` y
+`agendaclinicas.cl.malicioso.com` bloqueados. El dominio raíz `agendaclinicas.cl`
+(sin subdominio) NO entra en el comodín: agregarlo aparte si alguna vez descarga
+documentos. **Nunca `"*"` solo.** El token R2 del backend no puede leer ni cambiar
+esta regla (solo archivos): se configura en el panel.
 
 ### 7.4 Código del paciente por WhatsApp
 
