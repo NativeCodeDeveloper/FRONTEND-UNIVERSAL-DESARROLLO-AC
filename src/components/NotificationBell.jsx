@@ -11,6 +11,7 @@ function getNotifStyle(tipo) {
     if (tipo === 'cita_estado')    return { Icon: Activity,       bg: 'bg-sky-50',      color: 'text-sky-600'     };
     if (tipo === 'cita_cancelada') return { Icon: CalendarX,      bg: 'bg-red-50',      color: 'text-red-500'     };
     if (tipo === 'recordatorio')   return { Icon: Clock,          bg: 'bg-violet-50',   color: 'text-[#6E56CF]'   };
+    if (tipo === 'documento_firma') return { Icon: PenLine,       bg: 'bg-[#007AFF]/10', color: 'text-[#007AFF]'  };
     return { Icon: Bell, bg: 'bg-slate-100', color: 'text-slate-500' };
 }
 
@@ -36,6 +37,12 @@ export default function NotificationBell() {
     const totalAvisos = notifs.length + avisosFirma.length;
 
     function irACitaDeNotificacion(notif) {
+        // Aviso de documentos esperando la firma (vencen a los 30 días): a la bandeja.
+        if (notif.tipo === 'documento_firma') {
+            setOpen(false);
+            router.push('/dashboard/documentosPorFirmar');
+            return;
+        }
         if (notif.tipo !== 'recordatorio' || !notif.id_reserva) return;
         setOpen(false);
         router.push(`/dashboard/calendario?id_reserva=${notif.id_reserva}`);
@@ -174,11 +181,11 @@ export default function NotificationBell() {
                 ) : (
                     notifs.map(n => {
                         const { Icon, bg, color } = getNotifStyle(n.tipo);
-                        const clicable = n.tipo === 'recordatorio' && n.id_reserva;
+                        const clicable = (n.tipo === 'recordatorio' && n.id_reserva) || n.tipo === 'documento_firma';
                         return (
                             <div key={n.id}
                                 onClick={() => irACitaDeNotificacion(n)}
-                                title={clicable ? 'Ver cita en el calendario' : undefined}
+                                title={clicable ? (n.tipo === 'documento_firma' ? 'Ver documentos por firmar' : 'Ver cita en el calendario') : undefined}
                                 className={`group relative flex items-start gap-3 rounded-2xl px-3 py-3 transition-colors duration-150 hover:bg-slate-50 ${clicable ? 'cursor-pointer' : ''}`}>
                                 <div className={`w-9 h-9 rounded-[13px] ${bg} flex items-center justify-center shrink-0`}>
                                     <Icon size={15} className={color} strokeWidth={2} />

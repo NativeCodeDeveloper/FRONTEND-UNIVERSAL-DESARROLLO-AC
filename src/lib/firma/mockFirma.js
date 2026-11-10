@@ -325,7 +325,18 @@ export function crearMockFirma() {
         .map((r) => r.documento)
         .filter((d) => d.estado === "pendiente_firma");
       // Mismo formato que el servidor: en modo de prueba todo es "para tu firma".
-      return { message: true, documentos, enviados: [], clinica: [] };
+      // fecha-ok: instante de vencimiento simulado (30 días desde que se preparó).
+      const conVencimiento = (d) => ({ ...d, vence_at: new Date(new Date(d.preparado_at).getTime() + 30 * 86_400_000).toISOString() });
+      return { message: true, documentos: documentos.map(conVencimiento), enviados: [], clinica: [] };
+    },
+
+    async quitarPendiente({ id_documento }) {
+      await esperar();
+      const registro = estado.documentos.get(id_documento);
+      if (!registro) throw new ErrorFirma("noEncontrado", 404);
+      if (registro.documento.estado !== "pendiente_firma") throw new ErrorFirma("documentoYaFirmado", 409);
+      Object.assign(registro.documento, { estado: "anulado", anulado_at: ahoraIso() });
+      return { message: true };
     },
 
     async anularDocumento({ id_documento }) {

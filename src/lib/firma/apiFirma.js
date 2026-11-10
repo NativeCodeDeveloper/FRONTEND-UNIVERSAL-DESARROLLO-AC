@@ -130,6 +130,7 @@ export function crearApiFirma(getToken) {
     listarDocumentosPaciente: (c) => json("/documentos/listarDocumentosPaciente", c),
     listarPendientesFirma: () => json("/documentos/listarPendientesFirma"),
     anularDocumento: (c) => json("/documentos/anularDocumento", c),
+    quitarPendiente: (c) => json("/documentos/quitarPendiente", c),
     // Aceptación del paciente por código (consentimiento informado)
     solicitarOtpPaciente: (c) => json("/documentos/solicitarOtpPaciente", c),
     verificarOtpPaciente: (c) => json("/documentos/verificarOtpPaciente", c),

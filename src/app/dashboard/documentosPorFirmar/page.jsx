@@ -11,7 +11,7 @@ import { useApiFirma } from "@/hooks/useApiFirma";
 import { useSesionProfesional } from "@/hooks/useSesionProfesional";
 import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
 import { ESTADOS_DOCUMENTO, TIPOS_DOCUMENTO, mensajeError } from "@/lib/firma/constantes";
-import { formatearInstanteConOffset } from "@/lib/fechas";
+import { formatearFechaAuto, formatearInstanteConOffset } from "@/lib/fechas";
 import { BOTON } from "@/Componentes/documentos/botones";
 
 /*
@@ -71,6 +71,21 @@ export default function DocumentosPorFirmar() {
     } catch (e) {
       toast.error(mensajeError(e?.codigo));
       setAbierto(false);
+    }
+  }
+
+  // Quitar: saca de la bandeja un documento que no se firmó (queda en la evidencia como
+  // anulado). La firmante y la administración; los vencidos se quitan solos a los 30 días.
+  async function quitar(documento) {
+    try {
+      await api.quitarPendiente({ id_documento: documento.id_documento });
+      const fuera = (lista) => lista.filter((d) => d.id_documento !== documento.id_documento);
+      setDocumentos(fuera);
+      setEnviados(fuera);
+      setDelCentro(fuera);
+      toast.success("Documento quitado de la bandeja.");
+    } catch (e) {
+      toast.error(mensajeError(e?.codigo));
     }
   }
 
@@ -134,6 +149,7 @@ export default function DocumentosPorFirmar() {
                 ? "No tienes documentos pendientes. Cuando alguien prepare un documento para tu firma, aparecerá aquí."
                 : "Tu usuario no tiene una agenda profesional asignada, así que no firma documentos."}
               documentos={documentos}
+              onQuitar={quitar}
               detalle={(d) => `Preparado por ${d.preparado_por || "—"}`}
               accion={(d) => (
                 <button type="button" onClick={() => revisar(d)} className={BOTON.primario}>Revisar y firmar</button>
@@ -143,6 +159,7 @@ export default function DocumentosPorFirmar() {
               <SeccionBandeja
                 titulo="Enviados, esperando firma"
                 documentos={enviados}
+                onQuitar={quitar}
                 detalle={(d) => `Espera la firma de ${d.firmante_nombre || "el profesional"}`}
                 accion={(d) => (
                   <button type="button" onClick={() => ver(d)} className={`${BOTON.secundario} ${BOTON.compacto}`}>Ver</button>
@@ -153,6 +170,7 @@ export default function DocumentosPorFirmar() {
               <SeccionBandeja
                 titulo="Pendientes del centro"
                 documentos={delCentro}
+                onQuitar={quitar}
                 detalle={(d) => `Espera la firma de ${d.firmante_nombre || "el profesional"} · preparado por ${d.preparado_por || "—"}`}
                 accion={(d) => (
                   <button type="button" onClick={() => ver(d)} className={`${BOTON.secundario} ${BOTON.compacto}`}>Ver</button>
@@ -183,7 +201,7 @@ export default function DocumentosPorFirmar() {
   );
 }
 
-function SeccionBandeja({ titulo, vacio, documentos, detalle, accion }) {
+function SeccionBandeja({ titulo, vacio, documentos, detalle, accion, onQuitar }) {
   return (
     <section>
       <h2 className="mb-3 text-[13px] font-semibold text-[#6E6E73]">
@@ -195,22 +213,66 @@ function SeccionBandeja({ titulo, vacio, documentos, detalle, accion }) {
       ) : (
         <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {documentos.map((d) => (
-            <li key={d.id_documento} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate text-[14px] font-semibold text-slate-900">{d.titulo}</p>
-                  <InsigniaEstado estado={ESTADOS_DOCUMENTO[d.estado]} />
-                </div>
-                <p className="mt-0.5 text-[12px] text-slate-500">
-                  {TIPOS_DOCUMENTO[d.tipo_documento] || "Documento"}
-                  {d.paciente_nombre ? ` · ${d.paciente_nombre}` : ""} · {detalle(d)} · {formatearInstanteConOffset(d.preparado_at)}
-                </p>
-              </div>
-              {accion(d)}
-            </li>
+            <FilaBandeja key={d.id_documento} documento={d} detalle={detalle} accion={accion} onQuitar={onQuitar} />
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+function FilaBandeja({ documento: d, detalle, accion, onQuitar }) {
+  const [confirmando, setConfirmando] = useState(false);
+  const [quitando, setQuitando] = useState(false);
+  return (
+    <li className="px-4 py-4 sm:px-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="truncate text-[14px] font-semibold text-slate-900">{d.titulo}</p>
+            <InsigniaEstado estado={ESTADOS_DOCUMENTO[d.estado]} />
+          </div>
+          <p className="mt-0.5 text-[12px] text-slate-500">
+            {TIPOS_DOCUMENTO[d.tipo_documento] || "Documento"}
+            {d.paciente_nombre ? ` · ${d.paciente_nombre}` : ""} · {detalle(d)} · {formatearInstanteConOffset(d.preparado_at)}
+          </p>
+          {d.vence_at ? (
+            <p className="mt-0.5 text-[12px] text-[#86868B]">Si no se firma, se quita solo el {formatearFechaAuto(d.vence_at)}.</p>
+          ) : null}
+        </div>
+        {!confirmando ? (
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+            {onQuitar ? (
+              <button type="button" onClick={() => setConfirmando(true)} className={`${BOTON.textoDestructivo} ${BOTON.compacto}`}>Quitar</button>
+            ) : null}
+            {accion(d)}
+          </div>
+        ) : null}
+      </div>
+      {confirmando ? (
+        <div className="mt-3 flex flex-col gap-3 rounded-2xl bg-[#FF3B30]/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[13px] leading-snug text-[#3A3A3C]">
+            <span className="font-semibold text-[#1D1D1F]">¿Quitar este documento de la bandeja?</span> No se firmará y queda
+            registrado como anulado. Si hace falta, se vuelve a emitir.
+          </p>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+            <button type="button" onClick={() => setConfirmando(false)} disabled={quitando} className={`${BOTON.texto} ${BOTON.compacto}`}>Cancelar</button>
+            <button
+              type="button"
+              disabled={quitando}
+              onClick={async () => {
+                setQuitando(true);
+                await onQuitar(d);
+                setQuitando(false);
+                setConfirmando(false);
+              }}
+              className={`${BOTON.destructivo} ${BOTON.compacto}`}
+            >
+              {quitando ? "Quitando…" : "Quitar"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </li>
   );
 }
