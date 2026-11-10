@@ -59,6 +59,19 @@ async function conAutorizacion(recurso, opciones) {
   }
 }
 
+/**
+ * Peticiones de FONDO (sondeos periódicos, datos de apoyo de la pantalla): llevan la
+ * sesión igual que fetchConCarga, pero nunca muestran la pantalla de carga. Si usaran
+ * fetchConCarga, cada sondeo lento (campana cada 30 s, citas cada 5 min) volvía a
+ * tapar el dashboard completo y la carga parecía "pegada" al entrar.
+ * Regla: la pantalla de carga es para lo que el usuario pidió y está esperando.
+ */
+export async function fetchSegundoPlano(recurso, opciones) {
+  if (typeof window === "undefined") return globalThis.fetch(recurso, opciones);
+  const [recursoFinal, opcionesFinal] = await conAutorizacion(recurso, opciones);
+  return globalThis.fetch(recursoFinal, opcionesFinal);
+}
+
 export async function fetchConCarga(recurso, opciones) {
   // El fetch nativo queda intacto para Next, Clerk, telemetría y sondeos.
   if (typeof window === "undefined") return globalThis.fetch(recurso, opciones);

@@ -58,11 +58,11 @@ export function VistaPantallaCarga({ onClick }) {
     >
       <div className="flex h-full flex-col items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        {/* Marca de la plataforma en su morado. Reemplaza al logotipo de
-            texto (letrasLoading.png, 2170x725 y 380 KB): este es cuadrado,
-            pesa 12 KB y dice lo mismo en un tercio del espacio. */}
+        {/* Marca de la plataforma en el azul de los botones (#007AFF), igual
+            que las partículas. logo-mark-blue.png es logo-mark-purple.png con
+            el mismo trazo y transparencia, solo recoloreado. */}
         <img
-          src="/logo-mark-purple.png"
+          src="/logo-mark-blue.png"
           alt="Agenda Clínica"
           width={552}
           height={501}

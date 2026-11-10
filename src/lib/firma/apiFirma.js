@@ -12,7 +12,7 @@
  * - Con NEXT_PUBLIC_FIRMA_MOCK=1 responde con mockFirma.js (mismas formas).
  */
 
-import { fetchConCarga } from "@/lib/fetchConCarga";
+import { fetchConCarga, fetchSegundoPlano } from "@/lib/fetchConCarga";
 import { crearMockFirma } from "./mockFirma";
 
 import { ErrorFirma } from "./errores";
@@ -46,8 +46,10 @@ export function crearApiFirma(getToken) {
 
   // JSON → JSON. La señal de reverificación (403 + clerk_error) se devuelve tal
   // cual para que useReverification la detecte; cualquier otro error se lanza.
-  async function json(ruta, cuerpo = {}) {
-    const res = await fetchConCarga(`${base}${ruta}`, {
+  // segundoPlano: consultas que no espera el usuario (aviso de la campana, bandeja con su
+  // propio esqueleto de carga): no muestran la pantalla de carga.
+  async function json(ruta, cuerpo = {}, { segundoPlano = false } = {}) {
+    const res = await (segundoPlano ? fetchSegundoPlano : fetchConCarga)(`${base}${ruta}`, {
       method: "POST",
       mode: "cors",
       headers: { ...(await cabeceras()), Accept: "application/json", "Content-Type": "application/json" },
@@ -128,7 +130,7 @@ export function crearApiFirma(getToken) {
     descargarDocumento: (c) => binario("/documentos/descargarDocumento", c),
     enviarDocumentoCorreo: (c) => json("/documentos/enviarDocumentoCorreo", c),
     listarDocumentosPaciente: (c) => json("/documentos/listarDocumentosPaciente", c),
-    listarPendientesFirma: () => json("/documentos/listarPendientesFirma"),
+    listarPendientesFirma: () => json("/documentos/listarPendientesFirma", {}, { segundoPlano: true }),
     anularDocumento: (c) => json("/documentos/anularDocumento", c),
     quitarPendiente: (c) => json("/documentos/quitarPendiente", c),
     // Aceptación del paciente por código (consentimiento informado)

@@ -1,5 +1,6 @@
 'use client';
-import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
+// Datos de apoyo (una vez por sesión): de fondo, sin pantalla de carga.
+import { fetchSegundoPlano as fetch } from "@/lib/fetchConCarga";
 import { useEffect, useState } from 'react';
 
 // Misma estrategia que useEmpresaNombre: una petición por sesión de navegador,
