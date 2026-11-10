@@ -17,6 +17,7 @@ import ProveedorTokenApi from "@/Componentes/ProveedorTokenApi";
 import { TourProvider } from "@/ContextosGlobales/TourContext";
 import SecretariaRouteGuard from "./SecretariaRouteGuard";
 import FranjaModoSoporte from "./FranjaModoSoporte";
+import { aparienciaDashboard, localizacionDashboard } from "@/lib/clerkDashboard";
 
 export const metadata = {
     title: "Dashboard — Agenda Clínica",
@@ -26,7 +27,7 @@ export const metadata = {
 // ─── Layout principal ─────────────────────────────────────────────────────────
 export default function DashboardLayout({ children }) {
     return (
-        <ClerkProvider>
+        <ClerkProvider localization={localizacionDashboard} appearance={aparienciaDashboard}>
             <ClerkLoading><PantallaCarga /></ClerkLoading>
             {/* Telemetria del Health Score + registro de acceso para proteccion
                 de datos. No renderiza nada. Ver RegistroAcceso.jsx. */}
