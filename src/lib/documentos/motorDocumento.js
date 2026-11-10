@@ -20,6 +20,12 @@
  *
  * La zona de firma es SIEMPRE el último bloque. En modo "fes" queda en blanco:
  * el servidor estampa ahí la grafía, la leyenda y el QR (docs/firma/03 §5.6).
+ *
+ * Firma nunca sola en la última página: si el bloque de firma no cabe, salta entero a
+ * una página nueva y esa hoja quedaba solo con la firma. Cada generador marca con
+ * motor.cierre() dónde empieza su última sección (p. ej. "Condiciones") y se arma con
+ * generarConCierreJunto(): si la firma quedó sola, se vuelve a generar cortando la página
+ * antes del cierre, para que esa sección baje junto con la firma.
  */
 
 import { jsPDF } from "jspdf";
@@ -53,7 +59,20 @@ const PT_A_MM = 25.4 / 72;
  * @param {boolean} [o.borrador]     marca "Vista previa" en las zonas que estampa el servidor
  * @param {"letter"|"a5"} [o.formato]
  */
-export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaEmision = "", borrador = false, margen, formato = "letter" }) {
+/**
+ * Arma un documento cuidando que la firma no quede sola en la última página.
+ * `construir(opciones)` crea el motor con crearDocumento({ ...opciones }) y devuelve
+ * motor.finalizar(). Solo se genera dos veces cuando hace falta, y se conserva la
+ * primera versión si la segunda no mejora (la firma igual queda sola o hay más páginas).
+ */
+export function generarConCierreJunto(construir) {
+  const normal = construir({ cierreEnPaginaNueva: false });
+  if (!normal.firmaSola || !normal.hayCierre) return normal;
+  const junto = construir({ cierreEnPaginaNueva: true });
+  return junto.firmaSola || junto.paginas > normal.paginas ? normal : junto;
+}
+
+export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaEmision = "", borrador = false, margen, formato = "letter", cierreEnPaginaNueva = false }) {
   const doc = new jsPDF("p", "mm", formato);
   const compacto = formato === "a5";
   const m = margen ?? (compacto ? 13 : 20);
@@ -68,6 +87,16 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
   let y = inicio;
   let zona = null;
   let zonaPaciente = null;
+  // Cierre junto a la firma (ver arriba): si se marcó la última sección y si el primer
+  // bloque de firma (paciente o profesional) quedó al comienzo de una página nueva.
+  let hayCierre = false;
+  let firmaRegistrada = false;
+  let firmaSola = false;
+  const registrarInicioFirma = () => {
+    if (firmaRegistrada) return;
+    firmaRegistrada = true;
+    firmaSola = doc.internal.getCurrentPageInfo().pageNumber > 1 && Math.abs(y - inicio) < 0.01;
+  };
 
   const fuente = (estilo = "normal", tamano = 9, color = PALETA.negro) => {
     doc.setFont("helvetica", estilo);
@@ -172,6 +201,12 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
 
     espacio(mm) {
       y += mm;
+    },
+
+    /** Marca el comienzo de la última sección, la que debe ir junto a la firma. */
+    cierre() {
+      hayCierre = true;
+      if (cierreEnPaginaNueva && y > inicio + 0.01) nuevaPagina();
     },
 
     /** Título del documento (primera página): grande, con subtítulo opcional. */
@@ -367,6 +402,7 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
       // se reserva el espacio de ambas antes de dibujar la primera.
       y += 4;
       asegurar(ZONA_PACIENTE.alto + 6 + ZONA_FIRMA.alto);
+      registrarInicioFirma();
       zonaPaciente = { pagina: doc.internal.getCurrentPageInfo().pageNumber, x: m, y, ancho: anchoUtil, alto: ZONA_PACIENTE.alto };
       if (borrador) marcoVistaPrevia(zonaPaciente, "Vista previa — la aceptación del paciente se completa con su código");
       y += ZONA_PACIENTE.alto;
@@ -384,6 +420,7 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
       if (modo === MODOS_FIRMA.FES) {
         y += 4;
         asegurar(ZONA_FIRMA.alto);
+        registrarInicioFirma();
         zona = { pagina: doc.internal.getCurrentPageInfo().pageNumber, x: m, y, ancho: anchoUtil, alto: ZONA_FIRMA.alto };
         if (borrador) marcoVistaPrevia(zona, "Vista previa — la firma electrónica se completa al firmar");
         y += ZONA_FIRMA.alto;
@@ -409,6 +446,7 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
       const altoBloque = espacioFirma + 4.6 + altoProfesional + 4;
       y += 5;
       asegurar(altoBloque);
+      registrarInicioFirma();
       const yLinea = y + espacioFirma;
       const xProfesional = firmaPaciente ? derecha - anchoFirma : m;
 
@@ -473,7 +511,7 @@ export function crearDocumento({ empresa = {}, tipoDocumento, folio = "", fechaE
         doc.text(recortar(izquierda, anchoUtil - 42), m, yPie);
         doc.text(`${codigo ? `Código ${codigo}   ·   ` : ""}Página ${p} de ${total}`, derecha, yPie, { align: "right" });
       }
-      return { blob: doc.output("blob"), paginas: total, zonaFirma: zona, zonaPaciente };
+      return { blob: doc.output("blob"), paginas: total, zonaFirma: zona, zonaPaciente, firmaSola, hayCierre };
     },
   };
 

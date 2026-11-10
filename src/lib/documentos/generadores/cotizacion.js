@@ -7,7 +7,7 @@
  *   - "manuscrita": líneas de firma del paciente y del profesional.
  */
 
-import { crearDocumento, PALETA } from "../motorDocumento";
+import { crearDocumento, generarConCierreJunto, PALETA } from "../motorDocumento";
 import { formatRut } from "@/lib/designTokens";
 
 export function formatearMonto(valor) {
@@ -29,8 +29,13 @@ export function formatearMonto(valor) {
  * @param {string} p.fechaEmisionTexto
  * @param {string} [p.vigencia]    texto de la nota de vigencia
  */
-export function generarDocumentoValorizadoPdf({ modo, borrador, rotulo, folio, empresa, paciente, items, totales, profesional, fechaEmisionTexto, vigencia }) {
-  const motor = crearDocumento({ empresa, tipoDocumento: rotulo, folio, fechaEmision: fechaEmisionTexto, borrador });
+export function generarDocumentoValorizadoPdf(datos) {
+  // La firma nunca queda sola en la última página: si no cabe, "Condiciones" baja con ella.
+  return generarConCierreJunto((opcionesMotor) => armarDocumentoValorizado(datos, opcionesMotor));
+}
+
+function armarDocumentoValorizado({ modo, borrador, rotulo, folio, empresa, paciente, items, totales, profesional, fechaEmisionTexto, vigencia }, opcionesMotor = {}) {
+  const motor = crearDocumento({ empresa, tipoDocumento: rotulo, folio, fechaEmision: fechaEmisionTexto, borrador, ...opcionesMotor });
 
   motor.titulo(rotulo);
 
@@ -75,6 +80,7 @@ export function generarDocumentoValorizadoPdf({ modo, borrador, rotulo, folio, e
       : [{ etiqueta: "Total", valor: formatearMonto(totales.total), destacado: true }]
   );
 
+  motor.cierre(); // "Condiciones" baja junto con la firma si esta no cabe
   motor.seccion("Condiciones", { numero: 2 });
   motor.notas([
     "Valores expresados en pesos chilenos (CLP), con impuestos incluidos cuando corresponda.",

@@ -10,7 +10,7 @@
  * y del profesional (con RUT, especialidad y registro), secciones numeradas,
  * texto justificado y las firmas al final, siempre en la misma página. */
 
-import { crearDocumento } from "../motorDocumento";
+import { crearDocumento, generarConCierreJunto } from "../motorDocumento";
 import { MODOS_FIRMA } from "../zonaFirma";
 import { bloquesDeTexto } from "@/lib/consentimientos/textosLegales";
 
@@ -25,8 +25,13 @@ import { bloquesDeTexto } from "@/lib/consentimientos/textosLegales";
  * @param {{nombre,rut,especialidad,registroSis}} p.profesional
  * @param {string} p.fechaEmisionTexto
  */
-export function generarConsentimientoInformadoPdf({ modo, borrador, empresa, texto, procedimiento, paciente, profesional, fechaEmisionTexto, consulta = null, firmas = null }) {
-  const motor = crearDocumento({ empresa, tipoDocumento: "Consentimiento informado", fechaEmision: fechaEmisionTexto, borrador });
+export function generarConsentimientoInformadoPdf(datos) {
+  // Las firmas nunca quedan solas en la última página: si no caben, "Autorización" baja con ellas.
+  return generarConCierreJunto((opcionesMotor) => armarConsentimientoInformado(datos, opcionesMotor));
+}
+
+function armarConsentimientoInformado({ modo, borrador, empresa, texto, procedimiento, paciente, profesional, fechaEmisionTexto, consulta = null, firmas = null }, opcionesMotor = {}) {
+  const motor = crearDocumento({ empresa, tipoDocumento: "Consentimiento informado", fechaEmision: fechaEmisionTexto, borrador, ...opcionesMotor });
   const representante = paciente.representante?.nombre ? paciente.representante : null;
 
   motor.titulo("Consentimiento informado", procedimiento);
@@ -64,6 +69,7 @@ export function generarConsentimientoInformadoPdf({ modo, borrador, empresa, tex
 
   let numero = 0;
   for (const bloque of bloquesDeTexto(texto)) {
+    if (bloque.tipo === "titulo" && /^autorizaci[oó]n$/i.test(bloque.texto.trim())) motor.cierre(); // baja con las firmas
     if (bloque.tipo === "titulo") motor.seccion(bloque.texto, { numero: ++numero });
     else if (bloque.tipo === "subtitulo") motor.subseccion(bloque.texto);
     else if (bloque.tipo === "lista") motor.lista(bloque.items, { tamano: 9.3, justificar: true });

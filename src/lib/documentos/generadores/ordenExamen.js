@@ -4,7 +4,7 @@
  * exámenes numerados en dos columnas, indicaciones y el pie de firma FES o
  * manuscrito según `modo`. */
 
-import { crearDocumento, PALETA } from "../motorDocumento";
+import { crearDocumento, generarConCierreJunto, PALETA } from "../motorDocumento";
 import { formatRut } from "@/lib/designTokens";
 
 /**
@@ -18,8 +18,13 @@ import { formatRut } from "@/lib/designTokens";
  * @param {string} p.fechaEmisionTexto
  * @param {string} [p.indicaciones]  texto libre opcional (ayuno, preparación…)
  */
-export function generarOrdenExamenPdf({ modo, borrador, empresa, paciente, profesional, examenes, fechaEmisionTexto, indicaciones }) {
-  const motor = crearDocumento({ empresa, tipoDocumento: "Orden de exámenes", fechaEmision: fechaEmisionTexto, borrador });
+export function generarOrdenExamenPdf(datos) {
+  // La firma nunca queda sola en la última página: si no cabe, las indicaciones bajan con ella.
+  return generarConCierreJunto((opcionesMotor) => armarOrdenExamen(datos, opcionesMotor));
+}
+
+function armarOrdenExamen({ modo, borrador, empresa, paciente, profesional, examenes, fechaEmisionTexto, indicaciones }, opcionesMotor = {}) {
+  const motor = crearDocumento({ empresa, tipoDocumento: "Orden de exámenes", fechaEmision: fechaEmisionTexto, borrador, ...opcionesMotor });
 
   motor.titulo("Orden de exámenes", `${examenes.length} ${examenes.length === 1 ? "examen solicitado" : "exámenes solicitados"}`);
 
@@ -49,6 +54,7 @@ export function generarOrdenExamenPdf({ modo, borrador, empresa, paciente, profe
     bodyStyles: { fontSize: 9, textColor: PALETA.negro, cellPadding: { top: 3.2, bottom: 3.2, left: 2, right: 4 }, lineWidth: { bottom: 0.2 }, lineColor: PALETA.filete },
   });
 
+  motor.cierre(); // indicaciones y notas bajan junto con la firma si esta no cabe
   if (indicaciones?.trim()) {
     motor.seccion("Indicaciones", { numero: 2 });
     motor.parrafo(indicaciones.trim(), { justificar: true });
