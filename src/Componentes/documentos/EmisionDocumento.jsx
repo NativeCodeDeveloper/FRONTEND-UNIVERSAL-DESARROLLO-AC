@@ -255,9 +255,12 @@ export default function EmisionDocumento({
   }
 
   return (
-    <div className="font-system-apple rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-      <div className={`flex flex-col gap-4 ${compacto ? "" : "md:flex-row md:items-center md:justify-between"}`}>
-        <div className="min-w-0 md:flex-1">
+    <div className="font-system-apple @container rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+      {/* Se acomoda según el ancho de ESTE recuadro (popup, columna lateral o pantalla
+          completa), no el de la ventana: texto y botones en una fila desde 42rem; los
+          botones en fila desde 24rem y a la línea siguiente si no caben. */}
+      <div className={`flex flex-col gap-4 ${compacto ? "" : "@2xl:flex-row @2xl:items-center @2xl:justify-between"}`}>
+        <div className="min-w-0 @2xl:flex-1">
           <p className="text-[14px] font-semibold text-slate-900">Emitir documento</p>
           <p className="mt-0.5 text-[12px] text-slate-500">
             {deshabilitarAcciones
@@ -267,7 +270,7 @@ export default function EmisionDocumento({
               : `Firma: ${profesional.nombre || "profesional"} · ${TIPOS_DOCUMENTO[tipoDocumento] || "Documento"}`}
           </p>
         </div>
-        <div className={`flex flex-col-reverse gap-2 ${compacto ? "" : "sm:flex-row sm:justify-end"}`}>
+        <div className={`flex flex-col-reverse gap-2 ${compacto ? "" : "@sm:flex-row @sm:flex-wrap @sm:justify-end"}`}>
           <button
             type="button"
             onClick={imprimirManuscrita}

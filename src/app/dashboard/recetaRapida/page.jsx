@@ -376,15 +376,8 @@ export default function RecetaRapida() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-start">
-                                <ImpresionManuscrita generarPdf={generarPDFReceta} titulo="Receta" className="flex-1" />
-                                <button
-                                    type="button"
-                                    onClick={limpiarFormulario}
-                                    className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all duration-150 hover:bg-slate-50"
-                                >
-                                    Limpiar
-                                </button>
+                            <div className="border-t border-slate-100 px-5 py-4">
+                                <ImpresionManuscrita generarPdf={generarPDFReceta} titulo="Receta" accionSecundaria={{ etiqueta: "Limpiar", onClick: limpiarFormulario }} />
                             </div>
                         </div>
                     </div>

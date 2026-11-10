@@ -29,6 +29,9 @@ export default function ImpresionManuscrita({
   titulo = "Receta",
   className = "",
   nota = "Las recetas se firman de puño y letra. La firma electrónica simple no es válida para su dispensación en farmacia.",
+  // Acción de la pantalla que va en el mismo grupo (p. ej. "Limpiar"): así se acomoda
+  // junto con los demás botones en vez de quedar al lado y salirse del recuadro.
+  accionSecundaria = null, // { etiqueta, onClick }
 }) {
   const [blob, setBlob] = useState(null);
   const [preparando, setPreparando] = useState(false);
@@ -71,13 +74,17 @@ export default function ImpresionManuscrita({
   }
 
   return (
-    <div className={`font-system-apple space-y-2 ${className}`}>
-      <div className="flex flex-col gap-2 sm:flex-row">
+    <div className={`font-system-apple @container space-y-2 ${className}`}>
+      {/* Los botones no se encogen (rótulos en una línea): por eso se acomodan según el
+          ancho de este recuadro. Angosto → apilados a todo el ancho; desde 24rem → en
+          fila, pasando a la línea siguiente si no caben. Antes decidía el ancho de la
+          VENTANA y en columnas angostas (receta rápida) se salían del recuadro. */}
+      <div className="flex flex-col gap-2 @sm:flex-row @sm:flex-wrap @sm:items-center">
         <button
           type="button"
           onClick={verPrevia}
           disabled={deshabilitado || preparando}
-          className={`${BOTON.primario} w-full sm:w-auto`}
+          className={`${BOTON.primario} w-full @sm:w-auto`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
@@ -89,11 +96,16 @@ export default function ImpresionManuscrita({
           type="button"
           onClick={imprimirDirecto}
           disabled={deshabilitado || preparando}
-          className={`${BOTON.secundario} w-full sm:w-auto`}
+          className={`${BOTON.secundario} w-full @sm:w-auto`}
         >
           {ICONO_IMPRESORA}
           {etiqueta}
         </button>
+        {accionSecundaria ? (
+          <button type="button" onClick={accionSecundaria.onClick} disabled={preparando} className={`${BOTON.texto} w-full @sm:w-auto`}>
+            {accionSecundaria.etiqueta}
+          </button>
+        ) : null}
       </div>
       {nota ? <p className="text-[12px] leading-snug text-[#6E6E73]">{nota}</p> : null}
       {enlaceRespaldo ? <EnlaceRespaldo url={enlaceRespaldo} /> : null}

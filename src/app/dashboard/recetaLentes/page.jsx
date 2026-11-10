@@ -490,15 +490,8 @@ export default function RecetaLentesPage() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row-reverse sm:items-start md:px-6">
-                                <ImpresionManuscrita generarPdf={generarPDF} titulo="Receta de lentes" className="flex-1" />
-                                <button
-                                    type="button"
-                                    onClick={limpiarFormulario}
-                                    className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
-                                >
-                                    Limpiar formulario
-                                </button>
+                            <div className="border-t border-slate-100 px-5 py-4 md:px-6">
+                                <ImpresionManuscrita generarPdf={generarPDF} titulo="Receta de lentes" accionSecundaria={{ etiqueta: "Limpiar formulario", onClick: limpiarFormulario }} />
                             </div>
                         </div>
                     </div>
