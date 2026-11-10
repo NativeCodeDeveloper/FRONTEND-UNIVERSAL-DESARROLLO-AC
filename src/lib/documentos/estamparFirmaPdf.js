@@ -63,7 +63,7 @@ function ajustar(texto, fuente, tamano, anchoMax) {
  * @param {string} [p.resumen]   última línea, p. ej. "Consentimiento v3 · plantilla base + anexo"
  * @param {string} [p.titulo]
  * @param {{pagina,x,y,ancho,alto}} [p.zonaPaciente]  zona reservada para la aceptación del paciente (mm)
- * @param {{nombre:string, documento?:string, canal:"email"|"sms", destino:string, textoFecha:string}} [p.aceptacionPaciente]
+ * @param {{nombre:string, documento?:string, canal:"email"|"sms"|"whatsapp", destino:string, textoFecha:string}} [p.aceptacionPaciente]
  *        aceptación por código (OTP) ya verificada por el servidor
  * @returns {Promise<Uint8Array>}
  */
@@ -147,7 +147,7 @@ export async function estamparFirma({ borrador, zona, grafiaPng, qrPng, firmante
       x: xP, y: yTope - zonaPaciente.alto * MM, width: anchoP, height: zonaPaciente.alto * MM,
       color: rgb(244 / 255, 244 / 255, 247 / 255), borderColor: FILETE, borderWidth: 0.6,
     });
-    const canal = aceptacionPaciente.canal === "sms" ? "SMS" : "correo electrónico";
+    const canal = { whatsapp: "WhatsApp", sms: "SMS" }[aceptacionPaciente.canal] || "correo electrónico";
     const lineasP = [
       { texto: "Aceptado electrónicamente por el paciente", fuente, tamano: 7.5, color: SECUNDARIO },
       { texto: [aceptacionPaciente.nombre, aceptacionPaciente.documento].filter(Boolean).join(" · "), fuente: negrita, tamano: 9.5, color: TINTA },

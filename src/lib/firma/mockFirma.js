@@ -275,14 +275,15 @@ export function crearMockFirma() {
       await esperar();
       const registro = estado.documentos.get(id_documento);
       if (!registro) throw new ErrorFirma("noEncontrado", 404);
-      const dato = canal === "sms" ? registro.contactoPaciente.telefono : registro.contactoPaciente.correo;
+      const porTelefono = canal !== "email"; // whatsapp o sms
+      const dato = porTelefono ? registro.contactoPaciente.telefono : registro.contactoPaciente.correo;
       if (!dato) throw new ErrorFirma("sinDatoContacto", 422);
       const codigo = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000).padStart(6, "0");
       // fecha-ok: instante de vencimiento del código simulado (10 minutos).
       const expira = new Date(Date.now() + 10 * 60_000);
-      const destino = canal === "sms" ? enmascararTelefono(dato) : enmascararCorreo(dato);
+      const destino = porTelefono ? enmascararTelefono(dato) : enmascararCorreo(dato);
       registro.otp = { codigo, canal, destino, expira, intentos: 0 };
-      // Solo en modo de prueba se devuelve el código: no hay SMS ni correo reales.
+      // Solo en modo de prueba se devuelve el código: no hay WhatsApp ni correo reales.
       return { message: true, destino, expira_at: expira.toISOString(), codigo_prueba: codigo };
     },
 

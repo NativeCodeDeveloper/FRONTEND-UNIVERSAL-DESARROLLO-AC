@@ -421,6 +421,8 @@ FIRMA_HABILITADA=1
 FIRMA_CONCURRENCIA=2
 # Opcional: minutos de validez de la reverificación de Clerk (por defecto 10)
 FIRMA_REVERIFICACION_MIN=10
+# Fase 7: plantilla de autenticación de WhatsApp para el código del paciente
+TWILIO_CONTENT_SID_OTP=
 # Opcional (fase 7): número de Twilio habilitado para SMS (el de WhatsApp no sirve)
 TWILIO_SMS_FROM=
 ```
@@ -859,7 +861,7 @@ antes con un código enviado al correo o teléfono de su ficha.
 |---|---|
 | `services/firma/zonaFirma.js` | Medidas del pie de firma (idénticas al front) |
 | `services/firma/estamparFirmaPdf.js` | Estampa grafía, texto, QR y aceptación del paciente (el mismo archivo que usa el front) |
-| `services/firma/envioOtp.js` | Envía el código por SMS (Twilio) o correo (Brevo) |
+| `services/firma/envioOtp.js` | Envía el código por WhatsApp (Twilio, plantilla de autenticación) o correo (Brevo); SMS opcional |
 | `model/DocumentoEmitido.js` | Documentos y sus estados |
 | `model/PacienteOtp.js` | Códigos OTP (solo se guarda su HMAC, nunca el código) |
 | `controller/DocumentosController.js` | Preparar, firmar, descargar, enviar, listar, anular y OTP |
@@ -900,11 +902,25 @@ policy**:
 
 En producción, un origen por dominio de clínica. **Nunca `"*"`.**
 
-### 7.4 SMS del OTP (opcional)
+### 7.4 Código del paciente por WhatsApp
 
-Para enviar el código por SMS hace falta `TWILIO_SMS_FROM`: un número de Twilio
-habilitado para SMS en Chile (el de WhatsApp no sirve). Sin él, el SMS responde
-`503` y el profesional usa el correo, que funciona con lo que ya tienes en Brevo.
+El código va por **WhatsApp** (primera opción) o por **correo**. WhatsApp usa el
+mismo número que ya envía confirmaciones y recordatorios (`TWILIO_WHATSAPP_FROM`),
+pero con una plantilla propia de categoría **Authentication**: Meta no permite
+mandar códigos en las plantillas de utilidad (las pausaría junto con las de citas).
+
+1. **Migración** (una vez por base): `migraciones/2026-11-10_otp_whatsapp.sql`
+   agrega `whatsapp` al canal de `paciente_otp` y `documento_emitido`, para que la
+   evidencia diga el canal real. Se puede correr más de una vez.
+2. **Plantilla** (una vez por cuenta de Twilio): `codigo_verificacion_firma_es`,
+   español, botón "Copiar código", 10 minutos, categoría Authentication. En la cuenta
+   de NativeCode ya está aprobada: **`HX9d6b3543156e877d0ed67e4161fc86a2`**. Si una
+   instancia usa otra cuenta, se crea igual (la consola de Twilio a veces no completa
+   el envío a Meta: se puede crear y enviar por la API de Content).
+3. **`.env`:** `TWILIO_CONTENT_SID_OTP=HX9d6b3543156e877d0ed67e4161fc86a2`.
+
+Sin `TWILIO_CONTENT_SID_OTP`, el WhatsApp responde `503` y el profesional usa el
+correo. El SMS sigue disponible solo si se configura `TWILIO_SMS_FROM`.
 
 ### 7.5 Activar en el front
 
@@ -995,7 +1011,7 @@ pública y todo el resto de la plataforma siguen funcionando.
 | `403 reverificacionRequerida` en un bucle | El token no trae `fva` | Paso 5.2 |
 | `503 servicioOcupado` | Más de 12 firmas al mismo tiempo, o `FIRMA_HABILITADA=0` | Reintentar; revisar el interruptor |
 | `422 sinDatoContacto` al pedir el OTP | El paciente no tiene correo o teléfono en su ficha | Actualizar la ficha o imprimir para firmar a mano |
-| SMS del OTP responde 503 | Falta `TWILIO_SMS_FROM` | Paso 7.4, o usar correo |
+| El código por WhatsApp responde 503 | Falta `TWILIO_CONTENT_SID_OTP` o la plantilla no está aprobada | Paso 7.4, o usar correo |
 | `ER_CHECK_CONSTRAINT_VIOLATED` al firmar un consentimiento | Se intentó firmar sin la aceptación del paciente | Es la protección esperada (`chk_documento_aceptacion`) |
 | `firma_evento es append-only` | Alguien intentó modificar la evidencia | Es la protección esperada |
 

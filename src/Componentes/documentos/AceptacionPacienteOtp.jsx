@@ -11,6 +11,8 @@ function enmascararCorreo(correo) {
   return `${usuario[0]}${"•".repeat(Math.max(usuario.length - 2, 1))}${usuario.slice(-1)}@${dominio}`;
 }
 
+const CANALES = { whatsapp: "WhatsApp", sms: "SMS", email: "correo" };
+
 function enmascararTelefono(telefono) {
   const digitos = String(telefono || "").replace(/\D/g, "");
   return digitos.length >= 4 ? `+56 9 •••• ${digitos.slice(-4)}` : "";
@@ -18,7 +20,7 @@ function enmascararTelefono(telefono) {
 
 /**
  * Aceptación del consentimiento informado por el paciente, con un código de 6
- * dígitos (OTP) enviado al correo o teléfono QUE YA ESTÁ EN SU FICHA. No se puede
+ * dígitos (OTP) enviado por WhatsApp o correo al dato QUE YA ESTÁ EN SU FICHA. No se puede
  * escribir otro destino: es lo que permite atribuir la aceptación al paciente
  * (una firma en tablet sin este código sería un dibujo anónimo).
  *
@@ -28,7 +30,8 @@ function enmascararTelefono(telefono) {
 export default function AceptacionPacienteOtp({ api, paciente, asegurarDocumento, aceptacion, onAceptado }) {
   const correo = enmascararCorreo(paciente?.correo);
   const telefono = enmascararTelefono(paciente?.telefono);
-  const [canal, setCanal] = useState(telefono ? "sms" : "email");
+  // WhatsApp primero: es el canal que el paciente ya usa con la clínica (confirmaciones).
+  const [canal, setCanal] = useState(telefono ? "whatsapp" : "email");
   const [enviado, setEnviado] = useState(null); // { destino, expira_at, codigo_prueba? }
   const [codigo, setCodigo] = useState("");
   const [trabajando, setTrabajando] = useState(false);
@@ -46,7 +49,7 @@ export default function AceptacionPacienteOtp({ api, paciente, asegurarDocumento
           <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={3.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12.5l4.5 4.5L19 7.5" /></svg>
         </span>
         <span>
-          <span className="font-semibold">El paciente aceptó.</span> Código verificado por {aceptacion.canal === "sms" ? "SMS" : "correo"} el{" "}
+          <span className="font-semibold">El paciente aceptó.</span> Código verificado por {CANALES[aceptacion.canal] || "correo"} el{" "}
           {formatearInstanteConOffset(aceptacion.verificado_at)}.
         </span>
       </div>
@@ -105,7 +108,7 @@ export default function AceptacionPacienteOtp({ api, paciente, asegurarDocumento
         <>
           <div role="radiogroup" aria-label="Enviar el código por" className="inline-flex rounded-full bg-white p-1 ring-1 ring-black/[0.06]">
             {[
-              ["sms", "SMS", telefono],
+              ["whatsapp", "WhatsApp", telefono],
               ["email", "Correo", correo],
             ].map(([valor, etiqueta, destino]) => (
               <button

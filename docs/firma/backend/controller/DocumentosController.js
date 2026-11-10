@@ -17,7 +17,7 @@ import { registrarAcceso } from "../services/firma/bitacora.js";
 import { limitarEstampado } from "../services/firma/limitador.js";
 import { estamparFirma } from "../services/firma/estamparFirmaPdf.js";
 import { enviarCorreo, htmlDocumentoFirmado } from "../services/firma/correoFirma.js";
-import { enviarCodigoOtp } from "../services/firma/envioOtp.js";
+import { enviarCodigoOtp, telefonoE164 } from "../services/firma/envioOtp.js";
 import { enmascararCorreo, enmascararTelefono, CORREO_VALIDO } from "../services/firma/plantillas.js";
 import { esAdministrador, esProfesionalDueno, esRolClinico } from "../services/firma/roles.js";
 import { construirKeyPrivada, subirArchivo, eliminarArchivoR2, generarUrlDescarga, descargarArchivoComoBuffer } from "../services/r2Storage.js";
@@ -403,14 +403,15 @@ export default class DocumentosController {
         }
     }
 
-    // POST /documentos/solicitarOtpPaciente { id_documento, canal: "sms" | "email" }
+    // POST /documentos/solicitarOtpPaciente { id_documento, canal: "whatsapp" | "sms" | "email" }
     // El código va al dato YA REGISTRADO en la ficha del paciente: nunca a uno que mande el cliente.
     static async solicitarOtpPaciente(req, res) {
         try {
             if (!esRolClinico(req.usuario)) return res.status(403).json({ message: "sinPermiso" });
             const { id_documento } = req.body || {};
-            const canal = req.body?.canal === "sms" ? "sms" : req.body?.canal === "email" ? "email" : null;
+            const canal = ["whatsapp", "sms", "email"].includes(req.body?.canal) ? req.body.canal : null;
             if (!id_documento || !canal) return res.status(400).json({ message: "sindata" });
+            const porTelefono = canal !== "email";
 
             const documento = await new DocumentoEmitido().seleccionarPorId(id_documento);
             if (!documento) return res.status(404).json({ message: "noEncontrado" });
@@ -422,9 +423,10 @@ export default class DocumentosController {
             if (recientes >= 5) return res.status(429).json({ message: "demasiadasSolicitudes" });
 
             const paciente = (await new Pacientes().selectPacienteEspecifico(documento.id_paciente))?.[0];
-            const dato = canal === "sms" ? paciente?.telefono : paciente?.correo;
+            const dato = porTelefono ? paciente?.telefono : paciente?.correo;
             if (!dato || (canal === "email" && !CORREO_VALIDO.test(String(dato)))) return res.status(422).json({ message: "sinDatoContacto" });
-            const destino = canal === "sms" ? enmascararTelefono(dato) : enmascararCorreo(dato);
+            if (porTelefono && !telefonoE164(dato)) return res.status(422).json({ message: "sinDatoContacto" });
+            const destino = porTelefono ? enmascararTelefono(dato) : enmascararCorreo(dato);
 
             const codigo = String(randomInt(0, 1_000_000)).padStart(6, "0");
             const id_otp = nuevoId();
@@ -493,7 +495,7 @@ export default class DocumentosController {
             });
             await registrarEvento(conexion, {
                 tipo_evento: "otp_paciente_verificado", id_documento, id_paciente: documento.id_paciente,
-                actor_tipo: "paciente", actor_nombre: firmante, metodo_autenticacion: otp.canal === "sms" ? "otp_sms" : "otp_email",
+                actor_tipo: "paciente", actor_nombre: firmante, metodo_autenticacion: `otp_${otp.canal}`, // otp_whatsapp | otp_sms | otp_email
                 autenticado_at: ahora, ip: req.contexto?.ip, user_agent: req.contexto?.userAgent,
                 datos: { canal: otp.canal, destino: otp.destino_mascarado, id_otp: otp.id_otp, operador_clerk_id: req.usuario.clerkId },
             });
