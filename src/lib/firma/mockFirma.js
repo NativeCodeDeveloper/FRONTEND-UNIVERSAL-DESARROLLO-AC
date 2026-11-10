@@ -324,7 +324,8 @@ export function crearMockFirma() {
       const documentos = [...estado.documentos.values()]
         .map((r) => r.documento)
         .filter((d) => d.estado === "pendiente_firma");
-      return { message: true, documentos };
+      // Mismo formato que el servidor: en modo de prueba todo es "para tu firma".
+      return { message: true, documentos, enviados: [], clinica: [] };
     },
 
     async anularDocumento({ id_documento }) {

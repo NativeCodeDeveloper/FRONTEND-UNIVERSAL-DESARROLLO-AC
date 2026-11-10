@@ -233,9 +233,10 @@ export default function EmisionDocumento({
           type="button"
           onClick={abrirVistaPrevia}
           disabled={deshabilitarAcciones}
-          className={`${BOTON.primario} ${BOTON.compacto}`}
+          title={!esFirmante && profesional?.nombre ? `La firma ${profesional.nombre}` : undefined}
+          className={`${esFirmante ? BOTON.primario : BOTON.secundario} ${BOTON.compacto}`}
         >
-          Firmar
+          {esFirmante ? "Firmar" : "Enviar a firma"}
         </button>
         {enlaceRespaldo ? (
           <a href={enlaceRespaldo} target="_blank" rel="noreferrer" className={`${BOTON.texto} ${BOTON.compacto}`}>
@@ -274,7 +275,7 @@ export default function EmisionDocumento({
             disabled={deshabilitarAcciones}
             className={BOTON.primario}
           >
-            Revisar y firmar
+            {esFirmante ? "Revisar y firmar" : "Revisar y enviar a firma"}
           </button>
         </div>
       </div>

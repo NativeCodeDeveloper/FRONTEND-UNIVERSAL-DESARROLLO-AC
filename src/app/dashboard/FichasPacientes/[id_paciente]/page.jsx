@@ -14,7 +14,7 @@ import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { dibujarBloqueFirma, altoBloqueFirma } from "@/lib/pdfFirma";
-import { separarNombreYRut, profesionalPorNombre, datosProfesionalParaDocumento } from "@/lib/profesional";
+import { separarNombreYRut, profesionalPorNombre, profesionalPorRut, datosProfesionalParaDocumento } from "@/lib/profesional";
 import { useProfesionales } from "@/hooks/useProfesionales";
 import ToasterClient from "@/Componentes/ToasterClient";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales.js"
@@ -766,7 +766,11 @@ export default function Paciente() {
         const plantillaNombre = datos?._plantillaNombre;
         const titulo = plantillaNombre || ficha.tipoAtencion || "Consulta General";
         const { nombre: nombreProfesionalFicha, rut: rutEnNombre } = separarNombreYRut(ficha.observaciones);
-        const registrado = profesionalPorNombre(listaProfesionales, nombreProfesionalFicha);
+        // El autor se identifica por el RUT guardado en la ficha ("Nombre · RUT: …"): el
+        // nombre puede variar ("Dr. Daniel Lakes" escrito vs. "Dan Lakes" registrado) y,
+        // si no calza, la ficha no se podía firmar ni atribuir. El nombre queda de respaldo.
+        const registrado = profesionalPorRut(listaProfesionales, rutEnNombre)
+            || profesionalPorNombre(listaProfesionales, nombreProfesionalFicha);
         const datosRegistrado = datosProfesionalParaDocumento(registrado);
         const edad = calcularEdad(pacienteActual?.nacimiento);
 
@@ -1086,7 +1090,8 @@ export default function Paciente() {
             // nombre guardado en la ficha. profesionalPorNombre devuelve null si
             // no calza, para no atribuirle el RUT a otra persona.
             const registrado = datosProfesionalParaDocumento(
-                profesionalPorNombre(listaProfesionales, profesionalFicha)
+                profesionalPorRut(listaProfesionales, rutEnNombreProfesional)
+                || profesionalPorNombre(listaProfesionales, profesionalFicha)
             );
 
             // Prioridad: lo escrito a mano manda; si no, lo que venia dentro del
