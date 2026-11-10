@@ -4,6 +4,7 @@ import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import ModalBase from "@/Componentes/ModalBase";
+import { BOTON } from "@/Componentes/documentos/botones";
 import CampoFormulario from "@/Componentes/CampoFormulario";
 import ShadcnDatePicker from "@/Componentes/shadcnDatePicker";
 import { ShadcnSelect } from "@/Componentes/shadcnSelect";
@@ -51,6 +52,10 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
   const [datosDinamicos, setDatosDinamicos] = useState({});
   const [errores, setErrores] = useState({});
   const [guardando, setGuardando] = useState(false);
+  // La ficha no se modifica después de guardada (Ley 20.584): antes de enviarla se pide
+  // revisar y confirmar. Cualquier cambio en el formulario vuelve al paso de revisión.
+  const [confirmando, setConfirmando] = useState(false);
+  useEffect(() => setConfirmando(false), [idPlantilla, fechaConsulta, datosDinamicos, profesionalTexto, idProfesional]);
 
   const listaProfesionales = useProfesionales();
   const profesionalAsignado = idProfesionalAgendaAsignada
@@ -68,6 +73,7 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
     setIdProfesional("");
     setDatosDinamicos({});
     setErrores({});
+    setConfirmando(false);
   }, []);
 
   useEffect(() => {
@@ -159,11 +165,16 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
 
     if (Object.keys(nuevosErrores).length > 0) {
       setErrores(nuevosErrores);
+      setConfirmando(false);
       // Los campos de la plantilla se nombran aparte porque pueden ser muchos.
       toast.error(avisoDeFaltantes(pendientes) || nuevosErrores.campos);
       return;
     }
 
+    setConfirmando(true);
+  }
+
+  async function enviar() {
     setGuardando(true);
 
     try {
@@ -191,7 +202,10 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
       });
 
       if (!res.ok) {
-        toast.error("El servidor rechazó la ficha. Intenta nuevamente o contacta a soporte.");
+        const motivo = await res.clone().json().catch(() => null);
+        toast.error(motivo?.message === "sinAgenda"
+          ? "Tu usuario no tiene una agenda profesional asignada: no puede crear fichas a su nombre."
+          : "El servidor rechazó la ficha. Intenta nuevamente o contacta a soporte.");
         return;
       }
 
@@ -230,41 +244,41 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
           ? `${nombrePaciente}${paciente?.rut ? ` · RUT ${formatRut(paciente.rut) || paciente.rut}` : ""}`
           : undefined
       }
-      pie={
+      pie={confirmando ? (
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+          <p role="alert" className="text-[13px] leading-snug text-[#3A3A3C] sm:mr-auto sm:max-w-md">
+            <span className="font-semibold text-[#1D1D1F]">Revisa que los datos de la ficha estén correctos.</span>{" "}
+            Una vez guardada, la ficha clínica no se podrá modificar.
+          </p>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+            <button type="button" onClick={() => setConfirmando(false)} disabled={guardando} className={BOTON.texto}>
+              Seguir revisando
+            </button>
+            <button type="button" onClick={enviar} disabled={guardando} className={BOTON.primario}>
+              {guardando ? "Guardando…" : "Confirmar y guardar"}
+            </button>
+          </div>
+        </div>
+      ) : (
         <>
           {plantillaCompleta ? (
             <span className="mr-auto text-[11px] text-slate-400">
               {progreso.completados} de {progreso.total} campos completados
             </span>
           ) : null}
-          <button
-            type="button"
-            onClick={onCerrar}
-            disabled={guardando}
-            className="h-11 rounded-xl px-5 text-[14px] font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
-          >
+          <button type="button" onClick={onCerrar} disabled={guardando} className={BOTON.texto}>
             Cancelar
           </button>
           <button
             type="button"
             onClick={guardar}
             disabled={guardando || !usuarioCargado || Boolean(idProfesionalAgendaAsignada && !profesionalAsignado)}
-            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-60"
+            className={BOTON.primario}
           >
-            {guardando ? (
-              <>
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                </svg>
-                Guardando...
-              </>
-            ) : (
-              "Guardar ficha"
-            )}
+            Guardar ficha
           </button>
         </>
-      }
+      )}
     >
       <div className="space-y-5 pb-2">
         {/* Datos de la atencion. En el cajon lateral el panel mide ~480px

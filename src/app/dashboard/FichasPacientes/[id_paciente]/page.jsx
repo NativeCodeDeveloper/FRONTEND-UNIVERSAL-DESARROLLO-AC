@@ -5,7 +5,6 @@ import {useState, useEffect, useRef, useMemo} from "react";
 import { useUser } from "@clerk/nextjs";
 import { NOMBRES_PREVISION, previsionDesdeId, previsionIdDesdeNombre } from "@/lib/previsiones";
 import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
-import EditarFichaModal from "@/Componentes/EditarFichaModal";
 import ModalBase from "@/Componentes/ModalBase";
 import ConsentimientoInformadoPanel from "@/Componentes/documentos/ConsentimientoInformadoPanel";
 import { RecordatorioPaciente } from "@/Componentes/RecordatorioPaciente";
@@ -202,12 +201,9 @@ export default function Paciente() {
         router.push(`/dashboard/cotizacionesPaciente/${id_paciente}`);
     }
 
-    // Antes navegaba a /dashboard/EdicionFicha/[id_ficha]: habia que salir de
-    // la ficha del paciente, editar en otra pagina y volver. Ahora se edita
-    // encima, sin perder el contexto ni el scroll de la lista.
-    function editarFichaClinica(id_ficha) {
-        setFichaEnEdicion(id_ficha);
-    }
+    // La ficha clínica no se modifica después de creada (Ley 20.584): no hay botón
+    // Editar. Una corrección se registra como una ficha nueva. El servidor también
+    // rechaza cualquier edición (fichaInmodificable).
 
     function agendarPaciente() {
         const paciente = detallePaciente[0];
@@ -258,8 +254,6 @@ export default function Paciente() {
 
     const [listaFichas, setListaFichas] = useState([]);
     const [filtroProfesional, setFiltroProfesional] = useState("");
-    // id de la ficha que se esta editando en el popup; null = cerrado.
-    const [fichaEnEdicion, setFichaEnEdicion] = useState(null);
     // Filtro por fecha de consulta. Se aplica sobre la lista ya cargada, no
     // contra el backend: asi se combina con la busqueda por profesional en vez
     // de reemplazarla, y no hace falta un endpoint nuevo.
@@ -1829,7 +1823,6 @@ export default function Paciente() {
                                                     })() : (
                                                     <button onClick={() => descargarFichaPDF(ficha)} className={`${BOTON.secundario} ${BOTON.compacto}`}>PDF</button>
                                                     )}
-                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className={`${BOTON.secundario} ${BOTON.compacto}`}>Editar</button>
                                                 </div>
                                             </div>
                                             {expandida && (
@@ -1911,16 +1904,6 @@ export default function Paciente() {
                 idProfesionalAgendaAsignada={String(user?.publicMetadata?.idProfesionalAgenda || "").trim()}
                 usuarioCargado={usuarioCargado}
                 onCerrar={() => setModalFichaAbierto(false)}
-                onGuardada={() => listarFichasClinicasPaciente(id_paciente)}
-            />
-
-            <EditarFichaModal
-                abierto={fichaEnEdicion !== null}
-                id_ficha={fichaEnEdicion}
-                paciente={pacienteActual}
-                idProfesionalAgendaAsignada={String(user?.publicMetadata?.idProfesionalAgenda || "").trim()}
-                usuarioCargado={usuarioCargado}
-                onCerrar={() => setFichaEnEdicion(null)}
                 onGuardada={() => listarFichasClinicasPaciente(id_paciente)}
             />
         </div>
