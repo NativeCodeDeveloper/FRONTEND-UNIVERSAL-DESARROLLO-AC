@@ -192,10 +192,46 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
     });
   }, []);
 
+  // La foto de un profesional que ya existe se guarda al subirla: si dependiera del
+  // botón Guardar, quien cierra el formulario creyendo que ya quedó la pierde.
+  // Se manda con los datos YA guardados (no con lo que se esté escribiendo), así no
+  // se adelanta ningún otro cambio. Al crear, viaja con el formulario.
+  const fotoGuardadaRef = useRef(false);
+  const guardarFoto = useCallback(async (id) => {
+    actualizar("imagenProfesional", id);
+    if (!editando) return false;
+    const token = await getToken().catch(() => null);
+    const res = await fetch(`${API}/profesionales/actualizarProfesional`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        id_profesional: profesional.id_profesional,
+        nombreProfesional: profesional.nombreProfesional ?? "",
+        descripcionProfesional: profesional.descripcionProfesional ?? "",
+        [CAMPO_CATEGORIA]: normalizarCategoria(profesional[CAMPO_CATEGORIA] ?? ""),
+        correoContacto: profesional.correoContacto ?? "",
+        numeroTelefono: profesional.numeroTelefono ?? "",
+        rutProfesional: profesional.rutProfesional ?? "",
+        imagenProfesional: id,
+      }),
+      mode: "cors",
+    });
+    const respuesta = await res.json().catch(() => null);
+    if (!res.ok || respuesta?.message !== true) throw new Error(respuesta?.message || `HTTP ${res.status}`);
+    fotoGuardadaRef.current = true;
+    return true;
+  }, [API, actualizar, editando, getToken, profesional]);
+
   const cerrar = useCallback(() => {
     if (enviando) return;
+    // La tarjeta y la página pública muestran la foto nueva sin recargar.
+    if (fotoGuardadaRef.current) onGuardado?.();
     onCerrar();
-  }, [enviando, onCerrar]);
+  }, [enviando, onCerrar, onGuardado]);
 
   // Al abrir: carga los datos del profesional en edicion o limpia para uno nuevo,
   // y bloquea el scroll de fondo.
@@ -221,6 +257,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
     );
     setErrores({});
     setEnviando(false);
+    fotoGuardadaRef.current = false;
     focoPrevioRef.current = document.activeElement;
 
     const overflowPrevio = document.body.style.overflow;
@@ -421,7 +458,7 @@ export default function ProfesionalModal({ abierto, profesional, onCerrar, onGua
               <FotoProfesional
                 imagenId={datos.imagenProfesional}
                 nombre={datos.nombreProfesional}
-                onCambio={(id) => actualizar("imagenProfesional", id)}
+                onCambio={guardarFoto}
                 deshabilitado={enviando}
               />
             </div>

@@ -15,6 +15,11 @@ const LIMITE_BYTES = 8 * 1024 * 1024;
  * dashboard y de la reserva, y en la tarjeta 6:5 de la página pública, que
  * encuadra el rostro) y se sube a Cloudflare Images con el mismo endpoint que
  * el resto de las imágenes del sitio. Se guarda solo el id (imagenProfesional).
+ *
+ * onCambio(id) puede devolver una promesa: true si ya quedó guardada en el
+ * servidor (profesional existente) o false si se guarda con el formulario
+ * (profesional nuevo). Si la promesa falla, se avisa y el id queda en el
+ * formulario para guardarlo con el botón.
  */
 export default function FotoProfesional({ imagenId, nombre, onCambio, deshabilitado = false }) {
   const entradaRef = useRef(null);
@@ -35,17 +40,36 @@ export default function FotoProfesional({ imagenId, nombre, onCambio, deshabilit
   async function confirmar(recortada) {
     setOrigen(null);
     setSubiendo(true);
+    let id;
     try {
-      const id = await subirImagenCloudflare(recortada);
+      id = await subirImagenCloudflare(recortada);
       if (!id) throw new Error("sin id");
-      onCambio(id);
-      toast.success("Foto lista. Se guardará con los datos del profesional.");
     } catch (error) {
       console.error("[FotoProfesional]", error);
       toast.error("No se pudo subir la foto. Intenta nuevamente.");
+      setSubiendo(false);
+      if (entradaRef.current) entradaRef.current.value = "";
+      return;
+    }
+    try {
+      const guardada = await onCambio(id);
+      toast.success(guardada ? "Foto guardada." : "Foto lista. Se guardará al registrar el profesional.");
+    } catch {
+      toast.error("La foto se subió, pero no se pudo guardar. Pulsa Guardar para intentarlo de nuevo.");
     } finally {
       setSubiendo(false);
       if (entradaRef.current) entradaRef.current.value = "";
+    }
+  }
+
+  async function quitar() {
+    setSubiendo(true);
+    try {
+      if (await onCambio("")) toast.success("Foto quitada.");
+    } catch {
+      toast.error("No se pudo quitar la foto. Pulsa Guardar para intentarlo de nuevo.");
+    } finally {
+      setSubiendo(false);
     }
   }
 
@@ -81,7 +105,7 @@ export default function FotoProfesional({ imagenId, nombre, onCambio, deshabilit
           {url ? (
             <button
               type="button"
-              onClick={() => onCambio("")}
+              onClick={quitar}
               disabled={deshabilitado || subiendo}
               className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-[#FF3B30] transition-colors hover:bg-[#FF3B30]/10 disabled:text-[#C7C7CC]"
             >
