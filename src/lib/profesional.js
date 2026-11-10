@@ -132,3 +132,21 @@ export function profesionalPorNombre(profesionales, nombre) {
 
   return profesionales.find((p) => normalizar(p.nombreProfesional) === buscado) || null;
 }
+
+/**
+ * Autor de un registro que guardó al profesional como texto ("Nombre · RUT: …"),
+ * como la ficha clínica. El RUT identifica a la persona; el nombre desempata:
+ *  - un solo profesional con ese RUT → ese;
+ *  - varios con el mismo RUT (datos de prueba o duplicados) → el que además calza por
+ *    nombre; si ninguno calza, null: mejor no ofrecer firmar que atribuir la ficha a
+ *    otra persona;
+ *  - ninguno con ese RUT → el que calce exacto por nombre.
+ */
+export function profesionalDeRegistro(profesionales, nombre, rut) {
+  if (!Array.isArray(profesionales)) return null;
+  const buscado = cleanRut(rut);
+  const conRut = buscado ? profesionales.filter((p) => cleanRut(p.rutProfesional) === buscado) : [];
+  if (conRut.length === 1) return conRut[0];
+  if (conRut.length > 1) return profesionalPorNombre(conRut, nombre);
+  return profesionalPorNombre(profesionales, nombre);
+}

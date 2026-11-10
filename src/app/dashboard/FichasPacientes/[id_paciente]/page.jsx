@@ -14,7 +14,7 @@ import {toast} from "react-hot-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { dibujarBloqueFirma, altoBloqueFirma } from "@/lib/pdfFirma";
-import { separarNombreYRut, profesionalPorNombre, profesionalPorRut, datosProfesionalParaDocumento } from "@/lib/profesional";
+import { separarNombreYRut, profesionalDeRegistro, datosProfesionalParaDocumento } from "@/lib/profesional";
 import { useProfesionales } from "@/hooks/useProfesionales";
 import ToasterClient from "@/Componentes/ToasterClient";
 import formatearFecha from "@/FuncionesTranversales/funcionesTranversales.js"
@@ -766,11 +766,9 @@ export default function Paciente() {
         const plantillaNombre = datos?._plantillaNombre;
         const titulo = plantillaNombre || ficha.tipoAtencion || "Consulta General";
         const { nombre: nombreProfesionalFicha, rut: rutEnNombre } = separarNombreYRut(ficha.observaciones);
-        // El autor se identifica por el RUT guardado en la ficha ("Nombre · RUT: …"): el
-        // nombre puede variar ("Dr. Daniel Lakes" escrito vs. "Dan Lakes" registrado) y,
-        // si no calza, la ficha no se podía firmar ni atribuir. El nombre queda de respaldo.
-        const registrado = profesionalPorRut(listaProfesionales, rutEnNombre)
-            || profesionalPorNombre(listaProfesionales, nombreProfesionalFicha);
+        // El autor se identifica por el RUT guardado en la ficha ("Nombre · RUT: …") y el
+        // nombre desempata si dos profesionales comparten RUT (ver profesionalDeRegistro).
+        const registrado = profesionalDeRegistro(listaProfesionales, nombreProfesionalFicha, rutEnNombre);
         const datosRegistrado = datosProfesionalParaDocumento(registrado);
         const edad = calcularEdad(pacienteActual?.nacimiento);
 
@@ -1090,8 +1088,7 @@ export default function Paciente() {
             // nombre guardado en la ficha. profesionalPorNombre devuelve null si
             // no calza, para no atribuirle el RUT a otra persona.
             const registrado = datosProfesionalParaDocumento(
-                profesionalPorRut(listaProfesionales, rutEnNombreProfesional)
-                || profesionalPorNombre(listaProfesionales, profesionalFicha)
+                profesionalDeRegistro(listaProfesionales, profesionalFicha, rutEnNombreProfesional)
             );
 
             // Prioridad: lo escrito a mano manda; si no, lo que venia dentro del
