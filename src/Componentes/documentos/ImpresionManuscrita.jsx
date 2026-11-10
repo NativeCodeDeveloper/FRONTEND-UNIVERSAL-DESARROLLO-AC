@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { toast } from "react-hot-toast";
 import { imprimirPdf } from "@/lib/documentos/imprimirPdf";
 import VisorPdf from "@/Componentes/documentos/VisorPdf";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 const ICONO_IMPRESORA = (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
@@ -76,7 +77,7 @@ export default function ImpresionManuscrita({
           type="button"
           onClick={verPrevia}
           disabled={deshabilitado || preparando}
-          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC] disabled:opacity-50 sm:w-auto"
+          className={`${BOTON.primario} w-full sm:w-auto`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12s3.75-7.5 9.75-7.5 9.75 7.5 9.75 7.5-3.75 7.5-9.75 7.5S2.25 12 2.25 12z" />
@@ -88,7 +89,7 @@ export default function ImpresionManuscrita({
           type="button"
           onClick={imprimirDirecto}
           disabled={deshabilitado || preparando}
-          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#F2F2F7] px-5 text-[14px] font-medium text-[#1D1D1F] transition-colors hover:bg-[#E5E5EA] disabled:opacity-50 sm:w-auto"
+          className={`${BOTON.secundario} w-full sm:w-auto`}
         >
           {ICONO_IMPRESORA}
           {etiqueta}
@@ -179,7 +180,7 @@ function ModalVistaPrevia({ blob, titulo, nota, etiqueta, onCerrar, onImprimir, 
             <button
               type="button"
               onClick={onImprimir}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC]"
+              className={BOTON.primario}
             >
               {ICONO_IMPRESORA}
               {etiqueta}

@@ -11,6 +11,7 @@ import {
   mensajeError,
 } from "@/lib/firma/constantes";
 import { formatearInstanteConOffset } from "@/lib/fechas";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 function pesoLegible(bytes) {
   return bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -146,7 +147,7 @@ export default function SeccionRegistroSis({ idProfesional, registro, puedeEdita
                   type="button"
                   disabled={!puedeEditar || guardando}
                   onClick={() => archivoRef.current?.click()}
-                  className="h-8 rounded-lg bg-slate-100 px-3 text-[12px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:opacity-50"
+                  className={`${BOTON.secundario} ${BOTON.compacto}`}
                 >
                   {registro?.tiene_certificado ? "Reemplazar" : "Adjuntar"}
                 </button>
@@ -194,7 +195,7 @@ export default function SeccionRegistroSis({ idProfesional, registro, puedeEdita
             type="button"
             onClick={guardar}
             disabled={guardando || sinCambios}
-            className="h-10 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-40"
+            className={BOTON.primario}
           >
             {guardando ? "Guardando…" : "Guardar registro"}
           </button>
@@ -218,19 +219,19 @@ export default function SeccionRegistroSis({ idProfesional, registro, puedeEdita
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             {rechazando ? (
               <>
-                <button type="button" onClick={() => setRechazando(false)} disabled={guardando} className="h-10 rounded-xl px-4 text-[13px] font-medium text-slate-500 hover:bg-slate-100">
+                <button type="button" onClick={() => setRechazando(false)} disabled={guardando} className={BOTON.texto}>
                   Cancelar
                 </button>
-                <button type="button" onClick={() => decidir("rechazado")} disabled={guardando} className="h-10 rounded-xl bg-[#FF3B30] px-4 text-[13px] font-semibold text-white hover:bg-[#E0352B] disabled:opacity-60">
+                <button type="button" onClick={() => decidir("rechazado")} disabled={guardando} className={BOTON.destructivo}>
                   Confirmar rechazo
                 </button>
               </>
             ) : (
               <>
-                <button type="button" onClick={() => setRechazando(true)} disabled={guardando} className="h-10 rounded-xl px-4 text-[13px] font-medium text-[#D70015] hover:bg-[#FF3B30]/10">
+                <button type="button" onClick={() => setRechazando(true)} disabled={guardando} className={BOTON.textoDestructivo}>
                   Rechazar
                 </button>
-                <button type="button" onClick={() => decidir("verificado")} disabled={guardando} className="h-10 rounded-xl bg-[#34C759] px-4 text-[13px] font-semibold text-white hover:bg-[#2DB24F] disabled:opacity-60">
+                <button type="button" onClick={() => decidir("verificado")} disabled={guardando} className={BOTON.primario}>
                   Marcar verificado
                 </button>
               </>

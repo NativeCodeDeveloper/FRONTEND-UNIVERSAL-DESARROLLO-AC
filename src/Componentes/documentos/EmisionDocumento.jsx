@@ -7,6 +7,7 @@ import { useReverification } from "@clerk/nextjs";
 import { isReverificationCancelledError } from "@clerk/nextjs/errors";
 import VisorPdf from "@/Componentes/documentos/VisorPdf";
 import AceptacionPacienteOtp from "@/Componentes/documentos/AceptacionPacienteOtp";
+import { BOTON } from "@/Componentes/documentos/botones";
 import InsigniaEstado from "@/Componentes/firma/InsigniaEstado";
 import { useApiFirma } from "@/hooks/useApiFirma";
 import { useSesionProfesional } from "@/hooks/useSesionProfesional";
@@ -223,7 +224,7 @@ export default function EmisionDocumento({
           onClick={imprimirManuscrita}
           disabled={deshabilitarAcciones || imprimiendo}
           aria-label="Imprimir para firmar a mano"
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-[12px] font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+          className={`${BOTON.secundario} ${BOTON.compacto}`}
         >
           <IconoImpresora />
           {imprimiendo ? "…" : "Imprimir"}
@@ -232,12 +233,12 @@ export default function EmisionDocumento({
           type="button"
           onClick={abrirVistaPrevia}
           disabled={deshabilitarAcciones}
-          className="inline-flex h-10 items-center justify-center rounded-xl bg-[#1D1D1F] px-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
+          className={`${BOTON.primario} ${BOTON.compacto}`}
         >
           Firmar
         </button>
         {enlaceRespaldo ? (
-          <a href={enlaceRespaldo} target="_blank" rel="noreferrer" className="text-[12px] font-semibold text-[#007AFF]">
+          <a href={enlaceRespaldo} target="_blank" rel="noreferrer" className={`${BOTON.texto} ${BOTON.compacto}`}>
             Abrir para imprimir
           </a>
         ) : null}
@@ -248,8 +249,8 @@ export default function EmisionDocumento({
 
   return (
     <div className="font-system-apple rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-      <div className={`flex flex-col gap-3 ${compacto ? "" : "sm:flex-row sm:items-center sm:justify-between"}`}>
-        <div className="min-w-0">
+      <div className={`flex flex-col gap-4 ${compacto ? "" : "md:flex-row md:items-center md:justify-between"}`}>
+        <div className="min-w-0 md:flex-1">
           <p className="text-[14px] font-semibold text-slate-900">Emitir documento</p>
           <p className="mt-0.5 text-[12px] text-slate-500">
             {deshabilitarAcciones
@@ -257,23 +258,23 @@ export default function EmisionDocumento({
               : `Firma: ${profesional.nombre || "profesional"} · ${TIPOS_DOCUMENTO[tipoDocumento] || "Documento"}`}
           </p>
         </div>
-        <div className={`flex flex-col gap-2 ${compacto ? "" : "sm:flex-row"}`}>
+        <div className={`flex flex-col-reverse gap-2 ${compacto ? "" : "sm:flex-row sm:justify-end"}`}>
           <button
             type="button"
             onClick={imprimirManuscrita}
             disabled={deshabilitarAcciones || imprimiendo}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+            className={BOTON.secundario}
           >
             <IconoImpresora />
-            {imprimiendo ? "Preparando…" : "Imprimir para firmar a mano"}
+            {imprimiendo ? "Preparando…" : "Imprimir para firmar"}
           </button>
           <button
             type="button"
             onClick={abrirVistaPrevia}
             disabled={deshabilitarAcciones}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
+            className={BOTON.primario}
           >
-            Previsualizar y firmar
+            Revisar y firmar
           </button>
         </div>
       </div>
@@ -304,21 +305,30 @@ export function ModalEmision({
 
   useEffect(() => setMontado(true), []);
 
+  // onCerrar y paciente llegan como objetos nuevos en cada render del padre: si fueran
+  // dependencias, el efecto se repetía (borraba el correo escrito, movía el foco y volvía
+  // a registrar el teclado) cada vez que cambiaba algo arriba. Se lee la versión vigente.
+  const onCerrarRef = useRef(onCerrar);
+  useEffect(() => {
+    onCerrarRef.current = onCerrar;
+  });
+  const correoFicha = paciente?.correo || "";
+
   useEffect(() => {
     if (!abierto) return undefined;
-    setCorreo(paciente?.correo || "");
+    setCorreo(correoFicha);
     setEnviadoA("");
     setErrorCorreo("");
     const overflowPrevio = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const onKey = (e) => e.key === "Escape" && onCerrar();
+    const onKey = (e) => e.key === "Escape" && onCerrarRef.current();
     window.addEventListener("keydown", onKey);
     requestAnimationFrame(() => botonCerrarRef.current?.focus());
     return () => {
       document.body.style.overflow = overflowPrevio;
       window.removeEventListener("keydown", onKey);
     };
-  }, [abierto, paciente, onCerrar]);
+  }, [abierto, correoFicha]);
 
   const registrar = useCallback(
     (accion) => api.descargarDocumento({ id_documento: documento.id_documento, accion }),
@@ -448,13 +458,13 @@ export function ModalEmision({
                       }}
                       placeholder={paciente?.correo ? "correo@paciente.cl" : "Correo registrado del paciente"}
                       aria-label="Correo del paciente"
-                      className="h-11 min-w-0 flex-1 rounded-xl border border-slate-200 px-3 text-[13px] outline-none focus:border-slate-900"
+                      className="h-11 min-w-0 flex-1 rounded-full border border-black/10 bg-white px-4 text-[14px] outline-none transition focus:border-[#007AFF] focus:ring-4 focus:ring-[#007AFF]/15"
                     />
                     <button
                       type="button"
                       onClick={enviar}
                       disabled={enviando}
-                      className="h-11 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-60"
+                      className={BOTON.primario}
                     >
                       {enviando ? "Enviando…" : "Enviar al correo"}
                     </button>
@@ -463,10 +473,10 @@ export function ModalEmision({
                   {enviadoA ? <p className="mt-1 text-[12px] text-[#248A3D]">Enviado a {enviadoA}.</p> : null}
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:flex">
-                  <button type="button" onClick={descargar} className="h-11 rounded-xl border border-slate-200 px-4 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
+                  <button type="button" onClick={descargar} className={BOTON.secundario}>
                     Descargar
                   </button>
-                  <button type="button" onClick={imprimir} className="h-11 rounded-xl border border-slate-200 px-4 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
+                  <button type="button" onClick={imprimir} className={BOTON.secundario}>
                     Imprimir
                   </button>
                 </div>
@@ -478,7 +488,7 @@ export function ModalEmision({
                 Quedó en la bandeja de <span className="font-semibold text-slate-900">{profesional?.nombre}</span>. Cuando lo firme,
                 podrás enviarlo al paciente desde su carpeta.
               </p>
-              <button type="button" onClick={onCerrar} className="h-11 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white hover:bg-[#007AFF]">
+              <button type="button" onClick={onCerrar} className={BOTON.primario}>
                 Listo
               </button>
             </div>
@@ -504,14 +514,14 @@ export function ModalEmision({
                   : `Este documento lo firma ${profesional?.nombre || "el profesional"}. Se enviará a su bandeja.`}
               </p>
               <div className="flex flex-col-reverse gap-2 sm:flex-row">
-                <button type="button" onClick={onCerrar} disabled={paso === "trabajando"} className="h-11 rounded-xl px-5 text-[13px] font-medium text-slate-500 hover:bg-slate-100 disabled:opacity-40">
+                <button type="button" onClick={onCerrar} disabled={paso === "trabajando"} className={BOTON.texto}>
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={onFirmar}
                   disabled={!borrador || paso === "trabajando" || sinFirma || faltaAceptacion}
-                  className="h-11 rounded-xl bg-[#007AFF] px-6 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
+                  className={BOTON.primario}
                 >
                   {paso === "trabajando" ? "Procesando…" : esFirmante ? "Firmar con FES" : "Enviar a firma"}
                 </button>

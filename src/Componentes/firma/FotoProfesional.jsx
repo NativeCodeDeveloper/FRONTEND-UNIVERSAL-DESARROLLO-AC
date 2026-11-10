@@ -6,6 +6,7 @@ import ImageCropperModal from "@/Componentes/ImageCropperModal";
 import SiluetaProfesional from "@/Componentes/SiluetaProfesional";
 import { subirImagenCloudflare } from "@/FuncionesTranversales/FuncionesCloudflare";
 import { cfImageUrl } from "@/lib/cloudflare";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 const LIMITE_BYTES = 8 * 1024 * 1024;
@@ -98,7 +99,7 @@ export default function FotoProfesional({ imagenId, nombre, onCambio, deshabilit
             type="button"
             onClick={() => entradaRef.current?.click()}
             disabled={deshabilitado || subiendo}
-            className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/10 disabled:text-[#C7C7CC]"
+            className={`${BOTON.texto} ${BOTON.compacto}`}
           >
             {url ? "Cambiar foto" : "Subir foto"}
           </button>
@@ -107,7 +108,7 @@ export default function FotoProfesional({ imagenId, nombre, onCambio, deshabilit
               type="button"
               onClick={quitar}
               disabled={deshabilitado || subiendo}
-              className="h-8 rounded-lg px-2.5 text-[13px] font-medium text-[#FF3B30] transition-colors hover:bg-[#FF3B30]/10 disabled:text-[#C7C7CC]"
+              className={`${BOTON.textoDestructivo} ${BOTON.compacto}`}
             >
               Quitar
             </button>

@@ -10,6 +10,7 @@ import { ESTADOS_DOCUMENTO, TIPOS_DOCUMENTO, mensajeError } from "@/lib/firma/co
 import { ETIQUETAS_CONSENTIMIENTO, PLANTILLAS_RESPALDO } from "@/lib/consentimientos/textosLegales";
 import { imprimirPdf } from "@/lib/documentos/imprimirPdf";
 import { formatearInstanteConOffset } from "@/lib/fechas";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 const TITULOS_CONSENTIMIENTO = Object.fromEntries(PLANTILLAS_RESPALDO.map((p) => [p.codigo, p.titulo]));
 
@@ -139,7 +140,7 @@ export default function ListaDocumentosPaciente({ idPaciente, correoPaciente, pu
         ) : error ? (
           <p className="py-4 text-[13px] text-[#D70015]">
             {error}{" "}
-            <button type="button" onClick={cargar} className="font-semibold text-[#007AFF]">Reintentar</button>
+            <button type="button" onClick={cargar} className={`${BOTON.texto} ${BOTON.compacto}`}>Reintentar</button>
           </p>
         ) : lista.length === 0 ? (
           <p className="py-8 text-center text-[13px] text-slate-500">
@@ -189,7 +190,7 @@ function BotonAccion({ onClick, deshabilitado, children }) {
       type="button"
       onClick={onClick}
       disabled={deshabilitado}
-      className="h-9 rounded-lg px-3 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/10 disabled:text-[#C7C7CC]"
+      className={`${BOTON.texto} ${BOTON.compacto}`}
     >
       {children}
     </button>
@@ -211,7 +212,7 @@ function ModalVisor({ visor, onCerrar }) {
       <div role="dialog" aria-modal="true" aria-label={visor.titulo} className="relative flex max-h-[94dvh] w-full max-w-4xl flex-col overflow-hidden rounded-t-[24px] bg-white shadow-2xl sm:rounded-[24px]">
         <header className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3 sm:px-7">
           <h2 className="truncate text-[15px] font-semibold text-slate-900">{visor.titulo}</h2>
-          <button type="button" onClick={onCerrar} className="h-9 rounded-lg px-3 text-[14px] font-medium text-[#007AFF] hover:bg-[#007AFF]/10">
+          <button type="button" onClick={onCerrar} className={`${BOTON.texto} ${BOTON.compacto}`}>
             Cerrar
           </button>
         </header>

@@ -12,6 +12,7 @@ import { useSesionProfesional } from "@/hooks/useSesionProfesional";
 import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
 import { ESTADOS_DOCUMENTO, TIPOS_DOCUMENTO, mensajeError } from "@/lib/firma/constantes";
 import { formatearInstanteConOffset } from "@/lib/fechas";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 /*
  * Bandeja del profesional: documentos que otra persona (secretaría,
@@ -107,7 +108,7 @@ export default function DocumentosPorFirmar() {
         ) : error ? (
           <div className="rounded-2xl bg-[#FF3B30]/10 px-4 py-3 text-[13px] text-[#D70015]">
             {error}{" "}
-            <button type="button" onClick={cargar} className="font-semibold text-[#007AFF]">Reintentar</button>
+            <button type="button" onClick={cargar} className={`${BOTON.texto} ${BOTON.compacto}`}>Reintentar</button>
           </div>
         ) : documentos.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-slate-200 bg-white px-6 py-14 text-center">
@@ -132,7 +133,7 @@ export default function DocumentosPorFirmar() {
                 <button
                   type="button"
                   onClick={() => revisar(d)}
-                  className="h-10 shrink-0 rounded-xl bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#007AFF]"
+                  className={BOTON.primario}
                 >
                   Revisar y firmar
                 </button>

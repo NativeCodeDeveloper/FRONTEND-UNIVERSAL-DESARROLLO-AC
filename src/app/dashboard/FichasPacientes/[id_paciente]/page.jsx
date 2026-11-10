@@ -43,6 +43,7 @@ import EmisionDocumento from "@/Componentes/documentos/EmisionDocumento";
 import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
 import { generarFichaClinicaPdf } from "@/lib/documentos/generadores/fichaClinica";
 import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 
 function parsearDatosDinamicos(datos) {
@@ -1799,7 +1800,7 @@ export default function Paciente() {
                                                     </div>
                                                 </div>
                                                 <div className="relative z-10 flex flex-wrap items-center gap-2 xl:justify-end">
-                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className="h-10 rounded-xl border border-transparent bg-[#1D1D1F] px-4 text-[11px] font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-700 hover:bg-[#007AFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40 focus-visible:ring-offset-2">
+                                                    <button onClick={() => toggleFichaExpandida(ficha.id_ficha)} className={`${BOTON.secundario} ${BOTON.compacto}`}>
                                                         {expandida ? "Ocultar" : "Ver detalle"}
                                                     </button>
                                                     {FIRMA_HABILITADA ? (() => {
@@ -1824,9 +1825,9 @@ export default function Paciente() {
                                                             />
                                                         );
                                                     })() : (
-                                                    <button onClick={() => descargarFichaPDF(ficha)} className="h-10 rounded-xl border border-slate-200 bg-slate-100 px-4 text-[11px] font-bold text-slate-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">PDF</button>
+                                                    <button onClick={() => descargarFichaPDF(ficha)} className={`${BOTON.secundario} ${BOTON.compacto}`}>PDF</button>
                                                     )}
-                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className="h-10 rounded-xl border border-slate-200 bg-white px-4 text-[11px] font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">Editar</button>
+                                                    <button onClick={() => editarFichaClinica(ficha.id_ficha)} className={`${BOTON.secundario} ${BOTON.compacto}`}>Editar</button>
                                                 </div>
                                             </div>
                                             {expandida && (

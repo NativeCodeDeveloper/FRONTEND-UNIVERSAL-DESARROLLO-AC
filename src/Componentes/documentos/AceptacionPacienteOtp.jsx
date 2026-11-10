@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { MODO_MOCK } from "@/lib/firma/apiFirma";
 import { mensajeError } from "@/lib/firma/constantes";
 import { formatearInstanteConOffset } from "@/lib/fechas";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 function enmascararCorreo(correo) {
   const [usuario, dominio] = String(correo || "").split("@");
@@ -161,11 +162,11 @@ export default function AceptacionPacienteOtp({ api, paciente, asegurarDocumento
                   type="button"
                   onClick={verificar}
                   disabled={trabajando || codigo.length !== 6}
-                  className="h-11 rounded-full bg-[#007AFF] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#0062CC] disabled:opacity-40"
+                  className={BOTON.primario}
                 >
                   {trabajando ? "Verificando…" : "Verificar"}
                 </button>
-                <button type="button" onClick={enviar} disabled={trabajando} className="h-11 rounded-full px-4 text-[13px] font-medium text-[#007AFF] hover:bg-[#007AFF]/10">
+                <button type="button" onClick={enviar} disabled={trabajando} className={BOTON.texto}>
                   Reenviar
                 </button>
               </div>
@@ -175,7 +176,7 @@ export default function AceptacionPacienteOtp({ api, paciente, asegurarDocumento
               type="button"
               onClick={enviar}
               disabled={trabajando}
-              className="h-10 rounded-full bg-[#007AFF] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[#0062CC] disabled:opacity-40"
+              className={`${BOTON.primario} w-full sm:w-auto`}
             >
               {trabajando ? "Enviando…" : "Enviar código al paciente"}
             </button>

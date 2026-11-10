@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { bloquesDeTexto } from "@/lib/consentimientos/textosLegales";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 /**
  * Muestra un texto legal versionado (acta FES, política de datos,
@@ -131,7 +132,7 @@ export default function TextoLegalModal({ abierto, titulo, version, cuerpo, onCe
           <button
             type="button"
             onClick={onCerrar}
-            className="h-11 rounded-xl px-5 text-[14px] font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className={BOTON.texto}
           >
             Cerrar
           </button>
@@ -139,7 +140,7 @@ export default function TextoLegalModal({ abierto, titulo, version, cuerpo, onCe
             <button
               type="button"
               onClick={accionPrincipal.onClick}
-              className="h-11 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF]"
+              className={BOTON.primario}
             >
               {accionPrincipal.etiqueta}
             </button>

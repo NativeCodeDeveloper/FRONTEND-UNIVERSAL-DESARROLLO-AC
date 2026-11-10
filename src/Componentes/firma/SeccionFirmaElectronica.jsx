@@ -11,6 +11,7 @@ import { mensajeError } from "@/lib/firma/constantes";
 import { validarFirma } from "@/lib/firma/procesarTrazo";
 import { interpolarPlantilla } from "@/lib/consentimientos/textosLegales";
 import { formatearInstanteConOffset } from "@/lib/fechas";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 /**
  * Firma electrónica simple del profesional, dentro de ProfesionalModal.
@@ -195,10 +196,10 @@ export default function SeccionFirmaElectronica({ idProfesional, firma, puedeDib
             <p className="font-medium">¿Revocar tu firma?</p>
             <p className="mt-0.5 text-[12px] text-[#D70015]">No podrás firmar documentos hasta registrar una nueva. Los ya firmados siguen siendo válidos.</p>
             <div className="mt-3 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <button type="button" onClick={() => setConfirmandoRevocar(false)} disabled={enviando} className="h-10 rounded-xl px-4 text-[13px] font-medium text-[#D70015] hover:bg-[#FF3B30]/15">
+              <button type="button" onClick={() => setConfirmandoRevocar(false)} disabled={enviando} className={BOTON.texto}>
                 Cancelar
               </button>
-              <button type="button" onClick={confirmarRevocacion} disabled={enviando} className="h-10 rounded-xl bg-[#FF3B30] px-4 text-[13px] font-semibold text-white hover:bg-[#E0352B] disabled:opacity-60">
+              <button type="button" onClick={confirmarRevocacion} disabled={enviando} className={BOTON.destructivo}>
                 {enviando ? "Revocando…" : "Sí, revocar"}
               </button>
             </div>
@@ -208,14 +209,14 @@ export default function SeccionFirmaElectronica({ idProfesional, firma, puedeDib
             <button
               type="button"
               onClick={() => setModo("captura")}
-              className="h-10 rounded-xl border border-slate-200 px-4 text-[13px] font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              className={BOTON.secundario}
             >
               Reemplazar firma
             </button>
             <button
               type="button"
               onClick={() => setConfirmandoRevocar(true)}
-              className="h-10 rounded-xl px-4 text-[13px] font-medium text-[#D70015] transition-colors hover:bg-[#FF3B30]/10"
+              className={BOTON.textoDestructivo}
             >
               Revocar
             </button>
@@ -298,7 +299,7 @@ export default function SeccionFirmaElectronica({ idProfesional, firma, puedeDib
             type="button"
             onClick={() => setModo("registrada")}
             disabled={enviando}
-            className="h-11 rounded-xl px-5 text-[14px] font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className={BOTON.texto}
           >
             Mantener firma actual
           </button>
@@ -307,7 +308,7 @@ export default function SeccionFirmaElectronica({ idProfesional, firma, puedeDib
           type="button"
           onClick={guardar}
           disabled={enviando || !trazos.length || !actaAceptada}
-          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#007AFF] px-6 text-[14px] font-semibold text-white transition-colors hover:bg-[#007AFF] disabled:opacity-50"
+          className={BOTON.primario}
         >
           {enviando ? "Registrando…" : firma ? "Registrar nueva firma" : "Registrar firma"}
         </button>

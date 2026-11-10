@@ -3,6 +3,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TINTAS } from "@/lib/firma/constantes";
 import { recortarYNormalizar } from "@/lib/firma/procesarTrazo";
+import { BOTON } from "@/Componentes/documentos/botones";
 
 const GROSOR = 2.4;
 
@@ -204,7 +205,7 @@ const PadFirma = forwardRef(function PadFirma({ tinta = "azul", onCambioTinta, o
             type="button"
             onClick={deshacer}
             disabled={vacio || deshabilitado}
-            className="h-9 rounded-lg px-3 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/10 disabled:text-[#C7C7CC] disabled:hover:bg-transparent"
+            className={`${BOTON.texto} ${BOTON.compacto}`}
           >
             Deshacer
           </button>
@@ -212,7 +213,7 @@ const PadFirma = forwardRef(function PadFirma({ tinta = "azul", onCambioTinta, o
             type="button"
             onClick={limpiar}
             disabled={vacio || deshabilitado}
-            className="h-9 rounded-lg px-3 text-[13px] font-medium text-[#007AFF] transition-colors hover:bg-[#007AFF]/10 disabled:text-[#C7C7CC] disabled:hover:bg-transparent"
+            className={`${BOTON.texto} ${BOTON.compacto}`}
           >
             Limpiar
           </button>
