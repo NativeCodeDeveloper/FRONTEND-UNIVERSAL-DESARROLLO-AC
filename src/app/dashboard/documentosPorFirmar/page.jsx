@@ -18,8 +18,9 @@ import { BOTON } from "@/Componentes/documentos/botones";
  * Bandeja de documentos pendientes de firma:
  *  - Para tu firma: los que otra persona (secretaría, un colega) preparó para que
  *    tú los firmes. Solo el profesional firmante puede firmarlos.
- *  - Enviados, esperando firma: los que tú preparaste para otro profesional.
+ *  - Enviados, esperando firma (administración): los que preparó para un profesional.
  *  - Pendientes del centro (administración): el resto de lo que espera firma.
+ *  Reserva de la ficha (Ley 20.584): un profesional nunca ve documentos de otro.
  * Quien genera y quien firma quedan registrados por separado.
  */
 export default function DocumentosPorFirmar() {
@@ -108,7 +109,7 @@ export default function DocumentosPorFirmar() {
         <header className="mb-6">
           <h1 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Documentos por firmar</h1>
           <p className="mt-1 text-[13px] text-slate-500">
-            Lo que espera tu firma electrónica y lo que enviaste a firma de otros profesionales.
+            Documentos que esperan tu firma electrónica. Solo ves los que firmas tú.
           </p>
         </header>
 

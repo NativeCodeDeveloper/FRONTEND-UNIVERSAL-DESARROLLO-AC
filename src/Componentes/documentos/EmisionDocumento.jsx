@@ -192,6 +192,10 @@ export default function EmisionDocumento({
   }
 
   const deshabilitarAcciones = deshabilitado || !profesional?.id_profesional;
+  // Reserva de la ficha (Ley 20.584): un documento lo emite y firma su profesional; la
+  // administración puede prepararlo para su bandeja. Otro profesional no (el servidor
+  // también lo rechaza): no se le ofrece el botón.
+  const puedeEmitir = esFirmante || sesion.esAdministrador || sesion.esTecnico;
 
   const modal = (
     <ModalEmision
@@ -229,15 +233,17 @@ export default function EmisionDocumento({
           <IconoImpresora />
           {imprimiendo ? "…" : "Imprimir"}
         </button>
-        <button
-          type="button"
-          onClick={abrirVistaPrevia}
-          disabled={deshabilitarAcciones}
-          title={!esFirmante && profesional?.nombre ? `La firma ${profesional.nombre}` : undefined}
-          className={`${esFirmante ? BOTON.primario : BOTON.secundario} ${BOTON.compacto}`}
-        >
-          {esFirmante ? "Firmar" : "Enviar a firma"}
-        </button>
+        {puedeEmitir ? (
+          <button
+            type="button"
+            onClick={abrirVistaPrevia}
+            disabled={deshabilitarAcciones}
+            title={!esFirmante && profesional?.nombre ? `La firma ${profesional.nombre}` : undefined}
+            className={`${esFirmante ? BOTON.primario : BOTON.secundario} ${BOTON.compacto}`}
+          >
+            {esFirmante ? "Firmar" : "Enviar a firma"}
+          </button>
+        ) : null}
         {enlaceRespaldo ? (
           <a href={enlaceRespaldo} target="_blank" rel="noreferrer" className={`${BOTON.texto} ${BOTON.compacto}`}>
             Abrir para imprimir
@@ -256,6 +262,8 @@ export default function EmisionDocumento({
           <p className="mt-0.5 text-[12px] text-slate-500">
             {deshabilitarAcciones
               ? motivoDeshabilitado || "Selecciona el profesional responsable para emitir."
+              : !puedeEmitir
+              ? `Lo emite y firma ${profesional.nombre || "el profesional tratante"}. Solo ese profesional o la administración pueden hacerlo.`
               : `Firma: ${profesional.nombre || "profesional"} · ${TIPOS_DOCUMENTO[tipoDocumento] || "Documento"}`}
           </p>
         </div>
@@ -269,14 +277,16 @@ export default function EmisionDocumento({
             <IconoImpresora />
             {imprimiendo ? "Preparando…" : "Imprimir para firmar"}
           </button>
-          <button
-            type="button"
-            onClick={abrirVistaPrevia}
-            disabled={deshabilitarAcciones}
-            className={BOTON.primario}
-          >
-            {esFirmante ? "Revisar y firmar" : "Revisar y enviar a firma"}
-          </button>
+          {puedeEmitir ? (
+            <button
+              type="button"
+              onClick={abrirVistaPrevia}
+              disabled={deshabilitarAcciones}
+              className={BOTON.primario}
+            >
+              {esFirmante ? "Revisar y firmar" : "Revisar y enviar a firma"}
+            </button>
+          ) : null}
         </div>
       </div>
       {enlaceRespaldo ? (
