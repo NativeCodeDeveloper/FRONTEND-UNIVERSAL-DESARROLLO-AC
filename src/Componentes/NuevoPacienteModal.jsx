@@ -48,7 +48,7 @@ const CAMPOS_REQUERIDOS = [
 const ETIQUETAS = {
   nombre: "Nombres",
   apellido: "Apellidos",
-  rut: "Identificación (RUT)",
+  rut: "Identificación",
   nacimiento: "Fecha de nacimiento",
   sexo: "Sexo",
   prevision: "Previsión",

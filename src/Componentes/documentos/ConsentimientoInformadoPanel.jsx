@@ -8,7 +8,7 @@ import { useProfesionales } from "@/hooks/useProfesionales";
 import { useSesionProfesional } from "@/hooks/useSesionProfesional";
 import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
 import { datosProfesionalParaDocumento, profesionalPorId } from "@/lib/profesional";
-import { formatRut } from "@/lib/designTokens";
+import { textoDocumento } from "@/lib/rut";
 import { bloquesDeTexto } from "@/lib/consentimientos/textosLegales";
 import { PLANTILLA_BASE, renderizarConsentimiento } from "@/lib/consentimientos/plantillasProcedimiento";
 import { useProcedimientos } from "@/hooks/useProcedimientos";
@@ -59,11 +59,9 @@ export default function ConsentimientoInformadoPanel({ paciente, incrustado = fa
 
   const datosPaciente = useMemo(() => {
     const nombre = `${paciente?.nombre || ""} ${paciente?.apellido || ""}`.trim();
-    const tipo = paciente?.tipo_documento === "pasaporte" ? "Pasaporte" : "RUT";
-    const numero = tipo === "RUT" ? formatRut(paciente?.rut) || paciente?.rut : paciente?.rut;
     return {
       nombre,
-      documento: numero ? `${tipo} ${numero}` : "",
+      documento: textoDocumento(paciente?.rut, paciente?.tipo_documento),
       representante: conRepresentante && representante.nombre.trim()
         ? { nombre: representante.nombre.trim(), documento: representante.documento.trim() ? `RUT ${representante.documento.trim()}` : "" }
         : null,

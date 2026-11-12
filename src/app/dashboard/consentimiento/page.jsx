@@ -12,7 +12,7 @@ import { useProfesionales } from "@/hooks/useProfesionales";
 import { useProcedimientos } from "@/hooks/useProcedimientos";
 import { useSesionProfesional } from "@/hooks/useSesionProfesional";
 import { datosProfesionalParaDocumento, profesionalPorId } from "@/lib/profesional";
-import { formatRut } from "@/lib/designTokens";
+import { textoDocumento } from "@/lib/rut";
 import { bloquesDeTexto } from "@/lib/consentimientos/textosLegales";
 import { renderizarConsentimiento } from "@/lib/consentimientos/plantillasProcedimiento";
 import { PROCEDIMIENTOS_EN_SERVIDOR } from "@/lib/consentimientos/apiProcedimientos";
@@ -141,9 +141,7 @@ function ModuloConsentimiento() {
     const profesional = profesionalRegistrado ? datosProfesionalParaDocumento(profesionalRegistrado) : null;
     const datosPaciente = paciente ? {
         nombre: [paciente.nombre, paciente.apellido].filter(Boolean).join(" ").trim(),
-        documento: paciente.rut
-            ? (paciente.tipo_documento === "pasaporte" ? "Pasaporte " + paciente.rut : "RUT " + (formatRut(paciente.rut) || paciente.rut))
-            : "",
+        documento: textoDocumento(paciente.rut, paciente.tipo_documento),
         representante: conRepresentante ? {
             nombre: representante.nombre.trim(),
             documento: representante.documento.trim() ? "RUT " + representante.documento.trim() : "",

@@ -23,6 +23,7 @@ import {
 import {Textarea} from "@/components/ui/textarea";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import { formatRut } from "@/lib/designTokens";
+import { textoDocumento } from "@/lib/rut";
 import { useEmpresaNombre } from "@/hooks/useEmpresaNombre";
 import { edadCivil, formatearFechaCivil, hoyCivil } from "@/lib/fechas";
 
@@ -520,7 +521,7 @@ export default function ReecetasPacientes() {
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-base font-bold text-slate-900">{paciente.nombre} {paciente.apellido}</p>
-                                    <p className="text-[13px] text-slate-500 font-mono">RUT {formatRut(paciente.rut) || "---"}</p>
+                                    <p className="text-[13px] text-slate-500 font-mono">{textoDocumento(paciente.rut, paciente.tipo_documento) || "RUT ---"}</p>
                                 </div>
                                 <div className="ml-auto flex flex-wrap gap-2">
                                     <span className="inline-flex items-center rounded-lg bg-[#EBF4FF] border border-[#CCE4FF] px-2.5 py-0.5 text-[12px] font-semibold text-[#007AFF] ">

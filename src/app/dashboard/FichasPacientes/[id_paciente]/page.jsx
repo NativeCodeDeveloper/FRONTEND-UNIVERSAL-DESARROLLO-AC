@@ -29,6 +29,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {InfoButton} from "@/Componentes/InfoButton";
 import { formatRut, cleanRut, getStateTokens } from "@/lib/designTokens";
+import { etiquetaDocumento, formatearDocumento, textoDocumento } from "@/lib/rut";
 import { rutPerteneceAOtroPaciente } from "@/lib/validarRutPaciente";
 import {
     canAccessOdontograma,
@@ -212,6 +213,7 @@ export default function Paciente() {
             nombre: paciente.nombre || "",
             apellido: paciente.apellido || "",
             rut: paciente.rut || "",
+            tipo_documento: paciente.tipo_documento || "rut",
             telefono: paciente.telefono || "",
             email: paciente.correo || "",
         });
@@ -669,7 +671,7 @@ export default function Paciente() {
     const pacienteActual = detallePaciente[0];
     // Subtítulo de los popups de la carpeta: a quién corresponde lo que se emite o envía.
     const descripcionPacientePopup = pacienteActual
-        ? `${`${pacienteActual.nombre || ""} ${pacienteActual.apellido || ""}`.trim()}${pacienteActual.rut ? ` · RUT ${formatRut(pacienteActual.rut) || pacienteActual.rut}` : ""}`
+        ? `${`${pacienteActual.nombre || ""} ${pacienteActual.apellido || ""}`.trim()}${pacienteActual.rut ? ` · ${textoDocumento(pacienteActual.rut, pacienteActual.tipo_documento)}` : ""}`
         : undefined;
     // claveFechaCivil devuelve "AAAA-MM-DD", el mismo formato que entrega un
     // <input type="date">: se comparan como texto, sin pasar por Date, que
@@ -801,7 +803,7 @@ export default function Paciente() {
             nombreProfesional: nombreProfesionalFicha,
             identificacion: [
                 { rotulo: "Paciente", valor: `${pacienteActual?.nombre || ""} ${pacienteActual?.apellido || ""}`.trim(), completo: true },
-                { rotulo: "RUT", valor: formatRut(pacienteActual?.rut) || pacienteActual?.rut },
+                { rotulo: etiquetaDocumento(pacienteActual?.tipo_documento), valor: formatearDocumento(pacienteActual?.rut, pacienteActual?.tipo_documento) },
                 { rotulo: "Previsión", valor: previsionDesdeId(pacienteActual?.prevision_id) },
                 { rotulo: "Nacimiento", valor: formatearFecha(pacienteActual?.nacimiento) },
                 { rotulo: "Edad", valor: edad === "-" ? "-" : `${edad} años` },
@@ -937,7 +939,7 @@ export default function Paciente() {
             };
 
             escribirDato("PACIENTE", `${pacienteActual.nombre || ""} ${pacienteActual.apellido || ""}`, margin + 4, y + 18, 58);
-            escribirDato("RUT", formatRut(pacienteActual.rut) || pacienteActual.rut || "-", margin + 74, y + 18, 38);
+            escribirDato(etiquetaDocumento(pacienteActual.tipo_documento).toUpperCase(), formatearDocumento(pacienteActual.rut, pacienteActual.tipo_documento) || "-", margin + 74, y + 18, 38);
             escribirDato("ID PACIENTE", id_paciente, margin + 130, y + 18, 34);
             escribirDato("PROFESIONAL", profesionalFicha, margin + 4, y + 32, 58);
             escribirDato("FECHA CONSULTA", formatearFecha(ficha.fechaConsulta), margin + 74, y + 32, 38);
@@ -1156,8 +1158,8 @@ export default function Paciente() {
                             de la fila y el diseño de escritorio no cambia. */}
                         <div className="grid grid-cols-2 gap-3 sm:contents">
                             <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
-                                <span className="text-[12px] font-medium text-slate-400 leading-none">RUT</span>
-                                <span className="text-sm font-bold text-slate-900 mt-1 leading-none font-mono">{formatRut(pacienteActual?.rut) || "-"}</span>
+                                <span className="text-[12px] font-medium text-slate-400 leading-none">{etiquetaDocumento(pacienteActual?.tipo_documento)}</span>
+                                <span className="text-sm font-bold text-slate-900 mt-1 leading-none font-mono">{formatearDocumento(pacienteActual?.rut, pacienteActual?.tipo_documento) || "-"}</span>
                             </div>
                             <div className="h-14 px-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-center shadow-sm">
                                 <span className="text-[12px] font-medium text-slate-400 leading-none">Registros</span>

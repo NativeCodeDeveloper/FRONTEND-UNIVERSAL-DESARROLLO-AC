@@ -17,7 +17,7 @@ import {
   progresoFicha,
   transformarPlantilla,
 } from "@/lib/fichaPlantilla";
-import { formatRut } from "@/lib/designTokens";
+import { textoDocumento } from "@/lib/rut";
 
 // Arma el aviso nombrando lo que falta, en vez de mandar a revisar la pantalla.
 //   uno:    "Falta ingresar la fecha de atención."
@@ -241,7 +241,7 @@ export default function FichaClinicaModal({ abierto, paciente, id_paciente, idPr
       titulo="Nueva ficha clínica"
       descripcion={
         nombrePaciente
-          ? `${nombrePaciente}${paciente?.rut ? ` · RUT ${formatRut(paciente.rut) || paciente.rut}` : ""}`
+          ? `${nombrePaciente}${paciente?.rut ? ` · ${textoDocumento(paciente.rut, paciente.tipo_documento)}` : ""}`
           : undefined
       }
       pie={confirmando ? (

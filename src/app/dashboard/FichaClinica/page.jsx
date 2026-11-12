@@ -9,7 +9,8 @@ import {toast} from "react-hot-toast";
 import * as React from "react"
 import {useRouter} from "next/navigation";
 import {BookOpenIcon} from "@heroicons/react/24/outline";
-import { formatRut, cleanRut } from "@/lib/designTokens";
+import { cleanRut } from "@/lib/designTokens";
+import { formatearDocumento } from "@/lib/rut";
 import BotonVideoTutorial from "@/Componentes/VideoTutorial";
 
 
@@ -252,7 +253,7 @@ export default function FichaClinica() {
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">Identidad del Paciente</TableHead>
-                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">RUT</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">RUT o documento</TableHead>
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6">Contacto</TableHead>
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 px-6 text-center">Carpeta Médica</TableHead>
                                     </TableRow>
@@ -272,7 +273,7 @@ export default function FichaClinica() {
                                             </TableCell>
                                             <TableCell className="py-6 px-6">
                                                 <span className="text-[12px] font-mono text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200/50">
-                                                    {formatRut(paciente.rut)}
+                                                    {formatearDocumento(paciente.rut, paciente.tipo_documento)}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="py-6 px-6">

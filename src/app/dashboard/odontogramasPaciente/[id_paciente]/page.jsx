@@ -7,7 +7,7 @@ import {useParams, useRouter} from "next/navigation";
 import ToasterClient from "@/Componentes/ToasterClient";
 import {toast} from "react-hot-toast";
 import Odontograma from "@/Componentes/Odontograma";
-import { formatRut } from "@/lib/designTokens";
+import { etiquetaDocumento, formatearDocumento } from "@/lib/rut";
 
 
 const ALL_TEETH = [
@@ -222,7 +222,7 @@ export default function OdontogramasPaciente() {
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/>
                                                     </svg>
-                                                    RUT: <span className="font-mono font-medium text-slate-700">{formatRut(paciente.rut)}</span>
+                                                    {etiquetaDocumento(paciente.tipo_documento)}: <span className="font-mono font-medium text-slate-700">{formatearDocumento(paciente.rut, paciente.tipo_documento)}</span>
                                                 </span>
                                                 <span className="hidden sm:inline-flex h-4 w-px bg-slate-200"/>
                                                 <span className="hidden sm:inline-flex items-center gap-1.5 text-sm text-slate-500">

@@ -18,7 +18,8 @@ import es from "date-fns/locale/es";
 import {SelectDinamic} from "@/Componentes/SelectDinamic";
 import {AppointmentCard} from "@/Componentes/AppointmentCard";
 import {InfoButton} from "@/Componentes/InfoButton";
-import { formatRut, getStateTokens } from "@/lib/designTokens";
+import { getStateTokens } from "@/lib/designTokens";
+import { etiquetaDocumento, formatearDocumento } from "@/lib/rut";
 
 const locales = {
     es: es,
@@ -1243,7 +1244,7 @@ export default function Calendario() {
                                 <h2 className="text-2xl font-bold tracking-tight text-slate-900">
                                     {(r.nombrePaciente ?? "").trim()} {(r.apellidoPaciente ?? "").trim()}
                                 </h2>
-                                <p className="text-[13px] text-slate-400 mt-1">ID Reserva: #{r.id_reserva} • RUT: {formatRut(r.rut) || "—"}</p>
+                                <p className="text-[13px] text-slate-400 mt-1">ID Reserva: #{r.id_reserva} • {etiquetaDocumento(r.tipo_documento)}: {formatearDocumento(r.rut, r.tipo_documento) || "—"}</p>
                             </div>
 
                             {/* Body Popup */}

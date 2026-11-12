@@ -9,10 +9,11 @@
  *   - className: string (opcional)
  */
 
-import { formatRut } from "@/lib/designTokens";
+import { formatearDocumento } from "@/lib/rut";
 
-export function RutDisplay({ rut = "", className = "" }) {
-  const formatted = formatRut(rut);
+// `tipo` ("rut" | "pasaporte" | "dni"): un pasaporte o DNI se muestra tal cual.
+export function RutDisplay({ rut = "", tipo, className = "" }) {
+  const formatted = formatearDocumento(rut, tipo);
   if (!formatted) return null;
 
   return (

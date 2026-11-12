@@ -9,7 +9,8 @@ import {toast} from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {UserIcon} from "@heroicons/react/24/outline";
 import {InfoButton} from "@/Componentes/InfoButton";
-import { formatRut, cleanRut } from "@/lib/designTokens";
+import { cleanRut } from "@/lib/designTokens";
+import { formatearDocumento } from "@/lib/rut";
 import NuevoPacienteModal from "@/Componentes/NuevoPacienteModal";
 
 export default function ListaPacientes() {
@@ -265,7 +266,7 @@ export default function ListaPacientes() {
                                     <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100">
                                         <TableHead className="w-[100px] text-center text-[12px] font-medium text-slate-400 py-5">Perfil</TableHead>
                                         <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Nombre Completo</TableHead>
-                                        <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Identificación (RUT)</TableHead>
+                                        <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Identificación</TableHead>
                                         <TableHead className="text-left text-[12px] font-medium text-slate-400 py-5">Contacto Principal</TableHead>
                                         <TableHead className="text-center text-[12px] font-medium text-slate-400 py-5">Acción Rápida</TableHead>
                                     </TableRow>
@@ -302,7 +303,7 @@ export default function ListaPacientes() {
                                                     <span className="text-[11px] text-slate-400 font-medium">Paciente ID #{paciente.id_paciente}</span>
                                                 </TableCell>
                                                 <TableCell className="py-4">
-                                                    <span className="text-[13px] font-semibold text-slate-600 font-mono">{formatRut(paciente.rut) || "Sin registro"}</span>
+                                                    <span className="text-[13px] font-semibold text-slate-600 font-mono">{formatearDocumento(paciente.rut, paciente.tipo_documento) || "Sin registro"}</span>
                                                 </TableCell>
                                                 <TableCell className="py-4">
                                                     <span className="text-[13px] font-semibold text-slate-600 block">{paciente.telefono || "N/A"}</span>

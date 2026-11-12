@@ -4,7 +4,7 @@ import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { formatRut } from "@/lib/designTokens";
+import { etiquetaDocumento, formatearDocumento } from "@/lib/rut";
 import { claveFechaCivil, formatearFechaCivil } from "@/lib/fechas";
 import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
 import ToasterClient from "@/Componentes/ToasterClient";
@@ -203,7 +203,7 @@ export default function Telemedicina() {
                             <p className="mt-0.5 truncate text-[13px] text-[#86868B]">
                                 Telemedicina
                                 <span className="mx-1.5 text-[#C7C7CC]">·</span>
-                                RUT <span className="tabular-nums text-[#6E6E73]">{formatRut(paciente.rut) || paciente.rut || "—"}</span>
+                                {etiquetaDocumento(paciente.tipo_documento)} <span className="tabular-nums text-[#6E6E73]">{formatearDocumento(paciente.rut, paciente.tipo_documento) || "—"}</span>
                             </p>
                         )}
                     </div>

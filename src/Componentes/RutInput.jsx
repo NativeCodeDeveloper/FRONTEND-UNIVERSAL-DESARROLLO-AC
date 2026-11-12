@@ -2,11 +2,11 @@
 
 /**
  * RutInput.jsx
- * Input de documento de identidad: RUT chileno o, si se habilita, pasaporte.
+ * Input de documento de identidad: RUT chileno o, si se habilita, pasaporte o DNI.
  * - El onChange devuelve el valor LIMPIO (sin puntos ni guión) al componente padre
  * - Valida el dígito verificador (módulo 11), no solo el largo
- * - Con `permitirExtranjero`, muestra un selector RUT · Pasaporte para pacientes
- *   extranjeros; el pasaporte no tiene dígito verificador
+ * - Con `permitirExtranjero`, muestra un selector RUT · Pasaporte · DNI para pacientes
+ *   extranjeros; pasaporte y DNI no tienen dígito verificador
  * - El padre guarda el valor limpio → lo envía al backend sin formato
  * - El RutDisplay usa formatRut() para mostrarlo en pantalla
  *
@@ -18,7 +18,7 @@
  *
  *   <RutInput
  *     permitirExtranjero
- *     tipoDocumento={tipo}               // "rut" | "pasaporte"
+ *     tipoDocumento={tipo}               // "rut" | "pasaporte" | "dni"
  *     onTipoDocumentoChange={setTipo}
  *     value={documento}
  *     onChange={setDocumento}
@@ -28,6 +28,7 @@
 import { useEffect, useState } from "react";
 import {
     TIPOS_DOCUMENTO,
+    esDocumentoExtranjero,
     limpiarPasaporte,
     limpiarRut,
     validarDocumento,
@@ -45,9 +46,10 @@ export function RutInput({
     onTipoDocumentoChange,
     onValidez,
 }) {
-    const esPasaporte = permitirExtranjero && tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE;
-    const tipo = esPasaporte ? TIPOS_DOCUMENTO.PASAPORTE : TIPOS_DOCUMENTO.RUT;
-    const limpiar = esPasaporte ? limpiarPasaporte : (v) => limpiarRut(v).slice(0, 9);
+    // Pasaporte y DNI comparten regla (letras y números, sin dígito verificador).
+    const esExtranjero = permitirExtranjero && esDocumentoExtranjero(tipoDocumento);
+    const tipo = esExtranjero ? tipoDocumento : TIPOS_DOCUMENTO.RUT;
+    const limpiar = esExtranjero ? limpiarPasaporte : (v) => limpiarRut(v).slice(0, 9);
 
     const [display, setDisplay] = useState(value || "");
     const [touched, setTouched] = useState(false);
@@ -80,7 +82,7 @@ export function RutInput({
     function handleBeforeInput(e) {
         const data = e.data ?? "";
         if (!data) return;
-        const permitido = esPasaporte ? /^[0-9a-zA-Z]+$/ : /^[0-9kK]+$/;
+        const permitido = esExtranjero ? /^[0-9a-zA-Z]+$/ : /^[0-9kK]+$/;
         if (!permitido.test(data)) e.preventDefault();
     }
 
@@ -99,7 +101,9 @@ export function RutInput({
         setTouched(false);
         setError("");
         onTipoDocumentoChange?.(nuevo);
-        // El valor de un tipo no sirve para el otro ("12345678K" no es pasaporte útil).
+        // Entre pasaporte y DNI el número se conserva (misma regla); desde o hacia RUT no
+        // sirve ("12345678K" no es un pasaporte útil).
+        if (esDocumentoExtranjero(nuevo) && esExtranjero) return;
         setDisplay("");
         onChange?.("");
     }
@@ -115,7 +119,7 @@ export function RutInput({
                 ? "border-emerald-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                 : "border-slate-200 focus:border-[#007AFF]/30 focus:ring-2 focus:ring-[#007AFF]/10");
 
-    const textoPlaceholder = placeholder ?? (esPasaporte ? "N° de pasaporte" : "Ej: 19.168.408-7");
+    const textoPlaceholder = placeholder ?? (!esExtranjero ? "Ej: 19.168.408-7" : tipo === TIPOS_DOCUMENTO.DNI ? "N° de DNI" : "N° de pasaporte");
 
     return (
         <div className="space-y-1">
@@ -129,11 +133,12 @@ export function RutInput({
                 <div
                     role="radiogroup"
                     aria-label="Tipo de documento"
-                    className="mb-1.5 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 sm:inline-grid sm:w-auto"
+                    className="mb-1.5 grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1 sm:inline-grid sm:w-auto"
                 >
                     {[
                         [TIPOS_DOCUMENTO.RUT, "RUT"],
                         [TIPOS_DOCUMENTO.PASAPORTE, "Pasaporte"],
+                        [TIPOS_DOCUMENTO.DNI, "DNI"],
                     ].map(([valor, etiqueta]) => (
                         <button
                             key={valor}
@@ -170,7 +175,7 @@ export function RutInput({
                     autoComplete="off"
                     autoCapitalize="characters"
                     style={{ textTransform: "uppercase" }}
-                    maxLength={esPasaporte ? 20 : 9}
+                    maxLength={esExtranjero ? 20 : 9}
                 />
                 {/* Indicador de validez */}
                 {isOk && (
@@ -193,7 +198,7 @@ export function RutInput({
             {/* Hint solo antes de tocar */}
             {!touched && (
                 <p className="text-[11px] text-slate-400">
-                    {esPasaporte
+                    {esExtranjero
                         ? "Letras y números, sin espacios ni guiones"
                         : "Sin puntos ni guión · se valida el dígito verificador"}
                 </p>

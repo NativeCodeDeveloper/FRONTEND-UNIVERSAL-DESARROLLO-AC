@@ -39,6 +39,7 @@ import { PhoneInput } from "@/Componentes/PhoneInput";
 import { RutDisplay } from "@/Componentes/RutDisplay";
 import { RecordatorioPaciente } from "@/Componentes/RecordatorioPaciente";
 import { getStateTokens } from "@/lib/designTokens";
+import { TIPOS_DOCUMENTO, esDocumentoExtranjero, etiquetaDocumento, limpiarPasaporte } from "@/lib/rut";
 import { PREVISIONES } from "@/lib/previsiones";
 import { MAX_CARACTERES_COMENTARIO_RESERVA } from "@/lib/camposReserva";
 import { useRouter } from "next/navigation";
@@ -93,7 +94,7 @@ function InfoSection({ reserva, start, end, formatHora, formatFechaLarga }) {
           </p>
           {reserva?.rut && (
             <p className="text-[12px] text-slate-500 mt-0.5">
-              <RutDisplay rut={reserva.rut} />
+              <RutDisplay rut={reserva.rut} tipo={reserva.tipo_documento} />
             </p>
           )}
           {reserva?.telefono && (
@@ -676,15 +677,19 @@ function FormSection({
     .replace(/\s/g, "")
     .toUpperCase() === "RUTDESCONOCIDO";
 
+  // Pasaporte y DNI se buscan con letras y números (5 a 20); el RUT, con 8 o 9 caracteres.
+  const esExtranjero = esDocumentoExtranjero(popupForm.tipo_documento);
+
   useEffect(() => {
-    const rutBusqueda = String(popupForm.rut ?? "")
-      .replace(/[^0-9kK]/g, "")
-      .toUpperCase();
+    const rutBusqueda = esExtranjero
+      ? limpiarPasaporte(popupForm.rut)
+      : String(popupForm.rut ?? "").replace(/[^0-9kK]/g, "").toUpperCase();
 
     setPacienteCoincidente(null);
     setErrorBusquedaPaciente("");
 
-    if (esRutDesconocido || (rutBusqueda.length !== 8 && rutBusqueda.length !== 9)) {
+    const largoValido = esExtranjero ? rutBusqueda.length >= 5 : rutBusqueda.length === 8 || rutBusqueda.length === 9;
+    if (esRutDesconocido || !largoValido) {
       setBuscandoPaciente(false);
       return;
     }
@@ -708,9 +713,9 @@ function FormSection({
         const datos = await respuesta.json();
         const pacientes = Array.isArray(datos) ? datos : datos ? [datos] : [];
         const coincidenciaExacta = pacientes.find((paciente) =>
-          String(paciente?.rut ?? "")
-            .replace(/[^0-9kK]/g, "")
-            .toUpperCase() === rutBusqueda
+          (esExtranjero
+            ? limpiarPasaporte(paciente?.rut)
+            : String(paciente?.rut ?? "").replace(/[^0-9kK]/g, "").toUpperCase()) === rutBusqueda
         );
 
         if (!controlador.signal.aborted) {
@@ -737,7 +742,7 @@ function FormSection({
       window.clearTimeout(temporizador);
       controlador.abort();
     };
-  }, [API, esRutDesconocido, popupForm.rut]);
+  }, [API, esRutDesconocido, esExtranjero, popupForm.rut]);
 
   return (
     <div className="flex flex-col gap-3.5 p-4 sm:p-5">
@@ -793,12 +798,16 @@ function FormSection({
           </p>
           <div>
             <div className="mb-1 flex items-center justify-between gap-3">
-              <label className="block text-[11px] font-semibold text-slate-500">RUT</label>
+              <label className="block text-[11px] font-semibold text-slate-500">{esExtranjero ? etiquetaDocumento(popupForm.tipo_documento) : "RUT"}</label>
               <label className="inline-flex cursor-pointer items-center gap-2 text-[11px] font-semibold text-slate-600">
                 <input
                   type="checkbox"
                   checked={esRutDesconocido}
-                  onChange={(e) => onPopupFormChange("rut", e.target.checked ? "RUT DESCONOCIDO" : "")}
+                  onChange={(e) => {
+                    // "RUT desconocido" siempre es del tipo RUT (no se guarda como pasaporte ni DNI).
+                    if (e.target.checked) onPopupFormChange("tipo_documento", TIPOS_DOCUMENTO.RUT);
+                    onPopupFormChange("rut", e.target.checked ? "RUT DESCONOCIDO" : "");
+                  }}
                   className="h-4 w-4 rounded border-slate-300 text-[#007AFF] accent-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20"
                 />
                 RUT desconocido
@@ -814,6 +823,9 @@ function FormSection({
               />
             ) : (
               <RutInput
+                permitirExtranjero
+                tipoDocumento={popupForm.tipo_documento}
+                onTipoDocumentoChange={(tipo) => onPopupFormChange("tipo_documento", tipo)}
                 value={popupForm.rut}
                 onChange={(clean) => onPopupFormChange("rut", clean)}
                 className="h-11! rounded-xl! text-[16px]! sm:text-[13px]!"

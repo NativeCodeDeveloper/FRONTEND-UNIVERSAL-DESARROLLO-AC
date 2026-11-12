@@ -18,8 +18,7 @@ import {InfoButton} from "@/Componentes/InfoButton";
 import {Textarea} from "@/components/ui/textarea";
 import { RutInput } from "@/Componentes/RutInput";
 import { PhoneInput } from "@/Componentes/PhoneInput";
-import { formatRut } from "@/lib/designTokens";
-import { TIPOS_DOCUMENTO, validarDocumento } from "@/lib/rut";
+import { TIPOS_DOCUMENTO, validarDocumento, esDocumentoExtranjero, textoDocumento } from "@/lib/rut";
 import {canAccessFichasClinicas, getDashboardRoleFromUser} from "@/lib/dashboard-access";
 import ListaDocumentosPaciente from "@/Componentes/documentos/ListaDocumentosPaciente";
 import { FIRMA_HABILITADA } from "@/lib/firma/apiFirma";
@@ -223,7 +222,7 @@ export default function Paciente(){
             setApellido(paciente.apellido);
             setRut(paciente.rut);
             setRutOriginal(paciente.rut ?? "");
-            setTipoDocumento(paciente.tipo_documento === TIPOS_DOCUMENTO.PASAPORTE ? TIPOS_DOCUMENTO.PASAPORTE : TIPOS_DOCUMENTO.RUT);
+            setTipoDocumento(esDocumentoExtranjero(paciente.tipo_documento) ? paciente.tipo_documento : TIPOS_DOCUMENTO.RUT);
             setNacimiento(paciente.nacimiento);
             setSexo(paciente.sexo);
             setPrevision(previsionDesdeId(paciente.prevision_id));
@@ -372,7 +371,7 @@ export default function Paciente(){
                                         {paciente.nombre} {paciente.apellido}
                                     </h2>
                                     <p className="mt-1 text-[13px] text-slate-500">
-                                        RUT {formatRut(paciente.rut) || "---"}
+                                        {textoDocumento(paciente.rut, paciente.tipo_documento) || "RUT ---"}
                                     </p>
                                 </div>
                                 <div className="flex shrink-0 items-center gap-2">

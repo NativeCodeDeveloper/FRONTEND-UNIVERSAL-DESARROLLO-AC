@@ -29,7 +29,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import {SelectDinamic} from "@/Componentes/SelectDinamic";
-import { formatRut, cleanRut } from "@/lib/designTokens";
+import { cleanRut } from "@/lib/designTokens";
+import { formatearDocumento } from "@/lib/rut";
 
 
 export default function AgendaCitas() {
@@ -574,7 +575,7 @@ export default function AgendaCitas() {
                                                             </div>
                                                             <div className="mb-3">
                                                                 <p className="text-[14px] font-bold text-slate-800 leading-tight truncate">{data.nombrePaciente} {data.apellidoPaciente}</p>
-                                                                <p className="text-[11px] text-slate-400 mt-0.5">{formatRut(data.rut)} · <span className="text-slate-500 font-semibold">{data.nombreProfesional}</span></p>
+                                                                <p className="text-[11px] text-slate-400 mt-0.5">{formatearDocumento(data.rut, data.tipo_documento)} · <span className="text-slate-500 font-semibold">{data.nombreProfesional}</span></p>
                                                             </div>
                                                             <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100">
                                                                 <button onClick={() => actualizarEstadoReservaRapido(data.id_reserva, 'asiste')} disabled={actualizandoReservaId === data.id_reserva}
@@ -609,7 +610,7 @@ export default function AgendaCitas() {
                                     <TableRow className="hover:bg-transparent border-slate-100">
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Fecha y Hora</TableHead>
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5">Paciente / Profesional</TableHead>
-                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">RUT</TableHead>
+                                        <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">RUT o documento</TableHead>
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Estado</TableHead>
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Acciones Rápidas</TableHead>
                                         <TableHead className="text-[12px] font-medium text-slate-400 py-5 text-center">Ficha</TableHead>
@@ -635,7 +636,7 @@ export default function AgendaCitas() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="py-5 text-center text-[12px] font-mono text-slate-500">
-                                                {formatRut(data.rut)}
+                                                {formatearDocumento(data.rut, data.tipo_documento)}
                                             </TableCell>
                                             <TableCell className="py-5 text-center">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[12px] font-medium border shadow-sm ${badgeEstado(data.estadoReserva)}`}>

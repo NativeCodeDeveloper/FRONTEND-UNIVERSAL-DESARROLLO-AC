@@ -23,6 +23,7 @@ import { AppointmentDrawer } from "@/Componentes/AppointmentDrawer";
 import { AppointmentCard } from "@/Componentes/AppointmentCard";
 import { StatusFilterChips } from "@/Componentes/StatusFilterChips";
 import { getStateTokens } from "@/lib/designTokens";
+import { TIPOS_DOCUMENTO, esDocumentoExtranjero } from "@/lib/rut";
 import BotonAyuda from "@/Componentes/BotonAyuda";
 import TutorialGuiadoCalendario from "@/Componentes/TutorialGuiadoCalendario";
 import { useTour } from "@/ContextosGlobales/TourContext";
@@ -50,6 +51,11 @@ function normalizarIdProfesional(valor) {
 function normalizarCorreoOpcional(valor) {
     const correo = (valor ?? "").trim();
     return correo || null;
+}
+
+// Tipo de documento guardado → valor del formulario (sin tipo o desconocido = RUT).
+function tipoDocumentoDe(valor) {
+    return esDocumentoExtranjero(valor) ? valor : TIPOS_DOCUMENTO.RUT;
 }
 
 export default function Calendario() {
@@ -331,6 +337,8 @@ function CalendarioContent() {
     const [nombrePaciente, setNombrePaciente] = useState("");
     const [apellidoPaciente, setApellidoPaciente] = useState("");
     const [rut, setRut] = useState("");
+    // RUT, pasaporte o DNI del paciente en curso (se envía con la reserva y al crear su ficha).
+    const [tipoDocumento, setTipoDocumento] = useState(TIPOS_DOCUMENTO.RUT);
     const [telefono, setTelefono] = useState("");
     const [email, setEmail] = useState("");
 
@@ -346,6 +354,7 @@ function CalendarioContent() {
         setNombrePaciente(searchParams.get("nombre") || "");
         setApellidoPaciente(searchParams.get("apellido") || "");
         setRut(searchParams.get("rut") || "");
+        setTipoDocumento(tipoDocumentoDe(searchParams.get("tipo_documento")));
         setTelefono(searchParams.get("telefono") || "");
         setEmail(searchParams.get("email") || "");
     }, [searchParams]);
@@ -408,6 +417,7 @@ function CalendarioContent() {
         nombrePaciente: "",
         apellidoPaciente: "",
         rut: "",
+        tipo_documento: TIPOS_DOCUMENTO.RUT,
         telefono: "",
         email: "",
         motivoBloqueo: "",
@@ -649,6 +659,7 @@ function CalendarioContent() {
                 nombre: reserva?.nombrePaciente || "NO INDICADO",
                 apellido: reserva?.apellidoPaciente || "NO INDICADO",
                 rut: rutNormalizado,
+                tipo_documento: tipoDocumentoDe(reserva?.tipo_documento),
                 nacimiento: "1900-01-01",
                 sexo: "No especifica",
                 prevision_id: 4,
@@ -858,6 +869,7 @@ function CalendarioContent() {
             nombrePaciente: "",
             apellidoPaciente: "",
             rut: "",
+            tipo_documento: TIPOS_DOCUMENTO.RUT,
             telefono: "",
             email: "",
             motivoBloqueo: "",
@@ -895,6 +907,7 @@ function CalendarioContent() {
             nombrePaciente,
             apellidoPaciente,
             rut,
+            tipo_documento: tipoDocumento,
             telefono,
             email,
             motivoBloqueo: "",
@@ -940,6 +953,7 @@ function CalendarioContent() {
         setNombrePaciente(reserva.nombrePaciente ?? "");
         setApellidoPaciente(reserva.apellidoPaciente ?? "");
         setRut(reserva.rut ?? "");
+        setTipoDocumento(tipoDocumentoDe(reserva.tipo_documento));
         setTelefono(reserva.telefono ?? "");
         setEmail(reserva.email ?? "");
         setEstadoReserva(reserva.estadoReserva ?? "reservada");
@@ -960,6 +974,7 @@ function CalendarioContent() {
             nombrePaciente: reserva.nombrePaciente ?? "",
             apellidoPaciente: reserva.apellidoPaciente ?? "",
             rut: reserva.rut ?? "",
+            tipo_documento: tipoDocumentoDe(reserva.tipo_documento),
             telefono: reserva.telefono ?? "",
             email: reserva.email ?? "",
             motivoBloqueo: "",
@@ -1283,7 +1298,7 @@ function CalendarioContent() {
 
     // prestacion, modalidad, prevision y comentario vienen del popupForm. prestacion
     // y modalidad esperan su migración (ver guía más arriba); prevision y comentario ya se guardan.
-    async function insertarNuevaReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, id_profesional, prestacion = "", modalidad = "presencial", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "") {
+    async function insertarNuevaReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, id_profesional, prestacion = "", modalidad = "presencial", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "", tipo_documento = TIPOS_DOCUMENTO.RUT) {
         try {
             const rutLimpio = normalizarRut(rut);
             if (
@@ -1341,7 +1356,7 @@ function CalendarioContent() {
                     mode: "cors",
                     // NOTA: nombre_prestacion y modalidad se envían pero el backend
                     // aún no los persiste (falta su migración).
-                    body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
+                    body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, tipo_documento, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
                 });
                 const respuestaBackend = await res.json();
                 if (!res.ok && respuestaBackend.message === "conflicto") {
@@ -1353,7 +1368,7 @@ function CalendarioContent() {
                         marcarReservaDeTour(rutLimpio);
                         continuarTourTrasGuardarReserva();
                     }
-                    setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
+                    setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setTipoDocumento(TIPOS_DOCUMENTO.RUT); setEmail("");
                     await refrescarCalendario();
                     toast.success("Se ha ingresado correctamente el agendamiento");
                     return true;
@@ -1379,13 +1394,13 @@ function CalendarioContent() {
     // POST crudo para una fecha específica del agendamiento múltiple (paciente en varios días).
     // No valida horario/campos ni muestra toasts: eso ya se hizo una sola vez antes de iterar,
     // porque el horario y los datos del paciente son iguales en todas las fechas seleccionadas.
-    async function crearReservaEnFecha({ nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado, fecha, horaInicio, horaFinalizacion, id_profesional, nombreProfesional, prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario }) {
+    async function crearReservaEnFecha({ nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado, fecha, horaInicio, horaFinalizacion, id_profesional, nombreProfesional, prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario, tipo_documento }) {
         try {
             const res = await fetch(`${API}/reservaPacientes/insertarReservasMultiples`, {
                 method: "POST",
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
                 mode: "cors",
-                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
+                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional, rut: rutLimpio, tipo_documento, telefono, email: correoNormalizado, fechaInicio: fecha, horaInicio, fechaFinalizacion: fecha, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva: "reservada", id_profesional, nombre_prestacion: prestacion || null, modalidad: modalidad || "presencial", prevision: prevision || null, comentario: comentario || "", origen: "dashboard" })
             });
             const respuestaBackend = await res.json().catch(() => ({}));
             if (respuestaBackend.message === true) return { ok: true };
@@ -1408,7 +1423,7 @@ function CalendarioContent() {
         const {
             nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado,
             horaInicioStr, horaFinalizacionStr, id_profesional: idProfesionalEnvio, nombreProfesional,
-            prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario, fechaPrimaria,
+            prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario, fechaPrimaria, tipo_documento,
         } = datosBase;
 
         let exitosos = 0;
@@ -1447,7 +1462,7 @@ function CalendarioContent() {
                 nombrePaciente, apellidoPaciente, rutLimpio, telefono, correoNormalizado,
                 fecha, horaInicio: horaInicioStr, horaFinalizacion: horaFinalizacionStr,
                 id_profesional: idProfesionalEnvio, nombreProfesional,
-                prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario,
+                prestacion, modalidad, monto_reserva, motivo_reserva, prevision, comentario, tipo_documento,
             });
 
             if (resultado.ok) exitosos++;
@@ -1481,7 +1496,7 @@ function CalendarioContent() {
             const correo = normalizarCorreoOpcional(email);
 
             if (!nombre || !apellido || !rutLimpio || !telefonoLimpio) {
-                return toast.error("Debe completar nombre, apellido, RUT y teléfono para ingresar el paciente.");
+                return toast.error("Debe completar nombre, apellido, documento y teléfono para ingresar el paciente.");
             }
 
             const rutNormalizado = normalizarRut(rutLimpio);
@@ -1508,6 +1523,7 @@ function CalendarioContent() {
                     nombre,
                     apellido,
                     rut: rutNormalizado,
+                    tipo_documento: tipoDocumento,
                     nacimiento: "1900-01-01",
                     sexo: "No especifica",
                     prevision_id: 1,
@@ -1923,8 +1939,9 @@ function CalendarioContent() {
         </div>
     );
 
-    async function actualizarInformacionReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, estadoReserva, id_profesional, id_reserva, nombreProfesional = "", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "") {
+    async function actualizarInformacionReserva(nombrePaciente, apellidoPaciente, rut, telefono, email, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, estadoReserva, id_profesional, id_reserva, nombreProfesional = "", monto_reserva = "", motivo_reserva = "", prevision = "", comentario = "", tipo_documento = undefined) {
         try {
+            // Sin tipo (mover o estirar una cita) el backend conserva el guardado.
             const rutLimpio = normalizarRut(rut);
             if (!nombrePaciente || !apellidoPaciente || !rutLimpio || !telefono || !fechaInicio || !horaInicio || !fechaFinalizacion || !horaFinalizacion || !estadoReserva || !id_profesional || !id_reserva) {
                 toast.error("Debe llenar todos los campos para poder actualizar la reserva");
@@ -1940,7 +1957,7 @@ function CalendarioContent() {
                 method: "POST",
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
                 mode: "cors",
-                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional: nombreProfesionalEnvio, rut: rutLimpio, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva, id_profesional, id_reserva, prevision: prevision || null, comentario: comentario || "" })
+                body: JSON.stringify({ nombrePaciente, apellidoPaciente, nombreProfesional: nombreProfesionalEnvio, rut: rutLimpio, tipo_documento, telefono, email: correoNormalizado, fechaInicio, horaInicio, fechaFinalizacion, horaFinalizacion, monto_reserva: monto_reserva || "", motivo_reserva: motivo_reserva || "", estadoReserva, id_profesional, id_reserva, prevision: prevision || null, comentario: comentario || "" })
             });
             const respuestaBackend = await res.json();
             if (!res.ok && respuestaBackend.message === "conflicto") {
@@ -1952,7 +1969,7 @@ function CalendarioContent() {
                 return false;
             }
             if (respuestaBackend.message === true) {
-                setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
+                setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setTipoDocumento(TIPOS_DOCUMENTO.RUT); setEmail("");
                 await refrescarCalendario();
                 toast.success("Se ha actualizado la reserva correctamente");
                 return true;
@@ -1989,6 +2006,7 @@ function CalendarioContent() {
             setNombrePaciente(reserva.nombrePaciente ?? "");
             setApellidoPaciente(reserva.apellidoPaciente ?? "");
             setRut(reserva.rut ?? "");
+            setTipoDocumento(tipoDocumentoDe(reserva.tipo_documento));
             setEmail(reserva.email ?? "");
             setTelefono(reserva.telefono ?? "");
             setfechaInicio((reserva.fechaInicio ?? "").slice(0, 10));
@@ -2010,7 +2028,7 @@ function CalendarioContent() {
     }, [id_reserva]);
 
     function limpiarData() {
-        setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setEmail("");
+        setNombrePaciente(""); setApellidoPaciente(""); setTelefono(""); setRut(""); setTipoDocumento(TIPOS_DOCUMENTO.RUT); setEmail("");
         setMontoReserva(""); setMotivoReserva("");
     }
 
@@ -2077,7 +2095,8 @@ function CalendarioContent() {
             popupForm.monto_reserva ?? "",
             popupForm.motivo_reserva ?? "",
             popupForm.prevision ?? "",
-            popupForm.comentario ?? ""
+            popupForm.comentario ?? "",
+            popupForm.tipo_documento
         );
         if (created) {
             // Defensa adicional: aunque el botón "Agendar" ya queda deshabilitado en el
@@ -2106,11 +2125,13 @@ function CalendarioContent() {
                     prevision: popupForm.prevision ?? "",
                     comentario: popupForm.comentario ?? "",
                     fechaPrimaria: formatearFechaLocal(selectionDraft.start),
+                    tipo_documento: popupForm.tipo_documento,
                 });
             }
             setNombrePaciente(popupForm.nombrePaciente);
             setApellidoPaciente(popupForm.apellidoPaciente);
             setRut(popupForm.rut);
+            setTipoDocumento(popupForm.tipo_documento);
             setTelefono(popupForm.telefono);
             setEmail(popupForm.email);
             limpiarSeleccionTemporal();
@@ -2137,13 +2158,15 @@ function CalendarioContent() {
             popupForm.monto_reserva ?? "",
             popupForm.motivo_reserva ?? "",
             popupForm.prevision ?? "",
-            popupForm.comentario ?? ""
+            popupForm.comentario ?? "",
+            popupForm.tipo_documento
         );
 
         if (actualizado) {
             setNombrePaciente(popupForm.nombrePaciente);
             setApellidoPaciente(popupForm.apellidoPaciente);
             setRut(popupForm.rut);
+            setTipoDocumento(popupForm.tipo_documento);
             setTelefono(popupForm.telefono);
             setEmail(popupForm.email);
             setEstadoReserva(selectionDraft.estadoReserva || estadoReserva || "reservada");
@@ -2182,7 +2205,7 @@ function CalendarioContent() {
                     setid_reserva(0);
                     setNombrePaciente("");
                     setApellidoPaciente("");
-                    setRut("");
+                    setRut(""); setTipoDocumento(TIPOS_DOCUMENTO.RUT);
                     setTelefono("");
                     setEmail("");
                     setfechaInicio("");

@@ -12,7 +12,7 @@ import { IconoCheck } from "@/Componentes/PaginaPublica/Comunes/Iconos";
 import Selector from "@/Componentes/PaginaPublica/Comunes/Selector";
 import Calendario from "@/Componentes/PaginaPublica/Reserva/Calendario";
 import ConsentimientosReserva from "@/Componentes/PaginaPublica/Reserva/ConsentimientosReserva";
-import { TIPOS_DOCUMENTO, limpiarPasaporte, validarDocumento } from "@/lib/rut";
+import { TIPOS_DOCUMENTO, esDocumentoExtranjero, limpiarPasaporte, validarDocumento } from "@/lib/rut";
 import { registrarAceptacion, seleccionarVigentes } from "@/lib/consentimientos/apiConsentimientos";
 import { esObligatorio } from "@/lib/consentimientos/textosLegales";
 import { PREVISIONES } from "@/lib/previsiones";
@@ -125,7 +125,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
   const [enviando, setEnviando] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState("");
   const [confirmada, setConfirmada] = useState(false);
-  /* Pacientes extranjeros reservan con pasaporte (sin dígito verificador). */
+  /* Pacientes extranjeros reservan con pasaporte o DNI (sin dígito verificador). */
   const [tipoDocumento, setTipoDocumento] = useState(TIPOS_DOCUMENTO.RUT);
   const [prevision, setPrevision] = useState(null);
   /* Consentimientos (Ley 21.719 y Ley 20.584): dos aceptaciones separadas, ninguna premarcada. */
@@ -202,7 +202,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
       k,
       k === "rut"
         ? validarDocumento({ tipo: tipoDocumento, valor: datos.rut })
-          ? tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? "Revisa tu pasaporte" : "Revisa tu RUT"
+          ? tipoDocumento === TIPOS_DOCUMENTO.DNI ? "Revisa tu DNI" : tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? "Revisa tu pasaporte" : "Revisa tu RUT"
           : ""
         : errores[k](datos[k]),
     ])
@@ -254,7 +254,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
   }
 
   function cambiar(campo, valor) {
-    if (campo === "rut") valor = tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? limpiarPasaporte(valor) : formatearRut(valor);
+    if (campo === "rut") valor = esDocumentoExtranjero(tipoDocumento) ? limpiarPasaporte(valor) : formatearRut(valor);
     if (campo === "telefono") valor = formatearCelular(valor);
     setDatos((d) => ({ ...d, [campo]: valor }));
   }
@@ -273,7 +273,7 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
     const paciente = {
       nombrePaciente: datos.nombre.trim(),
       apellidoPaciente: datos.apellido.trim(),
-      rut: tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE ? limpiarPasaporte(datos.rut) : limpiarRut(datos.rut),
+      rut: esDocumentoExtranjero(tipoDocumento) ? limpiarPasaporte(datos.rut) : limpiarRut(datos.rut),
       tipo_documento: tipoDocumento,
       telefono: celularParaBackend(datos.telefono),
       email: datos.correo.trim(),
@@ -551,35 +551,62 @@ export default function Reserva({ profesional, tarifas, datosEmpresa, estadoPasa
           bloqueado={!bloqueVigente}
           aviso="Elige un horario para completar tu reserva."
         >
-          <div role="radiogroup" aria-label="Documento de identidad" className="mb-4 inline-flex rounded-full bg-niebla p-1">
-            {[
-              [TIPOS_DOCUMENTO.RUT, "Tengo RUT"],
-              [TIPOS_DOCUMENTO.PASAPORTE, "Soy extranjero/a"],
-            ].map(([valor, etiqueta]) => (
-              <button
-                key={valor}
-                type="button"
-                role="radio"
-                aria-checked={tipoDocumento === valor}
-                onClick={() => {
-                  if (valor === tipoDocumento) return;
-                  setTipoDocumento(valor);
-                  setDatos((d) => ({ ...d, rut: "" }));
-                  setTocados((t) => ({ ...t, rut: false }));
-                }}
-                className={`h-9 rounded-full px-4 text-[14px] font-medium transition-all ${
-                  tipoDocumento === valor ? "bg-papel text-tinta shadow-caja" : "text-tinta-2 hover:text-tinta"
-                }`}
-              >
-                {etiqueta}
-              </button>
-            ))}
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <div role="radiogroup" aria-label="Documento de identidad" className="inline-flex rounded-full bg-niebla p-1">
+              {[
+                [TIPOS_DOCUMENTO.RUT, "Tengo RUT", tipoDocumento === TIPOS_DOCUMENTO.RUT],
+                // Extranjero parte con pasaporte; abajo elige pasaporte o DNI.
+                [TIPOS_DOCUMENTO.PASAPORTE, "Soy extranjero/a", esDocumentoExtranjero(tipoDocumento)],
+              ].map(([valor, etiqueta, activo]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  role="radio"
+                  aria-checked={activo}
+                  onClick={() => {
+                    if (activo) return;
+                    setTipoDocumento(valor);
+                    setDatos((d) => ({ ...d, rut: "" }));
+                    setTocados((t) => ({ ...t, rut: false }));
+                  }}
+                  className={`h-9 rounded-full px-4 text-[14px] font-medium transition-all ${
+                    activo ? "bg-papel text-tinta shadow-caja" : "text-tinta-2 hover:text-tinta"
+                  }`}
+                >
+                  {etiqueta}
+                </button>
+              ))}
+            </div>
+            {esDocumentoExtranjero(tipoDocumento) ? (
+              // Pasaporte o DNI: misma regla, así que el número escrito se conserva.
+              <div role="radiogroup" aria-label="Documento de extranjero" className="inline-flex rounded-full bg-niebla p-1">
+                {[
+                  [TIPOS_DOCUMENTO.PASAPORTE, "Pasaporte"],
+                  [TIPOS_DOCUMENTO.DNI, "DNI"],
+                ].map(([valor, etiqueta]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    role="radio"
+                    aria-checked={tipoDocumento === valor}
+                    onClick={() => setTipoDocumento(valor)}
+                    className={`h-9 rounded-full px-4 text-[14px] font-medium transition-all ${
+                      tipoDocumento === valor ? "bg-papel text-tinta shadow-caja" : "text-tinta-2 hover:text-tinta"
+                    }`}
+                  >
+                    {etiqueta}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { campo: "nombre", etiqueta: "Nombre", tipo: "text", auto: "given-name", placeholder: "Ana" },
               { campo: "apellido", etiqueta: "Apellido", tipo: "text", auto: "family-name", placeholder: "Pérez" },
-              tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE
+              tipoDocumento === TIPOS_DOCUMENTO.DNI
+                ? { campo: "rut", etiqueta: "N° de DNI", tipo: "text", auto: "off", placeholder: "30123456" }
+                : tipoDocumento === TIPOS_DOCUMENTO.PASAPORTE
                 ? { campo: "rut", etiqueta: "N° de pasaporte", tipo: "text", auto: "off", placeholder: "AB1234567" }
                 : { campo: "rut", etiqueta: "RUT", tipo: "text", auto: "off", placeholder: "12.345.678-9" },
               { campo: "correo", etiqueta: "Correo electrónico", tipo: "email", auto: "email", placeholder: "ana@correo.cl" },

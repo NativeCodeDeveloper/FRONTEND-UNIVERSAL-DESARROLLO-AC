@@ -176,6 +176,9 @@ export function getStateTokens(estado = "") {
  */
 export function formatRut(rut = "") {
   if (!rut) return "";
+  // Un pasaporte o DNI con letras no es RUT: se muestra tal cual en vez de borrarle las
+  // letras ("AB1234567" salía "123.456-7"). Para mostrar con el tipo: formatearDocumento.
+  if (/[a-jl-z]/i.test(String(rut))) return String(rut);
   const clean = String(rut).replace(/[^0-9kK]/g, "").toUpperCase();
   if (clean.length < 2) return rut;
   const dv = clean.slice(-1);

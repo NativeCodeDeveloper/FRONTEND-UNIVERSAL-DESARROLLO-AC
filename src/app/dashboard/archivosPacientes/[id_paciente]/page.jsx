@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import ToasterClient from "@/Componentes/ToasterClient";
-import { formatRut } from "@/lib/designTokens";
+import { etiquetaDocumento, formatearDocumento } from "@/lib/rut";
 import { formatearFechaAuto } from "@/lib/fechas";
 
 // formatearFechaAuto y no `new Date`: si fecha_subida fuera una columna DATE,
@@ -409,8 +409,8 @@ export default function ArchivosPaciente() {
                             </div>
                             <div className="hidden sm:flex items-center gap-6">
                                 <div className="space-y-0.5 text-right">
-                                    <span className="text-[12px] font-medium text-slate-400 block">RUT</span>
-                                    <span className="text-[13px] font-bold text-slate-900 font-mono">{formatRut(paciente.rut) || "-"}</span>
+                                    <span className="text-[12px] font-medium text-slate-400 block">{etiquetaDocumento(paciente.tipo_documento)}</span>
+                                    <span className="text-[13px] font-bold text-slate-900 font-mono">{formatearDocumento(paciente.rut, paciente.tipo_documento) || "-"}</span>
                                 </div>
                                 <div className="h-8 w-px bg-slate-200" />
                                 <div className="space-y-0.5 text-right">
