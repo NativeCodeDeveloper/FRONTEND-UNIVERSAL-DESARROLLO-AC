@@ -35,6 +35,37 @@ y se puede activar sin esperar a las siguientes.
 > **Las recetas no pasan por el backend de firma** (se imprimen para firmar a mano).
 > Los otros 5 documentos sí llevan firma electrónica.
 
+### Estado al 11-11-2026 (instancia de desarrollo)
+
+Revisado sobre el servidor `desarrollo` y el código, no de memoria. Backend en `main`
+`aa1e38c` (servidor en `main`); front en `main` `e7c3daa` (Vercel).
+
+| Fase | Estado |
+|---|---|
+| A | ✅ Cerrada (29-10). Pendientes del sprint en A.3 |
+| B | ✅ Cerrada (01-11) |
+| 0, 1, 2, 2b, 3 | ✅ Desplegadas en desarrollo |
+| 4 | ✅ Desplegada. **Falta C1** (ver 4.2) |
+| 5, 6, 7 | ✅ Desplegadas. Código por WhatsApp probado en vivo por el usuario (10-11) |
+| **8** | ❌ **Pendiente.** En el servidor no están los scripts de `scripts/`, no hay `crontab`, pm2 corre sin `--max-memory-restart` ni `--kill-timeout` y `NODE_ENV` no está definido. Es lo siguiente |
+
+**Clave de la evidencia:** `FIRMA_HMAC_CLAVE` está en el `.env` del servidor, pero **no
+está guardada fuera de él** (los `env-*` de `~/respaldos` están en el mismo servidor y no
+cuentan). Guardarla en el gestor de contraseñas antes de seguir (ver 0.3).
+
+**Hecho fuera de estas fases** (todo con pruebas y desplegado en desarrollo):
+
+| Fecha | Qué | Commits |
+|---|---|---|
+| 10-11 | Reserva de la ficha (cada profesional ve solo lo suyo; la administración, todo) y ficha inmodificable (Ley 20.584) | back `89fb5b9` · front `fbb492b` |
+| 10-11 | Bandeja: vence a los 30 días (consentimiento a las 24 h), aviso a los 7, botón Quitar, campana por usuario | back `4f6f353` · front `0b3e4d1` |
+| 10-11 | Firma al instante; la bandeja queda como opción ("Dejar en bandeja"); consentimiento con paciente demorado se termina en la bandeja | back `cbbdafa` · front `c8be12f` |
+| 10-11 | La firma nunca queda sola en la última página; pantalla de carga sin quedarse pegada | front `4fd4dbf` · `446fc47` |
+| 11-11 | Pacientes extranjeros con **pasaporte o DNI** (antes el tipo de documento nunca se guardaba). Migración `2026-11-11_documento_extranjero_dni.sql` | back `aa1e38c` · front `05b53a0` |
+| 11-11 | Agendar desde la ficha o la lista sin datos del paciente en la URL (Ley 21.719) | front `e7c3daa` |
+
+Regresión del backend al 11-11: **137/137** (15 suites, cada una en una base aislada).
+
 ---
 
 ## Fase A · Previsión y comentario de la reserva (primera integración)
@@ -143,8 +174,8 @@ Pendientes para el próximo sprint:
 
 | # | Pendiente | Dónde | Prioridad |
 |---|---|---|---|
-| 1 | Quitar o enmascarar `console.log(req.body)`: `out.log` guarda RUT, teléfono y nombre del paciente en texto plano | Backend, controladores de reservas y pagos | **Alta** (SENS / Ley 21.719) |
-| 2 | Reservar con un profesional inactivo guarda la reserva pero responde 500 (`correoEnArray[0]` es `undefined`) | `controller/ReservaPacienteController.js` | Media |
+| 1 | ~~Quitar o enmascarar `console.log(req.body)`: `out.log` guarda RUT, teléfono y nombre del paciente en texto plano~~ ✅ Resuelto (los controladores ya no registran el body) | Backend, controladores de reservas y pagos | ~~Alta~~ |
+| 2 | Reservar con un profesional inactivo guarda la reserva pero responde 500 (`correoEnArray[0]` es `undefined`). **Sigue abierto al 11-11** (3 lugares) | `controller/ReservaPacienteController.js` | Media |
 | 3 | Capturas del dashboard (Finanzas "Reservas por previsión" y Panel de Reservaciones) a 390 px y escritorio | Front | Media |
 | 4 | `validar` responde 404 cuando la hora está ocupada (ruido en consola); evaluar 200 con `{ message: false }` coordinando con el front | Backend + `Reserva.jsx` | Baja |
 | 5 | pm2 del servidor con la versión en memoria desactualizada (`pm2 update`) | Servidor `desarrollo` | Baja |
@@ -775,7 +806,7 @@ cambio está marcado con un comentario `FIRMA`.
 | `view/profesionalesRoutes.js` | Agrega `actualizarRegistroSis`, `verificarRegistroSis` y `descargarCertificadoSis` (con sesión obligatoria). En `insertar` y `actualizar` agrega `verificarUsuarioClerk` (no bloquea: si viene el token, registra quién lo hizo) |
 
 > El front ya envía el token de Clerk al guardar un profesional (`ProfesionalModal.jsx`).
-> **Pendiente C1:** cuando confirmes que todas las pantallas que llaman a
+> **Pendiente C1 (sigue abierto al 11-11):** cuando confirmes que todas las pantallas que llaman a
 > `insertar/actualizar/eliminarProfesional` mandan el token, cambia
 > `verificarUsuarioClerk` por `exigirUsuarioClerk` en esas rutas.
 
@@ -992,6 +1023,13 @@ pública y todo el resto de la plataforma siguen funcionando.
 
 ## Antes del 1 de diciembre de 2026 (por instancia)
 
+> Estado al 11-11: en **desarrollo** están hechas las fases técnicas 0–7 y el CORS de R2.
+> Faltan, en desarrollo, la Fase 8 (cron con alerta), el respaldo diario automático (solo
+> hay respaldos manuales antes de cada despliegue) y guardar la clave fuera del servidor.
+> En las demás instancias no se ha replicado nada todavía. Para replicar, además de las
+> migraciones de docs/firma, correr las de `migraciones/` del backend en orden de fecha
+> (incluye `2026-11-11_documento_extranjero_dni.sql`).
+
 **Técnico**
 - [ ] Fases 0, 1, 2, 2b y 3 desplegadas y `NEXT_PUBLIC_CONSENTIMIENTOS_HABILITADOS=1` activo.
 - [ ] `FIRMA_HMAC_CLAVE` generada y guardada fuera del servidor.
@@ -1001,7 +1039,7 @@ pública y todo el resto de la plataforma siguen funcionando.
 
 **Legal** (con el abogado de la clínica; ver `03` §8)
 - [ ] Contrato de encargo de tratamiento clínica ↔ NativeCode.
-- [ ] Política de privacidad revisada (el texto está en la tabla `documento_plantilla`).
+- [ ] Política de privacidad revisada (el texto está en la tabla `documento_plantilla`). Debe sumar el **DNI**: hoy dice "RUT o número de pasaporte". Cambiarlo publica una versión nueva que los pacientes aceptan desde ese momento.
 - [ ] Revisión de los 14 anexos de ejemplo por el director técnico (editarlos desde la pantalla publica la versión revisada).
 - [ ] Bucket Lock de 15 años en R2 para `privado/documentos/firmados/` y `privado/consentimientos/` (no se puede acortar después: aplicarlo con calma).
 
@@ -1021,6 +1059,9 @@ pública y todo el resto de la plataforma siguen funcionando.
 | `ER_CHECK_CONSTRAINT_VIOLATED` al firmar un consentimiento | Se intentó firmar sin la aceptación del paciente | Es la protección esperada (`chk_documento_aceptacion`) |
 | `firma_evento es append-only` | Alguien intentó modificar la evidencia | Es la protección esperada |
 
+> **Resuelto (verificado el 11-11):** la base de desarrollo ya tiene `fechaExpiracionPago`
+> y el error no aparece en el registro del servidor. Nota original:
+>
 > **Encontrado en la prueba, ajeno a la firma:** con tu dump de desarrollo, el cron
 > de expiración de reservas registra cada minuto
 > `Unknown column 'fechaExpiracionPago' in 'where clause'`. La base de desarrollo no
