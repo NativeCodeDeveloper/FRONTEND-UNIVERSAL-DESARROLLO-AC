@@ -24,6 +24,7 @@ import { AppointmentCard } from "@/Componentes/AppointmentCard";
 import { StatusFilterChips } from "@/Componentes/StatusFilterChips";
 import { getStateTokens } from "@/lib/designTokens";
 import { TIPOS_DOCUMENTO, esDocumentoExtranjero } from "@/lib/rut";
+import { tomarPacienteParaAgendar } from "@/lib/agendarPaciente";
 import BotonAyuda from "@/Componentes/BotonAyuda";
 import TutorialGuiadoCalendario from "@/Componentes/TutorialGuiadoCalendario";
 import { useTour } from "@/ContextosGlobales/TourContext";
@@ -342,7 +343,9 @@ function CalendarioContent() {
     const [telefono, setTelefono] = useState("");
     const [email, setEmail] = useState("");
 
-    // Precargar datos del paciente si vienen por query params.
+    // Precargar el paciente que se mandó a agendar desde su ficha o la lista de pacientes.
+    // Sus datos NO vienen en la URL (Ley 21.719): la URL trae ?agendar=<id aleatorio> y los
+    // datos se toman una vez de sessionStorage (src/lib/agendarPaciente.js).
     // Depende de `searchParams` (no de []) porque Next.js puede reutilizar la
     // misma instancia de este componente entre navegaciones a /dashboard/calendario
     // con distintos query params (ej. "Agendar Cita" para dos pacientes seguidos);
@@ -350,13 +353,20 @@ function CalendarioContent() {
     // quedaban los datos del paciente anterior. Los setters ya no usan un chequeo
     // "truthy" (if (nombre) ...) para que un campo vacío en el paciente nuevo
     // también limpie el valor que hubiera quedado del paciente anterior.
+    // Los datos se borran al leerlos: si React vuelve a correr el efecto con el mismo id
+    // (modo estricto en desarrollo), no se vuelve a leer ni se vacía lo ya cargado.
+    const agendarLeido = useRef(null);
     useEffect(() => {
-        setNombrePaciente(searchParams.get("nombre") || "");
-        setApellidoPaciente(searchParams.get("apellido") || "");
-        setRut(searchParams.get("rut") || "");
-        setTipoDocumento(tipoDocumentoDe(searchParams.get("tipo_documento")));
-        setTelefono(searchParams.get("telefono") || "");
-        setEmail(searchParams.get("email") || "");
+        const idAgendar = searchParams.get("agendar");
+        if (idAgendar && idAgendar === agendarLeido.current) return;
+        agendarLeido.current = idAgendar;
+        const paciente = tomarPacienteParaAgendar(idAgendar);
+        setNombrePaciente(paciente?.nombre || "");
+        setApellidoPaciente(paciente?.apellido || "");
+        setRut(paciente?.rut || "");
+        setTipoDocumento(tipoDocumentoDe(paciente?.tipo_documento));
+        setTelefono(paciente?.telefono || "");
+        setEmail(paciente?.email || "");
     }, [searchParams]);
     const [fechaInicio, setfechaInicio] = useState("");
     const [fechaFinalizacion, setfechaFinalizacion] = useState("");

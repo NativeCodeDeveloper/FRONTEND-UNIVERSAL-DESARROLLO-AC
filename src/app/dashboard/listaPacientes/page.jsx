@@ -11,6 +11,7 @@ import {UserIcon} from "@heroicons/react/24/outline";
 import {InfoButton} from "@/Componentes/InfoButton";
 import { cleanRut } from "@/lib/designTokens";
 import { formatearDocumento } from "@/lib/rut";
+import { rutaAgendarPaciente } from "@/lib/agendarPaciente";
 import NuevoPacienteModal from "@/Componentes/NuevoPacienteModal";
 
 export default function ListaPacientes() {
@@ -311,16 +312,7 @@ export default function ListaPacientes() {
                                                 </TableCell>
                                                 <TableCell className="text-center py-4">
                                                     <button
-                                                        onClick={() => {
-                                                            const params = new URLSearchParams({
-                                                                nombre: paciente.nombre || "",
-                                                                apellido: paciente.apellido || "",
-                                                                rut: paciente.rut || "",
-                                                                telefono: paciente.telefono || "",
-                                                                email: paciente.correo || "",
-                                                            });
-                                                            router.push(`/dashboard/calendario?${params.toString()}`);
-                                                        }}
+                                                        onClick={() => router.push(rutaAgendarPaciente(paciente))}
                                                         className="h-10 px-5 rounded-xl bg-teal-50 text-teal-700 text-[11px] font-bold hover:bg-teal-600 hover:text-white border border-teal-100 transition-all flex items-center justify-center gap-2 mx-auto"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>

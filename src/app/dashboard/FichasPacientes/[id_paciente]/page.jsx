@@ -30,6 +30,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import {InfoButton} from "@/Componentes/InfoButton";
 import { formatRut, cleanRut, getStateTokens } from "@/lib/designTokens";
 import { etiquetaDocumento, formatearDocumento, textoDocumento } from "@/lib/rut";
+import { rutaAgendarPaciente } from "@/lib/agendarPaciente";
 import { rutPerteneceAOtroPaciente } from "@/lib/validarRutPaciente";
 import {
     canAccessOdontograma,
@@ -209,15 +210,8 @@ export default function Paciente() {
     function agendarPaciente() {
         const paciente = detallePaciente[0];
         if (!paciente) return;
-        const params = new URLSearchParams({
-            nombre: paciente.nombre || "",
-            apellido: paciente.apellido || "",
-            rut: paciente.rut || "",
-            tipo_documento: paciente.tipo_documento || "rut",
-            telefono: paciente.telefono || "",
-            email: paciente.correo || "",
-        });
-        router.push(`/dashboard/calendario?${params.toString()}`);
+        // Sin datos personales en la URL (src/lib/agendarPaciente.js).
+        router.push(rutaAgendarPaciente(paciente));
     }
 
     const [nombre, setNombre] = useState("");
