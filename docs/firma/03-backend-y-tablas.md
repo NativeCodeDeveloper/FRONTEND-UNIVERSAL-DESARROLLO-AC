@@ -1866,8 +1866,12 @@ Ninguna llamada externa se reintenta en bucle dentro de la misma petición.
 |---|---|---|
 | `verificar_cadena_firma.mjs` | diaria 03:00 | Recalcula hashes y HMAC de la cadena; avisa por correo al técnico si algo no cuadra |
 | `verificar_cadena_firma.mjs --con-pdf` | semanal | Además baja cada PDF firmado y compara su SHA-256 (de a uno, sin paralelismo) |
-| `limpiar_huerfanos_r2.mjs` | semanal | Borra objetos de `privado/documentos/` con más de 24 h que ninguna fila referencia (subidas interrumpidas). **Nunca** toca un objeto referenciado |
-| `expirar_borradores.mjs` | diaria | Documentos en `pendiente_firma` con más de 30 días pasan a `anulado` con motivo "vencido" (el borrador se conserva; el evento queda en la cadena) |
+| `limpiar_huerfanos_r2.mjs` | semanal | Borra objetos de `privado/documentos/`, `privado/firmas*` y `privado/consentimientos/` con más de 24 h que ninguna fila referencia (subidas interrumpidas). **Nunca** toca un objeto referenciado ni `privado/registro-sis/` |
+| `respaldo_bd.mjs` | diaria | Respaldo de la base: local (600) + copia en R2, 30 días |
+
+El vencimiento de los documentos por firmar no es un script: corre cada hora dentro de
+`app.js` (aviso a los 7 días, anulación a los 30, consentimiento a las 24 h). Detalle y
+cron en la guía `04`, Fase 8.
 
 ### 9.7 Interruptor de emergencia
 

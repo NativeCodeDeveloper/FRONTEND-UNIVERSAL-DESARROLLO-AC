@@ -976,48 +976,133 @@ Con esto el front deja el modo de prueba y usa el backend real. Recorrido de pru
 
 ## Fase 8 · Operación y protección
 
-### 8.1 Scripts (copiar a `scripts/`)
+Todo está en el repo del backend. Por instancia solo cambian la ruta, el nombre en pm2
+y el `.env`.
+
+### 8.1 Scripts (`scripts/` del backend)
 
 | Script | Cuándo | Qué hace |
 |---|---|---|
 | `verificar_cadena_firma.mjs` | Diario | Recalcula huellas y sellos de toda la evidencia. Sale con código 1 si algo fue alterado |
-| `verificar_cadena_firma.mjs --con-pdf` | Semanal | Además baja cada PDF firmado y compara su huella |
-| `limpiar_huerfanos_r2.mjs` | Semanal | Lista (o borra con `--borrar`) archivos de más de 24 h que ninguna fila referencia. Nunca toca uno referenciado |
-| `expirar_borradores.mjs` | Diario | Anula documentos con más de 30 días sin firmar (no borra nada) |
+| `verificar_cadena_firma.mjs --con-pdf` | Semanal | Además baja cada PDF firmado de R2 y compara su huella |
+| `respaldo_bd.mjs` | Diario | `mysqldump` consistente (con los triggers de la evidencia) → `~/respaldos/diario/<base>-<fecha Chile>.sql.gz` con permisos 600 + copia en R2 `privado/respaldos-bd/<base>/`. Borra los de más de `RESPALDO_DIAS` (30), solo si el respaldo del día salió bien |
+| `limpiar_huerfanos_r2.mjs` | Semanal | Lista (o borra con `--borrar`) archivos de más de 24 h que ninguna fila referencia. Nunca toca uno referenciado ni `privado/registro-sis/` (un certificado reemplazado puede tener su huella en la cadena) |
+| `avisar_falla.mjs "<tarea>"` | Si otra falla | Correo con Brevo a `ALERTA_CORREO`: qué tarea, servidor, base y hora. No copia el log |
 
-`crontab -e` en el servidor:
+`expirar_borradores.mjs` ya no hace falta: el vencimiento de la bandeja corre cada hora
+dentro de `app.js` (`services/firma/vencimientoDocumentos.js`).
 
-```cron
-0 3 * * *  cd /ruta/backend && node scripts/verificar_cadena_firma.mjs >> logs/firma.log 2>&1 || echo "Cadena de firma con problemas" | mail -s "ALERTA firma" soporte@nativecode.cl
-0 4 * * 0  cd /ruta/backend && node scripts/verificar_cadena_firma.mjs --con-pdf >> logs/firma.log 2>&1
-30 4 * * 0 cd /ruta/backend && node scripts/limpiar_huerfanos_r2.mjs --borrar >> logs/firma.log 2>&1
-15 3 * * * cd /ruta/backend && node scripts/expirar_borradores.mjs >> logs/firma.log 2>&1
+Restaurar un respaldo: `gunzip -c <archivo>.sql.gz | mysql -u <usuario> -p <base>`.
+Probado el 14-11: la base restaurada queda idéntica (51 tablas, 6 triggers, mismo
+`CHECKSUM TABLE` en todas).
+
+### 8.2 `.env`
+
+```
+ALERTA_CORREO=ingenieria.software@nativecode.cl   # varios: separados por coma
+NODE_ENV=production
+# Opcionales: RESPALDO_DIR (por omisión ~/respaldos/diario), RESPALDO_DIAS (30)
 ```
 
-### 8.2 pm2
+### 8.3 Cron
+
+La plantilla es `scripts/operacion.crontab`. Se instala sumándola al crontab actual (no
+borra las tareas de otros proyectos del servidor):
 
 ```bash
-pm2 start app.js --name backend --max-memory-restart 600M --kill-timeout 10000
+cd /ruta/del/backend && mkdir -p logs
+(crontab -l 2>/dev/null; sed "s|/ruta/del/backend|$PWD|g" scripts/operacion.crontab) | crontab -
+crontab -l
+```
+
+Horas en UTC (la zona del servidor): verificación 06:00, respaldo 06:30, y los domingos
+`--con-pdf` 07:00 y limpieza 07:30. En Chile es de madrugada (03:00 en verano, 02:00 en
+invierno). Cada línea sigue el patrón `tarea >> logs/operacion.log || avisar_falla`.
+
+Antes de instalarla, correr cada script a mano una vez (`limpiar_huerfanos_r2.mjs` sin
+`--borrar`, para ver qué borraría) y probar el aviso:
+`node scripts/avisar_falla.mjs "Prueba de alerta (ignorar)"`.
+
+### 8.4 pm2
+
+```bash
+pm2 delete <nombre>
+pm2 start app.js --name <nombre> --max-memory-restart 600M --kill-timeout 10000
 pm2 save
 ```
 
-- `--max-memory-restart`: reinicia si el proceso supera esa memoria (ajústalo a la RAM del servidor).
-- `--kill-timeout`: da 10 s a las firmas en curso antes de reiniciar.
+- `--max-memory-restart`: reinicia si el proceso supera esa memoria. 600M sirve en un
+  servidor de 4 GB con varias apps (el backend usa ~165 MB).
+- `--kill-timeout`: pm2 manda SIGINT y espera 10 s antes de matar. `app.js` usa ese margen:
+  deja de aceptar conexiones, termina las peticiones en curso (una firma escribiendo en la
+  base y en R2) y recién después cierra el pool (límite propio: 9 s). Antes del 14-11,
+  `config/Database.js` hacía `process.exit` al recibir la señal y cortaba la firma igual.
 
-### 8.3 Pruebas
+### 8.5 Pruebas
+
+Las e2e necesitan una base de prueba nueva por archivo (crean sus propios usuarios):
+dump + todas las `migraciones/*.sql` del backend.
 
 ```bash
-node --test "pruebas/firma/*.test.mjs"
-for tz in America/Santiago UTC Asia/Tokyo Pacific/Niue; do TZ=$tz node --test "pruebas/firma/*.test.mjs"; done
+for tz in America/Santiago UTC Asia/Tokyo Pacific/Niue; do
+  for f in pruebas/firma/*.e2e.mjs; do   # base nueva antes de cada archivo
+    TZ=$tz DB_DATABASE=<base_de_prueba> node --experimental-test-module-mocks --test $f
+  done
+  TZ=$tz node --test "pruebas/*/*.test.mjs"
+done
 ```
 
-Las 7 pruebas deben pasar en los 4 husos horarios (el resultado no depende del huso del servidor).
+Al 14-11: las 41 e2e de firma y las unitarias (incluidas las 7 de
+`pruebas/firma/unitarias.test.mjs`) pasan en los 4 husos, y `verificar_cadena_firma.mjs`
+da "Cadena íntegra" después de cada e2e. La regresión completa (`pruebas/*/*.e2e.mjs` +
+unitarias, con lo de seguridad del 14-11) da 205/205.
 
-### 8.4 Interruptor de emergencia
+### 8.6 Interruptor de emergencia
 
-Si algo falla en producción: `FIRMA_HABILITADA=0` en el `.env` y `pm2 restart backend`.
+Si algo falla en producción: `FIRMA_HABILITADA=0` en el `.env` y `pm2 restart <nombre>`.
 Preparar, firmar y el OTP responden 503. Descargar lo ya firmado, la verificación
 pública y todo el resto de la plataforma siguen funcionando.
+
+---
+
+## Instancia nueva (otra clínica o producción)
+
+Cada clínica es un par front (Vercel) + back (servidor) con su base, su bucket y su
+instancia de Clerk. Nada de lo marcado `[secreto]` se copia de otra instancia.
+
+**1. Generar (nuevos, nunca copiados)**
+- `FIRMA_HMAC_CLAVE` y `NOTIFICACION_TOKEN_SECRET`: `openssl rand -base64 48` cada una. La
+  primera se guarda además en el gestor de claves, fuera del servidor (sin ella la evidencia
+  firmada no se puede verificar).
+- Usuario MySQL propio de la base (no root), claves de R2 del bucket de la clínica, VAPID
+  (`npx web-push generate-vapid-keys`) si usa avisos del navegador.
+
+**2. Clerk (instancia de la clínica)**
+- *Restrictions → Sign-up mode → **Restricted***. Las cuentas se crean desde "Crear usuarios"
+  del dashboard. Con el registro en *Public*, cualquiera podía crearse una cuenta (así estaba
+  desarrollo hasta el 14-11); desde ese día el back además rechaza toda sesión sin perfil.
+- `sk_live_…` al `.env` del back y al de Vercel; `pk_live_…` a Vercel.
+
+**3. Backend**
+```bash
+cp .env.example .env          # completar
+node scripts/revisar_env.mjs  # sin errores antes de seguir; no muestra valores
+npm install --omit=dev
+# migraciones: docs/firma/backend/migraciones y migraciones/ en orden de fecha
+pm2 start app.js --name <nombre> --max-memory-restart 600M --kill-timeout 10000 && pm2 save
+mkdir -p logs && (crontab -l 2>/dev/null; sed "s|/ruta/del/backend|$PWD|g" scripts/operacion.crontab) | crontab -
+node scripts/avisar_falla.mjs "Prueba de alerta (ignorar)"   # debe llegar el correo
+```
+`CORS_ORIGENES` = el dominio del front de esa clínica (sin barra final). nginx con HSTS.
+
+**4. Front (Vercel)** — variables según `.env.example` del front. `NEXT_PUBLIC_API_URL` con
+las dos barras. `NEXT_PUBLIC_FIRMA_MOCK` jamás. Nada secreto en `NEXT_PUBLIC_*`.
+
+**5. Comprobar**
+- `curl -s https://<back>/persistence/obtenerPersistencia` → solo `estado_pasarela`.
+- `curl -s https://<back>/profesionales/seleccionarTodosProfesionales` → solo nombre,
+  descripción, categoría y foto.
+- Entrar al dashboard con cada perfil; la agenda pública reserva de punta a punta.
 
 ---
 
@@ -1096,6 +1181,7 @@ pública y todo el resto de la plataforma siguen funcionando.
 | `model/ProfesionalFirma.js` · `controller/FirmaProfesionalController.js` · `view/firmaProfesionalRoutes.js` | Nuevos | 6 |
 | `services/firma/zonaFirma.js` · `estamparFirmaPdf.js` · `envioOtp.js` | Nuevos | 7 |
 | `model/DocumentoEmitido.js` · `PacienteOtp.js` · `controller/DocumentosController.js` · `view/documentosRoutes.js` | Nuevos | 7 |
-| `scripts/verificar_cadena_firma.mjs` · `limpiar_huerfanos_r2.mjs` · `expirar_borradores.mjs` | Nuevos | 8 |
+| `scripts/verificar_cadena_firma.mjs` · `limpiar_huerfanos_r2.mjs` · `respaldo_bd.mjs` · `avisar_falla.mjs` · `operacion.crontab` | Nuevos | 8 |
 | `pruebas/firma/unitarias.test.mjs` | Nuevo | 8 |
+| `app.js` (apagado ordenado) · `config/Database.js` (sin `process.exit` en SIGINT) | Cambio | 8 |
 | `.gitignore` | Agregar 2 líneas | 0 |

@@ -4,16 +4,20 @@
  *   node scripts/limpiar_huerfanos_r2.mjs          → solo informa (no borra)
  *   node scripts/limpiar_huerfanos_r2.mjs --borrar → borra
  *
- * Reglas de seguridad: solo mira privado/documentos/, privado/firmas*,
- * privado/consentimientos/ y privado/registro-sis/; solo archivos con más de
- * 24 horas; NUNCA borra un archivo referenciado por la BD. */
+ * Reglas de seguridad: solo mira privado/documentos/, privado/firmas* y
+ * privado/consentimientos/; solo archivos con más de 24 horas; NUNCA borra un
+ * archivo referenciado por la BD.
+ *
+ * privado/registro-sis/ queda FUERA a propósito: al reemplazar el certificado,
+ * la fila apunta al nuevo, pero la huella del anterior puede seguir en la cadena de
+ * firma (evento registro_sis_declarado). Ese archivo es evidencia, no basura. */
 
 import "dotenv/config";
 import DataBase from "../config/Database.js";
 import { listarClaves, eliminarArchivoR2 } from "../services/r2Storage.js";
 
 const borrar = process.argv.includes("--borrar");
-const PREFIJOS = ["privado/documentos/", "privado/firmas/", "privado/firmas-trazos/", "privado/consentimientos/", "privado/registro-sis/"];
+const PREFIJOS = ["privado/documentos/", "privado/firmas/", "privado/firmas-trazos/", "privado/consentimientos/"];
 const db = DataBase.getInstance();
 
 try {
@@ -22,7 +26,6 @@ try {
         "SELECT borrador_key AS k FROM documento_emitido UNION ALL SELECT pdf_key FROM documento_emitido WHERE pdf_key IS NOT NULL",
         "SELECT imagen_key AS k FROM profesional_firma UNION ALL SELECT trazos_key FROM profesional_firma",
         "SELECT pdf_key AS k FROM consentimiento_aceptacion",
-        "SELECT registro_sis_certificado_key AS k FROM profesionales WHERE registro_sis_certificado_key IS NOT NULL",
     ];
     for (const sql of consultas) for (const fila of await db.ejecutarQuery(sql)) referenciadas.add(fila.k);
 
