@@ -9,12 +9,14 @@ import { claveFechaCivil, formatearFechaCivil } from "@/lib/fechas";
 import FichaClinicaModal from "@/Componentes/FichaClinicaModal";
 import ToasterClient from "@/Componentes/ToasterClient";
 import TelemedicinaSala from "@/Componentes/TelemedicinaSala";
+import { useDatosEmpresa } from "@/hooks/useDatosEmpresa";
 
 export default function Telemedicina() {
     const { id_paciente } = useParams();
     const router = useRouter();
     const API = process.env.NEXT_PUBLIC_API_URL;
     const { user, isLoaded: usuarioCargado } = useUser();
+    const datosEmpresa = useDatosEmpresa();
 
     const [paciente, setPaciente] = useState(null);
     const [pacienteCargando, setPacienteCargando] = useState(true);
@@ -219,6 +221,8 @@ export default function Telemedicina() {
                     modo="profesional"
                     identidad={user?.id}
                     nombreProfesional={user?.fullName || user?.firstName || ""}
+                    paciente={paciente ? { id_paciente, nombre: paciente.nombre, telefono: paciente.telefono, correo: paciente.correo } : null}
+                    nombreClinica={datosEmpresa?.empresaNombre || ""}
                 />
 
 

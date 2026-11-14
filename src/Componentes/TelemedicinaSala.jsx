@@ -3,7 +3,9 @@
 import Video from "twilio-video";
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useEffect, useRef, useState } from "react";
-import { Check, Link2, Mic, MicOff, PhoneOff, Video as IconoVideo, VideoOff } from "lucide-react";
+import { Check, Link2, Mail, MessageCircle, Mic, MicOff, PhoneOff, Video as IconoVideo, VideoOff } from "lucide-react";
+import { enlaceSala, mensajeInvitacion } from "@/lib/telemedicina";
+import { urlWhatsapp } from "@/lib/whatsapp";
 
 // Espera máxima por el paciente antes de cerrar la sala automáticamente.
 const MINUTOS_ESPERA = 15;
@@ -46,6 +48,10 @@ export default function TelemedicinaSala({
     nombreProfesional = "",
     nombreSalaInicial = "",
     invitacionInicial = "",
+    // Solo modo profesional: ficha del paciente (id_paciente, nombre, telefono, correo) y
+    // nombre de la clínica, para enviarle el enlace por WhatsApp o correo.
+    paciente = null,
+    nombreClinica = "",
 }) {
     const API = process.env.NEXT_PUBLIC_API_URL;
     const salaRef = useRef(null);
@@ -61,6 +67,9 @@ export default function TelemedicinaSala({
     const [pistasRemotas, setPistasRemotas] = useState([]);
     const [error, setError] = useState("");
     const [enlaceCopiado, setEnlaceCopiado] = useState(false);
+    const [enviandoCorreo, setEnviandoCorreo] = useState(false);
+    // Confirmación del último envío ("Enviado a j•••a@correo.cl").
+    const [avisoEnvio, setAvisoEnvio] = useState("");
     // Cuenta regresiva visible mientras el profesional espera al paciente.
     // null = temporizador inactivo.
     const [segundosEspera, setSegundosEspera] = useState(null);
@@ -253,12 +262,51 @@ export default function TelemedicinaSala({
         actualizarEstado(siguienteEstado);
     }
 
+    const enlacePaciente = () => enlaceSala(window.location.origin, salaDatos.nombreSala, salaDatos.invitacion);
+
+    // WhatsApp: abre el WhatsApp del propio profesional (celular o web) con el mensaje y el
+    // enlace ya escritos, dirigido al celular de la ficha. El profesional solo aprieta enviar.
+    function enviarPorWhatsapp() {
+        if (!salaDatos?.nombreSala || !salaDatos?.invitacion) return;
+        const url = urlWhatsapp(paciente?.telefono, mensajeInvitacion({
+            nombrePaciente: paciente?.nombre, nombreProfesional, nombreClinica, enlace: enlacePaciente(),
+        }));
+        if (!url) return setError("La ficha del paciente no tiene celular registrado.");
+        setError("");
+        window.open(url, "_blank", "noopener,noreferrer");
+        setAvisoEnvio("Se abrió WhatsApp con el mensaje listo: solo falta enviarlo.");
+    }
+
+    // Correo: lo envía el backend al correo registrado en la ficha (nunca a uno escrito aquí).
+    async function enviarPorCorreo() {
+        if (!salaDatos?.nombreSala || !salaDatos?.invitacion || !paciente?.id_paciente || enviandoCorreo) return;
+        setEnviandoCorreo(true);
+        setError("");
+        setAvisoEnvio("");
+        try {
+            const res = await fetch(`${API}/telemedicina/enviarInvitacionCorreo`, {
+                method: "POST",
+                headers: { Accept: "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id_paciente: paciente.id_paciente, nombreSala: salaDatos.nombreSala, invitacion: salaDatos.invitacion }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) return setAvisoEnvio(`Enlace enviado a ${data.destino}.`);
+            setError({
+                sinDatoContacto: "La ficha del paciente no tiene un correo válido.",
+                invitacionInvalida: "El enlace de esta sala ya venció. Inicia una videollamada nueva.",
+                demasiadasSolicitudes: "Enviaste muchos correos seguidos. Espera unos minutos.",
+            }[data.message] || "No se pudo enviar el correo. Intenta de nuevo.");
+        } catch {
+            setError("No se pudo enviar el correo. Revisa tu conexión.");
+        } finally {
+            setEnviandoCorreo(false);
+        }
+    }
+
     async function copiarEnlace() {
         if (!salaDatos?.nombreSala || !salaDatos?.invitacion) return;
-        const enlace = new URL(`/telemedicina/${encodeURIComponent(salaDatos.nombreSala)}`, window.location.origin);
-        enlace.searchParams.set("i", salaDatos.invitacion);
         try {
-            await navigator.clipboard.writeText(enlace.toString());
+            await navigator.clipboard.writeText(enlacePaciente());
             setEnlaceCopiado(true);
             window.setTimeout(() => setEnlaceCopiado(false), 2500);
         } catch {
@@ -386,9 +434,37 @@ export default function TelemedicinaSala({
             </div>
 
             {modo === "profesional" && salaDatos ? (
-                <p className="mt-3 text-center text-[12px] text-[#86868B]">
-                    Comparte el enlace solo con el paciente. Permite entrar durante 4 horas.
-                </p>
+                <div className="mx-auto mt-4 max-w-xl">
+                    <p className="mb-2.5 text-center text-[13px] font-medium text-[#1D1D1F]">Enviar el enlace al paciente</p>
+                    <div className="grid grid-cols-3 gap-2">
+                        <BotonEnvio
+                            onClick={enviarPorWhatsapp}
+                            deshabilitado={!paciente?.telefono}
+                            ayuda={paciente?.telefono ? "Abrir WhatsApp con el mensaje listo" : "La ficha no tiene celular"}
+                        >
+                            <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+                            WhatsApp
+                        </BotonEnvio>
+                        <BotonEnvio
+                            onClick={enviarPorCorreo}
+                            deshabilitado={!paciente?.correo || enviandoCorreo}
+                            ayuda={paciente?.correo ? "Enviar al correo de la ficha" : "La ficha no tiene correo"}
+                        >
+                            <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
+                            {enviandoCorreo ? "Enviando…" : "Correo"}
+                        </BotonEnvio>
+                        <BotonEnvio onClick={copiarEnlace} ayuda="Copiar el enlace">
+                            {enlaceCopiado ? <Check className="h-[18px] w-[18px]" aria-hidden="true" /> : <Link2 className="h-[18px] w-[18px]" aria-hidden="true" />}
+                            {enlaceCopiado ? "Copiado" : "Copiar"}
+                        </BotonEnvio>
+                    </div>
+                    {avisoEnvio ? (
+                        <p role="status" className="mt-2.5 text-center text-[13px] text-[#248A3D]">{avisoEnvio}</p>
+                    ) : null}
+                    <p className="mt-2 text-center text-[12px] text-[#86868B]">
+                        Va al celular o correo de la ficha. Comparte el enlace solo con el paciente: permite entrar durante 4 horas.
+                    </p>
+                </div>
             ) : null}
 
             {error ? (
@@ -403,6 +479,22 @@ export default function TelemedicinaSala({
                 </p>
             ) : null}
         </section>
+    );
+}
+
+/* Botón de envío del enlace: píldora gris tipo iOS con icono y texto. */
+function BotonEnvio({ onClick, deshabilitado = false, ayuda, children }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={deshabilitado}
+            title={ayuda}
+            aria-label={ayuda}
+            className="flex h-12 items-center justify-center gap-1.5 rounded-2xl bg-[#F2F2F7] px-2 text-[14px] font-semibold text-[#007AFF] transition-colors hover:bg-[#E5E5EA] active:bg-[#D1D1D6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF]/40 disabled:cursor-not-allowed disabled:text-[#AEAEB2] disabled:hover:bg-[#F2F2F7]"
+        >
+            {children}
+        </button>
     );
 }
 
