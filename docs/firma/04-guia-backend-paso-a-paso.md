@@ -4,9 +4,10 @@ Implementación del backend de la firma electrónica y los consentimientos, orde
 **de lo más fácil a lo más difícil**. Cada fase deja algo que funciona por sí solo
 y se puede activar sin esperar a las siguientes.
 
-- **El código ya está escrito y probado.** Está en `docs/firma/backend/` (copia en
-  `~/Desktop/firma-fes/backend/`), con la misma estructura de carpetas que tu backend
-  `BACKEND-DESARROLLO-UNIVERSAL-AC`. Los archivos **nuevos** se copian tal cual. En los
+- **El código ya está escrito y probado.** Está en `docs/firma/backend/`, con la misma
+  estructura de carpetas que tu backend `BACKEND-DESARROLLO-UNIVERSAL-AC` (desde el 14-11
+  todo está integrado en `main` del backend: esa es la fuente; `docs/firma/backend/` queda
+  como referencia). Los archivos **nuevos** se copian tal cual. En los
   archivos **existentes** esta guía te dice qué línea buscar y qué agregar.
 - **Se probó contra tu dump** `AGENDA_CLINICA_DESARROLLO-2.sql` en MySQL 9.6, con
   el servidor real (`app.js`) y 42 comprobaciones de punta a punta: política de
@@ -31,27 +32,32 @@ y se puede activar sin esperar a las siguientes.
 | 6 | Firma (grafía) del profesional | Media | parte de la fase 7 |
 | 7 | Documentos firmados: cotización, presupuesto, orden de exámenes, ficha clínica y consentimiento informado con código OTP | Alta | `NEXT_PUBLIC_FIRMA_HABILITADA=1` |
 | 8 | Operación: tareas programadas, pm2, monitoreo e interruptor | Media | — |
+| 9 | Revisión de logs y bugs antes de producción (datos personales fuera del log, horarios del cron, logs por sitio) | Media | — |
 
 > **Las recetas no pasan por el backend de firma** (se imprimen para firmar a mano).
 > Los otros 5 documentos sí llevan firma electrónica.
 
-### Estado al 11-11-2026 (instancia de desarrollo)
+### Estado al 14-11-2026 (instancia de desarrollo) — listo para revisión
 
 Revisado sobre el servidor `desarrollo` y el código, no de memoria. Backend en `main`
-`aa1e38c` (servidor en `main`); front en `main` `e7c3daa` (Vercel).
+`f42433b` (servidor en `main`); front en `main` `66ca7f9` (Vercel).
 
 | Fase | Estado |
 |---|---|
 | A | ✅ Cerrada (29-10). Pendientes del sprint en A.3 |
 | B | ✅ Cerrada (01-11) |
 | 0, 1, 2, 2b, 3 | ✅ Desplegadas en desarrollo |
-| 4 | ✅ Desplegada. **Falta C1** (ver 4.2) |
+| 4 | ✅ Desplegada. C1 cerrado el 14-11: crear, editar y eliminar profesionales exigen sesión con perfil |
 | 5, 6, 7 | ✅ Desplegadas. Código por WhatsApp probado en vivo por el usuario (10-11) |
-| **8** | ❌ **Pendiente.** En el servidor no están los scripts de `scripts/`, no hay `crontab`, pm2 corre sin `--max-memory-restart` ni `--kill-timeout` y `NODE_ENV` no está definido. Es lo siguiente |
+| 8 | ✅ Desplegada (14-11): cron con aviso por correo, respaldo diario (servidor + R2), pm2 con apagado ordenado. Ver Fase 8 |
+| 9 | ⏸ **Pendiente** (decidido el 14-11): primera revisión de logs hecha; las correcciones quedan para el próximo sprint y van **antes de producción**. Ver Fase 9 |
 
-**Clave de la evidencia:** `FIRMA_HMAC_CLAVE` está en el `.env` del servidor, pero **no
-está guardada fuera de él** (los `env-*` de `~/respaldos` están en el mismo servidor y no
-cuentan). Guardarla en el gestor de contraseñas antes de seguir (ver 0.3).
+**Avance:** fases técnicas **12/12 (100 %)** en desarrollo · lista técnica "Antes del 1-dic"
+**4,5/5** (falta el respaldo periódico del bucket R2) · réplica en otras instancias:
+**después de la revisión y las pruebas** de la plataforma y del código.
+
+**Clave de la evidencia:** `FIRMA_HMAC_CLAVE` guardada fuera del servidor (gestor de
+contraseñas del usuario, 11-11). Repetir en cada instancia nueva.
 
 **Hecho fuera de estas fases** (todo con pruebas y desplegado en desarrollo):
 
@@ -63,8 +69,34 @@ cuentan). Guardarla en el gestor de contraseñas antes de seguir (ver 0.3).
 | 10-11 | La firma nunca queda sola en la última página; pantalla de carga sin quedarse pegada | front `4fd4dbf` · `446fc47` |
 | 11-11 | Pacientes extranjeros con **pasaporte o DNI** (antes el tipo de documento nunca se guardaba). Migración `2026-11-11_documento_extranjero_dni.sql` | back `aa1e38c` · front `05b53a0` |
 | 11-11 | Agendar desde la ficha o la lista sin datos del paciente en la URL (Ley 21.719) | front `e7c3daa` |
+| 11-11 | Calendario `.ics` de la cita con hora exacta, sin datos de salud, también para el profesional | back `f40f725` |
+| 14-11 | **Fase 8** + `.env.example` (back y front) y `scripts/revisar_env.mjs` (revisa el `.env` sin mostrar valores) | back `3d16704` · front `f78f102` |
+| 14-11 | **Seguridad** (detalle abajo) | back `affbc66` |
+| 14-11 | Reseñas: el sitio público vuelve a mostrarlas (desde el 23-10 la lista exigía sesión y "desaparecían"); el paciente se muestra como "Nombre I." | back `8f7c07e` |
+| 14-11 | Telemedicina: enviar el enlace al paciente por **WhatsApp** (abre el WhatsApp del profesional con el mensaje listo) o **correo** (al de la ficha) | back `f42433b` · front `66ca7f9` |
 
-Regresión del backend al 11-11: **137/137** (15 suites, cada una en una base aislada).
+**Seguridad (14-11), lo que conviene revisar con más atención:**
+
+| Hallazgo | Antes | Ahora |
+|---|---|---|
+| Registro de Clerk en *Public* | Cualquiera se creaba una cuenta y con ese token pasaba `exigirSesionClerk` (pacientes, recetas, fichas…) | `exigirSesionClerk` y `exigirUsuarioClerk` exigen un perfil de la plataforma (técnico, administración, profesional o recepción); si no, 403. En Clerk: *Sign-up mode → Restricted* |
+| `GET /persistence/obtenerPersistencia` (pública) | Devolvía la fila completa con el `access_token` de Mercado Pago | Sin sesión solo `estado_pasarela`; el token solo al técnico |
+| Rutas que comparten sitio público y dashboard | Profesionales con RUT, correos, teléfono e id de Clerk; bloqueos con el motivo; reseñas con `paciente_id` | `sesionSiLaHay` + lista de campos permitidos en `services/camposPublicos.js` |
+| Reseñas | `insertarResena` aceptaba `paciente_id` sin sesión | Sin sesión se ignora |
+| CORS | Cualquier origen | Solo `CORS_ORIGENES` de la instancia |
+| HSTS | No estaba | En nginx del backend |
+| Enlaces de confirmar/cancelar cita | Clave fija escrita en el código como respaldo; URL de otro cliente por omisión | Sin clave fija; `NOTIFICACION_TOKEN_SECRET` propia (acepta lo firmado antes con `TWILIO_AUTH_TOKEN`, así los enlaces ya enviados siguen sirviendo) |
+| `.env` del servidor | `CLERK_SECRET_KEY` repetida (dos claves distintas) | Una sola, la que la app ya usaba |
+| Respaldos en `/root/respaldos` | Legibles por cualquier usuario del servidor | Solo root (600/700) |
+
+Pruebas nuevas: `pruebas/blindaje/perfilSesion.e2e.mjs` (30), `respuestasPublicas.e2e.mjs` (9),
+`revisarEnv.test.mjs` (5), `pruebas/reservas/tokenReserva.test.mjs` (5),
+`pruebas/telemedicina/enviarInvitacion.e2e.mjs` (6). Las de seguridad se comprobaron
+también al revés: con la protección desactivada, fallan.
+
+Regresión del backend al 14-11: **213/213** (146 de punta a punta en 14 suites, cada una en
+una base aislada, + 67 unitarias en America/Santiago, UTC, Asia/Tokyo y Pacific/Niue).
+Sitio público verificado con capturas a 390 px y escritorio contra `main` anterior: se ve igual.
 
 ---
 
@@ -175,7 +207,7 @@ Pendientes para el próximo sprint:
 | # | Pendiente | Dónde | Prioridad |
 |---|---|---|---|
 | 1 | ~~Quitar o enmascarar `console.log(req.body)`: `out.log` guarda RUT, teléfono y nombre del paciente en texto plano~~ ✅ Resuelto (los controladores ya no registran el body) | Backend, controladores de reservas y pagos | ~~Alta~~ |
-| 2 | Reservar con un profesional inactivo guarda la reserva pero responde 500 (`correoEnArray[0]` es `undefined`). **Sigue abierto al 11-11** (3 lugares) | `controller/ReservaPacienteController.js` | Media |
+| 2 | Reservar con un profesional inactivo guarda la reserva pero responde 500 (`correoEnArray[0]` es `undefined`, 3 lugares). **No ocurre desde la interfaz** (14-11): un profesional inactivo no aparece en el dashboard ni en la página pública. Queda solo como defensa del backend ante una llamada directa a la API | `controller/ReservaPacienteController.js` | Baja |
 | 3 | Capturas del dashboard (Finanzas "Reservas por previsión" y Panel de Reservaciones) a 390 px y escritorio | Front | Media |
 | 4 | `validar` responde 404 cuando la hora está ocupada (ruido en consola); evaluar 200 con `{ message: false }` coordinando con el front | Backend + `Reserva.jsx` | Baja |
 | 5 | pm2 del servidor con la versión en memoria desactualizada (`pm2 update`) | Servidor `desarrollo` | Baja |
@@ -806,9 +838,9 @@ cambio está marcado con un comentario `FIRMA`.
 | `view/profesionalesRoutes.js` | Agrega `actualizarRegistroSis`, `verificarRegistroSis` y `descargarCertificadoSis` (con sesión obligatoria). En `insertar` y `actualizar` agrega `verificarUsuarioClerk` (no bloquea: si viene el token, registra quién lo hizo) |
 
 > El front ya envía el token de Clerk al guardar un profesional (`ProfesionalModal.jsx`).
-> **Pendiente C1 (sigue abierto al 11-11):** cuando confirmes que todas las pantallas que llaman a
-> `insertar/actualizar/eliminarProfesional` mandan el token, cambia
-> `verificarUsuarioClerk` por `exigirUsuarioClerk` en esas rutas.
+> **C1 cerrado (14-11):** `insertar/actualizar/eliminarProfesional` están detrás de
+> `router.use(exigirSesionClerk)`, que desde el 14-11 exige sesión **y** perfil de la
+> plataforma. `verificarUsuarioClerk` queda solo para registrar quién hizo el cambio.
 
 ### 4.3 Probar
 
@@ -1065,6 +1097,51 @@ pública y todo el resto de la plataforma siguen funcionando.
 
 ---
 
+## Fase 9 · Revisión de logs y bugs antes de producción
+
+> **Pendiente (14-11):** revisión hecha, correcciones para el próximo sprint. Es requisito
+> para pasar a producción: sobre todo el punto 1 (datos personales en el log, Ley 21.719).
+
+La plataforma la usarán cientos de personas: antes de replicarla, se revisan los registros
+reales de desarrollo, se corrige todo lo que aparezca y se deja una rutina para repetirlo.
+Ninguna corrección se despliega sin pruebas (regresión completa) y respaldo previo.
+
+### 9.1 Primera revisión (14-11-2026, servidor `desarrollo`)
+
+Fuentes: logs de pm2 del backend (5 días, rotación diaria), `journalctl` de MySQL y el
+registro de actualizaciones automáticas. Los datos personales se contaron sin mostrarlos.
+
+| # | Hallazgo | Gravedad | Estado |
+|---|---|---|---|
+| 1 | **Datos personales en el log** (Ley 21.719). Siguen saliendo correos, teléfonos y nombre con fecha de la cita: `notificacionWhatsApp.js` (210, 241, 361), `notificacionPreviaDia.js` (124, 368, 393, 413, 433), `notificacionAgendamiento.js` (247, 349, 407, 512), `correoNotificacionProfesionales.js` y `correoActualizacionProfesional.js` (113, "CORREO DE PRUEBAS"), `MercadoPagoController.js` (347, 377, 392), `ReservaPacienteController.js` (153 RUT, 182 nombre), `envioCotizacionCorreo.js` (250-277: imprime la cotización completa y el PDF), `PedidoComprasController.js` (104), `MercadoPagoPersistenceController.js` (55). Corrección: registrar solo ids (`reserva 123`, `ficha 45`) o el dato enmascarado | **Alta** | Pendiente |
+| 2 | **Cron en la ventana de actualizaciones de Ubuntu.** `apt-daily-upgrade` corre entre 06:00 y 07:00 UTC y reinicia MySQL cuando se actualiza (pasó el 12-11). La verificación (06:00) y el respaldo (06:30) pueden fallar y mandar una falsa alarma. Corrección: moverlos a 07:30 / 08:00 UTC (04:30 / 05:00 en Chile en verano) | Media | Pendiente |
+| 3 | `[CRON] … expiración de reservas pendientes: AggregateError` el 12-11: MySQL estaba reiniciándose por la actualización (punto 2). El cron lo registra y sigue: sin pérdida de datos | Baja | Explicado |
+| 4 | `[MAIL] … codigoPrivacidad is not defined` (03-11 y 05-11) | — | Corregido el 10-11; no volvió a aparecer |
+| 5 | `SyntaxError` de JSON con la traza completa (10-11) | — | Corregido el 10-11 (errores en JSON, sin traza) |
+| 6 | `[RECORDATORIO] Email vacío` (13 veces el 31-10): pacientes sin correo. No es error; se registra como tal y ensucia el log de errores | Baja | Pendiente |
+| 7 | El `access.log` de nginx es común a todas las apps del servidor y no dice el dominio: no se pueden aislar los 5xx del backend. Corrección: `access_log` y `error_log` propios en el sitio del backend | Media | Pendiente |
+| 8 | Reservar con un profesional inactivo responde 500 (A.3 #2). No ocurre desde la interfaz | Baja | Pendiente |
+
+### 9.2 Falta revisar
+
+- Logs del **front en Vercel** (errores de servidor de Next y de las rutas `/api`).
+- Rechazos y rebotes en **Brevo** (correos no entregados) y **Twilio** (WhatsApp fallidos).
+- Recorrido completo con cada perfil (técnico, administración, profesional, recepción) y
+  como paciente (reserva, pago, consentimiento, reseña, videoconsulta), en celular y escritorio,
+  mirando la consola del navegador.
+
+### 9.3 Rutina antes de cada despliegue a producción
+
+```bash
+# errores agrupados de los últimos días, sin datos personales
+cd /root/.pm2/logs && zcat -f <app>-error__*.log <app>-error.log | grep -vE "^\s+at " \
+  | sed -E "s/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/<correo>/g; s/[0-9]{6,}/<n>/g" | sort | uniq -c | sort -rn
+# que no queden datos personales en el log (debe dar 0)
+grep -cE "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}|\+?569[0-9]{8}" <app>-out.log
+```
+
+---
+
 ## Instancia nueva (otra clínica o producción)
 
 Cada clínica es un par front (Vercel) + back (servidor) con su base, su bucket y su
@@ -1108,23 +1185,22 @@ las dos barras. `NEXT_PUBLIC_FIRMA_MOCK` jamás. Nada secreto en `NEXT_PUBLIC_*`
 
 ## Antes del 1 de diciembre de 2026 (por instancia)
 
-> Estado al 11-11: en **desarrollo** están hechas las fases técnicas 0–7 y el CORS de R2.
-> Faltan, en desarrollo, la Fase 8 (cron con alerta), el respaldo diario automático (solo
-> hay respaldos manuales antes de cada despliegue) y guardar la clave fuera del servidor.
-> En las demás instancias no se ha replicado nada todavía. Para replicar, además de las
-> migraciones de docs/firma, correr las de `migraciones/` del backend en orden de fecha
-> (incluye `2026-11-11_documento_extranjero_dni.sql`).
+> Estado al 14-11 (marcado para **desarrollo**): todo lo técnico hecho salvo el respaldo
+> periódico del bucket. La réplica en las demás instancias se hace **después de la revisión
+> y las pruebas** de la plataforma y del código, siguiendo "Instancia nueva". Para replicar,
+> además de las migraciones de docs/firma, correr las de `migraciones/` del backend en
+> orden de fecha (incluye `2026-11-11_documento_extranjero_dni.sql`).
 
 **Técnico**
-- [ ] Fases 0, 1, 2, 2b y 3 desplegadas y `NEXT_PUBLIC_CONSENTIMIENTOS_HABILITADOS=1` activo.
-- [ ] `FIRMA_HMAC_CLAVE` generada y guardada fuera del servidor.
-- [ ] CORS del bucket R2 configurado.
-- [ ] Cron de `verificar_cadena_firma.mjs` con alerta.
-- [ ] Respaldo diario de la base y respaldo periódico del bucket.
+- [x] Fases 0, 1, 2, 2b y 3 desplegadas y `NEXT_PUBLIC_CONSENTIMIENTOS_HABILITADOS=1` activo.
+- [x] `FIRMA_HMAC_CLAVE` generada y guardada fuera del servidor (11-11).
+- [x] CORS del bucket R2 configurado.
+- [x] Cron de `verificar_cadena_firma.mjs` con alerta (14-11).
+- [ ] Respaldo diario de la base ✅ (14-11, servidor + R2) y respaldo periódico del bucket ❌.
 
 **Legal** (con el abogado de la clínica; ver `03` §8)
 - [ ] Contrato de encargo de tratamiento clínica ↔ NativeCode.
-- [ ] Política de privacidad revisada (el texto está en la tabla `documento_plantilla`). Debe sumar el **DNI**: hoy dice "RUT o número de pasaporte". Cambiarlo publica una versión nueva que los pacientes aceptan desde ese momento.
+- [x] Política de privacidad revisada y **aprobada por el abogado** (informado el 14-11). El texto vive en la tabla `documento_plantilla`; al cargarlo se publica como versión nueva y los pacientes la aceptan desde ese momento. Confirmar al cargarla que mencione el **DNI** (antes decía "RUT o número de pasaporte").
 - [ ] Revisión de los 14 anexos de ejemplo por el director técnico (editarlos desde la pantalla publica la versión revisada).
 - [ ] Bucket Lock de 15 años en R2 para `privado/documentos/firmados/` y `privado/consentimientos/` (no se puede acortar después: aplicarlo con calma).
 
