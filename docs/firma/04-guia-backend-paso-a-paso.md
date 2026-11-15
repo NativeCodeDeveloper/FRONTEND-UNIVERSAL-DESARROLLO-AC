@@ -74,6 +74,7 @@ contraseñas del usuario, 11-11). Repetir en cada instancia nueva.
 | 14-11 | **Seguridad** (detalle abajo) | back `affbc66` |
 | 14-11 | Reseñas: el sitio público vuelve a mostrarlas (desde el 23-10 la lista exigía sesión y "desaparecían"); el paciente se muestra como "Nombre I." | back `8f7c07e` |
 | 14-11 | Telemedicina: enviar el enlace al paciente por **WhatsApp** (abre el WhatsApp del profesional con el mensaje listo) o **correo** (al de la ficha) | back `f42433b` · front `66ca7f9` |
+| 15-11 | Telemedicina: **enlace de 15 minutos por envío** (cada WhatsApp, correo o copiar genera uno nuevo y reinicia la espera), **un paciente por enlace** (vuelve con su llave si se le corta), **"Terminar" cierra la sala para los dos** y el enlace dice "La videollamada finalizó". Identidades que elige el backend (ya no el navegador), `tokenSala` con límite por IP, página del paciente con `noindex` y `no-referrer`. **Pendiente en Twilio:** desactivar *Client-side Room Creation* (Video → Settings) | rama `feat/telemedicina-enlace-15min` (back y front), sin commit |
 
 **Seguridad (14-11), lo que conviene revisar con más atención:**
 

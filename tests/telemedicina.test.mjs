@@ -15,6 +15,8 @@ test("mensaje: primer nombre, quién invita y el enlace; sin datos clínicos", (
   assert.match(texto, /^Hola Juana, soy Dra\. Pérez de Clínica Sur\./);
   assert.match(texto, /https:\/\/x\/y/);
   assert.doesNotMatch(texto, /María/);
+  assert.match(texto, /Tienes 15 minutos para entrar/);
+  assert.doesNotMatch(texto, /4 horas/);
   assert.equal(mensajeInvitacion({ enlace: "https://x" }).split("\n")[0], "Hola.");
 });
 

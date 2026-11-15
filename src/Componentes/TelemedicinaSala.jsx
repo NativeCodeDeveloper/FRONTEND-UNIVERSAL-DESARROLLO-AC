@@ -4,11 +4,41 @@ import Video from "twilio-video";
 import { fetchConCarga as fetch } from "@/lib/fetchConCarga";
 import { useEffect, useRef, useState } from "react";
 import { Check, Link2, Mail, MessageCircle, Mic, MicOff, PhoneOff, Video as IconoVideo, VideoOff } from "lucide-react";
-import { enlaceSala, mensajeInvitacion } from "@/lib/telemedicina";
+import { MINUTOS_ENLACE, enlaceSala, mensajeInvitacion } from "@/lib/telemedicina";
 import { urlWhatsapp } from "@/lib/whatsapp";
 
-// Espera máxima por el paciente antes de cerrar la sala automáticamente.
-const MINUTOS_ESPERA = 15;
+/* Reglas del enlace (las aplica el backend; acá solo se muestran):
+ *  - Cada envío (WhatsApp, correo, copiar) genera un enlace nuevo que sirve 15 minutos
+ *    para entrar. Mientras el profesional espera, la cuenta regresiva parte de nuevo.
+ *  - Si el paciente no entra a tiempo, la sala se cierra sola.
+ *  - "Salir" del profesional termina la videollamada para los dos: el enlace pasa a
+ *    decir "La videollamada finalizó". */
+
+// Códigos de desconexión de Twilio Video.
+const SALA_TERMINADA = 53118;
+const IDENTIDAD_DUPLICADA = 53205;
+
+// Pantallas finales del paciente (el backend responde el código en `message`).
+const FINALES_PACIENTE = {
+    salaFinalizada: { titulo: "La videollamada finalizó", detalle: "Gracias por conectarte. Ya puedes cerrar esta ventana." },
+    enlaceVencido: { titulo: "Este enlace venció", detalle: `Los enlaces sirven ${MINUTOS_ENLACE} minutos para entrar. Pídele uno nuevo al profesional.` },
+    enlaceUsado: { titulo: "Este enlace ya se usó", detalle: "Se abrió en otro dispositivo o navegador. Si eres el paciente, pídele un enlace nuevo al profesional." },
+    invitacionInvalida: { titulo: "Enlace no válido", detalle: "Revisa que esté completo o pídele uno nuevo al profesional." },
+};
+
+const MENSAJES_PROFESIONAL = {
+    sinDatoContacto: "La ficha del paciente no tiene un correo válido.",
+    demasiadasSolicitudes: "Hiciste muchos envíos seguidos. Espera unos minutos.",
+    sinPermiso: "No tienes permiso sobre esta videollamada.",
+};
+
+const claveLlave = (nombreSala) => `telemedicina-llave:${nombreSala}`;
+function leerLlave(nombreSala) {
+    try { return window.localStorage.getItem(claveLlave(nombreSala)) || undefined; } catch { return undefined; }
+}
+function guardarLlave(nombreSala, llave) {
+    try { window.localStorage.setItem(claveLlave(nombreSala), llave); } catch { /* sin almacenamiento: no podrá volver si se le corta */ }
+}
 
 function formatearMinutos(segundos) {
     const min = Math.floor(segundos / 60);
@@ -59,6 +89,15 @@ export default function TelemedicinaSala({
         nombreSala: nombreSalaInicial,
         invitacion: invitacionInicial,
     } : null);
+    // Copia para los manejadores de Twilio y la limpieza al salir de la página.
+    const salaDatosRef = useRef(salaDatos);
+    // Hasta cuándo sirve el último enlace enviado (reloj local, medido desde que llegó la
+    // respuesta: el backend manda los segundos que le quedan, no una hora).
+    const venceEnlaceRef = useRef(null);
+    // El paciente ya entró alguna vez a esta sala: deja de correr la espera.
+    const pacienteEntroRef = useRef(false);
+    // "Salir" o cierre por espera en curso: el evento disconnected no es una caída.
+    const cerrandoRef = useRef(false);
     const [conectado, setConectado] = useState(false);
     const [conectando, setConectando] = useState(false);
     const [microfonoActivo, setMicrofonoActivo] = useState(true);
@@ -67,16 +106,24 @@ export default function TelemedicinaSala({
     const [pistasRemotas, setPistasRemotas] = useState([]);
     const [error, setError] = useState("");
     const [enlaceCopiado, setEnlaceCopiado] = useState(false);
-    const [enviandoCorreo, setEnviandoCorreo] = useState(false);
+    const [enviando, setEnviando] = useState("");
     // Confirmación del último envío ("Enviado a j•••a@correo.cl").
     const [avisoEnvio, setAvisoEnvio] = useState("");
-    // Cuenta regresiva visible mientras el profesional espera al paciente.
-    // null = temporizador inactivo.
+    // Paciente: el enlace ya no sirve (finalizó, venció, ya se usó). Reemplaza el botón de entrar.
+    const [estadoFinal, setEstadoFinal] = useState(null);
+    // Cuenta regresiva mientras el profesional espera al paciente. null = inactiva.
+    const [venceEspera, setVenceEspera] = useState(null);
     const [segundosEspera, setSegundosEspera] = useState(null);
     const [avisoEspera, setAvisoEspera] = useState("");
     // Duración de la llamada: corre desde que llega el video de la otra persona.
     const [segundosLlamada, setSegundosLlamada] = useState(0);
     const hayVideoRemoto = pistasRemotas.some((item) => item.pista.kind === "video");
+
+    function definirSala(datos) {
+        salaDatosRef.current = datos;
+        setSalaDatos(datos);
+    }
+
     useEffect(() => {
         if (!hayVideoRemoto) {
             setSegundosLlamada(0);
@@ -86,29 +133,56 @@ export default function TelemedicinaSala({
         return () => window.clearInterval(id);
     }, [hayVideoRemoto]);
 
-    // Tictac: un efecto por segundo; al llegar a cero, el efecto de abajo cierra todo.
+    // Tictac de la espera, calculado contra la hora de vencimiento (no se atrasa si la
+    // pestaña queda en segundo plano y el navegador frena los temporizadores).
     useEffect(() => {
-        if (segundosEspera === null || segundosEspera === 0) return undefined;
-        const id = window.setTimeout(() => setSegundosEspera((s) => s - 1), 1000);
-        return () => window.clearTimeout(id);
-    }, [segundosEspera]);
+        if (venceEspera === null) {
+            setSegundosEspera(null);
+            return undefined;
+        }
+        const restante = () => Math.max(0, Math.ceil((venceEspera - Date.now()) / 1000));
+        setSegundosEspera(restante());
+        const id = window.setInterval(() => setSegundosEspera(restante()), 1000);
+        return () => window.clearInterval(id);
+    }, [venceEspera]);
 
-    // Se acabó la espera: cerrar la sala y dejar todo listo para una llamada nueva
-    // (salaDatos en null hace que el próximo intento genere sala e invitación nuevas).
+    // Se acabó la espera sin paciente: se cierra la sala (también en el backend, así el
+    // enlace queda muerto) y todo queda listo para una videollamada nueva.
     useEffect(() => {
         if (segundosEspera !== 0) return;
-        salaRef.current?.disconnect();
-        salaRef.current = null;
-        setConectado(false);
-        setPistasLocales([]);
-        setPistasRemotas([]);
-        setSalaDatos(null);
-        setAvisoEspera(`El paciente no se conectó en ${MINUTOS_ESPERA} minutos. La sala se cerró; puedes iniciar una nueva videollamada cuando quieras reintentar.`);
+        terminarVideollamada();
+        setAvisoEspera(`El paciente no se conectó en ${MINUTOS_ENLACE} minutos. La videollamada se cerró; puedes iniciar una nueva cuando quieras reintentar.`);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [segundosEspera]);
 
+    // Paciente: al abrir el enlace se revisa si todavía sirve, antes de pedir la cámara.
+    // El acceso que devuelve se descarta: el enlace se "usa" recién al entrar a la sala.
+    useEffect(() => {
+        if (modo !== "paciente" || !nombreSalaInicial || !invitacionInicial || !API) return undefined;
+        let vigente = true;
+        (async () => {
+            try {
+                const res = await fetch(`${API}/telemedicina/tokenSala`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nombreSala: nombreSalaInicial, invitacion: invitacionInicial, llave: leerLlave(nombreSalaInicial) }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (vigente && FINALES_PACIENTE[data.message]) setEstadoFinal(FINALES_PACIENTE[data.message]);
+            } catch {
+                // Sin conexión: se intentará de nuevo al apretar "Unirme".
+            }
+        })();
+        return () => { vigente = false; };
+    }, [modo, nombreSalaInicial, invitacionInicial, API]);
+
+    // El profesional sale de la página con la llamada abierta: se termina para los dos.
     useEffect(() => () => {
+        if (modo === "profesional" && salaRef.current) avisarFinalizacion();
+        cerrandoRef.current = true;
         salaRef.current?.disconnect();
         salaRef.current = null;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function agregarPista(setPistas, pista, participanteSid = "local") {
@@ -124,35 +198,86 @@ export default function TelemedicinaSala({
         setPistas((actuales) => actuales.filter((item) => item.clave !== clave));
     }
 
-    async function conectarASala(datosSala, identidadParticipante) {
-        if (!API) throw new Error("Falta configurar la URL de la API.");
+    function limpiarConexion() {
+        setVenceEspera(null);
+        salaRef.current = null;
+        setConectado(false);
+        setPistasLocales([]);
+        setPistasRemotas([]);
+    }
 
-        const respuestaToken = await fetch(`${API}/telemedicina/tokenSala`, {
+    /** Le pide al backend que termine la sala. No se espera: si falla, Twilio la cierra
+     *  sola cuando queda vacía. */
+    function avisarFinalizacion() {
+        const datos = salaDatosRef.current;
+        if (!API || !datos?.nombreSala) return;
+        fetch(`${API}/telemedicina/finalizarSala`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                identity: identidadParticipante,
-                nombreSala: datosSala.nombreSala,
-                invitacion: datosSala.invitacion,
-            }),
+            body: JSON.stringify({ nombreSala: datos.nombreSala, invitacion: datos.invitacion }),
+            keepalive: true,
+        }).catch(() => {});
+    }
+
+    /** Profesional: termina la videollamada para los dos y olvida la sala. */
+    function terminarVideollamada() {
+        avisarFinalizacion();
+        cerrandoRef.current = true;
+        salaRef.current?.disconnect();
+        limpiarConexion();
+        definirSala(null);
+        venceEnlaceRef.current = null;
+        setAvisoEnvio("");
+    }
+
+    /** Pide el acceso a la sala: el profesional con su sesión; el paciente con el enlace
+     *  (y su llave, si ya había entrado). */
+    async function pedirAcceso(datosSala) {
+        if (modo === "profesional") {
+            const res = await fetch(`${API}/telemedicina/tokenProfesional`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombreSala: datosSala.nombreSala, invitacion: datosSala.invitacion }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && typeof data.data === "string") return { token: data.data };
+            if (data.message === "salaFinalizada") {
+                definirSala(null);
+                throw new Error("Esa videollamada ya terminó. Inicia una nueva.");
+            }
+            throw new Error(MENSAJES_PROFESIONAL[data.message] || "No se pudo obtener el acceso a la sala.");
+        }
+
+        const res = await fetch(`${API}/telemedicina/tokenSala`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombreSala: datosSala.nombreSala, invitacion: datosSala.invitacion, llave: leerLlave(datosSala.nombreSala) }),
         });
-        const resultadoToken = await respuestaToken.json();
-
-        if (!respuestaToken.ok || !resultadoToken.success) {
-            throw new Error(resultadoToken.message || "No se pudo obtener el acceso a la sala.");
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && typeof data.data?.token === "string") return data.data;
+        if (FINALES_PACIENTE[data.message]) {
+            setEstadoFinal(FINALES_PACIENTE[data.message]);
+            return null;
         }
+        throw new Error(data.message === "demasiadasSolicitudes"
+            ? "Demasiados intentos. Espera unos minutos y vuelve a intentar."
+            : "No se pudo entrar a la videollamada. Intenta de nuevo.");
+    }
 
-        const token = resultadoToken.data;
-        if (typeof token !== "string" || !token) {
-            throw new Error("El servidor no devolvió un token de video válido.");
-        }
+    async function conectarASala(datosSala) {
+        if (!API) throw new Error("Falta configurar la URL de la API.");
 
-        const sala = await Video.connect(token, {
+        const acceso = await pedirAcceso(datosSala);
+        if (!acceso) return;
+
+        const sala = await Video.connect(acceso.token, {
             name: datosSala.nombreSala,
             audio: true,
             video: true,
         });
+        if (acceso.llave) guardarLlave(datosSala.nombreSala, acceso.llave);
 
+        cerrandoRef.current = false;
         salaRef.current = sala;
         setMicrofonoActivo(true);
         setCamaraActiva(true);
@@ -174,26 +299,37 @@ export default function TelemedicinaSala({
 
         sala.on("participantConnected", (participante) => {
             // El paciente llegó: se cancela la espera.
-            setSegundosEspera(null);
+            pacienteEntroRef.current = true;
+            setVenceEspera(null);
             registrarParticipante(participante);
         });
         sala.on("participantDisconnected", (participante) => {
             setPistasRemotas((actuales) => actuales.filter((item) => item.participanteSid !== participante.sid));
         });
-        sala.on("disconnected", () => {
-            setSegundosEspera(null);
-            salaRef.current = null;
-            setConectado(false);
-            setPistasLocales([]);
-            setPistasRemotas([]);
+        sala.on("disconnected", (_sala, errorTwilio) => {
+            limpiarConexion();
+            if (cerrandoRef.current) return;
+            if (errorTwilio?.code === SALA_TERMINADA) {
+                if (modo === "paciente") {
+                    setEstadoFinal(FINALES_PACIENTE.salaFinalizada);
+                } else {
+                    definirSala(null);
+                    setAvisoEspera("La videollamada finalizó.");
+                }
+            } else if (errorTwilio?.code === IDENTIDAD_DUPLICADA) {
+                setError("Entraste a esta videollamada desde otra pestaña o equipo; sigue allá.");
+            } else if (errorTwilio) {
+                setError("Se cortó la conexión. Vuelve a entrar con el botón verde.");
+            }
         });
         sala.participants.forEach(registrarParticipante);
+        if (sala.participants.size > 0) pacienteEntroRef.current = true;
         setConectado(true);
 
-        // Solo se espera al paciente si la sala está vacía; si ya está adentro,
-        // no hay temporizador que correr.
-        if (modo === "profesional" && sala.participants.size === 0) {
-            setSegundosEspera(MINUTOS_ESPERA * 60);
+        // Solo se espera al paciente si la sala está vacía y nunca entró: corre hasta que
+        // vence el último enlace.
+        if (modo === "profesional" && !pacienteEntroRef.current && venceEnlaceRef.current) {
+            setVenceEspera(venceEnlaceRef.current);
         }
     }
 
@@ -205,7 +341,6 @@ export default function TelemedicinaSala({
 
         try {
             let datosSala = salaDatos;
-            let identidadParticipante = identidad;
 
             if (modo === "profesional" && !datosSala) {
                 const respuestaSala = await fetch(`${API}/telemedicina/nuevaSala`, {
@@ -215,23 +350,19 @@ export default function TelemedicinaSala({
                     // encabezado que ve el paciente.
                     body: JSON.stringify({ nombreProfesional }),
                 });
-                const resultadoSala = await respuestaSala.json();
+                const resultadoSala = await respuestaSala.json().catch(() => ({}));
                 if (!respuestaSala.ok || !resultadoSala.success) {
-                    throw new Error(resultadoSala.message || "No se pudo crear la sala.");
+                    throw new Error(MENSAJES_PROFESIONAL[resultadoSala.message] || "No se pudo crear la sala.");
                 }
-                datosSala = resultadoSala.data;
-                setSalaDatos(datosSala);
+                pacienteEntroRef.current = false;
+                datosSala = aplicarInvitacion(resultadoSala.data);
             }
 
-            if (modo === "paciente") {
-                identidadParticipante = `paciente-${window.crypto.randomUUID()}`;
-            }
-
-            if (!datosSala?.nombreSala || !datosSala?.invitacion || !identidadParticipante) {
+            if (!datosSala?.nombreSala || !datosSala?.invitacion) {
                 throw new Error("Faltan datos para unirse a la sala.");
             }
 
-            await conectarASala(datosSala, identidadParticipante);
+            await conectarASala(datosSala);
         } catch (errorConexion) {
             console.error("Error iniciando telemedicina:", errorConexion);
             setError(errorConexion.message || "No se pudo iniciar la videollamada.");
@@ -241,14 +372,16 @@ export default function TelemedicinaSala({
     }
 
     function desconectar() {
-        const sala = salaRef.current;
-        if (!sala) return;
-        setSegundosEspera(null);
-        sala.disconnect();
-        salaRef.current = null;
-        setConectado(false);
-        setPistasLocales([]);
-        setPistasRemotas([]);
+        if (!salaRef.current) return;
+        if (modo === "profesional") {
+            terminarVideollamada();
+            setAvisoEspera("Terminaste la videollamada. El enlace del paciente ya no sirve.");
+            return;
+        }
+        // El paciente puede volver a entrar con el mismo enlace mientras la llamada siga.
+        cerrandoRef.current = true;
+        salaRef.current.disconnect();
+        limpiarConexion();
     }
 
     function alternarPista(tipo, activa, actualizarEstado) {
@@ -262,55 +395,128 @@ export default function TelemedicinaSala({
         actualizarEstado(siguienteEstado);
     }
 
-    const enlacePaciente = () => enlaceSala(window.location.origin, salaDatos.nombreSala, salaDatos.invitacion);
+    /** Guarda la invitación que mandó el backend y, si se está esperando al paciente,
+     *  reinicia la cuenta regresiva con los 15 minutos del enlace nuevo. */
+    function aplicarInvitacion(datos) {
+        const nueva = { nombreSala: datos.nombreSala, invitacion: datos.invitacion };
+        definirSala(nueva);
+        const vence = Date.now() + Number(datos.segundosRestantes || 0) * 1000;
+        venceEnlaceRef.current = vence;
+        if (!pacienteEntroRef.current) setVenceEspera((actual) => (actual === null ? null : vence));
+        return nueva;
+    }
+
+    /** Enlace nuevo (15 minutos desde ahora) para enviar por WhatsApp o copiar. */
+    async function renovarEnlace() {
+        const datos = salaDatosRef.current;
+        const res = await fetch(`${API}/telemedicina/renovarInvitacion`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombreSala: datos.nombreSala, invitacion: datos.invitacion }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+            const nueva = aplicarInvitacion(data);
+            return enlaceSala(window.location.origin, nueva.nombreSala, nueva.invitacion);
+        }
+        if (data.message === "salaFinalizada") {
+            terminarVideollamada();
+            throw new Error("Esta videollamada ya terminó. Inicia una nueva para enviar el enlace.");
+        }
+        throw new Error(MENSAJES_PROFESIONAL[data.message] || "No se pudo generar el enlace. Intenta de nuevo.");
+    }
 
     // WhatsApp: abre el WhatsApp del propio profesional (celular o web) con el mensaje y el
     // enlace ya escritos, dirigido al celular de la ficha. El profesional solo aprieta enviar.
-    function enviarPorWhatsapp() {
-        if (!salaDatos?.nombreSala || !salaDatos?.invitacion) return;
-        const url = urlWhatsapp(paciente?.telefono, mensajeInvitacion({
-            nombrePaciente: paciente?.nombre, nombreProfesional, nombreClinica, enlace: enlacePaciente(),
-        }));
-        if (!url) return setError("La ficha del paciente no tiene celular registrado.");
+    // La ventana se abre antes de pedir el enlace: si se abre después de esperar al backend,
+    // Safari y otros navegadores la bloquean por no venir directo del clic.
+    async function enviarPorWhatsapp() {
+        if (!salaDatosRef.current || enviando) return;
+        if (!urlWhatsapp(paciente?.telefono, "x")) return setError("La ficha del paciente no tiene celular registrado.");
         setError("");
-        window.open(url, "_blank", "noopener,noreferrer");
-        setAvisoEnvio("Se abrió WhatsApp con el mensaje listo: solo falta enviarlo.");
+        setAvisoEnvio("");
+        setEnviando("whatsapp");
+        const ventana = window.open("", "_blank");
+        try {
+            const enlace = await renovarEnlace();
+            const url = urlWhatsapp(paciente.telefono, mensajeInvitacion({
+                nombrePaciente: paciente?.nombre, nombreProfesional, nombreClinica, enlace,
+            }));
+            if (ventana) {
+                ventana.opener = null;
+                ventana.location.href = url;
+            } else {
+                window.open(url, "_blank", "noopener,noreferrer");
+            }
+            setAvisoEnvio(`Se abrió WhatsApp con un enlace nuevo: solo falta enviarlo. Sirve ${MINUTOS_ENLACE} minutos para entrar.`);
+        } catch (errorEnvio) {
+            ventana?.close();
+            setError(errorEnvio.message);
+        } finally {
+            setEnviando("");
+        }
     }
 
-    // Correo: lo envía el backend al correo registrado en la ficha (nunca a uno escrito aquí).
+    // Correo: lo envía el backend al correo registrado en la ficha (nunca a uno escrito aquí),
+    // con un enlace nuevo que devuelve para reiniciar la cuenta regresiva.
     async function enviarPorCorreo() {
-        if (!salaDatos?.nombreSala || !salaDatos?.invitacion || !paciente?.id_paciente || enviandoCorreo) return;
-        setEnviandoCorreo(true);
+        const datos = salaDatosRef.current;
+        if (!datos || !paciente?.id_paciente || enviando) return;
+        setEnviando("correo");
         setError("");
         setAvisoEnvio("");
         try {
             const res = await fetch(`${API}/telemedicina/enviarInvitacionCorreo`, {
                 method: "POST",
                 headers: { Accept: "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ id_paciente: paciente.id_paciente, nombreSala: salaDatos.nombreSala, invitacion: salaDatos.invitacion }),
+                body: JSON.stringify({ id_paciente: paciente.id_paciente, nombreSala: datos.nombreSala, invitacion: datos.invitacion }),
             });
             const data = await res.json().catch(() => ({}));
-            if (res.ok) return setAvisoEnvio(`Enlace enviado a ${data.destino}.`);
-            setError({
-                sinDatoContacto: "La ficha del paciente no tiene un correo válido.",
-                invitacionInvalida: "El enlace de esta sala ya venció. Inicia una videollamada nueva.",
-                demasiadasSolicitudes: "Enviaste muchos correos seguidos. Espera unos minutos.",
-            }[data.message] || "No se pudo enviar el correo. Intenta de nuevo.");
+            if (res.ok) {
+                aplicarInvitacion(data);
+                return setAvisoEnvio(`Enlace nuevo enviado a ${data.destino}. Sirve ${MINUTOS_ENLACE} minutos para entrar.`);
+            }
+            if (data.message === "salaFinalizada") {
+                terminarVideollamada();
+                return setError("Esta videollamada ya terminó. Inicia una nueva para enviar el enlace.");
+            }
+            setError(MENSAJES_PROFESIONAL[data.message] || "No se pudo enviar el correo. Intenta de nuevo.");
         } catch {
             setError("No se pudo enviar el correo. Revisa tu conexión.");
         } finally {
-            setEnviandoCorreo(false);
+            setEnviando("");
         }
     }
 
+    // Copiar: el enlace nuevo llega del backend después del clic. Con ClipboardItem se le
+    // entrega al portapapeles una promesa, que los navegadores aceptan como parte del clic;
+    // donde no existe, se copia al llegar.
     async function copiarEnlace() {
-        if (!salaDatos?.nombreSala || !salaDatos?.invitacion) return;
+        if (!salaDatosRef.current || enviando) return;
+        setError("");
+        setAvisoEnvio("");
+        setEnviando("copiar");
+        let errorEnlace = null;
+        const enlace = renovarEnlace().catch((e) => { errorEnlace = e; throw e; });
         try {
-            await navigator.clipboard.writeText(enlacePaciente());
+            if (typeof window.ClipboardItem === "function" && navigator.clipboard?.write) {
+                await navigator.clipboard.write([new window.ClipboardItem({
+                    "text/plain": enlace.then((texto) => new Blob([texto], { type: "text/plain" })),
+                })]).catch(async (errorPortapapeles) => {
+                    if (errorEnlace) throw errorEnlace;
+                    // Navegador sin soporte de promesas en ClipboardItem: se copia como texto.
+                    await navigator.clipboard.writeText(await enlace).catch(() => { throw errorPortapapeles; });
+                });
+            } else {
+                await navigator.clipboard.writeText(await enlace);
+            }
             setEnlaceCopiado(true);
+            setAvisoEnvio(`Enlace nuevo copiado. Sirve ${MINUTOS_ENLACE} minutos para entrar.`);
             window.setTimeout(() => setEnlaceCopiado(false), 2500);
         } catch {
-            setError("No se pudo copiar el enlace. Revisa los permisos del navegador.");
+            setError(errorEnlace?.message || "No se pudo copiar el enlace. Revisa los permisos del navegador.");
+        } finally {
+            setEnviando("");
         }
     }
 
@@ -318,6 +524,8 @@ export default function TelemedicinaSala({
     const pistaRemotaVideo = pistasRemotas.find((item) => item.pista.kind === "video");
     const identidadValida = modo === "paciente" || Boolean(identidad);
     const otraPersona = modo === "profesional" ? "al paciente" : "al profesional";
+    // El profesional se cayó de una sala que sigue abierta: vuelve a la misma.
+    const puedeVolver = modo === "profesional" && Boolean(salaDatos);
 
     return (
         <section className="w-full">
@@ -332,20 +540,26 @@ export default function TelemedicinaSala({
                             {conectado ? (
                                 <span className="absolute inset-0 animate-ping rounded-full bg-white/10 motion-reduce:hidden" aria-hidden="true" />
                             ) : null}
-                            <IconoVideo className="relative h-8 w-8 text-white/90" strokeWidth={1.5} aria-hidden="true" />
+                            {estadoFinal ? (
+                                <PhoneOff className="relative h-8 w-8 text-white/90" strokeWidth={1.5} aria-hidden="true" />
+                            ) : (
+                                <IconoVideo className="relative h-8 w-8 text-white/90" strokeWidth={1.5} aria-hidden="true" />
+                            )}
                         </span>
                         <p className="relative mt-5 text-[20px] font-semibold tracking-tight">
-                            {conectado ? `Esperando ${otraPersona}` : "Listo para la videollamada"}
+                            {estadoFinal ? estadoFinal.titulo : conectado ? `Esperando ${otraPersona}` : "Listo para la videollamada"}
                         </p>
                         <p className="relative mt-1.5 max-w-sm text-[14px] leading-relaxed text-white/60">
-                            {conectado
-                                ? segundosEspera !== null
-                                    ? `Si no se conecta en ${formatearMinutos(segundosEspera)}, la sala se cerrará sola.`
-                                    : "Su video aparecerá aquí apenas se una."
-                                : "El navegador te pedirá permiso para usar la cámara y el micrófono."}
+                            {estadoFinal
+                                ? estadoFinal.detalle
+                                : conectado
+                                    ? segundosEspera !== null
+                                        ? `Si no se conecta en ${formatearMinutos(segundosEspera)}, la videollamada se cerrará sola.`
+                                        : "Su video aparecerá aquí apenas se una."
+                                    : "El navegador te pedirá permiso para usar la cámara y el micrófono."}
                         </p>
 
-                        {!conectado ? (
+                        {!conectado && !estadoFinal ? (
                             <button
                                 type="button"
                                 onClick={iniciarLlamada}
@@ -353,7 +567,11 @@ export default function TelemedicinaSala({
                                 className="relative mt-7 inline-flex h-12 items-center gap-2.5 rounded-full bg-[#34C759] px-7 text-[16px] font-semibold text-white shadow-[0_10px_30px_-12px_rgba(52,199,89,0.8)] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                             >
                                 <IconoVideo className="h-5 w-5" aria-hidden="true" />
-                                {conectando ? "Conectando…" : modo === "paciente" ? "Unirme a la videollamada" : "Iniciar videollamada"}
+                                {conectando
+                                    ? "Conectando…"
+                                    : modo === "paciente"
+                                        ? "Unirme a la videollamada"
+                                        : puedeVolver ? "Volver a la videollamada" : "Iniciar videollamada"}
                             </button>
                         ) : null}
                     </div>
@@ -369,7 +587,7 @@ export default function TelemedicinaSala({
                         ? `En llamada · ${formatearMinutos(segundosLlamada)}`
                         : segundosEspera !== null
                             ? `Esperando · ${formatearMinutos(segundosEspera)}`
-                            : conectado ? "Conectado" : "Sala lista"}
+                            : conectado ? "Conectado" : estadoFinal ? "Sin videollamada" : "Sala lista"}
                 </div>
 
                 {/* Tu imagen, arriba a la derecha para no chocar con los controles */}
@@ -418,14 +636,19 @@ export default function TelemedicinaSala({
                             {modo === "profesional" && salaDatos ? (
                                 <BotonCircular
                                     etiqueta={enlaceCopiado ? "Copiado" : "Enlace"}
-                                    descripcion="Copiar enlace para el paciente"
+                                    descripcion="Copiar un enlace nuevo para el paciente"
                                     activo={enlaceCopiado}
                                     onClick={copiarEnlace}
                                 >
                                     {enlaceCopiado ? <Check className="h-6 w-6" /> : <Link2 className="h-6 w-6" />}
                                 </BotonCircular>
                             ) : null}
-                            <BotonCircular etiqueta="Salir" descripcion="Salir de la llamada" peligro onClick={desconectar}>
+                            <BotonCircular
+                                etiqueta={modo === "profesional" ? "Terminar" : "Salir"}
+                                descripcion={modo === "profesional" ? "Terminar la videollamada para los dos" : "Salir de la llamada"}
+                                peligro
+                                onClick={desconectar}
+                            >
                                 <PhoneOff className="h-6 w-6" />
                             </BotonCircular>
                         </div>
@@ -439,21 +662,21 @@ export default function TelemedicinaSala({
                     <div className="grid grid-cols-3 gap-2">
                         <BotonEnvio
                             onClick={enviarPorWhatsapp}
-                            deshabilitado={!paciente?.telefono}
+                            deshabilitado={!paciente?.telefono || Boolean(enviando)}
                             ayuda={paciente?.telefono ? "Abrir WhatsApp con el mensaje listo" : "La ficha no tiene celular"}
                         >
                             <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
-                            WhatsApp
+                            {enviando === "whatsapp" ? "Abriendo…" : "WhatsApp"}
                         </BotonEnvio>
                         <BotonEnvio
                             onClick={enviarPorCorreo}
-                            deshabilitado={!paciente?.correo || enviandoCorreo}
+                            deshabilitado={!paciente?.correo || Boolean(enviando)}
                             ayuda={paciente?.correo ? "Enviar al correo de la ficha" : "La ficha no tiene correo"}
                         >
                             <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
-                            {enviandoCorreo ? "Enviando…" : "Correo"}
+                            {enviando === "correo" ? "Enviando…" : "Correo"}
                         </BotonEnvio>
-                        <BotonEnvio onClick={copiarEnlace} ayuda="Copiar el enlace">
+                        <BotonEnvio onClick={copiarEnlace} deshabilitado={Boolean(enviando)} ayuda="Copiar un enlace nuevo">
                             {enlaceCopiado ? <Check className="h-[18px] w-[18px]" aria-hidden="true" /> : <Link2 className="h-[18px] w-[18px]" aria-hidden="true" />}
                             {enlaceCopiado ? "Copiado" : "Copiar"}
                         </BotonEnvio>
@@ -461,8 +684,8 @@ export default function TelemedicinaSala({
                     {avisoEnvio ? (
                         <p role="status" className="mt-2.5 text-center text-[13px] text-[#248A3D]">{avisoEnvio}</p>
                     ) : null}
-                    <p className="mt-2 text-center text-[12px] text-[#86868B]">
-                        Va al celular o correo de la ficha. Comparte el enlace solo con el paciente: permite entrar durante 4 horas.
+                    <p className="mt-2 text-center text-[12px] leading-relaxed text-[#86868B]">
+                        Va al celular o correo de la ficha. Cada envío es un enlace nuevo: sirve {MINUTOS_ENLACE} minutos para entrar, a una sola persona, y deja de funcionar al terminar la videollamada.
                     </p>
                 </div>
             ) : null}

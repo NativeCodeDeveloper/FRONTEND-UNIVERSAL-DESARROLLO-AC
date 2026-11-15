@@ -1,5 +1,12 @@
 import TelemedicinaSala from "@/Componentes/TelemedicinaSala";
 
+// El enlace lleva la invitación: que no quede en buscadores (las cabeceras de
+// next.config.mjs agregan X-Robots-Tag y Referrer-Policy: no-referrer).
+export const metadata = {
+    title: "Videoconsulta",
+    robots: { index: false, follow: false },
+};
+
 // El nombre del profesional viaja dentro del payload firmado de la invitación.
 // Acá solo se decodifica para el encabezado (la firma se verifica en el
 // backend al pedir el token, no al mostrar el enlace).
@@ -7,9 +14,8 @@ function leerNombreProfesional(invitacion) {
     try {
         const [payload] = invitacion.split(".");
         const datos = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-        return typeof datos.nombreProfesional === "string" && datos.nombreProfesional.trim()
-            ? datos.nombreProfesional.trim().slice(0, 80)
-            : "";
+        const nombre = datos.prof ?? datos.nombreProfesional;
+        return typeof nombre === "string" && nombre.trim() ? nombre.trim().slice(0, 80) : "";
     } catch {
         return "";
     }

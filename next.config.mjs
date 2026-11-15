@@ -24,6 +24,10 @@ const nextConfig = {
         source: "/telemedicina/:path*",
         headers: [
           { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=()" },
+          // El enlace del paciente lleva la invitación en la URL: que no viaje a otros
+          // sitios ni quede indexado.
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
       {
